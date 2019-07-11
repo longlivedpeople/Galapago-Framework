@@ -83,6 +83,7 @@ import math, sys, optparse, array, copy
 import gc, inspect
 
 import include.Sample as Sample
+import include.helper as helper
 
 
 
@@ -116,7 +117,11 @@ if __name__ == "__main__":
     gROOT.SetBatch(1)
     r.setTDRStyle()
 
-    tree = Sample.Tree(opts.sampleFile, 'MC', 0)
+
+    Datasets = ['ScalarBosons_1000_350_350', 'DisplacedSUSY_1500_494_160']
+    tree = Sample.Tree(helper.selectSamples(opts.sampleFile, Datasets, 'MC'), 'MC', 0)
+
+
  
     hnEE = tree.getStack(150, 'hnEE', 'nEE', 5, 0, 5, '', '', "N EE")
 
