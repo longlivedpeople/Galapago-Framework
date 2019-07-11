@@ -100,32 +100,6 @@ class bcolors:
 
 
 
-class processHandler:
-
-    def __init__(self, name):
-        self.name = name
-        self.registeredHisto = []  
-       
-    def registerHistogram(histoType, name, nbins, xmin, xmax):
-        self.registeredHisto.append([name, nbins, xmin, xmax])
-
-    def processEvent(self, ev):
-
-        self.h1.Fill(ev.nEE)
-        self.h2.Fill(ev.nMM)
-
-
-    def saveHistos(self):
-
-        output = TFile('output.root', 'RECREATE')
-        self.h1.Write()
-        self.h2.Write()
-        output.Close()
-
-
-class Produce
-
-
 
 if __name__ == "__main__":
 
@@ -153,8 +127,10 @@ if __name__ == "__main__":
     can.SaveAs("plot.png")
 
     
+    tree.Loop('lamadrequelopario.root')
 
-
+ 
+    
 
 
 

@@ -80,6 +80,7 @@
 import ROOT as r
 from array import array
 from ROOT import TTree, TFile, TCut, TH1F, TH2F, TH3F, THStack, TCanvas
+from include.processHandler import processHandler
 
 
 ########################################################################################
@@ -453,4 +454,19 @@ class Tree:
        del haux
 
      return h   
+
+
+   def Loop(self, nameOfRootFile):
+        
+     for b in self.blocks:
+       for s in b.samples:
+         process = processHandler(nameOfRootFile, self.name, b.name, s.name) 
+         for ev in s.ttree:
+           process.processEvent(ev)                 
+         process.Write()
+
+
+
+
+
 
