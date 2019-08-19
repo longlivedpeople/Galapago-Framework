@@ -55,10 +55,10 @@ class Canvas:
       latexb.SetTextAlign(31);
       latexb.SetTextSize(0.04);            
 
-      #if(isData):
-      latexb.DrawLatex(0.44, 0.93, "#it{Preliminary}")
-      #else:
-      #  latexb.DrawLatex(0.44, 0.93, "#it{Simulation}")
+      if(isData):
+         latexb.DrawLatex(0.44, 0.93, "#it{Preliminary}")
+      else:
+         latexb.DrawLatex(0.44, 0.93, "#it{Simulation}")
 
       text_lumi = str(lumi)+" fb^{-1}"
       latexc = TLatex()

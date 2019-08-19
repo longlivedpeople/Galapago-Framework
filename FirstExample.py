@@ -98,10 +98,12 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
     
-def makePlot(lumi, treeSI, treeMC, var, name, xlabel, logx):
+def makePlot(lumi, treeSI, treeMC, var, name, xlabel, logx, LLlabel = False, normed = False):
 
     hMCS = treeMC.getLoopStack('histMC_'+name, var, xlabel)
-    hSI = treeSI.getLoopTH1F('histSI_'+name, var, xlabel)
+    hSIS = treeSI.getLoopStack('histSI_'+name, var, xlabel)
+
+    luminosity = lumi
 
     ### MC total histogram
     f = 0
@@ -110,28 +112,60 @@ def makePlot(lumi, treeSI, treeMC, var, name, xlabel, logx):
         else: hMC.Add(_h, 1.)
         f = 1
 
+    #hMC.GetXaxis().SetTitle(hMCS.GetXaxis().GetTitle())
+
+    ### Signal histograms
+    s_histos = []
+    for _i, _h in enumerate(hSIS.GetHists()):
+        s_histos.append(copy.deepcopy(_h))
+
+    # Normalization
+    if normed:
+        hMC.Scale(1.0/hMC.Integral())
+        for _h in s_histos: _h.Scale(1.0/_h.Integral())
+        luminosity = 1.0
+
     ### Get maximum
     maxValMC = hMC.GetMaximum()
-    maxValSI = hSI.GetMaximum()
+    maxValSI = max([s_histos[i].GetMaximum() for i in range(0, len(s_histos))])
     maxVal = max(maxValMC, maxValSI)
 
     ### Set Maximum
     if not logx:
         hMCS.SetMaximum(1.3*maxVal)
-        hSI.SetMaximum(1.3*maxVal)
         hMCS.SetMinimum(0.0)
-        hSI.SetMinimum(0.0)
+        hMC.SetMaximum(1.3*maxVal)
+        hMC.SetMinimum(0.0)
+        for _h in s_histos: 
+            _h.SetMaximum(1.3*maxVal)
+            _h.SetMinimum(0.0)
     else:
         hMCS.SetMaximum(10.0*maxVal)
-        hSI.SetMaximum(10.0*maxVal)
         hMCS.SetMinimum(0.1)
-        hSI.SetMinimum(0.1)
+        hMC.SetMaximum(10.0*maxVal)
+        hMC.SetMinimum(0.1)
+        for _h in s_histos: 
+            _h.SetMaximum(10.0*maxVal)
+            _h.SetMinimum(0.1)
+
 
     ### Canvas object
-    plot = Canvas.Canvas('hist_'+name, 'png,pdf,root', 0.5, 0.83, 0.9, 0.9)
-    plot.addStack(hMCS, 'HIST', 1, 0)
-    plot.addHisto(hSI, 'HIST, SAME', '', 'l', r.kCyan, 1, 1)
-    plot.save(1, 0, logx, lumi, '')
+    plot = Canvas.Canvas('hist_'+name, 'png', 0.62, 0.8, 0.9, 0.9)
+
+    if normed: plot.addHisto(hMC, 'HIST', '', 'l', r.kBlue, 1, 0) # Background
+    else: plot.addStack(hMCS, 'HIST', 1, 0) # Background
+
+    for _h in s_histos:
+        plot.addHisto(_h, 'HIST, SAME', '', 'l', _h.GetFillColor(), 1, 1) # Signal
+
+    ### Dilepton banner
+    if LLlabel == 'EE':
+        plot.addLatex(0.17, 0.86, 'e^{+}e^{-} channel')
+    if LLlabel == 'MM':
+        plot.addLatex(0.17, 0.86, '#mu^{+}#mu^{-} channel')
+
+    ### Save it
+    plot.save(1, 0, logx, luminosity, '')
 
 
 
@@ -165,11 +199,12 @@ if __name__ == "__main__":
 
 
     ############# Signal definition
-    Signal = ['ScalarBosons_1000_350_350']
+    Signal = ['ScalarBosons_1000_350_350',
+              'ScalarBosons_200_50_200']
 
 
     ############# Parameter definition
-    lumi = 150 # luminosity
+    lumi = 21.79 # luminosity
 
 
     ############# Tree creation
@@ -178,41 +213,45 @@ if __name__ == "__main__":
 
 
     ############# Tree loop
-    treeMC.Loop(lumi, opts.outputFile, 5000)
-    treeSI.Loop(lumi, opts.outputFile, 5000)
+    treeMC.Loop(lumi, opts.outputFile, 50000)
+    treeSI.Loop(lumi, opts.outputFile, 50000)
 
-    makePlot(lumi, treeSI, treeMC, 'nEE', 'nEE', 'Number of EE', 1)
-    makePlot(lumi, treeSI, treeMC, 'EEsel_minIxy', 'EEsel_minIxy', '|d_{0}|/#sigma_{d}', 1)
-    makePlot(lumi, treeSI, treeMC, 'EEsel_invMass', 'EEsel_invMass', 'Mass (GeV/c^{2})', 1)
-    makePlot(lumi, treeSI, treeMC, 'EEsel_Chi2', 'EEsel_Chi2', 'Vertex #Chi^{2}', 1)
-    makePlot(lumi, treeSI, treeMC, 'EEsel_dPhi', 'EEsel_dPhi', 'Collinearity |#DeltaR|', 1)
-    makePlot(lumi, treeSI, treeMC, 'EEsel_leadingPt', 'EEsel_leadingPt', 'Leading p_{T} (GeV/c)', 1)
-    makePlot(lumi, treeSI, treeMC, 'EEsel_subleadingPt', 'EEsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1)
 
-    ############# Get histograms
-    """
-    hnEE = treeMC.getLoopStack('stacked', 'nEE', 'nEE')
-    hnEE2 = treeSI.getLoopTH1F('TH1F', 'nEE', 'nEE')
-   
+    makePlot(lumi, treeSI, treeMC, 'E1_pt', 'E1_pt', 'Leading electron p_{T}', 0, False, True)
+    makePlot(lumi, treeSI, treeMC, 'E2_pt', 'E2_pt', 'Subleading electron p_{T}', 0, False, True)
+    makePlot(lumi, treeSI, treeMC, 'E1_et', 'E1_et', 'Leading electron E_{T}', 0, False, True)
+    makePlot(lumi, treeSI, treeMC, 'E2_et', 'E2_et', 'Subleading electron E_{T}', 0, False, True)
+    makePlot(lumi, treeSI, treeMC, 'E1_eta', 'E1_eta', 'Leading electron #eta', 0, False, True)
+    makePlot(lumi, treeSI, treeMC, 'E2_eta', 'E2_eta', 'Subleading electron #eta', 0, False, True)
+    makePlot(lumi, treeSI, treeMC, 'E1_reliso', 'E1_reliso', 'Leading electron relIso', 0, False, True)
+    makePlot(lumi, treeSI, treeMC, 'E2_reliso', 'E2_reliso', 'Subleading electron relIso', 0, False, True)
+
+    makePlot(lumi, treeSI, treeMC, 'M1_pt', 'M1_pt', 'Leading muon p_{T}', 0, False, True)
+    makePlot(lumi, treeSI, treeMC, 'M2_pt', 'M2_pt', 'Subleading muon p_{T}', 0, False, True)
+    makePlot(lumi, treeSI, treeMC, 'M1_triggerPt', 'M1_triggerPt', 'Leading HLT muon p_{T}', 0, False, True)
+    makePlot(lumi, treeSI, treeMC, 'M2_triggerPt', 'M2_triggerPt', 'Subleading HLT muon p_{T}', 0, False, True)
+    makePlot(lumi, treeSI, treeMC, 'M1_eta', 'M1_eta', 'Leading muon #eta', 0, False, True)
+    makePlot(lumi, treeSI, treeMC, 'M2_eta', 'M2_eta', 'Subleading muon #eta', 0, False, True)
+    makePlot(lumi, treeSI, treeMC, 'M1_reliso', 'M1_reliso', 'Leading muon relIso', 0, False, True)
+    makePlot(lumi, treeSI, treeMC, 'M2_reliso', 'M2_reliso', 'Subleading muon relIso', 0, False, True)
 
     
-    plot = Canvas.Canvas('prueba', 'png,pdf,root', 0.7, 0.55, 0.9, 0.9)
-    plot.addStack(hnEE, 'HIST', 1, 0)
-    plot.addHisto(hnEE2, 'HIST, SAME', 'hola', '', r.kBlue, 1, 1)
-    plot.save(1, 0, 1, lumi, '')
-    """
+    makePlot(lumi, treeSI, treeMC, 'nEE', 'nEE', 'Number of EE', 1, 'EE')
+    makePlot(lumi, treeSI, treeMC, 'EEsel_minIxy', 'EEsel_minIxy', '|d_{0}|/#sigma_{d}', 1, 'EE')
+    makePlot(lumi, treeSI, treeMC, 'EEsel_invMass', 'EEsel_invMass', 'Mass (GeV/c^{2})', 1, 'EE')
+    makePlot(lumi, treeSI, treeMC, 'EEsel_Chi2', 'EEsel_Chi2', 'Vertex #Chi^{2}', 1, 'EE')
+    makePlot(lumi, treeSI, treeMC, 'EEsel_dPhi', 'EEsel_dPhi', 'Collinearity |#Delta#Phi|', 1, 'EE')
+    makePlot(lumi, treeSI, treeMC, 'EEsel_leadingPt', 'EEsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, 'EE')
+    makePlot(lumi, treeSI, treeMC, 'EEsel_subleadingPt', 'EEsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, 'EE')
 
-
-
-
-
-
-
-
-
-
-
-
-
+    makePlot(lumi, treeSI, treeMC, 'nMM', 'nMM', 'Number of MM', 1, 'MM')
+    makePlot(lumi, treeSI, treeMC, 'MMsel_minIxy', 'MMsel_minIxy', '|d_{0}|/#sigma_{d}', 1, 'MM')
+    makePlot(lumi, treeSI, treeMC, 'MMsel_invMass', 'MMsel_invMass', 'Mass (GeV/c^{2})', 1, 'MM')
+    makePlot(lumi, treeSI, treeMC, 'MMsel_Chi2', 'MMsel_Chi2', 'Vertex #Chi^{2}', 1, 'MM')
+    makePlot(lumi, treeSI, treeMC, 'MMsel_dPhi', 'MMsel_dPhi', 'Collinearity |#Delta#Phi|', 1, 'MM')
+    makePlot(lumi, treeSI, treeMC, 'MMsel_leadingPt', 'MMsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, 'MM')
+    makePlot(lumi, treeSI, treeMC, 'MMsel_subleadingPt', 'MMsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, 'MM')
+    makePlot(lumi, treeSI, treeMC, 'MMsel_cosAlpha', 'MMsel_cosAlpha', 'cos(#alpha)', 1, 'MM')
+    
 
 

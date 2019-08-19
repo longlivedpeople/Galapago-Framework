@@ -90,10 +90,11 @@ import copy
 ########################################################################################
 class Sample:
    'Common base class for all Samples'
-   def __init__(self, name, label, friendlocation, xsection, isdata):
+   def __init__(self, name, label, color, friendlocation, xsection, isdata):
 
       self.name = name
       self.label = label
+      self.color = eval(color)
       self.location = friendlocation
       self.xSection = xsection
       self.isData = isdata
@@ -326,7 +327,7 @@ class Tree:
           color = eval(theColor[0:plusposition])
           color = color + int(theColor[plusposition+1:len(theColor)])
 
-        sample = Sample(name, label, flocation, xsection, isdata)
+        sample = Sample(name, label, theColor, flocation, xsection, isdata)
         coincidentBlock = [l for l in self.blocks if l.name == block]
         if(coincidentBlock == []):
           newBlock = Block(block, label, color, isdata)
@@ -373,7 +374,7 @@ class Tree:
      
        AuxName = "auxStack_block_" + name + "_" + b.name
        haux = b.getTH1F(lumi, AuxName, var, nbin, xmin, xmax, cut, options, xlabel)
-       haux.SetFillColor(b.color)
+       haux.SetFillColor(c.color)
        hs.Add(haux)
        del haux
 
@@ -483,19 +484,18 @@ class Tree:
   
          haux2 = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
          haux = copy.deepcopy(haux2)
-         haux.SetTitle(s.name)
+         haux.SetTitle(s.label)
          SetOwnership(haux, 0) 
          print('h'+var+'_'+self.name+'_'+b.name+'_'+s.name) 
          xmin = haux.GetXaxis().GetXmin()
          xmax = haux.GetXaxis().GetXmax()
          nbin = haux.GetXaxis().GetNbins()
-         haux.SetFillColor(b.color)
+         haux.SetFillColor(s.color)
          hs.Add(haux)
 
      can_aux = TCanvas("can_%s_%s"%(name, b.name))
      can_aux.cd()
      hs.Draw()
-     can_aux.Print('prueb.png')
 
      ylabel = "Events"
      if xmax != xmin:
@@ -518,18 +518,15 @@ class Tree:
        for si,s in enumerate(b.samples):
          AuxName = "auxh1_block_" + name + "_" + b.name + s.name
          haux = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
-       if not bi and not si:
-          h = haux.Clone(name+'_treeHisto')
-          h.SetTitle(s.label)
-       else:
-          h.Add(haux)
-       del haux
+         if not bi and not si:
+           h = haux.Clone(name+'_treeHisto')
+           h.SetTitle(s.label)
+         else:
+           h.Add(haux)
+         del haux
 
-       c1 = r.TCanvas("c1", "")
-       h.Draw()
-       c1.SaveAs('holi.png')
-
-       h2 = copy.deepcopy(h)
-       return h2
+     h2 = copy.deepcopy(h)
+     h2.GetXaxis().SetTitle(xlabel)
+     return h2
 
 
