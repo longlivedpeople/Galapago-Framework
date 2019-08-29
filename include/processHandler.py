@@ -83,7 +83,13 @@ class processHandler:
 
 
 
-    def processEvent(self, ev, weight):
+    def processEvent(self, ev, lumiweight, isData):
+
+        if not isData:
+            #weight = lumiweight
+            weight = lumiweight*ev.wPU
+        else: 
+            weight = 1
 
         #### Generation variables
 
@@ -109,7 +115,7 @@ class processHandler:
 
 
         #### Dielectron channel
-        if ev.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15_v8 and ev.nElectronCandidate > 1:            
+        if ev.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15_v8 and not ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10_v6 and ev.nElectronCandidate > 1:            
 
             # Single electron histograms
             ei = list(range(0, ev.nElectronCandidate))
@@ -177,7 +183,7 @@ class processHandler:
                     self.hCR_EEsel_Chi2.Fill(ev.EE_normalizedChi2[maxIxyi], weight)
 
         #### Dimuon channel
-        if ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10_v6 and not ev.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15_v8 and ev.nMuonCandidate > 1:
+        if ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10_v6 and ev.nMuonCandidate > 1:
 
             # Single dimuon histograms
             mi = list(range(0, ev.nMuonCandidate))

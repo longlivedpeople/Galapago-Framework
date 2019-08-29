@@ -137,7 +137,6 @@ class Canvas:
       latexc.SetTextAlign(31);
       latexc.SetTextSize(0.05);
 
-
    def addBand(self, x1, y1, x2, y2, color, opacity):
 
       grshade = TGraph(4)
@@ -252,7 +251,7 @@ class Canvas:
       if not os.path.exists(d):
          os.makedirs(d)                 
 
-   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, label ="Data/Prediction"):
+   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, label ="Data/Prediction", outputDir = 'plots/'):
 
       self.myCanvas.cd()
 
@@ -344,11 +343,15 @@ class Canvas:
 
       pad1.cd()
       self.banner2(isData, lumi)
+
+      if not outputDir[-1] == '/': dirName = outputDir + '/'
+      else: dirName = outputDir
+
       for i,plotName in enumerate(self.plotNames):
           pad1.cd()
           pad1.SetLogy(0)
-          path    = 'plots/'+plotName
-          pathlog = 'plots/'+self.plotNamesLog[i]
+          path    = dirName+plotName
+          pathlog = dirName+self.plotNamesLog[i]
           self.ensurePath(path)
           self.myCanvas.SaveAs(path)
           if not '.root' in pathlog:
@@ -364,7 +367,7 @@ class Canvas:
       self.myCanvas.IsA().Destructor(self.myCanvas)                                                                                                                                            
 
 
-   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0):
+   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/'):
 
       self.myCanvas.cd()
       
@@ -376,6 +379,9 @@ class Canvas:
               if ymin and ymax:
                   self.histos[i].GetYaxis().SetRangeUser(ymin, ymax)
               self.histos[i].Draw(self.options[i])
+
+      ## Draw axis:
+      self.histos[0].Draw('same axis')
 
       for band in self.bands:
           band.Draw('f')
@@ -405,8 +411,12 @@ class Canvas:
       
       
       self.banner(isData, lumi)
+
+      if not outputDir[-1] == '/': dirName = outputDir + '/'
+      else: dirName = outputDir
+
       for plotName in self.plotNames:
-          path = 'plots/'+plotName
+          path = dirName+plotName
           self.ensurePath(path)
           self.myCanvas.SaveAs(path)
 

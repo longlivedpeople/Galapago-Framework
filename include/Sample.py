@@ -99,7 +99,7 @@ class Sample:
       self.xSection = xsection
       self.isData = isdata
       ftfileloc = friendlocation 
-      self.ftfile = TFile(ftfileloc)                                    
+      self.ftfile = TFile(ftfileloc)
       self.ttree = self.ftfile.Get('Events')
 
       if not self.isData:
@@ -295,13 +295,13 @@ class Block:
 class Tree:
    'Common base class for a physics meaningful tree'
 
-   def __init__(self, fileName, name, isdata):
+   def __init__(self, fileName, name, isdata, loopFile):
       #print fileName
       self.name  = name
       self.isData = isdata
       self.blocks = []
       self.parseFileName(fileName)
-      self.loopFile = ''
+      self.loopFile = loopFile
 
    def parseFileName(self, fileName):
       f = open(fileName)
@@ -459,16 +459,20 @@ class Tree:
      return h   
 
 
-   def Loop(self, lumi, filename, maxNumber):
+   def Loop(self, lumi, filename = False, maxNumber = False):
         
-     self.loopFile = filename
+     if filename: self.loopFile = filename
 
      for b in self.blocks:
        for s in b.samples:
-         process = processHandler(self.loopFile, self.name, b.name, s.name) 
+         process = processHandler(self.loopFile, self.name, b.name, s.name)
          for n,ev in enumerate(s.ttree):
-           #if n > maxNumber: break #### OJOO esto es auxiliar, al cortar la normalizacion no se cumple 
-           process.processEvent(ev, lumi*s.lumWeight)                 
+           if maxNumber:
+               if n > maxNumber: break #### OJOO esto es auxiliar, al cortar la normalizacion no se cumple 
+           if s.isData:
+             process.processEvent(ev, 1, True)
+           else:                 
+             process.processEvent(ev, lumi*s.lumWeight, False)
          process.Write()
 
 
@@ -480,18 +484,29 @@ class Tree:
      _file = r.TFile(self.loopFile)
 
      for b in self.blocks:
-       for s in b.samples:
+
+       print('h'+var+'_'+self.name+'_'+b.name+'_'+b.samples[0].name)
+       hblock_aux = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+b.samples[0].name)
+       hblock_clone = hblock_aux.Clone()
+       hblock = copy.deepcopy(hblock_clone)
+       hblock.SetTitle(b.label)
+       SetOwnership(hblock, 0)
+       xmin = hblock.GetXaxis().GetXmin()
+       xmax = hblock.GetXaxis().GetXmax()
+       nbin = hblock.GetXaxis().GetNbins()
+       hblock.SetFillColor(b.color) 
+ 
+       for si,s in enumerate(b.samples):
   
-         haux2 = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
-         haux = copy.deepcopy(haux2)
-         haux.SetTitle(s.label)
-         SetOwnership(haux, 0) 
-         print('h'+var+'_'+self.name+'_'+b.name+'_'+s.name) 
-         xmin = haux.GetXaxis().GetXmin()
-         xmax = haux.GetXaxis().GetXmax()
-         nbin = haux.GetXaxis().GetNbins()
-         haux.SetFillColor(s.color)
-         hs.Add(haux)
+         hsample = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
+
+         if si == 0: 
+             continue
+         else:
+             hblock.Add(hsample)
+
+       hs.Add(hblock)
+
 
      can_aux = TCanvas("can_%s_%s"%(name, b.name))
      can_aux.cd()
