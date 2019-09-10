@@ -41,15 +41,15 @@ The datasets that are used to make the plots (with all the information that is r
 
 ### The samples.dat file
 
-<p> In this ```.dat``` file all the details of the datasets reserved for creating the NTuples are specified. The information needed (in the correct order) to be filled is </p>
+<p> In this .dat file all the details of the datasets reserved for creating the NTuples are specified. The information needed (in the correct order) to be filled is </p>
 <ul>
-  <li> **Block**: It specified a *block* of similar datasets that are drawn jointly e.g. WW, WZ and WZ are drawn together under the block name *Diboson*.</li>
+  <li> <strong>Block</strong>: It specified a *block* of similar datasets that are drawn jointly e.g. WW, WZ and WZ are drawn together under the block name *Diboson*.</li>
   <li> **Color**: The color of each dataset. </li>
   <li> **Name**: This is the name used to identify the sample. The output histograms used to make the plots will have this identified. It also serves to select in the running file if one dataset is included or not in the plotting.</li>
   <li> **Label**: The text that is put in the legend for each sample (or block). </li>
   <li> **Location of friends**: Absolute path of the .root files of the NTuples. </li>
   <li> **Xsec**: Cross-section of the dataset, used to compute the luminosity weights. Should be filled in fb^{-1}.</li>
-  <li> **IsData**: 1 if the sample is a data sample or 0 if it is Monte Carlo.>li>
+  <li> **IsData**: 1 if the sample is a data sample or 0 if it is Monte Carlo.</li>
 </ul>
 
 ### How to select the files of the samples.dat file in the running file
