@@ -29,15 +29,32 @@ git clone https://github.com/longlivedpeople/Galapago-Framework.git
 
 The running files are located inside this directory, all of them are .py files. All the modules that are required to make the plots are located inside the include/ directory.
 
-The plots combine different datasets by grouping them in blocks and properly scaling them according to the luminosity, pile up and other relevant weights.
+The framework combine different datasets by grouping them in blocks and properly scaling them according to the luminosity, pile up and other relevant weights.
 
-The datasets that are used to make the plots (with all the information that is required) are declared in the ```samples.dat``` file. In this file it is specified the block of each dataset, its color, name, label (of the legend), lovation of the NTuples, cross section and type (DATA or MC). Each user has the option to select which datasets of the ```samples.dat``` file wants to include in the plots in the running files.
+The datasets that are used to make the plots (with all the information that is required) are declared in the ```samples.dat``` file. In this file it is specified the block of each dataset, its color, name, label (of the legend), location of the NTuples, cross section and type (DATA or MC). Each user has the option to select which datasets of the ```samples.dat``` file wants to include in the plots in the running files.
 
 <p>The plots creation process is divided in two steps: Loop and plotting:</p>
 <ul> 
   <li> In the loop part the framework run over the events of the NTuples, applying the cuts and filling a set of predefined histograms. This step works with instances of the Sample.py, CutManager.py and processHandler.py classes, located in the include/ directory. The filled histograms are stored in a .root file (that the user can specify if desired)</li>
   <li> The plotting step works with instances of both the Sample.py and Canvas.py classes. It accesses the histograms stored in the previously created .root file and make the plots. For this step to succeed the .root file must exist, to the previous step needs to be run at least once time before. The user has the option to skip the loop step if the file already exists.</li>
 </ul>
+
+### The samples.dat file
+
+<p> In this ```.dat``` file all the details of the datasets reserved for creating the NTuples are specified. The information needed (in the correct order) to be filled is </p>
+<ul>
+  <li> **Block**: It specified a *block* of similar datasets that are drawn jointly e.g. WW, WZ and WZ are drawn together under the block name *Diboson*.</li>
+  <li> **Color**: The color of each dataset. </li>
+  <li> **Name**: This is the name used to identify the sample. The output histograms used to make the plots will have this identified. It also serves to select in the running file if one dataset is included or not in the plotting.</li>
+  <li> **Label**: The text that is put in the legend for each sample (or block). </li>
+  <li> **Location of friends**: Absolute path of the .root files of the NTuples. </li>
+  <li> **Xsec**: Cross-section of the dataset, used to compute the luminosity weights. Should be filled in fb^{-1}.</li>
+  <li> **IsData**: 1 if the sample is a data sample or 0 if it is Monte Carlo.>li>
+</ul>
+
+### How to select the files of the samples.dat file in the running file
+
+To be filled
 
 ## Instructions to run 
 
