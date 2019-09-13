@@ -52,19 +52,42 @@ The datasets that are used to make the plots (with all the information that is r
   <li> <strong>IsData</strong>: 1 if the sample is a data sample or 0 if it is Monte Carlo.</li>
 </ul>
 
-### How to read a dataset of the samples.dat file
+### How to read all (or some) datasets of the samples.dat file
 
 To read the ```samples.dat``` file the user has to define an instance of the class ```Tree``` (defined in ```include/Samples.py```). The command to do so is:
 
 ```tree = Sample.Tree('samples.dat', 'Name of tree instance', isData, loopFile)```
 
-where ```'Name of the tree instance'``` is an identifier of the instance created with this dataset, ```isData``` indicates if the dataset is data (1) or Monte Carlo (0) (necessary to apply weights, for examples) and ```loopFile``` is the name of the root file where the histograms of this dataset are stored.
+where ```'Name of the tree instance'``` is an identifier of the instance created with this dataset, ```isData``` indicates if the dataset is data (1) or Monte Carlo (0) (necessary to apply weights, for example) and ```loopFile``` is the name of the root file where the histograms of this dataset are stored.
 
-If the user wants to select some, but not all, datasets of the ```samples.dat``` file, he/she can use a helper.
+<strong>All the datasets described in the ```samples.dat``` file are read.</strong> If the user wants to select some, but not all, he/she can use the function ```selectSamples()``` defined in the ```ìnclude/helper.py``` module. This function takes as an input the ```samples.dat``` file and a list of the datasets identified by the name. It creates a temporary ```.tmp_sampleFileMC.txt``` file with just the selected datasets that is given to the Tree instance instead. The sequence would be: 
+
+```
+listOfDatasets = []
+listOfDatasets.append('Dataset1')
+listOfDatasets.append('Dataset2')
+listOfDatasets.append('Dataset2')
+
+tree = Sample.Tree(helper.selectSamples('samples.dat', listOfDatasets, sType), 'Name of tree instance', isData, loopFile)
+```
 
 
-### 
+### How to read the trees of the datasets and create the histograms 
 
+Once the TTree's of the datasets are read the histograms can be created by means of the function ```Loop()``` of the class Tree declared in the ```include/Sample.py``` module. All the events of the trees defined in the Tree instance are read and a set of predefined histograms are filled and stored in the ```loopFile``` given as an input when the Tree instance was created first. The command is
+
+```
+tree.Loop(luminosity, filename = False, maxNumber = False)
+```
+
+where ```luminosity``` stands for the luminosity value to which the histograms are normalized, and ```filename``` and ```maxNumber``` are optional parameters, usually set to ```False```.
+
+The set of predefined histograms is declared in the ```include/processHandler.py``` module. If the user wants to add a histogram to the list, it must be defined here. One histogram is created per dataset (specified in the ```samples.dat``` file) separately.
+
+
+### Plotting
+
+Once the individual histograms of the datasets are filled and stored in the ```.root``` file, they can be combined and drawn in the final plots. This is done by means of functions defined in the running files. In ```plotDistributions.py``` there are available ```makePlot()```, to combine and compare Monte Carlo backgrounds and signal distributions, and ```makeSensitivity``` to compute the sensitivity S/sqrt(S+B) for a given set of signal samples.
 
 
 ## Instructions to run 
