@@ -1,0 +1,17 @@
+#-----------------------------------------------------------
+#-----------------------------------------------------------
+#----- all samples that are currently available ------------
+#-----------------------------------------------------------
+#
+#-----------------------------------------------------------
+#----------------- data samples ----------------------------
+# BLOCK        COLOR                         NAME                 LABEL                                     LOCATION OF FRIENDS                                                     XSEC     ISDATA
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#
+#----------------- monte carlo -----------------------------
+#-----------------------------------------------------------
+# BLOCK     COLOR         NAME                       LABEL                       LOCATION OF FRIENDS                                                                   XSEC    ISDATA
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Data          r.kBlack       DoubleMuon-Run2016H                        Data                              /gpfs/projects/cms/fernance/DoubleMuon/crab_DoubleMuon-Run2016H-17Jul2018-v1_NTuple/190902_125850/DoubleMuon-Run2016H-17Jul2018-v1.root           1   1 
+Data          r.kBlack       DoubleMuon-Run2016B                        Data                              /gpfs/projects/cms/fernance/DoubleMuon/crab_DoubleMuon-Run2016B-17Jul2018_ver2-v1_NTuple/190925_162917/DoubleMuon-Run2016B.root      1   1 
+Data          r.kBlack       DoubleEG-Run2016B                          Data                              /gpfs/projects/cms/fernance/DoubleEG/crab_DoubleEG-Run2016B-17Jul2018_ver2-v1_NTuple/190925_162947/DoubleEG-Run2016B.root            1   1 
