@@ -5,7 +5,7 @@ from array import array
 class Canvas:
    'Common base class for all Samples'
 
-   def __init__(self, name, _format, x1, y1, x2, y2, ww=0, hh=0):
+   def __init__(self, name, _format, x1, y1, x2, y2, c, ww=0, hh=0):
       self.name = name
       self.format = _format
       self.plotNames    = [name + "." + i for i in _format.split(',')]
@@ -26,7 +26,8 @@ class Canvas:
       self.myLegend.SetTextFont(42)
       self.myLegend.SetTextSize(0.03)
       self.myLegend.SetLineWidth(0)
-      self.myLegend.SetBorderSize(0)              
+      self.myLegend.SetBorderSize(0)
+      self.myLegend.SetNColumns(c)              
       r.gStyle.SetPadRightMargin(0.05)
 
    def changeLabelsToNames(self):
@@ -277,6 +278,7 @@ class Canvas:
 
       if(legend):
           self.makeLegend()
+          self.myLegend.SetTextSize(0.035) # Modify the legend size
           self.myLegend.Draw()
 
       for band in self.bands:

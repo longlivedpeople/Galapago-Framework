@@ -465,6 +465,7 @@ class Tree:
 
      for b in self.blocks:
        for s in b.samples:
+         print("Reading samples: " + s.name)
          process = processHandler(self.loopFile, self.name, b.name, s.name)
          for n,ev in enumerate(s.ttree):
            if maxNumber:
@@ -485,7 +486,7 @@ class Tree:
 
      for b in self.blocks:
 
-       print('h'+var+'_'+self.name+'_'+b.name+'_'+b.samples[0].name)
+       print('> h'+var+'_'+self.name+'_'+b.name+'_'+b.samples[0].name)
        hblock_aux = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+b.samples[0].name)
        hblock_clone = hblock_aux.Clone()
        hblock = copy.deepcopy(hblock_clone)
@@ -499,10 +500,12 @@ class Tree:
        for si,s in enumerate(b.samples):
   
          hsample = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
+         print('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
 
          if si == 0: 
              continue
          else:
+             print('Uese')
              hblock.Add(hsample)
 
        hs.Add(hblock)
@@ -533,6 +536,7 @@ class Tree:
        for si,s in enumerate(b.samples):
          AuxName = "auxh1_block_" + name + "_" + b.name + s.name
          haux = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
+         print('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
          if not bi and not si:
            h = haux.Clone(name+'_treeHisto')
            h.SetTitle(s.label)

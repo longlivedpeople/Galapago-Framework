@@ -12,7 +12,7 @@
 
 # Change the job name to "hello_world"
 
-#$ -N TTbar_13TeV_TuneCUETP8M1_cfi_GEN_SIM_10_chunk0 
+#$ -N ${SAMPLE} 
 
 # Resource request. We request 1MB of memory, and 60 seconds of wall
 # clock time, that more than is enough for the test.
@@ -27,7 +27,8 @@
 # Actual script #
 #################
 
-pushd "ABSOLUTE PATH WHERE THE CMSSW/SRC DIR RELEASE IS LOCATED"
+pushd /gpfs/users/fernanc/CMSSW_9_4_4/src/
 eval `scramv1 runtime -sh`
 pushd
-python "ABSOLUTE PATH TO plotDistributions.py running file" 
+eval `cmsenv`
+python /gpfs/users/fernanc/CMSSW_9_4_4/src/MyAnalysis/Galapago-Framework/fillingWithGridui.py -s ${SAMPLE} -d ${DATFILE} -o ${OUTPATH} -l ${LUMI} -p ${OPTION} 
