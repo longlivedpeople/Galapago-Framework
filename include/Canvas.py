@@ -369,12 +369,14 @@ class Canvas:
       self.myCanvas.IsA().Destructor(self.myCanvas)                                                                                                                                            
 
 
-   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/'):
+   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False):
 
       self.myCanvas.cd()
       
       if(log):
           self.myCanvas.GetPad(0).SetLogy(1)
+      if(xlog):
+          self.myCanvas.GetPad(0).SetLogx(1)
      
       for i in range(0, len(self.histos)):
           if(self.ToDraw[i] != 0):        
@@ -383,7 +385,7 @@ class Canvas:
               self.histos[i].Draw(self.options[i])
 
       ## Draw axis:
-      self.histos[0].Draw('same axis')
+      #self.histos[0].Draw('same axis')
 
       for band in self.bands:
           band.Draw('f')
@@ -416,6 +418,7 @@ class Canvas:
 
       if not outputDir[-1] == '/': dirName = outputDir + '/'
       else: dirName = outputDir
+
 
       for plotName in self.plotNames:
           path = dirName+plotName

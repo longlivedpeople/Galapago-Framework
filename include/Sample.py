@@ -486,7 +486,7 @@ class Tree:
 
      for b in self.blocks:
 
-       print('> h'+var+'_'+self.name+'_'+b.name+'_'+b.samples[0].name)
+       #print('> h'+var+'_'+self.name+'_'+b.name+'_'+b.samples[0].name)
        hblock_aux = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+b.samples[0].name)
        hblock_clone = hblock_aux.Clone()
        hblock = copy.deepcopy(hblock_clone)
@@ -500,12 +500,11 @@ class Tree:
        for si,s in enumerate(b.samples):
   
          hsample = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
-         print('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
+         #print('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
 
          if si == 0: 
              continue
          else:
-             print('Uese')
              hblock.Add(hsample)
 
        hs.Add(hblock)

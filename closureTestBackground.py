@@ -79,13 +79,14 @@
 
 import ROOT as r
 from   ROOT import gROOT, TCanvas, TFile, TGraphErrors, SetOwnership
-import math, sys, optparse, array, copy
+import math, sys, optparse, array, copy, os
 import gc, inspect
 
 import include.Sample as Sample
 import include.helper as helper
 import include.Canvas as Canvas
 
+WORKPATH = os.path.abspath('./') + '/'
 
 class bcolors:
     HEADER = '\033[95m'
@@ -102,6 +103,11 @@ def makeBackgroundValidation(lumi, treeMC, var, name, xlabel, logx, LLlabel = Fa
 
     hSR_MC = treeMC.getLoopTH1F('histMC_SR_'+name, 'SR_' + var, xlabel)
     hCR_MC = treeMC.getLoopTH1F('histMC_CR_'+name, 'CR_' + var, xlabel)
+
+    hSR_MC.SetMarkerStyle(20)
+    hSR_MC.SetMarkerSize(0.8)
+    hCR_MC.SetMarkerStyle(20)
+    hCR_MC.SetMarkerSize(0.8)
 
     luminosity = lumi
 
@@ -175,17 +181,8 @@ if __name__ == "__main__":
     print '########################################################################' + bcolors.ENDC
 
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
-    parser.add_option('-s', '--samples', action='store', type=str, dest='sampleFile', default='samples.dat', help='the samples file. default \'samples.dat\'')
-    parser.add_option('-o', '--output', action='store', type=str, dest='outputFile', default='closureHistos.root', help='the output file. default \'outputHistograms.root\'')
-    parser.add_option('-l', '--avoidLoop', action='store_true', dest='avoidLoop', help='It determines if the histograms need to be done again')
-
+    parser.add_option('-i', '--input', action='store', type=str, dest='inputFile', default='launchWithGridui/merged.root', help='the input file. default \'merged.root\'')
     (opts, args) = parser.parse_args()
-
-
-    ############# Initialize the output root file with the histos
-    if not opts.avoidLoop:
-        output = r.TFile(opts.outputFile, "RECREATE")
-        output.Close()
 
 
     ############# Set the TDR plot style
@@ -205,16 +202,10 @@ if __name__ == "__main__":
     Backgrounds.append('QCD_Pt-30to40') 
     Backgrounds.append('QCD_Pt-40toInf') 
 
-    ############# Parameter definition
-    lumi = 21.79 # luminosity
-
+    lumi = 37.66
 
     ############# Tree creation
-    treeMC = Sample.Tree(helper.selectSamples(opts.sampleFile, Backgrounds, 'MC'), 'MC', 0, opts.outputFile)
-
-    ############# Tree loop
-    if not opts.avoidLoop:
-        treeMC.Loop(lumi, False, False)
+    treeMC = Sample.Tree(helper.selectSamples(WORKPATH + 'dat/MC.dat', Backgrounds, 'MC'), 'MC', 0, WORKPATH + opts.inputFile)
 
     makeBackgroundValidation(lumi, treeMC, 'EEsel_leadingPt', 'EEsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, 'EE')
     makeBackgroundValidation(lumi, treeMC, 'EEsel_subleadingPt', 'EEsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, 'EE')

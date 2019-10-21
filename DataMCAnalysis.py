@@ -81,6 +81,7 @@ import ROOT as r
 from   ROOT import gROOT, TCanvas, TFile, TGraphErrors, SetOwnership
 import math, sys, optparse, array, copy, os
 import gc, inspect
+import numpy as np
 
 import include.Sample as Sample
 import include.helper as helper
@@ -214,7 +215,7 @@ def makeSensitivity(lumi, treeSI, treeMC, var, name, xlabel, logx, LLlabel = Fal
         s_histos.append(copy.deepcopy(_h))
 
     ### Get significance values
-    plot = Canvas.Canvas('sensitivity_'+name, 'png', 0.5, 0.7, 0.9, 0.9)
+    plot = Canvas.Canvas('sensitivity_'+name, 'png', 0.5, 0.7, 0.9, 0.9, 1)
 
     significances = []
 
@@ -238,6 +239,7 @@ def makeSensitivity(lumi, treeSI, treeMC, var, name, xlabel, logx, LLlabel = Fal
         gh.SetLineWidth(2)
         gh.GetYaxis().SetTitle('S/#sqrt{S + B}')
         gh.GetXaxis().SetTitle(xlabel)
+        gh.SetLineColor(_h.GetFillColor())
         significances.append(copy.deepcopy(gh))
 
    
@@ -249,10 +251,10 @@ def makeSensitivity(lumi, treeSI, treeMC, var, name, xlabel, logx, LLlabel = Fal
     ### Plot significances
     for _i,s in enumerate(significances):
         if _i == 0:
-            s.SetMaximum(s_max)
-            plot.addHisto(s, 'l', _h.GetTitle(), 'l', _h.GetFillColor(), 1, 1)
+            s.SetMaximum(1.4*s_max)
+            plot.addHisto(s, 'l', s.GetTitle(), 'l', s.GetLineColor(), 1, 1)
         else:
-            plot.addHisto(s, 'l, same', _h.GetTitle(), 'l', _h.GetFillColor(), 1, 1)
+            plot.addHisto(s, 'l, same', s.GetTitle(), 'l', s.GetLineColor(), 1, 1)
             
     ### Dilepton banner
     if LLlabel == 'EE':
@@ -262,6 +264,59 @@ def makeSensitivity(lumi, treeSI, treeMC, var, name, xlabel, logx, LLlabel = Fal
 
     ### Save it
     plot.save(1, 0, logx, luminosity, '', outputDir = WORKPATH + 'sensitivity/')
+
+
+def makeROC(lumi, treeSI, treeMC, var, name, xlabel, ylog, LLlabel = False, normed = False):
+
+    hMCS = treeMC.getLoopTH1F('histMC_'+name, var, xlabel)
+    hSIS = treeSI.getLoopStack('histSI_'+name, var, xlabel)
+
+    luminosity = lumi
+
+    ### Signal histograms
+    s_histos = []
+    for _i, _h in enumerate(hSIS.GetHists()):
+        s_histos.append(copy.deepcopy(_h))
+
+    ### Get significance values
+    plot = Canvas.Canvas('ROC_'+name, 'png', 0.5, 0.2, 0.9, 0.4, 1)
+    graphs = []
+
+    for _i, _h in enumerate(s_histos):
+        effs = []
+        rejs = []
+        for n in range(1, hMCS.GetNbinsX() + 1):
+            sig_value = 0.0
+            back_value = 0.0
+            for j in range(n, hMCS.GetNbinsX() + 1):
+                sig_value = sig_value + _h.GetBinContent(j)
+                back_value = back_value + hMCS.GetBinContent(j)
+            if sig_value + back_value == 0:
+                effs.append(0.0)
+                rejs.append(0.0)
+            else:
+                effs.append(sig_value/_h.Integral())
+                rejs.append(back_value/hMCS.Integral())
+
+        gh = r.TGraph(len(effs), np.array(rejs), np.array(effs))
+        gh.SetMaximum(1.0)
+        gh.SetMinimum(0.0)
+        gh.GetXaxis().SetLimits(0.0, 1.0)
+        gh.SetTitle(_h.GetTitle())
+        gh.SetLineWidth(2)
+        gh.GetYaxis().SetTitle('Selected signal/All signal')
+        gh.GetXaxis().SetTitle('Selected background/All background')
+        gh.SetLineColor(_h.GetFillColor())
+        graphs.append(copy.deepcopy(gh))
+
+    for _i,g in enumerate(graphs):
+        if _i == 0:
+            plot.addHisto(g, 'la', g.GetTitle(), 'l', g.GetLineColor(), 1, _i)
+        else:
+            plot.addHisto(g, 'l, same', g.GetTitle(), 'l', g.GetLineColor(), 1, _i)
+
+    plot.save(1, 0, ylog, luminosity, '', outputDir = WORKPATH + 'sensitivity/', xlog = True)
+
 
 
 
@@ -348,11 +403,11 @@ if __name__ == "__main__":
 
 
 
-    """
-    makeSensitivity(lumi, treeSI, treeMC, 'SR_EEsel_minIxy', 'SR_EEsel_minIxy', '|d_{0}|/#sigma_{d}', 0, 'EE')
-    makeSensitivity(lumi, treeSI, treeMC, 'SR_MMsel_minIxy', 'SR_MMsel_minIxy', '|d_{0}|/#sigma_{d}', 0, 'MM')
-    makeSensitivity(lumi, treeSI, treeMC, 'SR_EEsel_minIxy', 'SR_EEsel_minIxy', '|d_{0}|/#sigma_{d}', 0, 'EE')
-    """
+    
+    makeROC(lumi, treeSI, treeMC, 'SR_EEsel_minIxy', 'SR_EEsel_minIxy', '|d_{0}|/#sigma_{d}', ylog = True, LLlabel = 'EE')
+    makeSensitivity(lumi, treeSI, treeMC, 'SR_EEsel_minIxy', 'SR_EEsel_minIxy', '|d_{0}|/#sigma_{d}', 1, 'EE')
+    #makeSensitivity(lumi, treeSI, treeMC, 'SR_MMsel_minIxy', 'SR_MMsel_minIxy', '|d_{0}|/#sigma_{d}', 0, 'MM')
+    
 
     """
     #makePlot(lumi, treeSI, treeMC, 'nEE', 'nEE', 'Number of EE', 1, 'EE')
