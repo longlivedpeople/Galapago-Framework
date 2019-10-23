@@ -366,6 +366,7 @@ class Tree:
       del h
       return y
 
+
    def getStack(self, lumi, name, var, nbin, xmin, xmax, cut, options, xlabel):
      if cut == '':
        cut = '(1)'

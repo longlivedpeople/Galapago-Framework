@@ -8,7 +8,7 @@ import include.Sample as Sample
 import include.helper as helper
 import include.Canvas as Canvas
 
-LUMI = 4.80
+LUMI = 36.773
 OUTPATH = os.path.abspath('./') + '/launchWithGridui/outputHistograms'
 WORKDIR = os.path.abspath('./') + '/'
 
