@@ -199,7 +199,7 @@ def makePlot(lumi, var, name, xlabel, logx, treeMC, treeSI = False, treeDATA = F
 
     ### Save it
     #plot.save(1, 0, logx, luminosity, '', outputDir = WORKPATH + 'plots/')
-    plot.saveRatio(1, 0, logx, luminosity, hDATA, hMC, label="Data/MC", outputDir = 'DataVSMC/')
+    plot.saveRatio(1, 0, logx, luminosity, hDATA, hMC, label="Data/MC", outputDir = 'DataVSMC2016/')
 
 
 def makeSensitivity(lumi, treeSI, treeMC, var, name, xlabel, logx, LLlabel = False, normed = False):
@@ -252,6 +252,7 @@ def makeSensitivity(lumi, treeSI, treeMC, var, name, xlabel, logx, LLlabel = Fal
     for _i,s in enumerate(significances):
         if _i == 0:
             s.SetMaximum(1.4*s_max)
+            s.SetMaximum(10.0*s_max)
             plot.addHisto(s, 'l', s.GetTitle(), 'l', s.GetLineColor(), 1, 1)
         else:
             plot.addHisto(s, 'l, same', s.GetTitle(), 'l', s.GetLineColor(), 1, 1)
@@ -388,12 +389,24 @@ if __name__ == "__main__":
     ############## Data definition
     MuonData = []
     MuonData.append('DoubleMuon-Run2016B')
+    MuonData.append('DoubleMuon-Run2016C')
+    MuonData.append('DoubleMuon-Run2016D')
+    MuonData.append('DoubleMuon-Run2016E')
+    MuonData.append('DoubleMuon-Run2016F')
+    MuonData.append('DoubleMuon-Run2016G')
+    MuonData.append('DoubleMuon-Run2016H')
     ElectronData = []
     ElectronData.append('DoubleEG-Run2016B')
+    ElectronData.append('DoubleEG-Run2016C')
+    ElectronData.append('DoubleEG-Run2016D')
+    ElectronData.append('DoubleEG-Run2016E')
+    ElectronData.append('DoubleEG-Run2016F')
+    ElectronData.append('DoubleEG-Run2016G')
+    ElectronData.append('DoubleEG-Run2016H')
 
 
     ############# Parameter definition
-    lumi = 4.80 # luminosity
+    lumi = 36.773 # luminosity
 
     ############# Tree creation
     treeMC = Sample.Tree(helper.selectSamples(WORKPATH + 'dat/MC.dat', Backgrounds, 'MC'), 'MC', 0, WORKPATH + opts.inputFile)
