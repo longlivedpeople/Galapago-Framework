@@ -166,8 +166,8 @@ if __name__ == "__main__":
     Backgrounds.append('QCD_Pt-30to40')
     Backgrounds.append('QCD_Pt-40toInf')
 
-    EEchannel = DatacardManager.Channel('EE', 'SR_EEsel_minIxy', 4.0, 20.0)
-    MMchannel = DatacardManager.Channel('MM', 'SR_MMsel_minIxy', 4.0, 20.0)
+    EEchannel = DatacardManager.Channel('EE', 'SR_EEsel_minIxy', 5.0, 20.0)
+    MMchannel = DatacardManager.Channel('MM', 'SR_MMsel_minIxy', 3.5, 20.0)
 
 
     # Fill the two channels with the background information (just one time because the yields are the same for every signal datacard) 
@@ -204,7 +204,13 @@ if __name__ == "__main__":
     Signal.append('DisplacedSUSY_1500_494_160')
     Signal.append('DisplacedSUSY_1000_148_60')
     Signal.append('DisplacedSUSY_350_148_173')
-    Signal.append('DisplacedSUSY_120_48_165')
+    Signal.append('HXX_1000_350_350')
+    Signal.append('HXX_1000_350_35')
+    Signal.append('HXX_1000_150_100')
+    Signal.append('HXX_1000_150_10')
+    Signal.append('HXX_400_150_400')
+    Signal.append('HXX_400_150_40')
+#    Signal.append('DisplacedSUSY_120_48_165')
 
 
     # Loop over the signals to make the datacards
@@ -219,7 +225,7 @@ if __name__ == "__main__":
         datacard = DatacardManager.Datacard()
         datacard.addChannel(EEchannel)
         datacard.addChannel(MMchannel)
-        datacard.saveDatacard()
+        datacard.saveDatacard(outputDir = 'Datacards/')
 
 
 

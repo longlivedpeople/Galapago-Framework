@@ -1,4 +1,5 @@
 import ROOT as r
+import os
 
 
 
@@ -50,7 +51,7 @@ class Datacard:
         return cell
 
 
-    def saveDatacard(self):
+    def saveDatacard(self, outputDir = False):
 
         self.separator += '\n' # we suppose we have added all the backgrounds we wanted
 
@@ -116,7 +117,13 @@ class Datacard:
  
 
         ### Write file:
-        _f = open('datacard_' + self.signalName + '.txt', 'w')
+
+        if not os.path.exists(outputDir):
+            os.makedirs(outputDir)
+
+        outputPath = outputDir if outputDir else ''
+
+        _f = open(outputDir + 'datacard_' + self.signalName + '.txt', 'w')
         _f.write(self.heading)
         _f.write(self.separator)
         _f.write(self.observation)

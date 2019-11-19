@@ -108,10 +108,46 @@ WORKPATH = os.path.abspath('./') + '/'
 
 ##################################### FUNCTION DEFINITION ########################################
 
-    
-def makePlot(lumi, var, name, xlabel, logx, treeMC, treeSI = False, treeDATA = False, LLlabel = False, normed = False):
 
-    hMCS = treeMC.getLoopStack('histMC_'+name, var, xlabel)
+def combineStack(stackList, xlabel):
+
+    fullSet = {}
+    histNumber = stackList[0].GetNhists()
+    names = []
+
+    for hist in stackList[0].GetHists():
+        names.append(hist.GetTitle())
+        fullSet[hist.GetTitle()] = hist
+
+    for n in range(1, len(stackList)):
+
+        for hist in stackList[n].GetHists():
+            fullSet[hist.GetTitle()].Add(hist)
+
+
+    aux_stack = r.THStack()
+    for name in names:
+        aux_stack.Add(fullSet[name])
+
+    aux_c1 = TCanvas()
+    aux_stack.Draw()
+    aux_stack.GetXaxis().SetTitle(xlabel)
+    aux_stack.GetYaxis().SetTitle('Events')
+    aux_c1.Delete()
+
+    return aux_stack
+        
+
+
+    
+def makePlot(lumi, regs, var, name, xlabel, logx, treeMC, treeSI = False, treeDATA = False, LLlabel = False, normed = False):
+
+    MCstackList = []
+
+    for reg in regs:
+        MCstackList.append(treeMC.getLoopStack('histMC_'+name, reg+'_'+var, xlabel))
+
+    hMCS = combineStack(MCstackList, xlabel)
 
     luminosity = lumi
 
@@ -125,15 +161,27 @@ def makePlot(lumi, var, name, xlabel, logx, treeMC, treeSI = False, treeDATA = F
 
     ### Signal histograms
     if treeSI:
-        hSIS = treeSI.getLoopStack('histSI_'+name, var, xlabel)
+
+        hSIS = treeSI.getLoopStack('histSI_'+name, regs[0]+'_'+var, xlabel)
 
         s_histos = []
         for _i, _h in enumerate(hSIS.GetHists()):
             s_histos.append(copy.deepcopy(_h))
 
+        for i in range(1, len(regs)):
+            aux_hSIS = treeSI.getLoopStack('histSI_'+name, regs[i]+'_'+var, xlabel)
+            for _i, _h in enumerate(aux_hSIS.GetHists()):
+                s_histos[_i].Add(copy.deepcopy(_h))
+
+
     ### Data histogram
     if treeDATA:
-        hDATA = treeDATA.getLoopTH1F('histDATA_'+name, var, xlabel)
+
+        hDATA = treeDATA.getLoopTH1F('histDATA_'+name, regs[0] + '_' + var, xlabel)
+        for i in range(1, len(regs)):
+            if regs[i] == 'SR': continue # BLINDED
+            hDATA.Add(treeDATA.getLoopTH1F('histDATA_'+name, regs[i] + '_' + var, xlabel))
+
         hDATA.SetMarkerStyle(20)
         hDATA.SetMarkerSize(0.8)
         #hDATA.Scale(hMC.Integral()/hDATA.Integral())
@@ -201,26 +249,44 @@ def makePlot(lumi, var, name, xlabel, logx, treeMC, treeSI = False, treeDATA = F
         plot.addLatex(0.17, 0.86, '#mu^{+}#mu^{-} channel')
 
     ### Save it
+
+    regName = ''
+    for reg in regs: regName = regName + reg + '_'
+
     if treeDATA:
-        plot.saveRatio(1, 0, logx, luminosity, hDATA, hMC, label="Data/MC", outputDir = 'DataVSMC2016/')
+        plot.saveRatio(1, 0, logx, luminosity, hDATA, hMC, label="Data/MC", outputDir = WORKPATH + regName + 'blindPlots/')
     else:
-        plot.save(1, 0, logx, luminosity, '', outputDir = WORKPATH + 'blindPlots/')
+        plot.save(1, 0, logx, luminosity, '', outputDir = WORKPATH + regName + 'blindPlots/')
 
 
-def makeSensitivity(lumi, treeSI, treeMC, var, name, xlabel, logx, LLlabel = False, normed = False):
+def makeSensitivity(lumi, regs, treeSI, treeMC, var, name, xlabel, logx, LLlabel = False, normed = False):
 
-    hMCS = treeMC.getLoopTH1F('histMC_'+name, var, xlabel)
-    hSIS = treeSI.getLoopStack('histSI_'+name, var, xlabel)
+    hMCS = treeMC.getLoopTH1F('histMC_'+name, regs[0] + '_'+var, xlabel)
+
+    for i in range(1, len(regs)):
+        hMCS.Add(treeMC.getLoopTH1F('histMC_'+name, regs[i]+'_'+var, xlabel))
+
+
 
     luminosity = lumi
 
     ### Signal histograms
-    s_histos = []
-    for _i, _h in enumerate(hSIS.GetHists()):
-        s_histos.append(copy.deepcopy(_h))
+    if treeSI:
+
+        hSIS = treeSI.getLoopStack('histSI_'+name, regs[0]+'_'+var, xlabel)
+
+        s_histos = []
+        for _i, _h in enumerate(hSIS.GetHists()):
+            s_histos.append(copy.deepcopy(_h))
+
+        for i in range(1, len(regs)):
+            aux_hSIS = treeSI.getLoopStack('histSI_'+name, regs[i]+'_'+var, xlabel)
+            for _i, _h in enumerate(aux_hSIS.GetHists()):
+                s_histos[_i].Add(copy.deepcopy(_h))
+
 
     ### Get significance values
-    plot = Canvas.Canvas('sensitivity_'+name, 'png', 0.5, 0.7, 0.9, 0.9, 1)
+    plot = Canvas.Canvas('sensitivity_'+name, 'png', 0.5, 0.9 - 0.04*len(s_histos), 0.9, 0.9, 1)
 
     significances = []
 
@@ -257,7 +323,7 @@ def makeSensitivity(lumi, treeSI, treeMC, var, name, xlabel, logx, LLlabel = Fal
     for _i,s in enumerate(significances):
         if _i == 0:
             s.SetMaximum(1.4*s_max)
-            s.SetMaximum(10.0*s_max)
+            s.SetMaximum(1000.0*s_max)
             plot.addHisto(s, 'l', s.GetTitle(), 'l', s.GetLineColor(), 1, 1)
         else:
             plot.addHisto(s, 'l, same', s.GetTitle(), 'l', s.GetLineColor(), 1, 1)
@@ -384,12 +450,23 @@ if __name__ == "__main__":
 
 
     ############# Signal definition
-    Signal = []
-    Signal.append('DisplacedSUSY_1500_494_160')
-    Signal.append('DisplacedSUSY_1000_148_60')
-    Signal.append('DisplacedSUSY_350_148_173')
-    Signal.append('DisplacedSUSY_120_48_165')
+    SignalRPV = []
+    SignalRPV.append('DisplacedSUSY_1500_494_160')
+    SignalRPV.append('DisplacedSUSY_1000_148_60')
+    SignalRPV.append('DisplacedSUSY_350_148_173')
+#    Signal.append('DisplacedSUSY_120_48_165')
+    SignalHXX = []
+    SignalHXX.append('HXX_1000_350_350')
+    SignalHXX.append('HXX_1000_350_35')
+    SignalHXX.append('HXX_1000_150_100')
+    SignalHXX.append('HXX_1000_150_10')
+    SignalHXX.append('HXX_400_150_400')
+    SignalHXX.append('HXX_400_150_40')
 
+    Signal = []
+    Signal.append('DisplacedSUSY_350_148_173')
+    Signal.append('HXX_400_150_400')
+    #Signal.append('HXX_1000_350_350')
 
     ############## Data definition
     MuonData = []
@@ -416,68 +493,73 @@ if __name__ == "__main__":
     ############# Tree creation
     treeMC = Sample.Tree(helper.selectSamples(WORKPATH + 'dat/MC.dat', Backgrounds, 'MC'), 'MC', 0, WORKPATH + opts.inputFile)
     treeSI = Sample.Tree(helper.selectSamples(WORKPATH + 'dat/SI.dat', Signal, 'SI'), 'SI', 0, WORKPATH + opts.inputFile)
+    treeRPV = Sample.Tree(helper.selectSamples(WORKPATH + 'dat/SI.dat', SignalRPV, 'SI'), 'SI', 0, WORKPATH + opts.inputFile)
+    treeHXX = Sample.Tree(helper.selectSamples(WORKPATH + 'dat/SI.dat', SignalHXX, 'SI'), 'SI', 0, WORKPATH + opts.inputFile)
     treeMuonDATA = Sample.Tree(helper.selectSamples(WORKPATH + 'dat/DATA.dat', MuonData, 'DATA'), 'DATA', 1, WORKPATH + opts.inputFile)
     treeElectronDATA = Sample.Tree(helper.selectSamples(WORKPATH + 'dat/DATA.dat', ElectronData, 'DATA'), 'DATA', 1, WORKPATH + opts.inputFile)
 
 
 
+    makePlot(lumi, ['SR'], 'MMsel_Chi2', 'SR_MMsel_Chi2', 'Vertex #Chi^{2}', 1, treeMC, treeSI, False, 'MM')
     
-    makeROC(lumi, treeSI, treeMC, 'SR_EEsel_minIxy', 'SR_EEsel_minIxy', '|d_{0}|/#sigma_{d}', ylog = True, LLlabel = 'EE')
-    makeSensitivity(lumi, treeSI, treeMC, 'SR_EEsel_minIxy', 'SR_EEsel_minIxy', '|d_{0}|/#sigma_{d}', 1, 'EE')
-    #makeSensitivity(lumi, treeSI, treeMC, 'SR_MMsel_minIxy', 'SR_MMsel_minIxy', '|d_{0}|/#sigma_{d}', 0, 'MM')
+    #makeROC(lumi, treeSI, treeMC, 'SR_EEsel_minIxy', 'SR_EEsel_minIxy', '|d_{0}|/#sigma_{d}', ylog = True, LLlabel = 'EE')
+    makeSensitivity(lumi, ['SR', 'CR2'], treeRPV, treeMC, 'EEsel_minIxy', 'RPV_EEsel_minIxy', '|d_{0}|/#sigma_{d}', 1, 'EE')
+    makeSensitivity(lumi, ['SR', 'CR2'], treeRPV, treeMC, 'MMsel_minIxy', 'RPV_MMsel_minIxy', '|d_{0}|/#sigma_{d}', 1, 'MM')
+    makeSensitivity(lumi, ['SR', 'CR2'], treeHXX, treeMC, 'EEsel_minIxy', 'HXX_EEsel_minIxy', '|d_{0}|/#sigma_{d}', 1, 'EE')
+    makeSensitivity(lumi, ['SR', 'CR2'], treeHXX, treeMC, 'MMsel_minIxy', 'HXX_MMsel_minIxy', '|d_{0}|/#sigma_{d}', 1, 'MM')
     
 
-    """
-    #makePlot(lumi, treeSI, treeMC, 'nEE', 'nEE', 'Number of EE', 1, 'EE')
-    makePlot(lumi, 'SR_EEsel_minIxy', 'SR_EEsel_minIxy', treeMC, treeSI, treeDATA, '|d_{0}|/#sigma_{d}', 1, 'EE')
-    makePlot(lumi, treeSI, treeMC, 'SR_EEsel_invMass', 'SR_EEsel_invMass', 'Mass (GeV/c^{2})', 1, 'EE')
-    makePlot(lumi, treeSI, treeMC, 'SR_EEsel_Chi2', 'SR_EEsel_Chi2', 'Vertex #Chi^{2}', 1, 'EE')
-    makePlot(lumi, treeSI, treeMC, 'SR_EEsel_dPhi', 'SR_EEsel_dPhi', 'Collinearity |#Delta#Phi|', 1, 'EE')
-    makePlot(lumi, treeSI, treeMC, 'SR_EEsel_leadingPt', 'SR_EEsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, 'EE')
-    makePlot(lumi, treeSI, treeMC, 'SR_EEsel_subleadingPt', 'SR_EEsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, 'EE')
-    makePlot(lumi, treeSI, treeMC, 'SR_EEsel_Ptll', 'SR_EEsel_Ptll', 'p_{T}(ll)', 1, 'EE')
-    makePlot(lumi, treeSI, treeMC, 'CR_EEsel_minIxy', 'CR_EEsel_minIxy', '|d_{0}|/#sigma_{d}', 1, 'EE')
-    makePlot(lumi, treeSI, treeMC, 'CR_EEsel_invMass', 'CR_EEsel_invMass', 'Mass (GeV/c^{2})', 1, 'EE')
-    makePlot(lumi, treeSI, treeMC, 'CR_EEsel_Chi2', 'CR_EEsel_Chi2', 'Vertex #Chi^{2}', 1, 'EE')
-    makePlot(lumi, treeSI, treeMC, 'CR_EEsel_dPhi', 'CR_EEsel_dPhi', 'Collinearity |#Delta#Phi|', 1, 'EE')
-    makePlot(lumi, treeSI, treeMC, 'CR_EEsel_leadingPt', 'CR_EEsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, 'EE')
-    makePlot(lumi, treeSI, treeMC, 'CR_EEsel_subleadingPt', 'CR_EEsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, 'EE')
-    makePlot(lumi, treeSI, treeMC, 'CR_EEsel_Ptll', 'CR_EEsel_Ptll', 'p_{T}(ll)', 1, 'EE')
 
-    """
+    makePlot(lumi, ['SR'], 'MMsel_minIxy', 'SR_MMsel_minIxy', '|d_{0}|/#sigma_{d}', 1, treeMC, treeSI, False, 'MM') 
+    makePlot(lumi, ['SR'], 'MMsel_invMass', 'SR_MMsel_invMass', 'Mass (GeV/c^{2})', 1, treeMC, treeSI, False, 'MM')
+    makePlot(lumi, ['SR'], 'MMsel_Chi2', 'SR_MMsel_Chi2', 'Vertex #Chi^{2}', 1, treeMC, treeSI, False, 'MM')
+    makePlot(lumi, ['SR'], 'MMsel_dPhi', 'SR_MMsel_dPhi', 'Collinearity |#Delta#Phi|', 1, treeMC, treeSI, False, 'MM')
+    makePlot(lumi, ['SR'], 'MMsel_leadingPt', 'SR_MMsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, treeMC, treeSI, False, 'MM')
+    makePlot(lumi, ['SR'], 'MMsel_subleadingPt', 'SR_MMsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, treeMC, treeSI, False, 'MM')
+    makePlot(lumi, ['SR'], 'MMsel_cosAlpha', 'SR_MMsel_cosAlpha', 'cos(#alpha)', 1, treeMC, treeSI, False, 'MM')
+    makePlot(lumi, ['SR'], 'MMsel_Ptll', 'SR_MMsel_Ptll', 'p_{T}(ll)', 1, treeMC, treeSI, False, 'MM')
 
-    makePlot(lumi, 'nMM', 'nMM', 'Number of MM', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'SR_MMsel_minIxy', 'SR_MMsel_minIxy', '|d_{0}|/#sigma_{d}', 1, treeMC, treeSI, False, 'MM') 
-    makePlot(lumi, 'SR_MMsel_invMass', 'SR_MMsel_invMass', 'Mass (GeV/c^{2})', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'SR_MMsel_Chi2', 'SR_MMsel_Chi2', 'Vertex #Chi^{2}', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'SR_MMsel_dPhi', 'SR_MMsel_dPhi', 'Collinearity |#Delta#Phi|', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'SR_MMsel_leadingPt', 'SR_MMsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'SR_MMsel_subleadingPt', 'SR_MMsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'SR_MMsel_cosAlpha', 'SR_MMsel_cosAlpha', 'cos(#alpha)', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'SR_MMsel_Ptll', 'SR_MMsel_Ptll', 'p_{T}(ll)', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'CR_MMsel_minIxy', 'CR_MMsel_minIxy', '|d_{0}|/#sigma_{d}', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'CR_MMsel_invMass', 'CR_MMsel_invMass', 'Mass (GeV/c^{2})', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'CR_MMsel_Chi2', 'CR_MMsel_Chi2', 'Vertex #Chi^{2}', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'CR_MMsel_dPhi', 'CR_MMsel_dPhi', 'Collinearity |#Delta#Phi|', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'CR_MMsel_leadingPt', 'CR_MMsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'CR_MMsel_subleadingPt', 'CR_MMsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'CR_MMsel_cosAlpha', 'CR_MMsel_cosAlpha', 'cos(#alpha)', 1, treeMC, treeSI, False, 'MM')
-    makePlot(lumi, 'CR_MMsel_Ptll', 'CR_MMsel_Ptll', 'p_{T}(ll)', 1, treeMC, treeSI, False, 'MM')
-   
+    makePlot(lumi, ['CR2', 'SR'], 'MMsel_minIxy', 'SR_MMsel_minIxy', '|d_{0}|/#sigma_{d}', 1, treeMC, treeSI, treeMuonDATA, 'MM') 
+    makePlot(lumi, ['CR2', 'SR'], 'MMsel_invMass', 'SR_MMsel_invMass', 'Mass (GeV/c^{2})', 1, treeMC, treeSI, treeMuonDATA, 'MM')
+    makePlot(lumi, ['CR2', 'SR'], 'MMsel_Chi2', 'SR_MMsel_Chi2', 'Vertex #Chi^{2}', 1, treeMC, treeSI, treeMuonDATA, 'MM')
+    makePlot(lumi, ['CR2', 'SR'], 'MMsel_dPhi', 'SR_MMsel_dPhi', 'Collinearity |#Delta#Phi|', 1, treeMC, treeSI, treeMuonDATA, 'MM')
+    makePlot(lumi, ['CR2', 'SR'], 'MMsel_leadingPt', 'SR_MMsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, treeMC, treeSI, treeMuonDATA, 'MM')
+    makePlot(lumi, ['CR2', 'SR'], 'MMsel_subleadingPt', 'SR_MMsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, treeMC, treeSI, treeMuonDATA, 'MM')
+    makePlot(lumi, ['CR2', 'SR'], 'MMsel_cosAlpha', 'SR_MMsel_cosAlpha', 'cos(#alpha)', 1, treeMC, treeSI, treeMuonDATA, 'MM')
+    makePlot(lumi, ['CR2', 'SR'], 'MMsel_Ptll', 'SR_MMsel_Ptll', 'p_{T}(ll)', 1, treeMC, treeSI, treeMuonDATA, 'MM')
 
-    makePlot(lumi, 'nEE', 'nEE', 'Number of EE', 1, treeMC, treeSI, False, 'EE')
-    makePlot(lumi, 'SR_EEsel_minIxy', 'SR_EEsel_minIxy', '|d_{0}|/#sigma_{d}', 1, treeMC, treeSI, False, 'EE') 
-    makePlot(lumi, 'SR_EEsel_invMass', 'SR_EEsel_invMass', 'Mass (GeV/c^{2})', 1, treeMC, treeSI, False, 'EE')
-    makePlot(lumi, 'SR_EEsel_Chi2', 'SR_EEsel_Chi2', 'Vertex #Chi^{2}', 1, treeMC, treeSI, False, 'EE')
-    makePlot(lumi, 'SR_EEsel_dPhi', 'SR_EEsel_dPhi', 'Collinearity |#Delta#Phi|', 1, treeMC, treeSI, False, 'EE')
-    makePlot(lumi, 'SR_EEsel_leadingPt', 'SR_EEsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, treeMC, treeSI, False, 'EE')
-    makePlot(lumi, 'SR_EEsel_subleadingPt', 'SR_EEsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, treeMC, treeSI, False, 'EE')
-    makePlot(lumi, 'SR_EEsel_Ptll', 'SR_EEsel_Ptll', 'p_{T}(ll)', 1, treeMC, treeSI, False, 'EE')
-    makePlot(lumi, 'CR_EEsel_minIxy', 'CR_EEsel_minIxy', '|d_{0}|/#sigma_{d}', 1, treeMC, treeSI, False, 'EE')
-    makePlot(lumi, 'CR_EEsel_invMass', 'CR_EEsel_invMass', 'Mass (GeV/c^{2})', 1, treeMC, treeSI, False, 'EE')
-    makePlot(lumi, 'CR_EEsel_Chi2', 'CR_EEsel_Chi2', 'Vertex #Chi^{2}', 1, treeMC, treeSI, False, 'EE')
-    makePlot(lumi, 'CR_EEsel_dPhi', 'CR_EEsel_dPhi', 'Collinearity |#Delta#Phi|', 1, treeMC, treeSI, False, 'EE')
-    makePlot(lumi, 'CR_EEsel_leadingPt', 'CR_EEsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, treeMC, treeSI, False, 'EE')
-    makePlot(lumi, 'CR_EEsel_subleadingPt', 'CR_EEsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, treeMC, treeSI, False, 'EE')
-    makePlot(lumi, 'CR_EEsel_Ptll', 'CR_EEsel_Ptll', 'p_{T}(ll)', 1, treeMC, treeSI, False, 'EE')
+
+    makePlot(lumi, ['CR1A', 'CR1B'], 'MMsel_minIxy', 'CR1_MMsel_minIxy', '|d_{0}|/#sigma_{d}', 1, treeMC, treeSI, treeMuonDATA, 'MM')
+    makePlot(lumi, ['CR1A', 'CR1B'], 'MMsel_invMass', 'CR1_MMsel_invMass','Mass (GeV/c^{2})', 1, treeMC, treeSI, treeMuonDATA, 'MM')
+    makePlot(lumi, ['CR1A', 'CR1B'], 'MMsel_Chi2', 'CR1_MMsel_Chi2', 'Vertex #Chi^{2}', 1, treeMC, treeSI, treeMuonDATA, 'MM')
+    makePlot(lumi, ['CR1A', 'CR1B'], 'MMsel_dPhi', 'CR1_MMsel_dPhi', 'Collinearity |#Delta#Phi|', 1, treeMC, treeSI, treeMuonDATA, 'MM')
+    makePlot(lumi, ['CR1A', 'CR1B'], 'MMsel_leadingPt', 'CR1_MMsel_leading1', 'Leading p_{T} (GeV/c)', 1, treeMC, treeSI, treeMuonDATA, 'MM')
+    makePlot(lumi, ['CR1A', 'CR1B'], 'MMsel_subleadingPt', 'CR1_MMsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, treeMC, treeSI, treeMuonDATA, 'MM')
+    makePlot(lumi, ['CR1A', 'CR1B'], 'MMsel_cosAlpha', 'CR1_MMsel_cosAlpha', 'cos(#alpha)', 1, treeMC, treeSI, treeMuonDATA, 'MM')
+    makePlot(lumi, ['CR1A', 'CR1B'], 'MMsel_Ptll', 'CR1_MMsel_Ptll', 'p_{T}(ll)', 1, treeMC, treeSI, treeMuonDATA, 'MM')
+
+
+    makePlot(lumi, ['SR'], 'EEsel_minIxy', 'SR_EEsel_minIxy', '|d_{0}|/#sigma_{d}', 1, treeMC, treeSI, False, 'EE')
+    makePlot(lumi, ['SR'], 'EEsel_invMass', 'SR_EEsel_invMass', 'Mass (GeV/c^{2})', 1, treeMC, treeSI, False, 'EE')
+    makePlot(lumi, ['SR'], 'EEsel_Chi2', 'SR_EEsel_Chi2', 'Vertex #Chi^{2}', 1, treeMC, treeSI, False, 'EE')
+    makePlot(lumi, ['SR'], 'EEsel_dPhi', 'SR_EEsel_dPhi', 'Collinearity |#Delta#Phi|', 1, treeMC, treeSI, False, 'EE')
+    makePlot(lumi, ['SR'], 'EEsel_leadingPt', 'SR_EEsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, treeMC, treeSI, False, 'EE')
+    makePlot(lumi, ['SR'], 'EEsel_subleadingPt', 'SR_EEsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, treeMC, treeSI, False, 'EE')
+    makePlot(lumi, ['SR'], 'EEsel_Ptll', 'SR_EEsel_Ptll', 'p_{T}(ll)', 1, treeMC, treeSI, False, 'EE')
+
+    makePlot(lumi, ['CR2', 'SR'], 'EEsel_minIxy', 'SR_EEsel_minIxy', '|d_{0}|/#sigma_{d}', 1, treeMC, treeSI, treeElectronDATA, 'EE')
+    makePlot(lumi, ['CR2', 'SR'], 'EEsel_invMass', 'SR_EEsel_invMass', 'Mass (GeV/c^{2})', 1, treeMC, treeSI, treeElectronDATA, 'EE')
+    makePlot(lumi, ['CR2', 'SR'], 'EEsel_Chi2', 'SR_EEsel_Chi2', 'Vertex #Chi^{2}', 1, treeMC, treeSI, treeElectronDATA, 'EE')
+    makePlot(lumi, ['CR2', 'SR'], 'EEsel_dPhi', 'SR_EEsel_dPhi', 'Collinearity |#Delta#Phi|', 1, treeMC, treeSI, treeElectronDATA, 'EE')
+    makePlot(lumi, ['CR2', 'SR'], 'EEsel_leadingPt', 'SR_EEsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, treeMC, treeSI, treeElectronDATA, 'EE')
+    makePlot(lumi, ['CR2', 'SR'], 'EEsel_subleadingPt', 'SR_EEsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, treeMC, treeSI, treeElectronDATA, 'EE')
+    makePlot(lumi, ['CR2', 'SR'], 'EEsel_Ptll', 'SR_EEsel_Ptll', 'p_{T}(ll)', 1, treeMC, treeSI, treeElectronDATA, 'EE')
+
+    makePlot(lumi, ['CR1A', 'CR1B'], 'EEsel_minIxy', 'CR1_EEsel_minIxy', '|d_{0}|/#sigma_{d}', 1, treeMC, treeSI, treeElectronDATA, 'EE')
+    makePlot(lumi, ['CR1A', 'CR1B'], 'EEsel_invMass', 'CR1_EEsel_invMass', 'Mass (GeV/c^{2})', 1, treeMC, treeSI, treeElectronDATA, 'EE')
+    makePlot(lumi, ['CR1A', 'CR1B'], 'EEsel_Chi2', 'CR1_EEsel_Chi2', 'Vertex #Chi^{2}', 1, treeMC, treeSI, treeElectronDATA, 'EE')
+    makePlot(lumi, ['CR1A', 'CR1B'], 'EEsel_dPhi', 'CR1_EEsel_dPhi', 'Collinearity |#Delta#Phi|', 1, treeMC, treeSI, treeElectronDATA, 'EE')
+    makePlot(lumi, ['CR1A', 'CR1B'], 'EEsel_leadingPt', 'CR1_EEsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, treeMC, treeSI, treeElectronDATA, 'EE')
+    makePlot(lumi, ['CR1A', 'CR1B'], 'EEsel_subleadingPt', 'CR1_EEsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, treeMC, treeSI, treeElectronDATA, 'EE')
+    makePlot(lumi, ['CR1A', 'CR1B'], 'EEsel_Ptll', 'CR1_EEsel_Ptll', 'p_{T}(ll)', 1, treeMC, treeSI, treeElectronDATA, 'EE')
 

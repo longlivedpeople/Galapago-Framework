@@ -274,7 +274,7 @@ if __name__ == "__main__":
     Backgrounds.append('QCD_Pt-30to40') 
     Backgrounds.append('QCD_Pt-40toInf') 
 
-    lumi = 4.8
+    lumi = 36.773
 
     ############# Tree creation
     treeMC = Sample.Tree(helper.selectSamples(WORKPATH + 'dat/MC.dat', Backgrounds, 'MC'), 'MC', 0, WORKPATH + opts.inputFile)
