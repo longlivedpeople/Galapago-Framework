@@ -236,6 +236,7 @@ def makePlot(lumi, regs, var, name, xlabel, logx, treeMC, treeSI = False, treeDA
 
     if treeSI:
         for _h in s_histos:
+            _h.SetLineWidth(2) # provisional
             plot.addHisto(_h, 'HIST, SAME', '', 'l', _h.GetFillColor(), 1, 3) # Signal
 
     if treeDATA:
@@ -464,9 +465,11 @@ if __name__ == "__main__":
     SignalHXX.append('HXX_400_150_40')
 
     Signal = []
+    #Signal.append('HXX_400_150_400')
+    Signal.append('HXX_1000_350_350')
     Signal.append('DisplacedSUSY_350_148_173')
-    Signal.append('HXX_400_150_400')
-    #Signal.append('HXX_1000_350_350')
+
+    Signal = SignalHXX
 
     ############## Data definition
     MuonData = []
@@ -499,6 +502,7 @@ if __name__ == "__main__":
     treeElectronDATA = Sample.Tree(helper.selectSamples(WORKPATH + 'dat/DATA.dat', ElectronData, 'DATA'), 'DATA', 1, WORKPATH + opts.inputFile)
 
 
+#    makePlot(lumi, [''], 'counts', 'counts', 'Weighted counts', 0, treeMC, treeSI, False, 'MM')
 
     makePlot(lumi, ['SR'], 'MMsel_Chi2', 'SR_MMsel_Chi2', 'Vertex #Chi^{2}', 1, treeMC, treeSI, False, 'MM')
     
@@ -562,4 +566,3 @@ if __name__ == "__main__":
     makePlot(lumi, ['CR1A', 'CR1B'], 'EEsel_leadingPt', 'CR1_EEsel_leadingPt', 'Leading p_{T} (GeV/c)', 1, treeMC, treeSI, treeElectronDATA, 'EE')
     makePlot(lumi, ['CR1A', 'CR1B'], 'EEsel_subleadingPt', 'CR1_EEsel_subleadingPt', 'Subleading p_{T} (GeV/c)', 1, treeMC, treeSI, treeElectronDATA, 'EE')
     makePlot(lumi, ['CR1A', 'CR1B'], 'EEsel_Ptll', 'CR1_EEsel_Ptll', 'p_{T}(ll)', 1, treeMC, treeSI, treeElectronDATA, 'EE')
-

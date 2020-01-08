@@ -183,6 +183,9 @@ class Channel:
         nbinmin = h.FindBin(self.xmin)
         nbinmax = h.FindBin(self.xmax)
         value = h.Integral(nbinmin, nbinmax)
+        print(">> Signal", sample)
+        print(h.GetBinCenter(nbinmax))
+        print(self.xmin, nbinmin, self.xmax, nbinmax, value)
 
         signal = EventSet(name = name, number = '0', rate = value)
         self.signal = signal

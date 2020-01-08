@@ -14,6 +14,8 @@ class processHandler:
         self.samplename = samplename
         self.cutManager = CutManager.CutManager()
 
+        self.hcounts = r.TH1F('hcounts_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 1, 0, 1)
+        self.hchannel = r.TH1F('hchannel_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 0, 0, 3) # 0: None, 1: Electron, 2: Muon
 
         # Generation histograms
         self.hgenMM_cosAlpha = r.TH1F('hgenMM_cosAlpha_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 22, -1.1, 1.1)
@@ -143,6 +145,8 @@ class processHandler:
             weight = 1
 
         #### Generation variables
+
+        self.hcounts.Fill(0, weight)
 
         if (ev.nGenLepton == 4):
 

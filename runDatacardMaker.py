@@ -145,7 +145,7 @@ if __name__ == "__main__":
     print '########################################################################' + bcolors.ENDC
 
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
-    parser.add_option('-i', '--input', action='store', type=str, dest='inputFile', default='launchWithGridui/merged.root', help='the input file. default \'merged.root\'')
+    parser.add_option('-i', '--input', action='store', type=str, dest='inputFile', default='launchWithGridui/Aachen.root', help='the input file. default \'merged.root\'')
 
     (opts, args) = parser.parse_args()
 
