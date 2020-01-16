@@ -295,7 +295,7 @@ class Block:
 class Tree:
    'Common base class for a physics meaningful tree'
 
-   def __init__(self, fileName, name, isdata, loopFile):
+   def __init__(self, fileName, name, isdata, loopFile = 'default.root'):
       #print fileName
       self.name  = name
       self.isData = isdata
@@ -375,7 +375,8 @@ class Tree:
      
        AuxName = "auxStack_block_" + name + "_" + b.name
        haux = b.getTH1F(lumi, AuxName, var, nbin, xmin, xmax, cut, options, xlabel)
-       haux.SetFillColor(c.color)
+       haux.SetFillColor(b.color)
+       haux.SetTitle(b.label)
        hs.Add(haux)
        del haux
 

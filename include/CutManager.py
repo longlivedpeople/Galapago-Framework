@@ -1,4 +1,4 @@
-
+import math
 
 class CutManager:
    'This class serves as an on-demand cut server'
@@ -8,8 +8,10 @@ class CutManager:
       ########################################################################
       ######Basic Lepton Cuts ################################################
       ########################################################################
-      self.twoElectrons = self.brackets('ev.nEE < 2')
-      self.twoMuons = self.brackets('ev.nMM < 2')
+      self.haveEEBase = self.brackets('nEEBase > 0')
+      self.EESR_dPhi = self.brackets('fabs(EEBase_dPhi[EEBase_maxIxy])< 3.14/2.0')
+      self.EECR_dPhi = self.brackets('fabs(EEBase_dPhi[EEBase_maxIxy]) > 3.14/2.0')
+      self.haveMMBase = self.brackets('nMMBase > 0')
 
    def donotB(self, cut):
      return '(!' + self.brackets(cut) + ')'
