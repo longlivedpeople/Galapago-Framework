@@ -3,24 +3,47 @@ import time
 
 class Launcher:
 
-    def __init__(self, script, ID = '', output = 'withID', name = False):
+    def __init__(self, script, ID = '', output = 'withID', name = False, gridui = True):
 
         self.basename = name if name else 'Galapago'
         self.script = script
         self.ID = ID
+        self.gridui = gridui
 
+        # Identify workpath:
         self.workpath = ''
         for level in script.split('/')[:-1]: self.workpath += level + '/'
+
+        # Identify cmssw release
+        self.cmssw = ''
+        for level in script.split('/'): 
+            self.cmssw += level + '/'
+            if 'CMSSW' in level:
+                self.cmssw += 'src' 
+                break
+
+        # Define file names for job submission
         self.auxscript = self.workpath + '_auxScript'+str(ID)+'.py'
         self.auxsubmit = self.workpath + '_auxSubmit'+str(ID)+'.sh'
+        self.condorfile = self.workpath + '_auxCondorFile' + str(ID)+'.sh'
+        self.condorsub = self.workpath + '_auxCondorSub' + str(ID)+'.sh'
+
+        # Define qeue (CONDOR)
+        self.qeue = '8nh'
 
         self.output = output
 
+
+        # Execute:
         self.makeSubmitScript()
-        self.makeGriduiSubmitFile(out = self.output)
+
+        if self.gridui:
+            self.makeGriduiSubmitFile()
+        else: # default condor
+            self.makeCondorSubmitFiles()
 
 
-    def makeGriduiSubmitFile(self, out):
+    def makeGriduiSubmitFile(self):
 
         text = """
 ###################
@@ -56,8 +79,38 @@ pushd
 python {1} --out {2}
 """
         _auxSubmit = open(self.auxsubmit, 'w')
-        _auxSubmit.write(text.format(self.basename, self.auxscript, out))
+        _auxSubmit.write(text.format(self.basename, self.auxscript, self.output))
         _auxSubmit.close()
+
+    def makeCondorSubmitFiles():
+
+        templateCONDOR = """#!/bin/bash
+pushd {0}
+eval `scramv1 runtime -sh`
+pushd
+python {1} --out {2}
+"""
+
+        _f = open(self.condorfile, 'w')
+        _f.write(templateCONDOR.format(self.cmssw, self.auxscript, self.output))
+        _f.close()
+
+
+        templateCONDORsub = """
+universe                = vanilla
+executable              = $(filename)
+output                  = {0}/$(ClusterId).$(ProcId).out
+error                   = {0}/$(ClusterId).$(ProcId).err
+log                     = {0}/$(ClusterId).log
+Notify_user             = fernance@cern.ch
++JobFlavour = "{1}" 
+queue filename matching ({2})
+"""
+
+        _fs = open(self.condorsub, 'w')
+        _fs.write(templateCONDORsub.format(self.logs, self.qeue, self.condorfile))
+        _fs.close()
+
 
     def makeSubmitScript(self):
 
@@ -82,8 +135,14 @@ python {1} --out {2}
 
     def launch(self):
 
-        os.system('chmod +x ' + self.auxsubmit)
-        os.system('qsub -o '+ self.workpath + 'logs/gridui'+str(self.ID)+'.log -e ' + self.workpath + 'logs/gridui'+str(self.ID)+'.err ' + self.auxsubmit)
+        if self.gridui:
+            os.system('chmod +x ' + self.auxsubmit)
+            os.system('qsub -o '+ self.workpath + 'logs/gridui'+str(self.ID)+'.log -e ' + self.workpath + 'logs/gridui'+str(self.ID)+'.err ' + self.auxsubmit)
+        else:
+            os.system('chmod +x ' + self.condorfile)
+            os.system('chmod +x ' + self.condorsub)
+            os.system('source ' + self.condorsub)
+
 
     def clear(self):
 
