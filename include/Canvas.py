@@ -2,6 +2,8 @@ from ROOT import TCanvas, TLegend,TPie,  TPad, TLine, TLatex, TGraphAsymmErrors,
 import ROOT as r
 import os, copy, math, array
 from array import array
+import time
+
 class Canvas:
    'Common base class for all Samples'
 
@@ -248,9 +250,22 @@ class Canvas:
           
 
    def ensurePath(self, _path):
-      d = os.path.dirname(_path)
-      if not os.path.exists(d):
-         os.makedirs(d)                 
+
+      ## Enter a while loop to avoid race conditions
+      print("Hacemos ensure")
+      while True:
+          d = os.path.dirname(_path)
+          print("Primer intento: " + d) 
+          try:
+              if not os.path.exists(d):
+                  os.makedirs(d)
+              break
+          except OSError, e:
+              if e.errno != os.errno.EEXIST:
+                  raise
+              print("Sleeping...")
+              time.sleep(1.0)
+              pass
 
    def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, label ="Data/Prediction", outputDir = 'plots/'):
 
@@ -425,6 +440,7 @@ class Canvas:
           self.ensurePath(path)
           self.myCanvas.SaveAs(path)
 
+      #for _h in self.histos: del _h
       self.myLegend.IsA().Destructor(self.myLegend)
       self.myCanvas.IsA().Destructor(self.myCanvas)
 

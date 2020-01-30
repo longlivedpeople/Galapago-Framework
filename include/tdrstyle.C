@@ -152,7 +152,7 @@ void setTDRStyle(bool fatline=true) {
   // Double_t blue[5]  = { 0.51, 1.00, 0.12, 0.00, 0.00 };
   // TColor::CreateGradientColorTable(5, stops, red, green,blue, 255);
   tdrStyle->SetNumberContours(255);
-  tdrStyle->SetPalette(53);
+  tdrStyle->SetPalette(55);
   
   tdrStyle->cd();
 }

@@ -115,6 +115,7 @@ class Sample:
         self.lumWeight = self.xSection / self.count
 
 
+
    def printSample(self):
       print "#################################"
       print "Sample Name: ", self.name
@@ -152,7 +153,11 @@ class Sample:
       
       if(self.isData == 0):
          cut = cut + "* ( " + str(self.lumWeight*lumi) + " * genWeight/abs(genWeight) " + " )" 
+
+      print("Aqui empieza Project:")
       self.ttree.Project(h.GetName(), var, cut, options)
+      print("Aqui termina Project")
+
       for _bin in range(1, h.GetNbinsX()+2):
           h_of.SetBinContent(_bin, h.GetBinContent(_bin))
           h_of.SetBinError  (_bin, h.GetBinError  (_bin))
@@ -371,6 +376,7 @@ class Tree:
      if cut == '':
        cut = '(1)'
      hs = THStack(name, "")
+     SetOwnership(hs, 0 )
      for b in self.blocks:
      
        AuxName = "auxStack_block_" + name + "_" + b.name
