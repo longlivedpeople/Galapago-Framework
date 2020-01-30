@@ -1,0 +1,6 @@
+_auxScript*
+_auxSubmit*
+.tmp_sampleFile*
+*.pyc
+*.png
+dat/*
