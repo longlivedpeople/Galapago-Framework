@@ -107,7 +107,13 @@ outtag = ''
 
 ################################# GLOBAL VARIABLES DEFINITION ####################################
 
-WORKPATH = os.path.abspath('./') + '/'
+runningfile = os.path.abspath(__file__)
+WORKPATH = ''
+for level in runningfile.split('/')[:-1]: 
+    print(level) 
+    WORKPATH += level
+    WORKPATH += '/'
+
 
 ##################################### FUNCTION DEFINITION ########################################
 
@@ -277,21 +283,22 @@ if __name__ == "__main__":
     outtag = opts.out
 
     ############# Set the TDR plot style
+    print(WORKPATH)
     r.gROOT.LoadMacro(WORKPATH + 'include/tdrstyle.C+')
     r.gROOT.SetBatch(1)
     r.setTDRStyle()
 
     ############# Background definition
     Backgrounds = []
-    Backgrounds.append('DYJetsToLL_M-50') 
-    Backgrounds.append('DYJetsToLL_M-10to50') 
+    #Backgrounds.append('DYJetsToLL_M-50') 
+    #Backgrounds.append('DYJetsToLL_M-10to50') 
     Backgrounds.append('WW') 
-    Backgrounds.append('WZ') 
-    Backgrounds.append('ZZ') 
-    Backgrounds.append('WJetsToLNu') 
-    Backgrounds.append('TTJets_DiLept') 
-    Backgrounds.append('QCD_Pt-30to40') 
-    Backgrounds.append('QCD_Pt-40toInf') 
+    #Backgrounds.append('WZ') 
+    #Backgrounds.append('ZZ') 
+    #Backgrounds.append('WJetsToLNu') 
+    #Backgrounds.append('TTJets_DiLept') 
+    #Backgrounds.append('QCD_Pt-30to40') 
+    #Backgrounds.append('QCD_Pt-40toInf') 
 
     ############# Signal definition
     Signals = []
