@@ -29,7 +29,8 @@ class Launcher:
         self.condorsub = self.workpath + '_auxCondorSub' + str(ID)+'.sh'
 
         # Define qeue (CONDOR)
-        self.qeue = '8nh'
+        self.qeue = 'espresso'
+        self.logs = self.workpath + 'logs/'
 
         self.output = output
 
@@ -82,7 +83,7 @@ python {1} --out {2}
         _auxSubmit.write(text.format(self.basename, self.auxscript, self.output))
         _auxSubmit.close()
 
-    def makeCondorSubmitFiles():
+    def makeCondorSubmitFiles(self):
 
         templateCONDOR = """#!/bin/bash
 pushd {0}
@@ -99,12 +100,12 @@ python {1} --out {2}
         templateCONDORsub = """
 universe                = vanilla
 executable              = $(filename)
-output                  = {0}/$(ClusterId).$(ProcId).out
-error                   = {0}/$(ClusterId).$(ProcId).err
-log                     = {0}/$(ClusterId).log
+output                  = {0}$(ClusterId).$(ProcId).out
+error                   = {0}$(ClusterId).$(ProcId).err
+log                     = {0}$(ClusterId).log
 Notify_user             = fernance@cern.ch
 +JobFlavour = "{1}" 
-queue filename matching ({2})
+queue filename matching {2}
 """
 
         _fs = open(self.condorsub, 'w')
@@ -141,7 +142,7 @@ queue filename matching ({2})
         else:
             os.system('chmod +x ' + self.condorfile)
             os.system('chmod +x ' + self.condorsub)
-            os.system('source ' + self.condorsub)
+            os.system('condor_submit ' + self.condorsub)
 
 
     def clear(self):
