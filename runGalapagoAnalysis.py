@@ -105,6 +105,9 @@ class bcolors:
 global outtag
 outtag = ''
 
+global qeue
+qeue = False
+
 ################################# GLOBAL VARIABLES DEFINITION ####################################
 
 runningfile = os.path.abspath(__file__)
@@ -123,7 +126,7 @@ def makePlot(qeue, lumi, var, name, nbin, xmin, xmax, xlabel, logx, treeMC, cuts
 
     if qeue:
 
-        launcher = Launcher.Launcher(script = os.path.dirname(os.path.abspath(__file__)) +'/'+ __file__, ID = name, output = outtag, gridui = False)
+        launcher = Launcher.Launcher(script = os.path.dirname(os.path.abspath(__file__)) +'/'+ __file__, env = qeue, ID = name, output = outtag)
         order = "makePlot(qeue = False, lumi = {0}, var = '{1}', name = '{2}', nbin = {3}, xmin = {4}, xmax = {5}, xlabel = '{6}', logx = {7}, treeMC = treeMC, cuts = '{8}', treeSI = treeSI, treeDATA = treeDATA, LLlabel = '{9}', normed = {10})".format(lumi, var, name, nbin, xmin, xmax, xlabel, logx, cuts, LLlabel, normed)
         launcher.addOrder(order)
         launcher.launch()
@@ -277,10 +280,11 @@ if __name__ == "__main__":
 
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
     parser.add_option('-o', '--out', action='store', type=str, dest='out', default='', help='Output tag')
-    parser.add_option('-q', '--qeue', action='store_true', dest='qeue', help='Select if you want to send the job a qeue')
+    parser.add_option('-q', '--qenv', action='store', type=str, dest='qenv', default='', help='Select if you want to send the job a condor qeue')
     (opts, args) = parser.parse_args()
 
     outtag = opts.out
+    if opts.qenv == '': opts.qenv = False
 
     ############# Set the TDR plot style
     print(WORKPATH)
@@ -290,15 +294,15 @@ if __name__ == "__main__":
 
     ############# Background definition
     Backgrounds = []
-    #Backgrounds.append('DYJetsToLL_M-50') 
-    #Backgrounds.append('DYJetsToLL_M-10to50') 
+    Backgrounds.append('DYJetsToLL_M-50') 
+    Backgrounds.append('DYJetsToLL_M-10to50') 
     Backgrounds.append('WW') 
-    #Backgrounds.append('WZ') 
-    #Backgrounds.append('ZZ') 
-    #Backgrounds.append('WJetsToLNu') 
-    #Backgrounds.append('TTJets_DiLept') 
-    #Backgrounds.append('QCD_Pt-30to40') 
-    #Backgrounds.append('QCD_Pt-40toInf') 
+    Backgrounds.append('WZ') 
+    Backgrounds.append('ZZ') 
+    Backgrounds.append('WJetsToLNu') 
+    Backgrounds.append('TTJets_DiLept') 
+    Backgrounds.append('QCD_Pt-30to40') 
+    Backgrounds.append('QCD_Pt-40toInf') 
 
     ############# Signal definition
     Signals = []
@@ -320,12 +324,12 @@ if __name__ == "__main__":
 
     ############# Plotting
     start_time = time.time()
-    makePlot(opts.qeue, lumi, 'MMBase_trackIxy[MMBase_maxIxy]', 'SR_MMBase_trackIxy', 40, 0, 20, 'MM I_{xy}', True, treeMC, MMSR, treeSI)
-    makePlot(opts.qeue, lumi, 'MMBase_refittedIxy[MMBase_maxIxy] - MMBase_trackIxy[MMBase_maxIxy]', 'SR_MMBase_IxyDiff', 50, -20, 120, 'Refitted I_{xy} - original I_{xy}', True, treeMC, MMSR, treeSI)
-    makePlot(opts.qeue, lumi, 'nEEBase', 'nEEBase', 3, 0, 3, 'Number of valid EE candidates', True, treeMC, EESR, treeSI)
-    makePlot(opts.qeue, lumi, 'EEBase_trackIxy[EEBase_maxIxy]', 'SR_EEBase_trackIxy', 40, 0, 20, 'EE I_{xy}', True, treeMC, EESR, treeSI)
-    makePlot(opts.qeue, lumi, 'EEBase_refittedIxy[EEBase_maxIxy] - EEBase_trackIxy[EEBase_maxIxy]', 'SREEBase_IxyDiff', 50, -20, 120, 'Refitted I_{xy} - original I_{xy}', True, treeMC, EESR, treeSI)
-    makePlot(opts.qeue, lumi, 'nMMBase', 'nMMBase', 3, 0, 3, 'Number of valid MM candidates', True, treeMC, MMSR, treeSI)
+    makePlot(opts.qenv, lumi, 'MMBase_trackIxy[MMBase_maxIxy]', 'SR_MMBase_trackIxy', 40, 0, 20, 'MM I_{xy}', True, treeMC, MMSR, treeSI)
+    makePlot(opts.qenv, lumi, 'MMBase_refittedIxy[MMBase_maxIxy] - MMBase_trackIxy[MMBase_maxIxy]', 'SR_MMBase_IxyDiff', 50, -20, 120, 'Refitted I_{xy} - original I_{xy}', True, treeMC, MMSR, treeSI)
+    makePlot(opts.qenv, lumi, 'nEEBase', 'nEEBase', 3, 0, 3, 'Number of valid EE candidates', True, treeMC, EESR, treeSI)
+    makePlot(opts.qenv, lumi, 'EEBase_trackIxy[EEBase_maxIxy]', 'SR_EEBase_trackIxy', 40, 0, 20, 'EE I_{xy}', True, treeMC, EESR, treeSI)
+    makePlot(opts.qenv, lumi, 'EEBase_refittedIxy[EEBase_maxIxy] - EEBase_trackIxy[EEBase_maxIxy]', 'SREEBase_IxyDiff', 50, -20, 120, 'Refitted I_{xy} - original I_{xy}', True, treeMC, EESR, treeSI)
+    makePlot(opts.qenv, lumi, 'nMMBase', 'nMMBase', 3, 0, 3, 'Number of valid MM candidates', True, treeMC, MMSR, treeSI)
     print("--- %s seconds ---" % (time.time() - start_time))
 
 

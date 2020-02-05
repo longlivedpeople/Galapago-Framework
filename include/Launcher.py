@@ -3,12 +3,13 @@ import time
 
 class Launcher:
 
-    def __init__(self, script, ID = '', output = 'withID', name = False, gridui = True):
+    def __init__(self, script, env, ID = '', output = 'random', name = False):
 
         self.basename = name if name else 'Galapago'
         self.script = script
         self.ID = ID
-        self.gridui = gridui
+        self.env = env
+
 
         # Identify workpath:
         self.workpath = ''
@@ -28,8 +29,8 @@ class Launcher:
         self.condorfile = self.workpath + '_auxCondorFile' + str(ID)+'.sh'
         self.condorsub = self.workpath + '_auxCondorSub' + str(ID)+'.sh'
 
-        # Define qeue (CONDOR)
-        self.qeue = 'espresso'
+        # Define qeue (only in condorCONDOR)
+        self.qeue = 'microcentury'
         self.logs = self.workpath + 'logs/'
 
         self.output = output
@@ -38,9 +39,9 @@ class Launcher:
         # Execute:
         self.makeSubmitScript()
 
-        if self.gridui:
+        if self.env == 'gridui':
             self.makeGriduiSubmitFile()
-        else: # default condor
+        if self.env == 'condor': 
             self.makeCondorSubmitFiles()
 
 
@@ -136,7 +137,7 @@ queue filename matching {2}
 
     def launch(self):
 
-        if self.gridui:
+        if self.env == 'gridui':
             os.system('chmod +x ' + self.auxsubmit)
             os.system('qsub -o '+ self.workpath + 'logs/gridui'+str(self.ID)+'.log -e ' + self.workpath + 'logs/gridui'+str(self.ID)+'.err ' + self.auxsubmit)
         else:
