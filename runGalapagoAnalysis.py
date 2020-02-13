@@ -324,12 +324,40 @@ if __name__ == "__main__":
 
     ############# Plotting
     start_time = time.time()
-    makePlot(opts.qenv, lumi, 'MMBase_trackIxy[MMBase_maxIxy]', 'SR_MMBase_trackIxy', 40, 0, 20, 'MM I_{xy}', True, treeMC, MMSR, treeSI)
-    makePlot(opts.qenv, lumi, 'MMBase_refittedIxy[MMBase_maxIxy] - MMBase_trackIxy[MMBase_maxIxy]', 'SR_MMBase_IxyDiff', 50, -20, 120, 'Refitted I_{xy} - original I_{xy}', True, treeMC, MMSR, treeSI)
-    makePlot(opts.qenv, lumi, 'nEEBase', 'nEEBase', 3, 0, 3, 'Number of valid EE candidates', True, treeMC, EESR, treeSI)
-    makePlot(opts.qenv, lumi, 'EEBase_trackIxy[EEBase_maxIxy]', 'SR_EEBase_trackIxy', 40, 0, 20, 'EE I_{xy}', True, treeMC, EESR, treeSI)
-    makePlot(opts.qenv, lumi, 'EEBase_refittedIxy[EEBase_maxIxy] - EEBase_trackIxy[EEBase_maxIxy]', 'SREEBase_IxyDiff', 50, -20, 120, 'Refitted I_{xy} - original I_{xy}', True, treeMC, EESR, treeSI)
-    makePlot(opts.qenv, lumi, 'nMMBase', 'nMMBase', 3, 0, 3, 'Number of valid MM candidates', True, treeMC, MMSR, treeSI)
+
+    makePlot(opts.qenv, lumi, 'nEEBase', 'nEEBase', 3, 0, 3, 'Number of valid EE candidates', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.EEChannel]), treeSI)
+    makePlot(opts.qenv, lumi, 'nMMBase', 'nMMBase', 3, 0, 3, 'Number of valid MM candidates', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.MMChannel]), treeSI)
+
+    makePlot(opts.qenv, lumi, 'RefittedPV_nExcludedTrack', 'PV_excludedTracks_MM', 4, 0, 4, 'Number of excluded tracks', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMMBase]), treeSI)
+    makePlot(opts.qenv, lumi, 'RefittedPV_nExcludedTrack', 'PV_excludedTracks_EE', 4, 0, 4, 'Number of excluded tracks', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.EEChannel, cuts.haveEEBase]), treeSI)
+
+    makePlot(opts.qenv, lumi, 'MMBase_dPhi[MMBase_maxIxy]', 'MMBase_dPhi', 40, -3.5, 3.5, 'MM Collinearity #Phi', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMMBase]), treeSI)
+    makePlot(opts.qenv, lumi, 'EEBase_dPhi[EEBase_maxIxy]', 'EEBase_dPhi', 40, -3.5, 3.5, 'EE Collinearity #Phi', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.EEChannel, cuts.haveEEBase]), treeSI)
+
+    makePlot(opts.qenv, lumi, 'MMBase_cosAlpha[MMBase_maxIxy]', 'MMBase_cosAlpha', 40, -3.5, 3.5, 'MM cos(#alpha)', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMMBase]), treeSI)
+    makePlot(opts.qenv, lumi, 'EEBase_cosAlpha[EEBase_maxIxy]', 'EEBase_cosAlpha', 40, -3.5, 3.5, 'EE cos(#alpha)', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.EEChannel, cuts.haveEEBase]), treeSI)
+
+    makePlot(opts.qenv, lumi, 'MMBase_mass[MMBase_maxIxy]', 'MMBase_mass', 100, 0, 200, 'Invariant mass m_{#mu#mu}', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMMBase]), treeSI)
+    makePlot(opts.qenv, lumi, 'EEBase_mass[EEBase_maxIxy]', 'EEBase_mass', 100, 0, 200, 'Invariant mass m_{ee}', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.EEChannel, cuts.haveEEBase]), treeSI)
+
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_Lxy[MMBase_maxIxy])', 'SR_MMBase_Lxy', 40, 0, 20, 'MM vertex length L_{xy}', True, treeMC, MMSR, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_Ixy[MMBase_maxIxy])', 'SR_MMBase_Ixy', 40, 0, 20, 'MM vertex length I_{xy}', True, treeMC, MMSR, treeSI)
+
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackIxy[MMBase_maxIxy])', 'SR_MMBase_trackIxy', 40, 0, 20, 'MM I_{xy}', True, treeMC, cuts.AddListB([MMSR, cuts.MM_etaConstrained]), treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackDxy[MMBase_maxIxy])', 'SR_MMBase_trackDxy', 40, 0, 20, 'MM d_{xy}', True, treeMC, MMSR, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_refittedIxy[MMBase_maxIxy])', 'SR_MMBase_refittedIxy', 40, 0, 20, 'MM I_{xy}', True, treeMC, MMSR, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_refittedDxy[MMBase_maxIxy])', 'SR_MMBase_refittedDxy', 40, 0, 20, 'MM d_{xy}', True, treeMC, MMSR, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_refittedIxy[MMBase_maxIxy]) - fabs(MMBase_trackIxy[MMBase_maxIxy])', 'SR_MMBase_IxyDiff', 50, -20, 120, 'Refitted I_{xy} - original I_{xy}', True, treeMC, MMSR, treeSI)
+
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_Lxy[EEBase_maxIxy])', 'SR_EEBase_Lxy', 40, 0, 20, 'EE vertex length L_{xy}', True, treeMC, EESR, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_Ixy[EEBase_maxIxy])', 'SR_EEBase_Ixy', 40, 0, 20, 'EE vertex length I_{xy}', True, treeMC, EESR, treeSI)
+
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_trackIxy[EEBase_maxIxy])', 'SR_EEBase_trackIxy', 40, 0, 20, 'EE I_{xy}', True, treeMC, EESR, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_trackDxy[EEBase_maxIxy])', 'SR_EEBase_trackDxy', 40, 0, 20, 'EE d_{xy}', True, treeMC, EESR, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_refittedIxy[EEBase_maxIxy])', 'SR_EEBase_refittedIxy', 40, 0, 20, 'EE I_{xy}', True, treeMC, EESR, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_refittedDxy[EEBase_maxIxy])', 'SR_EEBase_refittedDxy', 40, 0, 20, 'EE d_{xy}', True, treeMC, EESR, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_refittedIxy[EEBase_maxIxy]) - fabs(EEBase_trackIxy[EEBase_maxIxy])', 'SREEBase_IxyDiff', 50, -20, 120, 'Refitted I_{xy} - original I_{xy}', True, treeMC, EESR, treeSI)
+
     print("--- %s seconds ---" % (time.time() - start_time))
 
 

@@ -1,5 +1,4 @@
-_auxScript*
-_auxSubmit*
+_aux*
 .tmp_sampleFile*
 *.pyc
 *.png

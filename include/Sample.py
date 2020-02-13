@@ -382,6 +382,7 @@ class Tree:
        AuxName = "auxStack_block_" + name + "_" + b.name
        haux = b.getTH1F(lumi, AuxName, var, nbin, xmin, xmax, cut, options, xlabel)
        haux.SetFillColor(b.color)
+       haux.SetLineColor(r.kBlack)
        haux.SetTitle(b.label)
        hs.Add(haux)
        del haux
