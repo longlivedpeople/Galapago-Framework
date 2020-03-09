@@ -1,0 +1,5 @@
+_aux*
+.tmp_sampleFile*
+*.pyc
+*.png
+dat/*

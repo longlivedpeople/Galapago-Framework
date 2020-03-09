@@ -2,10 +2,12 @@ from ROOT import TCanvas, TLegend,TPie,  TPad, TLine, TLatex, TGraphAsymmErrors,
 import ROOT as r
 import os, copy, math, array
 from array import array
+import time
+
 class Canvas:
    'Common base class for all Samples'
 
-   def __init__(self, name, _format, x1, y1, x2, y2, ww=0, hh=0):
+   def __init__(self, name, _format, x1, y1, x2, y2, c, ww=0, hh=0):
       self.name = name
       self.format = _format
       self.plotNames    = [name + "." + i for i in _format.split(',')]
@@ -26,7 +28,8 @@ class Canvas:
       self.myLegend.SetTextFont(42)
       self.myLegend.SetTextSize(0.03)
       self.myLegend.SetLineWidth(0)
-      self.myLegend.SetBorderSize(0)              
+      self.myLegend.SetBorderSize(0)
+      self.myLegend.SetNColumns(c)              
       r.gStyle.SetPadRightMargin(0.05)
 
    def changeLabelsToNames(self):
@@ -60,7 +63,7 @@ class Canvas:
       else:
          latexb.DrawLatex(0.44, 0.93, "#it{Simulation}")
 
-      text_lumi = str(lumi)+" fb^{-1}"
+      text_lumi = str(lumi)+" fb^{-1}  (13 TeV)"
       latexc = TLatex()
       latexc.SetNDC();
       latexc.SetTextAngle(0);
@@ -94,7 +97,7 @@ class Canvas:
       #else:
       #  latexb.DrawLatex(0.38, 0.93, "#it{Simulation}")
 
-      text_lumi =str(lumi)+" fb^{-1}"
+      text_lumi =str(lumi)+" fb^{-1} (13 TeV)"
       latexc = TLatex()
       latexc.SetNDC();
       latexc.SetTextAngle(0);
@@ -136,7 +139,6 @@ class Canvas:
       latexc.SetTextFont(42);
       latexc.SetTextAlign(31);
       latexc.SetTextSize(0.05);
-
 
    def addBand(self, x1, y1, x2, y2, color, opacity):
 
@@ -248,11 +250,24 @@ class Canvas:
           
 
    def ensurePath(self, _path):
-      d = os.path.dirname(_path)
-      if not os.path.exists(d):
-         os.makedirs(d)                 
 
-   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, label ="Data/Prediction"):
+      ## Enter a while loop to avoid race conditions
+      print("Hacemos ensure")
+      while True:
+          d = os.path.dirname(_path)
+          print("Primer intento: " + d) 
+          try:
+              if not os.path.exists(d):
+                  os.makedirs(d)
+              break
+          except OSError, e:
+              if e.errno != os.errno.EEXIST:
+                  raise
+              print("Sleeping...")
+              time.sleep(1.0)
+              pass
+
+   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, label ="Data/Prediction", outputDir = 'plots/'):
 
       self.myCanvas.cd()
 
@@ -278,6 +293,7 @@ class Canvas:
 
       if(legend):
           self.makeLegend()
+          self.myLegend.SetTextSize(0.035) # Modify the legend size
           self.myLegend.Draw()
 
       for band in self.bands:
@@ -344,11 +360,15 @@ class Canvas:
 
       pad1.cd()
       self.banner2(isData, lumi)
+
+      if not outputDir[-1] == '/': dirName = outputDir + '/'
+      else: dirName = outputDir
+
       for i,plotName in enumerate(self.plotNames):
           pad1.cd()
           pad1.SetLogy(0)
-          path    = 'plots/'+plotName
-          pathlog = 'plots/'+self.plotNamesLog[i]
+          path    = dirName+plotName
+          pathlog = dirName+self.plotNamesLog[i]
           self.ensurePath(path)
           self.myCanvas.SaveAs(path)
           if not '.root' in pathlog:
@@ -364,18 +384,23 @@ class Canvas:
       self.myCanvas.IsA().Destructor(self.myCanvas)                                                                                                                                            
 
 
-   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0):
+   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False):
 
       self.myCanvas.cd()
       
       if(log):
           self.myCanvas.GetPad(0).SetLogy(1)
+      if(xlog):
+          self.myCanvas.GetPad(0).SetLogx(1)
      
       for i in range(0, len(self.histos)):
           if(self.ToDraw[i] != 0):        
               if ymin and ymax:
                   self.histos[i].GetYaxis().SetRangeUser(ymin, ymax)
               self.histos[i].Draw(self.options[i])
+
+      ## Draw axis:
+      #self.histos[0].Draw('same axis')
 
       for band in self.bands:
           band.Draw('f')
@@ -405,11 +430,17 @@ class Canvas:
       
       
       self.banner(isData, lumi)
+
+      if not outputDir[-1] == '/': dirName = outputDir + '/'
+      else: dirName = outputDir
+
+
       for plotName in self.plotNames:
-          path = 'plots/'+plotName
+          path = dirName+plotName
           self.ensurePath(path)
           self.myCanvas.SaveAs(path)
 
+      #for _h in self.histos: del _h
       self.myLegend.IsA().Destructor(self.myLegend)
       self.myCanvas.IsA().Destructor(self.myCanvas)
 
