@@ -285,7 +285,7 @@ if __name__ == "__main__":
     for i in range(0, _tree.GetEntries()):
 
         _tree.GetEntry(i)
-        #if i > 1000: break
+        if i > 1000: break
 
         ### Muon Channel
         #if _tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 == 1:
@@ -610,7 +610,7 @@ if __name__ == "__main__":
     outputFile.Close()
 
     #### Plot some of the efficiencies:
-    EFF_algoVSpt = Efficiency.Efficiency('EFF_algoVSpt', 'png', 0.45, 0.80, 0.9, 0.89, 3)
+    EFF_algoVSpt = Canvas.Canvas('EFF_algoVSpt', 'png', 0.45, 0.80, 0.9, 0.89, 3)
     EFF_algoVSpt.addRate(eff_IFCA_pt, 'AP', 'IFCA', 'p', r.kMagenta-4, True, 0, marker = 22)
     EFF_algoVSpt.addRate(eff_GM_pt, 'AP, same', 'GM', 'p', r.kAzure-4, True, 1, marker = 20)
     EFF_algoVSpt.addRate(eff_DGM_pt, 'AP, same', 'DGM', 'p', r.kAzure-3, True, 2, marker = 20)
@@ -620,9 +620,9 @@ if __name__ == "__main__":
     EFF_algoVSpt.addRate(eff_Med_pt, 'AP, same', 'Med', 'p', r.kGreen-4, True, 6, marker = 21)
     EFF_algoVSpt.addRate(eff_miniGM_pt, 'AP, same', 'GM (mini)', 'p', r.kGreen-3, True, 7, marker = 21)
     EFF_algoVSpt.addRate(eff_miniSA_pt, 'AP, same', 'SA (mini)', 'p', r.kGreen-2, True, 8, marker = 21)
-    EFF_algoVSpt.save(1, 0, 0, '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
+    EFF_algoVSpt.save(1, 0, 0, '', '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
 
-    EFF_algoVSLxy = Efficiency.Efficiency('EFF_algoVSLxy', 'png', 0.55, 0.80, 0.9, 0.89, 3)
+    EFF_algoVSLxy = Canvas.Canvas('EFF_algoVSLxy', 'png', 0.55, 0.80, 0.9, 0.89, 3)
 #    EFF_algoVSLxy.addRate(eff_IFCA_Lxy, 'AP', 'IFCA', 'p', r.kMagenta-4, True, 0, marker = 22)
 #    EFF_algoVSLxy.addRate(eff_GM_Lxy, 'AP, same', 'GM', 'p', r.kAzure-4, True, 3, marker = 20)
     EFF_algoVSLxy.addRate(eff_DGM_Lxy, 'AP, same', 'DGM', 'p', r.kAzure-3, True, 0, marker = 20)
@@ -632,27 +632,24 @@ if __name__ == "__main__":
 #    EFF_algoVSLxy.addRate(eff_Med_Lxy, 'AP, same', 'Med', 'p', r.kGreen-4, True, 6, marker = 21)
 #    EFF_algoVSLxy.addRate(eff_miniGM_Lxy, 'AP, same', 'GM (mini)', 'p', r.kGreen-3, True, 7, marker = 21)
 #    EFF_algoVSLxy.addRate(eff_miniSA_Lxy, 'AP, same', 'SA (mini)', 'p', r.kGreen-2, True, 8, marker = 21)
-    EFF_algoVSLxy.save(1, 0, 0, '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
+    EFF_algoVSLxy.save(1, 0, 0, '', '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
 
 
-    EFF_algoVSdR = Efficiency.Efficiency('EFF_algoVSdR', 'png', 0.55, 0.80, 0.9, 0.89, 3)
+    EFF_algoVSdR = Canvas.Canvas('EFF_algoVSdR', 'png', 0.55, 0.80, 0.9, 0.89, 3)
     EFF_algoVSdR.addRate(eff_SA_dR, 'AP, same', 'SA', 'p', r.kRed-7, True, 1, marker = 34)
     EFF_algoVSdR.addRate(eff_DSA_dR, 'AP, same', 'DSA', 'p', r.kRed+1, True, 1, marker = 34)
-    EFF_algoVSdR.save(1, 0, 0, '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
+    EFF_algoVSdR.save(1, 0, 0, '', '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
 
 
-    EFF_algoVSeta = Efficiency.Efficiency('EFF_algoVSeta', 'png', 0.16, 0.83, 0.9, 0.89, 6)
+    EFF_algoVSeta = Canvas.Canvas('EFF_algoVSeta', 'png', 0.16, 0.83, 0.9, 0.89, 6)
     EFF_algoVSeta.addRate(eff_IFCA_eta, 'AP', 'IFCA', 'p', r.kMagenta-4, True, 0, marker = 22)
     EFF_algoVSeta.addRate(eff_SA_eta, 'AP, same', 'SA', 'p', r.kRed-7, True, 1, marker = 34)
     EFF_algoVSeta.addRate(eff_RSA_eta, 'AP, same', 'RSA', 'p', r.kRed-4, True, 2, marker = 34)
     EFF_algoVSeta.addRate(eff_DSA_eta, 'AP, same', 'DSA', 'p', r.kRed+1, True, 3, marker = 34)
     EFF_algoVSeta.addRate(eff_GM_eta, 'AP, same', 'GM', 'p', r.kAzure-4, True, 4, marker = 20)
     EFF_algoVSeta.addRate(eff_DGM_eta, 'AP, same', 'DGM', 'p', r.kAzure-3, True, 5, marker = 20)
-    EFF_algoVSeta.save(1, 0, 0, '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
+    EFF_algoVSeta.save(1, 0, 0, '', '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
 
-    #EFF_SA_ptVSLxy = Efficiency.Efficiency('EFF_SA_ptVSLxy', 'png', 0.16, 0.83, 0.9, 0.89, 6)
-    #EFF_SA_ptVSLxy.addRate(eff_SA_ptVSLxy, 'colz, text', '', '', r.kRed, True, 0, marker = 22)
-    #EFF_SA_ptVSLxy.save(0, 0, 0, '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
     c1 = r.TCanvas()
     eff_SA_ptVSLxy.Draw("colz, text")
     c1.SaveAs(WORKPATH + 'efficiencies_'+opts.tag+'/' + 'eff_SA_ptVSLxy.png')

@@ -186,6 +186,21 @@ class Canvas:
          newhisto.SetBinError  (i,histo.GetBinError  (i))
       return newhisto
         
+   def makeRate(self, eff, option):
+
+      eff.Draw(option)
+      self.myCanvas.Update()
+
+      _h = eff.GetTotalHistogram()
+      xmax = _h.GetXaxis().GetBinUpEdge(_h.GetNbinsX())
+
+      _g = eff.GetPaintedGraph()
+      _g.SetMinimum(0.0)
+      _g.SetMaximum(1.2)
+      _g.GetXaxis().SetLimits(0.,xmax)
+
+      return eff
+
  
    def addHisto(self, h, option, label, labelOption, color, ToDraw, orderForLegend, doOF = False):
 
@@ -202,6 +217,30 @@ class Canvas:
       self.labelsOption.append(labelOption)
       self.ToDraw.append(ToDraw)
       self.orderForLegend.append(orderForLegend)
+
+   def addRate(self, eff, option, label, labelOption, color, ToDraw, orderForLegend, marker = False):
+
+      if(label == ""):
+          label = eff.GetTitle()
+
+      _eff = copy.deepcopy(eff)
+      if marker:
+          _eff.SetMarkerStyle(marker)
+      else:
+          _eff.SetMarkerStyle(21)
+      _eff.SetMarkerColor(color)
+      _eff.SetLineWidth(2)
+      _eff.SetLineColor(color)
+      _eff.SetMarkerSize(1.0)
+
+      self.histos.append(_eff)
+      self.options.append(option)
+      self.labels.append(label)
+      self.labelsOption.append(labelOption)
+      self.ToDraw.append(ToDraw)
+      self.orderForLegend.append(orderForLegend) 
+
+
 
    def addGraph(self, h, option, label, labelOption, color, ToDraw, orderForLegend):
 
@@ -252,10 +291,8 @@ class Canvas:
    def ensurePath(self, _path):
 
       ## Enter a while loop to avoid race conditions
-      print("Hacemos ensure")
       while True:
           d = os.path.dirname(_path)
-          print("Primer intento: " + d) 
           try:
               if not os.path.exists(d):
                   os.makedirs(d)
@@ -397,7 +434,11 @@ class Canvas:
           if(self.ToDraw[i] != 0):        
               if ymin and ymax:
                   self.histos[i].GetYaxis().SetRangeUser(ymin, ymax)
-              self.histos[i].Draw(self.options[i])
+
+              if str(type(self.histos[i])) == "<class 'ROOT.TEfficiency'>":
+                  self.makeRate(self.histos[i], self.options[i])
+              else:
+                  self.histos[i].Draw(self.options[i])
 
       ## Draw axis:
       #self.histos[0].Draw('same axis')
