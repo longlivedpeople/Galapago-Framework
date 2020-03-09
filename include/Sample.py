@@ -418,7 +418,7 @@ class Tree:
           h.Add(haux)
        del haux
        
-       return h
+     return h
 
    def getTH2F(self, lumi, name, var, nbinx, xmin, xmax, nbiny, ymin, ymax, cut, options, xlabel):
      if cut == '':

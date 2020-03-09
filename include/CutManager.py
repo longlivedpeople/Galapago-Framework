@@ -9,6 +9,8 @@ class CutManager:
       ######  Event cuts   #######
       ############################
       self.nTrack = self.brackets('RefittedPV_nPFTrack + RefittedPV_nLostTrack + RefittedPV_nExcludedTrack > 5')
+      self.highPU = self.brackets('nPUTrue > 35')
+      self.lowPU = self.brackets('nPUTrue < 20')
 
 
       #################################
@@ -18,11 +20,15 @@ class CutManager:
       self.haveEEBase = self.brackets('nEEBase > 0')
       self.EESR_dPhi = self.brackets('fabs(EEBase_dPhi[EEBase_maxIxy])< 3.14/2.0')
       self.EECR_dPhi = self.brackets('fabs(EEBase_dPhi[EEBase_maxIxy]) > 3.14/2.0')
+      self.EEtailRegime = self.brackets('fabs(EEBase_trackIxy[EEBase_maxIxy])> 5.0')
+      self.EEpromptRegime = self.brackets('fabs(EEBase_trackIxy[EEBase_maxIxy])< 5.0')
 
 
       self.MMChannel = self.brackets('Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 == 1')
       self.haveMMBase = self.brackets('nMMBase > 0')
       self.MM_etaConstrained = self.brackets('fabs(MuonCandidate_eta[MMBase_idxA[MMBase_maxIxy]])< 1.4442 && fabs(MuonCandidate_eta[MMBase_idxB[MMBase_maxIxy]])< 1.4442')
+      self.MMtailRegime = self.brackets('fabs(MMBase_trackIxy[MMBase_maxIxy])> 5.0')
+      self.MMpromptRegime = self.brackets('fabs(MMBase_trackIxy[MMBase_maxIxy])< 5.0')
       self.MMSR_dPhi = self.brackets('fabs(MMBase_dPhi[MMBase_maxIxy])< 3.14/2.0')
       self.MMCR_dPhi = self.brackets('fabs(MMBase_dPhi[MMBase_maxIxy]) > 3.14/2.0')
 

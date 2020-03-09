@@ -245,6 +245,119 @@ def makePlot(qeue, lumi, var, name, nbin, xmin, xmax, xlabel, logx, treeMC, cuts
         del plot
         return 
 
+
+def makeSensitivity(qeue, lumi, var, name, nbin, xmin, xmax, xlabel, logx, treeMC, treeSI, cuts, treeDATA = False, LLlabel = ''):
+
+    if qeue:
+
+        launcher = Launcher.Launcher(script = os.path.dirname(os.path.abspath(__file__)) +'/'+ __file__, env = qeue, ID = name, output = outtag)
+        order = "makeSensitivity(qeue = False, lumi = {0}, var = '{1}', name = '{2}', nbin = {3}, xmin = {4}, xmax = {5}, xlabel = '{6}', logx = {7}, treeMC = treeMC, treeSI = treeSI, cuts = '{8}', treeDATA = False, LLlabel = '{9}')".format(lumi, var, name, nbin, xmin, xmax, xlabel, logx, cuts, LLlabel)
+        launcher.addOrder(order)
+        launcher.launch()
+        time.sleep(1.0)
+#        launcher.clear()
+
+    else:
+        ### Get background histogram
+        hMC = treeMC.getTH1F(lumi, "hMC_%s"%(name), var, nbin, xmin, xmax, cuts, "", xlabel)
+        print("GetEntries: ", hMC.GetEntries())
+        hSIS = treeSI.getStack(lumi, "hMCS_%s"%(name), var, nbin, xmin, xmax, cuts, "", xlabel)
+        luminosity = lumi
+
+        ### Get signal histogram
+        s_histos = []
+        for _i, _h in enumerate(hSIS.GetHists()):
+            s_histos.append(copy.deepcopy(_h))
+
+        ### Get significance values
+        plot = Canvas.Canvas('sensitivity_'+name, 'png', 0.5, 0.7, 0.9, 0.9, 1)
+        significances = []
+        signalYields = []
+
+        for _i, _h in enumerate(s_histos):
+
+            if (_i == 0):
+                bh = r.TH1F('gr', '', hMC.GetNbinsX(), hMC.GetXaxis().GetXmin(), hMC.GetXaxis().GetXmax())
+
+            sh = r.TH1F('sh', '', hMC.GetNbinsX(), hMC.GetXaxis().GetXmin(), hMC.GetXaxis().GetXmax())
+            gh = r.TH1F('gh', '', hMC.GetNbinsX(), hMC.GetXaxis().GetXmin(), hMC.GetXaxis().GetXmax())
+            
+            for n in range(1, hMC.GetNbinsX() + 1):
+                
+                Svalue = _h.Integral(n, hMC.GetNbinsX())
+                Bvalue = hMC.Integral(n, hMC.GetNbinsX())
+                print('Signal: ', Svalue)
+                print('Background: ', Bvalue)
+
+                if (Svalue + Bvalue == 0): sig = 0
+                else: sig = Svalue/math.sqrt(Svalue + Bvalue)
+                print("Sensitivity: ", sig)
+
+                gh.SetBinContent(n, sig)
+                sh.SetBinContent(n, Svalue)
+                if (_i == 0): bh.SetBinContent(n, Bvalue)
+
+            gh.SetTitle(_h.GetTitle())
+            gh.SetLineWidth(2)
+            gh.GetYaxis().SetTitle('S/#sqrt{S + B}')
+            gh.GetXaxis().SetTitle(xlabel)
+            gh.SetLineColor(_h.GetFillColor())
+            sh.SetTitle(_h.GetTitle())
+            sh.SetLineWidth(2)
+            sh.GetYaxis().SetTitle('S/#sqrt{S + B}')
+            sh.GetXaxis().SetTitle(xlabel)
+            sh.SetLineColor(_h.GetFillColor())
+            significances.append(copy.deepcopy(gh))
+            signalYields.append(copy.deepcopy(sh))
+
+        ### Compute the maximum significance
+        s_max = 0
+        for s in significances:
+            if s.GetMaximum() > s_max: s_max = s.GetMaximum()
+
+        ### Compute the maximum sample yield
+        y_max = 0
+        for s in signalYields:
+            if s.GetMaximum() > s_max: y_max = s.GetMaximum()
+        if bh.GetMaximum() > y_max: y_max = bh.GetMaximum()
+
+        ### Plot significances
+        for _i,s in enumerate(significances):
+            if _i == 0:
+                if logx: 
+                    s.SetMaximum(10.0*s_max)
+                    s.SetMinimum(0.1)
+                else: 
+                    s.SetMaximum(1.4*s_max)
+                    s.SetMinimum(0.0)
+
+                plot.addHisto(s, 'l', s.GetTitle(), 'l', s.GetLineColor(), 1, _i)
+            else:
+                plot.addHisto(s, 'l, same', s.GetTitle(), 'l', s.GetLineColor(), 1, _i)
+
+        ### Dilepton banner
+        if LLlabel == 'EE':
+            plot.addLatex(0.17, 0.86, 'e^{+}e^{-} channel')
+        if LLlabel == 'MM':
+            plot.addLatex(0.17, 0.86, '#mu^{+}#mu^{-} channel')
+
+        ### Save it
+        plot.save(1, 0, logx, luminosity, '', outputDir = WORKPATH + 'sensitivity_'+outtag+'/')
+
+        ### yield plot
+        yieldplot = Canvas.Canvas('yields_'+name, 'png', 0.5, 0.7, 0.9, 0.9, 1)
+        bh.SetMaximum(10.0*y_max)
+        bh.SetLineWidth(2)
+        yieldplot.addHisto(bh, 'l', 'Background', 'l', r.kBlack, 1, 0)
+        for _i,sy in enumerate(signalYields):
+            yieldplot.addHisto(sy, 'l, same', sy.GetTitle(), 'l', sy.GetLineColor(), 1, _i +1)
+
+        yieldplot.save(1, 0, logx, luminosity, '', outputDir = WORKPATH + 'yields_'+outtag+'/')
+
+        return
+
+
+
 if __name__ == "__main__":
 
     print bcolors.HEADER
@@ -294,15 +407,16 @@ if __name__ == "__main__":
 
     ############# Background definition
     Backgrounds = []
-    Backgrounds.append('DYJetsToLL_M-50') 
+    #Backgrounds.append('DYJetsToLL_M-50') 
     Backgrounds.append('DYJetsToLL_M-10to50') 
-    Backgrounds.append('WW') 
+    #Backgrounds.append('WW') 
     Backgrounds.append('WZ') 
     Backgrounds.append('ZZ') 
-    Backgrounds.append('WJetsToLNu') 
+    #Backgrounds.append('WJetsToLNu') 
     Backgrounds.append('TTJets_DiLept') 
-    Backgrounds.append('QCD_Pt-30to40') 
-    Backgrounds.append('QCD_Pt-40toInf') 
+    Backgrounds.append('DYJetsToLL_M-50') 
+    #Backgrounds.append('QCD_Pt-30to40') 
+    #Backgrounds.append('QCD_Pt-40toInf') 
 
     ############# Signal definition
     Signals = []
@@ -319,12 +433,25 @@ if __name__ == "__main__":
     ############# Cut definition
     cuts = CutManager.CutManager()
     EESR = cuts.AddListB([cuts.nTrack, cuts.EEChannel, cuts.haveEEBase, cuts.EESR_dPhi])
+    EECR = cuts.AddListB([cuts.nTrack, cuts.EEChannel, cuts.haveEEBase, cuts.EECR_dPhi])
+    EESRtailReg = cuts.AddListB([cuts.nTrack, cuts.EEChannel, cuts.haveEEBase, cuts.EESR_dPhi, cuts.EEtailRegime])
+    EESRpromptReg = cuts.AddListB([cuts.nTrack, cuts.EEChannel, cuts.haveEEBase, cuts.EESR_dPhi, cuts.EEpromptRegime])
     MMSR = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMMBase, cuts.MMSR_dPhi])
+    MMCR = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMMBase, cuts.MMCR_dPhi])
+    MMSRtailReg = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMMBase, cuts.MMSR_dPhi, cuts.MMtailRegime])
+    MMSRpromptReg = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMMBase, cuts.MMSR_dPhi, cuts.MMpromptRegime])
 
 
     ############# Plotting
     start_time = time.time()
 
+    makeSensitivity(opts.qenv, lumi, 'fabs(MMBase_trackIxy[MMBase_maxIxy])', 'sen_MMBase_trackIxy', 40, 0, 20, 'MM I_{xy}', 1, treeMC, treeSI, MMSR, treeDATA = False, LLlabel = '')
+
+    #makePlot(opts.qenv, lumi, 'nPUTrue', 'nPUTrue', 50, 0, 70, 'Number of true primary vertices', False, treeMC, cuts.AddListB([cuts.nTrack, '(nPUTrue < 20 || nPUTrue > 35) && (nEEBase > 0 || nMMBase >0)']), treeSI)
+    #makePlot(opts.qenv, lumi, 'nPUTrue', 'MMSRtail_nPUTrue', 40, 0, 70, 'Number of true primary vertices', True, treeMC, MMSRtailReg, treeSI)
+    #makePlot(opts.qenv, lumi, 'nPUTrue', 'MMSRprompt_nPUTrue', 40, 0, 70, 'Number of true primary vertices', True, treeMC, MMSRpromptReg, treeSI)
+
+    """
     makePlot(opts.qenv, lumi, 'nEEBase', 'nEEBase', 3, 0, 3, 'Number of valid EE candidates', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.EEChannel]), treeSI)
     makePlot(opts.qenv, lumi, 'nMMBase', 'nMMBase', 3, 0, 3, 'Number of valid MM candidates', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.MMChannel]), treeSI)
 
@@ -337,18 +464,32 @@ if __name__ == "__main__":
     makePlot(opts.qenv, lumi, 'MMBase_cosAlpha[MMBase_maxIxy]', 'MMBase_cosAlpha', 40, -3.5, 3.5, 'MM cos(#alpha)', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMMBase]), treeSI)
     makePlot(opts.qenv, lumi, 'EEBase_cosAlpha[EEBase_maxIxy]', 'EEBase_cosAlpha', 40, -3.5, 3.5, 'EE cos(#alpha)', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.EEChannel, cuts.haveEEBase]), treeSI)
 
-    makePlot(opts.qenv, lumi, 'MMBase_mass[MMBase_maxIxy]', 'MMBase_mass', 100, 0, 200, 'Invariant mass m_{#mu#mu}', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMMBase]), treeSI)
-    makePlot(opts.qenv, lumi, 'EEBase_mass[EEBase_maxIxy]', 'EEBase_mass', 100, 0, 200, 'Invariant mass m_{ee}', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.EEChannel, cuts.haveEEBase]), treeSI)
+    ### Signal Region 
+    makePlot(opts.qenv, lumi, 'MMBase_mass[MMBase_maxIxy]', 'SR_MMBase_mass', 100, 0, 200, 'Invariant mass m_{#mu#mu}', True, treeMC, MMSR, treeSI)
+    makePlot(opts.qenv, lumi, 'EEBase_mass[EEBase_maxIxy]', 'SR_EEBase_mass', 100, 0, 200, 'Invariant mass m_{ee}', True, treeMC, EESR, treeSI)
+
+    makePlot(opts.qenv, lumi, 'MET_pt', 'SR_MM_MET_pt', 50, 0, 200, 'Missing transverse energy p_{T}^{miss}', True, treeMC, MMSR, treeSI)
+    makePlot(opts.qenv, lumi, 'MET_pt', 'SR_EE_MET_pt', 50, 0, 200, 'Missing transverse energy p_{T}^{miss}', True, treeMC, EESR, treeSI)
 
     makePlot(opts.qenv, lumi, 'fabs(MMBase_Lxy[MMBase_maxIxy])', 'SR_MMBase_Lxy', 40, 0, 20, 'MM vertex length L_{xy}', True, treeMC, MMSR, treeSI)
     makePlot(opts.qenv, lumi, 'fabs(MMBase_Ixy[MMBase_maxIxy])', 'SR_MMBase_Ixy', 40, 0, 20, 'MM vertex length I_{xy}', True, treeMC, MMSR, treeSI)
 
-    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackIxy[MMBase_maxIxy])', 'SR_MMBase_trackIxy', 40, 0, 20, 'MM I_{xy}', True, treeMC, cuts.AddListB([MMSR, cuts.MM_etaConstrained]), treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackIxy[MMBase_maxIxy])', 'SR_MMBase_trackIxy', 40, 0, 20, 'MM I_{xy}', True, treeMC, MMSR, treeSI)
     makePlot(opts.qenv, lumi, 'fabs(MMBase_trackDxy[MMBase_maxIxy])', 'SR_MMBase_trackDxy', 40, 0, 20, 'MM d_{xy}', True, treeMC, MMSR, treeSI)
     makePlot(opts.qenv, lumi, 'fabs(MMBase_refittedIxy[MMBase_maxIxy])', 'SR_MMBase_refittedIxy', 40, 0, 20, 'MM I_{xy}', True, treeMC, MMSR, treeSI)
     makePlot(opts.qenv, lumi, 'fabs(MMBase_refittedDxy[MMBase_maxIxy])', 'SR_MMBase_refittedDxy', 40, 0, 20, 'MM d_{xy}', True, treeMC, MMSR, treeSI)
     makePlot(opts.qenv, lumi, 'fabs(MMBase_refittedIxy[MMBase_maxIxy]) - fabs(MMBase_trackIxy[MMBase_maxIxy])', 'SR_MMBase_IxyDiff', 50, -20, 120, 'Refitted I_{xy} - original I_{xy}', True, treeMC, MMSR, treeSI)
+    """
+    """
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackIxy[MMBase_maxIxy])', 'SR_MMBase_trackIxy_highPU', 40, 0, 20, 'MM I_{xy}', True, treeMC, cuts.AddListB([MMSR, cuts.highPU]), treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackIxy[MMBase_maxIxy])', 'SR_MMBase_trackIxy_lowPU', 40, 0, 20, 'MM I_{xy}', True, treeMC, cuts.AddListB([MMSR, cuts.lowPU]), treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackDxy[MMBase_maxIxy])', 'SR_MMBase_trackDxy_highPU', 40, 0, 20, 'MM I_{xy}', True, treeMC, cuts.AddListB([MMSR, cuts.highPU]), treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackDxy[MMBase_maxIxy])', 'SR_MMBase_trackDxy_lowPU', 40, 0, 20, 'MM I_{xy}', True, treeMC, cuts.AddListB([MMSR, cuts.lowPU]), treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackDxy[MMBase_maxIxy])/fabs(MMBase_trackIxy[MMBase_maxIxy])', 'SR_MMBase_trackSigmaxy_highPU', 40, 0, 20, 'MM I_{xy}', True, treeMC, cuts.AddListB([MMSR, cuts.highPU]), treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackDxy[MMBase_maxIxy])/fabs(MMBase_trackIxy[MMBase_maxIxy])', 'SR_MMBase_trackSigmaxy_lowPU', 40, 0, 20, 'MM I_{xy}', True, treeMC, cuts.AddListB([MMSR, cuts.lowPU]), treeSI)
+    """
 
+    """
     makePlot(opts.qenv, lumi, 'fabs(EEBase_Lxy[EEBase_maxIxy])', 'SR_EEBase_Lxy', 40, 0, 20, 'EE vertex length L_{xy}', True, treeMC, EESR, treeSI)
     makePlot(opts.qenv, lumi, 'fabs(EEBase_Ixy[EEBase_maxIxy])', 'SR_EEBase_Ixy', 40, 0, 20, 'EE vertex length I_{xy}', True, treeMC, EESR, treeSI)
 
@@ -357,7 +498,50 @@ if __name__ == "__main__":
     makePlot(opts.qenv, lumi, 'fabs(EEBase_refittedIxy[EEBase_maxIxy])', 'SR_EEBase_refittedIxy', 40, 0, 20, 'EE I_{xy}', True, treeMC, EESR, treeSI)
     makePlot(opts.qenv, lumi, 'fabs(EEBase_refittedDxy[EEBase_maxIxy])', 'SR_EEBase_refittedDxy', 40, 0, 20, 'EE d_{xy}', True, treeMC, EESR, treeSI)
     makePlot(opts.qenv, lumi, 'fabs(EEBase_refittedIxy[EEBase_maxIxy]) - fabs(EEBase_trackIxy[EEBase_maxIxy])', 'SREEBase_IxyDiff', 50, -20, 120, 'Refitted I_{xy} - original I_{xy}', True, treeMC, EESR, treeSI)
+    """
 
+    """
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_trackIxy[EEBase_maxIxy])', 'SR_EEBase_trackIxy_highPU', 40, 0, 20, 'EE I_{xy}', True, treeMC, cuts.AddListB([EESR, cuts.highPU]), treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_trackIxy[EEBase_maxIxy])', 'SR_EEBase_trackIxy_lowPU', 40, 0, 20, 'EE I_{xy}', True, treeMC, cuts.AddListB([EESR, cuts.lowPU]), treeSI)
+
+    ### Control region
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackIxy[MMBase_maxIxy])', 'CR_MMBase_trackIxy', 40, 0, 20, 'MM I_{xy}', True, treeMC, MMCR, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_trackIxy[EEBase_maxIxy])', 'CR_EEBase_trackIxy', 40, 0, 20, 'EE I_{xy}', True, treeMC, EECR, treeSI)
+    """
+
+    """
+    ### Tail signal region
+    makePlot(opts.qenv, lumi, 'MMBase_mass[MMBase_maxIxy]', 'SRtail_MMBase_mass', 100, 0, 200, 'Invariant mass m_{#mu#mu}', True, treeMC, MMSRtailReg, treeSI)
+    makePlot(opts.qenv, lumi, 'EEBase_mass[EEBase_maxIxy]', 'SRtail_EEBase_mass', 100, 0, 200, 'Invariant mass m_{ee}', True, treeMC, EESRtailReg, treeSI)
+
+    makePlot(opts.qenv, lumi, 'MET_pt', 'SRtail_MM_MET_pt', 50, 0, 200, 'Missing transverse energy p_{T}^{miss}', True, treeMC, MMSRtailReg, treeSI)
+    makePlot(opts.qenv, lumi, 'MET_pt', 'SRtail_EE_MET_pt', 50, 0, 200, 'Missing transverse energy p_{T}^{miss}', True, treeMC, EESRtailReg, treeSI)
+
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackIxy[MMBase_maxIxy])', 'SRtail_MMBase_trackIxy', 40, 0, 20, 'MM I_{xy}', True, treeMC, MMSRtailReg, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_trackIxy[EEBase_maxIxy])', 'SRtail_EEBase_trackIxy', 40, 0, 20, 'EE I_{xy}', True, treeMC, EESRtailReg, treeSI)
+
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackDxy[MMBase_maxIxy])', 'SRtail_MMBase_trackDxy', 40, 0, 1, 'MM |d_{xy}|', True, treeMC, MMSRtailReg, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_trackDxy[EEBase_maxIxy])', 'SRtail_EEBase_trackDxy', 40, 0, 1, 'EE |d_{xy}|', True, treeMC, EESRtailReg, treeSI)
+
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackDxy[MMBase_maxIxy])/fabs(MMBase_trackIxy[MMBase_maxIxy])', 'SRtail_MMBase_Sigmaxy', 40, 0, 0.1, 'MM #sigma_{d}', True, treeMC, MMSRtailReg, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_trackDxy[EEBase_maxIxy])/fabs(EEBase_trackIxy[EEBase_maxIxy])', 'SRtail_EEBase_Sigmaxy', 40, 0, 0.1, 'EE #sigma_{d}', True, treeMC, EESRtailReg, treeSI)
+
+    ### Prompt signal region
+    makePlot(opts.qenv, lumi, 'MMBase_mass[MMBase_maxIxy]', 'SRprompt_MMBase_mass', 100, 0, 200, 'Invariant mass m_{#mu#mu}', True, treeMC, MMSRpromptReg, treeSI)
+    makePlot(opts.qenv, lumi, 'EEBase_mass[EEBase_maxIxy]', 'SRprompt_EEBase_mass', 100, 0, 200, 'Invariant mass m_{ee}', True, treeMC, EESRpromptReg, treeSI)
+
+    makePlot(opts.qenv, lumi, 'MET_pt', 'SRprompt_MM_MET_pt', 50, 0, 200, 'Missing transverse energy p_{T}^{miss}', True, treeMC, MMSRpromptReg, treeSI)
+    makePlot(opts.qenv, lumi, 'MET_pt', 'SRprompt_EE_MET_pt', 50, 0, 200, 'Missing transverse energy p_{T}^{miss}', True, treeMC, EESRpromptReg, treeSI)
+
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackIxy[MMBase_maxIxy])', 'SRprompt_MMBase_trackIxy', 40, 0, 20, 'MM I_{xy}', True, treeMC, MMSRpromptReg, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_trackIxy[EEBase_maxIxy])', 'SRprompt_EEBase_trackIxy', 40, 0, 20, 'EE I_{xy}', True, treeMC, EESRpromptReg, treeSI)
+
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackDxy[MMBase_maxIxy])', 'SRprompt_MMBase_trackDxy', 40, 0, 1, 'MM |d_{xy}|', True, treeMC, MMSRpromptReg, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_trackDxy[EEBase_maxIxy])', 'SRprompt_EEBase_trackDxy', 40, 0, 1, 'EE |d_{xy}|', True, treeMC, EESRpromptReg, treeSI)
+
+    makePlot(opts.qenv, lumi, 'fabs(MMBase_trackDxy[MMBase_maxIxy])/fabs(MMBase_trackIxy[MMBase_maxIxy])', 'SRprompt_MMBase_Sigmaxy', 40, 0, 0.1, 'MM #sigma_{d}', True, treeMC, MMSRpromptReg, treeSI)
+    makePlot(opts.qenv, lumi, 'fabs(EEBase_trackDxy[EEBase_maxIxy])/fabs(EEBase_trackIxy[EEBase_maxIxy])', 'SRprompt_EEBase_Sigmaxy', 40, 0, 0.1, 'EE #sigma_{d}', True, treeMC, EESRpromptReg, treeSI)
+    """
     print("--- %s seconds ---" % (time.time() - start_time))
 
 

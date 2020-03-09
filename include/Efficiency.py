@@ -15,6 +15,7 @@ class Efficiency:
       self.ToDraw = []
       self.orderForLegend = []
       self.effs = []
+      self.profs = []
       self.lines = []
       self.latexs= []
       self.bands = []
@@ -95,14 +96,17 @@ class Efficiency:
       _g.GetXaxis().SetLimits(0.,xmax)
  
       return eff
- 
-   def addRate(self, eff, option, label, labelOption, color, ToDraw, orderForLegend, doOF = False):
+
+   def addRate(self, eff, option, label, labelOption, color, ToDraw, orderForLegend, marker = False, doOF = False):
 
       if(label == ""):
           label = eff.GetTitle()
 
       _eff = copy.deepcopy(eff)
-      _eff.SetMarkerStyle(21)
+      if marker:
+          _eff.SetMarkerStyle(marker)
+      else:
+          _eff.SetMarkerStyle(21)
       _eff.SetMarkerColor(color)
       _eff.SetLineWidth(2)
       _eff.SetLineColor(color)
@@ -115,7 +119,6 @@ class Efficiency:
       self.labelsOption.append(labelOption)
       self.ToDraw.append(ToDraw)
       self.orderForLegend.append(orderForLegend)
-
 
    def makeLegend(self):
 
@@ -260,6 +263,10 @@ class Efficiency:
           if(self.ToDraw[i] != 0):        
               self.makeRate(self.effs[i], self.options[i])
               self.myCanvas.Update()
+
+      for i in range(0, len(self.profs)):
+          if not i: self.prof[i].Draw('AP')
+          else: self.prof[i].Draw('AP, same')
 
       ## Draw axis:
       #self.effs[0].Draw('same axis')
