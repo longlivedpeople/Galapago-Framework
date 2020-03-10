@@ -63,7 +63,10 @@ class Canvas:
       else:
          latexb.DrawLatex(0.44, 0.93, "#it{Simulation}")
 
-      text_lumi = str(lumi)+" fb^{-1}  (13 TeV)"
+      text_lumi = ''
+      if isData:
+          text_lumi = str(lumi)+" fb^{-1}  (13 TeV)"
+     
       latexc = TLatex()
       latexc.SetNDC();
       latexc.SetTextAngle(0);

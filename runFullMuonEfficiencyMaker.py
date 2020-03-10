@@ -168,6 +168,7 @@ if __name__ == "__main__":
     #################################
     #Lxy_bin = np.array([0.0, 0.025, 0.5, 1.0, 2.0, 4.0, 8.0, 12.0, 16.0, 20., 30., 40., 50., 60., 70., 90., 110.0])
     Lxy_bin = np.linspace(0.0, 140.0, 51)
+    Lxy_logbin = np.logspace(0.0, 3.0, 101)
     pt_bin = np.linspace(0.0, 300.0, 100)
     
 
@@ -175,16 +176,16 @@ if __name__ == "__main__":
     ####   Book TEfficiency objects   ####
     ######################################
     eff_IFCA_pt = r.TEfficiency("eff_IFCA_pt", ";Generated #mu p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
-    eff_IFCA_Lxy = r.TEfficiency("eff_IFCA_Lxy", ";Generated #mu L_{xy} (cm);Efficiency", len(Lxy_bin)-1, Lxy_bin)
+    eff_IFCA_Lxy = r.TEfficiency("eff_IFCA_Lxy", ";Generated #mu L_{xy} (cm);Efficiency", len(Lxy_logbin)-1, Lxy_logbin)
     eff_IFCA_eta = r.TEfficiency("eff_IFCA_eta", "; Generated #mu #eta;Efficiency", 51, -2.1, 2.1)
 
     eff_SA_pt = r.TEfficiency("eff_SA_pt", ";Generated #mu p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
-    eff_SA_Lxy = r.TEfficiency("eff_SA_Lxy", ";Generated #mu L_{xy} (cm);Efficiency", len(Lxy_bin)-1, Lxy_bin)
+    eff_SA_Lxy = r.TEfficiency("eff_SA_Lxy", ";Generated #mu L_{xy} (cm);Efficiency", len(Lxy_logbin)-1, Lxy_logbin)
     eff_SA_eta = r.TEfficiency("eff_SA_eta", "; Generated #mu #eta;Efficiency", 51, -2.1, 2.1)
     eff_SA_dR = r.TEfficiency("eff_SA_dR", ";Generated #mu #DeltaR;Efficiency", 10, 0.0, 1.0)
 
     eff_DSA_pt = r.TEfficiency("eff_DSA_pt", ";Generated #mu p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
-    eff_DSA_Lxy = r.TEfficiency("eff_DSA_Lxy", ";Generated #mu L_{xy} (cm);Efficiency", len(Lxy_bin)-1, Lxy_bin)
+    eff_DSA_Lxy = r.TEfficiency("eff_DSA_Lxy", ";Generated #mu L_{xy} (cm);Efficiency", len(Lxy_logbin)-1, Lxy_logbin)
     eff_DSA_eta = r.TEfficiency("eff_DSA_eta", "; Generated #mu #eta;Efficiency", 51, -2.1, 2.1)
     eff_DSA_dR = r.TEfficiency("eff_DSA_dR", ";Generated #mu #DeltaR;Efficiency", 10, 0.0, 1.0)
 
@@ -197,7 +198,7 @@ if __name__ == "__main__":
     eff_GM_eta = r.TEfficiency("eff_GM_eta", "; Generated #mu #eta;Efficiency", 51, -2.1, 2.1)
 
     eff_DGM_pt = r.TEfficiency("eff_DGM_pt", ";Generated #mu p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
-    eff_DGM_Lxy = r.TEfficiency("eff_DGM_Lxy", ";Generated #mu L_{xy} (cm);Efficiency", len(Lxy_bin)-1, Lxy_bin)
+    eff_DGM_Lxy = r.TEfficiency("eff_DGM_Lxy", ";Generated #mu L_{xy} (cm);Efficiency", len(Lxy_logbin)-1, Lxy_logbin)
     eff_DGM_eta = r.TEfficiency("eff_DGM_eta", "; Generated #mu #eta;Efficiency", 51, -2.1, 2.1)
 
     eff_Med_pt = r.TEfficiency("eff_Med_pt", ";Generated #mu p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
@@ -285,7 +286,7 @@ if __name__ == "__main__":
     for i in range(0, _tree.GetEntries()):
 
         _tree.GetEntry(i)
-        if i > 1000: break
+        #if i > 1000: break
 
         ### Muon Channel
         #if _tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 == 1:
@@ -294,7 +295,7 @@ if __name__ == "__main__":
             for j in range(0, _tree.nGenLepton):
                 
                 if abs(_tree.GenLeptonSel_pdgId[j]) != 13: continue
-                if abs(_tree.GenLeptonSel_eta[j]) > 1.4: continue #2.4 antes
+                if abs(_tree.GenLeptonSel_eta[j]) > 2.4: continue #2.4 antes
                 if _tree.GenLeptonSel_pt[j] < 10: continue
 
                 #Lxy = math.sqrt((_tree.GenLeptonSel_vx[j]-_tree.PV_vx)**2 + (_tree.GenLeptonSel_vy[j]-_tree.PV_vy)**2)
@@ -610,29 +611,19 @@ if __name__ == "__main__":
     outputFile.Close()
 
     #### Plot some of the efficiencies:
-    EFF_algoVSpt = Canvas.Canvas('EFF_algoVSpt', 'png', 0.45, 0.80, 0.9, 0.89, 3)
+    EFF_algoVSpt = Canvas.Canvas('EFF_algoVSpt', 'png', 0.5, 0.84, 0.9, 0.89, 4)
     EFF_algoVSpt.addRate(eff_IFCA_pt, 'AP', 'IFCA', 'p', r.kMagenta-4, True, 0, marker = 22)
-    EFF_algoVSpt.addRate(eff_GM_pt, 'AP, same', 'GM', 'p', r.kAzure-4, True, 1, marker = 20)
-    EFF_algoVSpt.addRate(eff_DGM_pt, 'AP, same', 'DGM', 'p', r.kAzure-3, True, 2, marker = 20)
-    EFF_algoVSpt.addRate(eff_SA_pt, 'AP, same', 'SA', 'p', r.kRed-7, True, 3, marker = 34)
-    EFF_algoVSpt.addRate(eff_RSA_pt, 'AP, same', 'RSA', 'p', r.kRed-4, True, 4, marker = 34)
-    EFF_algoVSpt.addRate(eff_DSA_pt, 'AP, same', 'DSA', 'p', r.kRed+1, True, 5, marker = 34)
-    EFF_algoVSpt.addRate(eff_Med_pt, 'AP, same', 'Med', 'p', r.kGreen-4, True, 6, marker = 21)
-    EFF_algoVSpt.addRate(eff_miniGM_pt, 'AP, same', 'GM (mini)', 'p', r.kGreen-3, True, 7, marker = 21)
-    EFF_algoVSpt.addRate(eff_miniSA_pt, 'AP, same', 'SA (mini)', 'p', r.kGreen-2, True, 8, marker = 21)
+    EFF_algoVSpt.addRate(eff_DGM_pt, 'AP, same', 'DGM', 'p', r.kAzure-3, True, 1, marker = 20)
+    EFF_algoVSpt.addRate(eff_SA_pt, 'AP, same', 'SA', 'p', r.kGreen-2, True, 2, marker = 21)
+    EFF_algoVSpt.addRate(eff_DSA_pt, 'AP, same', 'DSA', 'p', r.kRed+1, True, 3, marker = 34)
     EFF_algoVSpt.save(1, 0, 0, '', '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
 
-    EFF_algoVSLxy = Canvas.Canvas('EFF_algoVSLxy', 'png', 0.55, 0.80, 0.9, 0.89, 3)
-#    EFF_algoVSLxy.addRate(eff_IFCA_Lxy, 'AP', 'IFCA', 'p', r.kMagenta-4, True, 0, marker = 22)
-#    EFF_algoVSLxy.addRate(eff_GM_Lxy, 'AP, same', 'GM', 'p', r.kAzure-4, True, 3, marker = 20)
-    EFF_algoVSLxy.addRate(eff_DGM_Lxy, 'AP, same', 'DGM', 'p', r.kAzure-3, True, 0, marker = 20)
-    EFF_algoVSLxy.addRate(eff_SA_Lxy, 'AP, same', 'SA', 'p', r.kRed-7, True, 1, marker = 34)
-#    EFF_algoVSLxy.addRate(eff_RSA_Lxy, 'AP, same', 'RSA', 'p', r.kRed-4, True, 1, marker = 34)
-    EFF_algoVSLxy.addRate(eff_DSA_Lxy, 'AP, same', 'DSA', 'p', r.kRed+1, True, 2, marker = 34)
-#    EFF_algoVSLxy.addRate(eff_Med_Lxy, 'AP, same', 'Med', 'p', r.kGreen-4, True, 6, marker = 21)
-#    EFF_algoVSLxy.addRate(eff_miniGM_Lxy, 'AP, same', 'GM (mini)', 'p', r.kGreen-3, True, 7, marker = 21)
-#    EFF_algoVSLxy.addRate(eff_miniSA_Lxy, 'AP, same', 'SA (mini)', 'p', r.kGreen-2, True, 8, marker = 21)
-    EFF_algoVSLxy.save(1, 0, 0, '', '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
+    EFF_algoVSLxy = Canvas.Canvas('EFF_algoVSLxy', 'png', 0.5, 0.84, 0.9, 0.89, 4)
+    EFF_algoVSLxy.addRate(eff_IFCA_Lxy, 'AP', 'IFCA', 'p', r.kMagenta-4, True, 0, marker = 22)
+    EFF_algoVSLxy.addRate(eff_DGM_Lxy, 'AP, same', 'DGM', 'p', r.kAzure-3, True, 1, marker = 20)
+    EFF_algoVSLxy.addRate(eff_SA_Lxy, 'AP, same', 'SA', 'p', r.kGreen-2, True, 2, marker = 21)
+    EFF_algoVSLxy.addRate(eff_DSA_Lxy, 'AP, same', 'DSA', 'p', r.kRed+1, True, 3, marker = 34)
+    EFF_algoVSLxy.save(1, 0, 0, '', '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/', xlog = True)
 
 
     EFF_algoVSdR = Canvas.Canvas('EFF_algoVSdR', 'png', 0.55, 0.80, 0.9, 0.89, 3)
@@ -641,14 +632,6 @@ if __name__ == "__main__":
     EFF_algoVSdR.save(1, 0, 0, '', '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
 
 
-    EFF_algoVSeta = Canvas.Canvas('EFF_algoVSeta', 'png', 0.16, 0.83, 0.9, 0.89, 6)
-    EFF_algoVSeta.addRate(eff_IFCA_eta, 'AP', 'IFCA', 'p', r.kMagenta-4, True, 0, marker = 22)
-    EFF_algoVSeta.addRate(eff_SA_eta, 'AP, same', 'SA', 'p', r.kRed-7, True, 1, marker = 34)
-    EFF_algoVSeta.addRate(eff_RSA_eta, 'AP, same', 'RSA', 'p', r.kRed-4, True, 2, marker = 34)
-    EFF_algoVSeta.addRate(eff_DSA_eta, 'AP, same', 'DSA', 'p', r.kRed+1, True, 3, marker = 34)
-    EFF_algoVSeta.addRate(eff_GM_eta, 'AP, same', 'GM', 'p', r.kAzure-4, True, 4, marker = 20)
-    EFF_algoVSeta.addRate(eff_DGM_eta, 'AP, same', 'DGM', 'p', r.kAzure-3, True, 5, marker = 20)
-    EFF_algoVSeta.save(1, 0, 0, '', '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
 
     c1 = r.TCanvas()
     eff_SA_ptVSLxy.Draw("colz, text")

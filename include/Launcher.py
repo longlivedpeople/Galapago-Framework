@@ -33,6 +33,10 @@ class Launcher:
         self.qeue = 'microcentury'
         self.logs = self.workpath + 'logs/'
 
+        # Create logs/ folder
+        if not os.path.exists(self.logs):
+            os.makedirs(self.logs)
+
         self.output = output
 
 
