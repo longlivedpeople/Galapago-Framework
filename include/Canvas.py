@@ -205,7 +205,7 @@ class Canvas:
       return eff
 
  
-   def addHisto(self, h, option, label, labelOption, color, ToDraw, orderForLegend, doOF = False):
+   def addHisto(self, h, option, label, labelOption, color, ToDraw, orderForLegend, doOF = False, normed = False):
 
       if(color != ""):
           h.SetLineColor(color)
@@ -214,6 +214,8 @@ class Canvas:
       if(label == ""):
           label = h.GetTitle()
 
+      if normed:
+          h.Scale(1.0/h.Integral())
       self.histos.append(h if not doOF else self.makeOFHisto(h))
       self.options.append(option)
       self.labels.append(label)
@@ -242,6 +244,28 @@ class Canvas:
       self.labelsOption.append(labelOption)
       self.ToDraw.append(ToDraw)
       self.orderForLegend.append(orderForLegend) 
+
+   def addProf(self, prof, option, label, labelOption, color, ToDraw, orderForLegend, marker = False):
+
+      if(label == ""):
+          label = prof.GetTitle()
+
+      _prof = copy.deepcopy(prof)
+      if marker: 
+          _prof.SetMarkerStyle(marker)
+      else:
+          _prof.SetMarkerStyle(21)
+      _prof.SetMarkerColor(color)
+      _prof.SetLineWidth(2)
+      _prof.SetLineColor(color)
+      _prof.SetMarkerSize(1.0)
+
+      self.histos.append(_prof)
+      self.options.append(option)
+      self.labels.append(label)
+      self.labelsOption.append(labelOption)
+      self.ToDraw.append(ToDraw)
+      self.orderForLegend.append(orderForLegend)
 
 
 
@@ -437,6 +461,7 @@ class Canvas:
           if(self.ToDraw[i] != 0):        
               if ymin and ymax:
                   self.histos[i].GetYaxis().SetRangeUser(ymin, ymax)
+                  #self.histos[i].SetMaximum(ymax)
 
               if str(type(self.histos[i])) == "<class 'ROOT.TEfficiency'>":
                   self.makeRate(self.histos[i], self.options[i])
