@@ -144,6 +144,8 @@ queue filename matching {2}
             submitfile = self.auxscript
 
         with open(submitfile, 'a') as _file:
+            if order[0] != ' ': 
+                order = 4*' ' + order # correct indentation (provisional)
             _file.write(order)
             _file.close()
 
