@@ -109,6 +109,12 @@ WORKPATH = os.path.abspath('./') + '/'
 
 def makeOFHisto(h):
 
+    """
+    Function to make overflow histograms
+       Parameter: Histogram
+       Return:    Same histogram with an additional bin with events out of x axis
+    """
+
     nbin = h.GetNbinsX()
     bw = h.GetBinWidth(1)
     xmin = h.GetXaxis().GetBinLowEdge(1)
@@ -171,13 +177,11 @@ if __name__ == "__main__":
     parser.add_option('-f', '--filename', action='store', type=str, dest='filename', default='', help='Path to file')
     (opts, args) = parser.parse_args()
 
-
+    outputPath =  WORKPATH + 'TRGEff_electrons/' if not opts.tag else WORKPATH + 'TRGEff_electrons_' + opts.tag + '/'
 
     #################################
     ####   TEfficiency binning   ####
     #################################
-    #Lxy_bin = np.array([0.0, 0.5, 1.0, 2.0, 4.0, 8.0, 12.0, 16.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 70.0, 80.0, 90.0, 100.0, 110.0])
-    #Lxy_bin = np.linspace(0.0, 100.0, 51)
     dxy_bin = np.linspace(0.0, 100.0, 51)
     Lxy_logbin = np.logspace(0.0, 4.0, 41)
     pt_bin = np.linspace(0.0, 300.0, 40)
@@ -196,29 +200,29 @@ if __name__ == "__main__":
     hist_dR = r.TH1F('hist_dR', '; #DeltaR(l1, l2) (GeV); Events', 20, 0, 4)
 
     hist2D_dRnEle = r.TH2F('hist_dRnEle', '; #DeltaR(l1, l2); Number of status 1 electrons;', 20, 0, 4, 7, 0, 7)
-    hist2D_pt2dR = r.TH2F('hist_dRnEle', '; Subleading lepton p_{T} (GeV);#DeltaR(l1, l2);', 30, 0, 200, 20, 0, 3)
+    hist2D_pt2dR = r.TH2F('hist_pt2dR', '; Subleading lepton p_{T} (GeV);#DeltaR(l1, l2);', 30, 0, 200, 20, 0, 3)
 
     ######################################
     ####   Book TEfficiency objects   ####
     ######################################
     eff_pt1 = r.TEfficiency("eff_pt1", ";p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
     eff_pt2 = r.TEfficiency("eff_pt1", ";p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
-    eff_pt_1vs2 = r.TEfficiency("eff_pt_1vs2", ";Leading lepton p_{T} (GeV);Subleading lepton p_{T} GeV", len(pt_bin)-1, pt_bin, len(pt_bin) -1, pt_bin)
+    eff_pt_12 = r.TEfficiency("eff_pt_12", ";Leading lepton p_{T} (GeV);Subleading lepton p_{T} GeV", len(pt_bin)-1, pt_bin, len(pt_bin) -1, pt_bin)
 
     eff_Lxy1 = r.TEfficiency("eff_Lxy1", ";Production radius r (cm);Efficiency", len(Lxy_bin)-1, Lxy_bin)
     eff_Lxy2 = r.TEfficiency("eff_Lxy1", ";Production radius r (cm);Efficiency", len(Lxy_bin)-1, Lxy_bin)
-    eff_Lxy_1vs2 = r.TEfficiency("eff_Lxy_1vs2", ";Leading lepton r (cm) ;Subleading lepton r (cm)", len(Lxy_bin)-1, Lxy_bin, len(Lxy_bin) -1, Lxy_bin)
+    eff_Lxy_12 = r.TEfficiency("eff_Lxy_12", ";Leading lepton r (cm) ;Subleading lepton r (cm)", len(Lxy_bin)-1, Lxy_bin, len(Lxy_bin) -1, Lxy_bin)
 
-    eff_pt1vsLxy1 = r.TEfficiency("eff_pt1vsLxy1", ";Leading lepton p_{T} (GeV);Leading lepton r (cm)", len(pt_bin)-1, pt_bin, len(Lxy_bin) -1, Lxy_bin)
-    eff_pt2vsLxy2 = r.TEfficiency("eff_pt2vsLxy2", ";Subleading lepton p_{T} (GeV);Subleading r (cm)", len(pt_bin)-1, pt_bin, len(Lxy_bin) -1, Lxy_bin)
+    eff_pt1Lxy1 = r.TEfficiency("eff_pt1Lxy1", ";Leading lepton p_{T} (GeV);Leading lepton r (cm)", len(pt_bin)-1, pt_bin, len(Lxy_bin) -1, Lxy_bin)
+    eff_pt2Lxy2 = r.TEfficiency("eff_pt2Lxy2", ";Subleading lepton p_{T} (GeV);Subleading r (cm)", len(pt_bin)-1, pt_bin, len(Lxy_bin) -1, Lxy_bin)
 
     eff_dR = r.TEfficiency("eff_dR", ";#DeltaR(l1, l2);Efficiency", 20, 0.0, 4.0)
     eff_mass = r.TEfficiency("eff_mass", ";Mass(l1, l2) (GeV);Efficiency", 40, 0.0, 500.0)
     eff_nConv = r.TEfficiency("eff_nConv", ";Number of electrons (PromptHadron);Efficiency", 10, 0.0, 12)
 
-    eff_eta_1vs2 = r.TEfficiency("eff_eta_1vs2", ";Leading lepton #eta;Subleading lepton #eta", 16, 0, 2.4, 16, 0, 2.4)
+    eff_eta_12 = r.TEfficiency("eff_eta_12", ";Leading lepton #eta;Subleading lepton #eta", 16, 0, 2.4, 16, 0, 2.4)
 
-    eff_pt2_dR = r.TEfficiency("eff_pt2vsLxy2", ";Subleading lepton p_{T} (GeV);#DeltaR(l_{1}, l_{2})", 30, 0, 300, 16, 0, 4)
+    eff_pt2dR = r.TEfficiency("eff_pt2dR", ";Subleading lepton p_{T} (GeV);#DeltaR(l_{1}, l_{2})", 30, 0, 300, 16, 0, 4)
 
     #########################
     ####   Load sample   ####
@@ -285,10 +289,12 @@ if __name__ == "__main__":
         #####################
         ####   Filling   ####
         #####################
-        #if pt1_cut and pt2_cut and Lxy1_cut and Lxy2_cut:
-        #if pt1_cut and pt2_cut:
-        #if pt2_cut:
-        if True:
+        #if pt1_cut and pt2_cut and Lxy1_cut and Lxy2_cut: # pt + Lxy cuts
+        #if pt1_cut and pt2_cut: # pt cuts only
+        #if pt2_cut: # pt2 cut
+        #if resonance: # check inside X resonance
+        #if not resonance: # check outside X resonance
+        if True: # no cuts
 
             hist_Lxy1.Fill(Lxy1)
             hist_Lxy2.Fill(Lxy2)
@@ -302,22 +308,22 @@ if __name__ == "__main__":
 
             eff_pt1.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, pt1)
             eff_pt2.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, pt2)
-            eff_pt_1vs2.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, pt1, pt2)
+            eff_pt_12.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, pt1, pt2)
 
             eff_Lxy1.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, Lxy1)
             eff_Lxy2.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, Lxy2)
-            eff_Lxy_1vs2.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, Lxy1, Lxy2)
+            eff_Lxy_12.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, Lxy1, Lxy2)
 
-            eff_pt1vsLxy1.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, pt1, Lxy1)
-            eff_pt2vsLxy2.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, pt2, Lxy2)
+            eff_pt1Lxy1.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, pt1, Lxy1)
+            eff_pt2Lxy2.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, pt2, Lxy2)
 
 
             eff_dR.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, dR)
             eff_mass.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, mass)
         
-            eff_eta_1vs2.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, abs(eta1), abs(eta2))
+            eff_eta_12.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, abs(eta1), abs(eta2))
 
-            eff_pt2_dR.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, pt2, dR)
+            eff_pt2dR.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, pt2, dR)
 
 
     ###########################
@@ -341,72 +347,72 @@ if __name__ == "__main__":
     HIST_Lxy.addHisto(OFhist_Lxy1, 'HIST', 'Leading lepton', 'l', r.kBlue+2, 1, 0)
     HIST_Lxy.addHisto(OFhist_Lxy2, 'HIST, SAME', 'Subleading lepton', 'l', r.kBlue-7, 1, 1)
     HIST_Lxy.addLatex(0.5, 0.935, 'l_{1} > 70 GeV, l_{2} > 50 GeV', size = 0.031)
-    HIST_Lxy.save(1, 0, 1, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    HIST_Lxy.save(1, 0, 1, '', '', outputDir = outputPath)
 
     valmax = OFhist_pt1.GetMaximum() if OFhist_pt1.GetMaximum() > OFhist_pt2.GetMaximum() else OFhist_pt2.GetMaximum()
     OFhist_pt1.SetMaximum(1.3*valmax)
     HIST_pt = Canvas.Canvas('hist_pt', 'png', 0.35, 0.84, 0.9, 0.89, 2)
     HIST_pt.addHisto(OFhist_pt1, 'HIST', 'Leading lepton', 'l', r.kBlue+2, 1, 0)
     HIST_pt.addHisto(OFhist_pt2, 'HIST, SAME', 'Subleading lepton', 'l', r.kBlue-7, 1, 1)
-    HIST_pt.save(1, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    HIST_pt.save(1, 0, 0, '', '', outputDir = outputPath)
 
     HIST_dR = Canvas.Canvas('hist_dR', 'png', 0.6, 0.84, 0.9, 0.89, 2)
     HIST_dR.addHisto(OFhist_dR, 'HIST', '', 'l', r.kBlue+2, 1, 0)
-    HIST_dR.save(0, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    HIST_dR.save(0, 0, 0, '', '', outputDir = outputPath)
 
     HIST_mass = Canvas.Canvas('hist_mass', 'png', 0.6, 0.84, 0.9, 0.89, 2)
     HIST_mass.addHisto(OFhist_mass, 'HIST', '', 'l', r.kBlue+2, 1, 0)
-    HIST_mass.save(0, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    HIST_mass.save(0, 0, 0, '', '', outputDir = outputPath)
 
-    HIST_dRvsnEle = Canvas.Canvas('hist_dRnEle', 'png', 0.6, 0.84, 0.9, 0.89, 2)
-    HIST_dRvsnEle.addHisto(hist2D_dRnEle, 'colz', '', 'l', r.kBlue+2, 1, 0)
-    HIST_dRvsnEle.save(0, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    HIST_dRnEle = Canvas.Canvas('hist_dRnEle', 'png', 0.6, 0.84, 0.9, 0.89, 2)
+    HIST_dRnEle.addHisto(hist2D_dRnEle, 'colz', '', 'l', r.kBlue+2, 1, 0)
+    HIST_dRnEle.save(0, 0, 0, '', '', outputDir = outputPath)
 
     HIST_pt2dR = Canvas.Canvas('hist_pt2dR', 'png', 0.6, 0.84, 0.9, 0.89, 2)
     HIST_pt2dR.addHisto(hist2D_pt2dR, 'colz', '', 'l', r.kBlue+2, 1, 0)
-    HIST_pt2dR.save(0, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    HIST_pt2dR.save(0, 0, 0, '', '', outputDir = outputPath)
 
     EFF_pt12 = Canvas.Canvas('EFF_pt12', 'png', 0.5, 0.84, 0.9, 0.89, 4)
-    EFF_pt12.add2DRate(eff_pt_1vs2, 'colz')
-    EFF_pt12.save(0, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    EFF_pt12.add2DRate(eff_pt_12, 'colz')
+    EFF_pt12.save(0, 0, 0, '', '', outputDir = outputPath)
 
     EFF_Lxy12 = Canvas.Canvas('EFF_Lxy12', 'png', 0.5, 0.84, 0.9, 0.89, 4)
-    EFF_Lxy12.add2DRate(eff_Lxy_1vs2, 'colz')
+    EFF_Lxy12.add2DRate(eff_Lxy_12, 'colz')
     #EFF_Lxy12.addLatex(0.5, 0.935, 'l_{1} > 70 GeV, l_{2} > 50 GeV', size = 0.031)
-    EFF_Lxy12.save(0, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    EFF_Lxy12.save(0, 0, 0, '', '', outputDir = outputPath)
 
     EFF_pt1Lxy1 = Canvas.Canvas('EFF_pt1Lxy1', 'png', 0.5, 0.84, 0.9, 0.89, 4)
-    EFF_pt1Lxy1.add2DRate(eff_pt1vsLxy1, 'colz')
-    EFF_pt1Lxy1.save(0, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    EFF_pt1Lxy1.add2DRate(eff_pt1Lxy1, 'colz')
+    EFF_pt1Lxy1.save(0, 0, 0, '', '', outputDir = outputPath)
 
     EFF_pt2Lxy2 = Canvas.Canvas('EFF_pt2Lxy2', 'png', 0.5, 0.84, 0.9, 0.89, 4)
-    EFF_pt2Lxy2.add2DRate(eff_pt2vsLxy2, 'colz')
-    EFF_pt2Lxy2.save(0, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    EFF_pt2Lxy2.add2DRate(eff_pt2Lxy2, 'colz')
+    EFF_pt2Lxy2.save(0, 0, 0, '', '', outputDir = outputPath)
 
     EFF_pt2dR = Canvas.Canvas('EFF_pt2dR', 'png', 0.5, 0.84, 0.9, 0.89, 4)
-    EFF_pt2dR.add2DRate(eff_pt2_dR, 'colz')
-    EFF_pt2dR.save(0, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    EFF_pt2dR.add2DRate(eff_pt2dR, 'colz')
+    EFF_pt2dR.save(0, 0, 0, '', '', outputDir = outputPath)
 
     EFF_eta12 = Canvas.Canvas('EFF_eta12', 'png', 0.5, 0.84, 0.9, 0.89, 4)
-    EFF_eta12.add2DRate(eff_eta_1vs2, 'colz')
-    EFF_eta12.save(0, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    EFF_eta12.add2DRate(eff_eta_12, 'colz')
+    EFF_eta12.save(0, 0, 0, '', '', outputDir = outputPath)
 
     EFF_pt = Canvas.Canvas('EFF_pt', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_pt.addRate(eff_pt1, 'AP', 'Leading lepton', 'p', r.kBlue+2, True, 0, marker = 20)
     EFF_pt.addRate(eff_pt2, 'AP, SAME', 'Subleading lepton', 'p', r.kBlue-7, True, 0, marker = 20)
-    EFF_pt.save(1, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    EFF_pt.save(1, 0, 0, '', '', outputDir = outputPath)
 
     EFF_Lxy = Canvas.Canvas('EFF_Lxy', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_Lxy.addRate(eff_Lxy1, 'AP', 'Leading lepton', 'p', r.kBlue+2, True, 0, marker = 20)
     EFF_Lxy.addRate(eff_Lxy2, 'AP, SAME', 'Subleading lepton', 'p', r.kBlue-7, True, 0, marker = 20)
-    EFF_Lxy.save(1, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/', xlog = False)
+    EFF_Lxy.save(1, 0, 0, '', '', outputDir = outputPath, xlog = False)
 
     EFF_dR = Canvas.Canvas('EFF_dR', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_dR.addRate(eff_dR, 'AP', '', 'p', r.kBlue+2, True, 0, marker = 20)
-    EFF_dR.save(0, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    EFF_dR.save(0, 0, 0, '', '', outputDir = outputPath)
 
     EFF_mass = Canvas.Canvas('EFF_mass', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_mass.addRate(eff_mass, 'AP', '', 'p', r.kBlue+2, True, 0, marker = 20)
-    EFF_mass.save(0, 0, 0, '', '', outputDir = WORKPATH + 'TRGEff_electrons/')
+    EFF_mass.save(0, 0, 0, '', '', outputDir = outputPath)
 
 
