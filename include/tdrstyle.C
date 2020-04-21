@@ -157,6 +157,7 @@ void setTDRStyle(bool fatline=true) {
   for (int i=0; i<255; i++){ colors[i] = FI+i;}
   tdrStyle->SetNumberContours(255);
   tdrStyle->SetPalette(255, colors);
+  tdrStyle->SetPalette(kCool);
   
   tdrStyle->cd();
 }

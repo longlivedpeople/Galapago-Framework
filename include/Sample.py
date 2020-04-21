@@ -179,7 +179,7 @@ class Sample:
      h.GetYaxis().SetTitle(ylabel)
      
      if(self.isData == 0):
-        cut = cut + "* ( " + str(self.lumWeight*lumi) + " * genWeight/abs(genWeight) " 
+        cut = cut + "* ( " + str(self.lumWeight*lumi) + " * genWeight/abs(genWeight) )" 
      self.ttree.Project(name, var, cut, options) 
      return h
 
@@ -195,7 +195,7 @@ class Sample:
      h.GetZaxis().SetTitle(zlabel)
      
      if(self.isData == 0):
-        cut = cut + "* ( " + str(self.lumWeight*lumi) + " * genWeight/abs(genWeight) "
+        cut = cut + "* ( " + str(self.lumWeight*lumi) + " * genWeight/abs(genWeight) )"
      self.ttree.Project(name, var, cut, options) 
      return h
 
@@ -420,7 +420,7 @@ class Tree:
        
      return h
 
-   def getTH2F(self, lumi, name, var, nbinx, xmin, xmax, nbiny, ymin, ymax, cut, options, xlabel):
+   def getTH2F(self, lumi, name, var, nbinx, xmin, xmax, nbiny, ymin, ymax, cut, options, xlabel, ylabel):
      if cut == '':
        cut = '(1)'
      if(xmin == xmax) and (ymax == ymin):

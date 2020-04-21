@@ -29,8 +29,8 @@ class Launcher:
         self.condorfile = self.workpath + '_auxCondorFile' + str(ID)+'.sh'
         self.condorsub = self.workpath + '_auxCondorSub' + str(ID)+'.sh'
 
-        # Define qeue (only in condorCONDOR)
-        self.qeue = 'microcentury'
+        # Define queue (only in condorCONDOR)
+        self.queue = 'microcentury'
         self.logs = self.workpath + 'logs/'
 
         # Create logs/ folder
@@ -88,17 +88,23 @@ python {1} --out {2}
         _auxSubmit.write(text.format(self.basename, self.auxscript, self.output))
         _auxSubmit.close()
 
-    def makeCondorSubmitFiles(self):
+    def makeCondorSubmitFiles(self, submitfile = False):
+
+        if not submitfile:
+            submitfile = self.auxscript
 
         templateCONDOR = """#!/bin/bash
 pushd {0}
 eval `scramv1 runtime -sh`
 pushd
-python {1} --out {2}
-"""
+""".format(self.cmssw)
+
+        templateCONDOR += 'python {0}'.format(submitfile)
+        if self.output != '':
+            templateCONDOR += ' --out {0}'.format(self.output)
 
         _f = open(self.condorfile, 'w')
-        _f.write(templateCONDOR.format(self.cmssw, self.auxscript, self.output))
+        _f.write(templateCONDOR)
         _f.close()
 
 
@@ -114,7 +120,7 @@ queue filename matching {2}
 """
 
         _fs = open(self.condorsub, 'w')
-        _fs.write(templateCONDORsub.format(self.logs, self.qeue, self.condorfile))
+        _fs.write(templateCONDORsub.format(self.logs, self.queue, self.condorfile))
         _fs.close()
 
 
@@ -132,18 +138,24 @@ queue filename matching {2}
         copy.close()
 
 
-    def addOrder(self, order):
+    def addOrder(self, order, submitfile = False):
 
-        with open(self.auxscript, 'a') as _file:
-            _file.write(4*' ' + order)
+        if not submitfile:
+            submitfile = self.auxscript
+
+        with open(submitfile, 'a') as _file:
+            _file.write(order)
             _file.close()
 
 
-    def launch(self):
+    def launch(self, submitfile = False):
+
+        if not submitfile: 
+            submitfile = self.auxsubmit
 
         if self.env == 'gridui':
-            os.system('chmod +x ' + self.auxsubmit)
-            os.system('qsub -o '+ self.workpath + 'logs/gridui'+str(self.ID)+'.log -e ' + self.workpath + 'logs/gridui'+str(self.ID)+'.err ' + self.auxsubmit)
+            os.system('chmod +x ' + submitfile)
+            os.system('qsub -o '+ self.workpath + 'logs/gridui'+str(self.ID)+'.log -e ' + self.workpath + 'logs/gridui'+str(self.ID)+'.err ' + submitfile)
         else:
             os.system('chmod +x ' + self.condorfile)
             os.system('chmod +x ' + self.condorsub)

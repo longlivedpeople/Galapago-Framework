@@ -30,7 +30,7 @@ class Canvas:
       self.myLegend.SetLineWidth(0)
       self.myLegend.SetBorderSize(0)
       self.myLegend.SetNColumns(c)              
-      r.gStyle.SetPadRightMargin(0.05)
+      #r.gStyle.SetPadRightMargin(0.05)
 
    def changeLabelsToNames(self):
       newlabels = []
@@ -233,7 +233,10 @@ class Canvas:
           _eff.SetMarkerStyle(marker)
       else:
           _eff.SetMarkerStyle(21)
-      _eff.SetMarkerColor(color)
+
+      if color:
+          _eff.SetMarkerColor(color)
+
       _eff.SetLineWidth(2)
       _eff.SetLineColor(color)
       _eff.SetMarkerSize(1.0)
@@ -244,6 +247,17 @@ class Canvas:
       self.labelsOption.append(labelOption)
       self.ToDraw.append(ToDraw)
       self.orderForLegend.append(orderForLegend) 
+
+   def add2DRate(self, eff, option):
+
+      _eff = copy.deepcopy(eff)
+      self.histos.append(_eff)
+      self.options.append(option)
+      self.labels.append('')
+      self.labelsOption.append('')
+      self.ToDraw.append(True)
+      self.orderForLegend.append(0) 
+
 
    def addProf(self, prof, option, label, labelOption, color, ToDraw, orderForLegend, marker = False):
 
@@ -350,7 +364,7 @@ class Canvas:
       for i in range(0, len(self.histos)):
           if(self.ToDraw[i] != 0):
               #self.histos[i].SetMinimum(0.00001)
-              self.histos[i].SetMinimum(0.1)
+              #self.histos[i].SetMinimum(0.1)
               #self.histos[i].SetMinimum(0.0001)
               #self.histos[i].SetMaximum(0.5)
               self.histos[i].Draw(self.options[i])
@@ -400,15 +414,15 @@ class Canvas:
           tmp_ratio.GetXaxis().SetTitleSize(0.12);
           tmp_ratio.GetXaxis().SetLabelOffset(0.08);
           tmp_ratio.GetXaxis().SetTitle('');
-          tmp_ratio.SetMarkerStyle(tmp_hMC.GetMarkerStyle());
-          tmp_ratio.SetFillColorAlpha(r.kBlue-3,0.9)
+          tmp_ratio.SetMarkerStyle(20);
+          tmp_ratio.SetFillColorAlpha(r.kAzure-3,0.8)
           tmp_ratio.SetFillStyle(3017)
           tmp_ratio.SetMarkerColor(r.kBlack);
-          tmp_ratio.SetMarkerSize(0.6);
-          #tmp_ratio.SetMarkerColor(r.kBlack if len(hMClist) == 1 else tmp_hMC.GetMarkerColor());
-          #tmp_ratio.SetLineColor  (r.kBlack if len(hMClist) == 1 else tmp_hMC.GetLineColor  ());
-          tmp_ratio.SetLineColor  (tmp_hMC.GetLineColor());
-          tmp_ratio.SetLineStyle(tmp_hMC.GetLineStyle())
+          tmp_ratio.SetMarkerSize(0.8);
+          tmp_ratio.SetMarkerColor(r.kBlack if len(hMClist) == 1 else tmp_hMC.GetMarkerColor());
+          tmp_ratio.SetLineColor  (r.kBlack if len(hMClist) == 1 else tmp_hMC.GetLineColor  ());
+          #tmp_ratio.SetLineColor(tmp_hMC.GetLineColor());
+          #tmp_ratio.SetLineStyle(tmp_hMC.GetLineStyle())
           ratios.append(tmp_ratio)
           xmin = tmp_ratio.GetBinLowEdge(1)
           xmax = tmp_ratio.GetBinLowEdge(tmp_ratio.GetNbinsX()+1)
@@ -448,7 +462,7 @@ class Canvas:
       self.myCanvas.IsA().Destructor(self.myCanvas)                                                                                                                                            
 
 
-   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False):
+   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False, zlog = False):
 
       self.myCanvas.cd()
       
@@ -456,6 +470,8 @@ class Canvas:
           self.myCanvas.GetPad(0).SetLogy(1)
       if(xlog):
           self.myCanvas.GetPad(0).SetLogx(1)
+      if(zlog):
+          self.myCanvas.GetPad(0).SetLogz(1)
      
       for i in range(0, len(self.histos)):
           if(self.ToDraw[i] != 0):        
@@ -463,7 +479,7 @@ class Canvas:
                   self.histos[i].GetYaxis().SetRangeUser(ymin, ymax)
                   #self.histos[i].SetMaximum(ymax)
 
-              if str(type(self.histos[i])) == "<class 'ROOT.TEfficiency'>":
+              if str(type(self.histos[i])) == "<class 'ROOT.TEfficiency'>" and 'colz' not in self.options[i] and 'COLZ' not in self.options[i]:
                   self.makeRate(self.histos[i], self.options[i])
               else:
                   self.histos[i].Draw(self.options[i])
