@@ -169,8 +169,8 @@ class Canvas:
           arrow.SetLineWidth(thickness)
       self.arrows.append(arrow)
 
-   def addLatex(self, x1, y1, text, font=42, size = 0.04):
-      lat = [x1, y1, text, font, size]
+   def addLatex(self, x1, y1, text, font=42, size = 0.04, align = 11):
+      lat = [x1, y1, text, font, size, align]
       self.latexs.append(lat)
 
    def makeOFHisto(self, histo):
@@ -499,8 +499,9 @@ class Canvas:
       for latex in self.latexs:
           lat = TLatex()
           lat.SetNDC()
-          lat.SetTextSize(latex[-1])
-          lat.SetTextFont(latex[-2])
+          lat.SetTextAlign(latex[-1])
+          lat.SetTextSize(latex[-2])
+          lat.SetTextFont(latex[-3])
           lat.DrawLatex(latex[0], latex[1], latex[2])
   
       if(legend):

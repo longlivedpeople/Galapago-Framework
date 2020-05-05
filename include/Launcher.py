@@ -8,7 +8,17 @@ class Launcher:
         self.basename = name if name else 'Galapago'
         self.script = script
         self.ID = ID
-        self.env = env
+        self.env = ''
+        self.queue = ''
+
+        if env == 'gridui':
+            self.env = 'gridui'            
+        elif env in ['espresso', 'microcentury', 'longlunch', 'workday', 'tomorrow', 'testmatch', 'nextweek']:
+            self.env = 'condor'
+            self.queue = env
+        elif env == 'condor': # default (to be changed)
+            self.env = 'condor'
+            self.queue = 'microcentury' 
 
 
         # Identify workpath:
@@ -30,7 +40,6 @@ class Launcher:
         self.condorsub = self.workpath + '_auxCondorSub' + str(ID)+'.sh'
 
         # Define queue (only in condorCONDOR)
-        self.queue = 'microcentury'
         self.logs = self.workpath + 'logs/'
 
         # Create logs/ folder

@@ -213,6 +213,9 @@ if __name__ == "__main__":
     eff_Lxy2 = r.TEfficiency("eff_Lxy1", ";Production radius r (cm);Efficiency", len(Lxy_bin)-1, Lxy_bin)
     eff_Lxy_12 = r.TEfficiency("eff_Lxy_12", ";Leading lepton r (cm) ;Subleading lepton r (cm)", len(Lxy_bin)-1, Lxy_bin, len(Lxy_bin) -1, Lxy_bin)
 
+    eff_Lxy1_log = r.TEfficiency("eff_Lxy1_log", ";Production radius r (cm);Efficiency", len(Lxy_logbin)-1, Lxy_logbin)
+    eff_Lxy2_log = r.TEfficiency("eff_Lxy1_log", ";Production radius r (cm);Efficiency", len(Lxy_logbin)-1, Lxy_logbin)
+
     eff_pt1Lxy1 = r.TEfficiency("eff_pt1Lxy1", ";Leading lepton p_{T} (GeV);Leading lepton r (cm)", len(pt_bin)-1, pt_bin, len(Lxy_bin) -1, Lxy_bin)
     eff_pt2Lxy2 = r.TEfficiency("eff_pt2Lxy2", ";Subleading lepton p_{T} (GeV);Subleading r (cm)", len(pt_bin)-1, pt_bin, len(Lxy_bin) -1, Lxy_bin)
 
@@ -240,7 +243,7 @@ if __name__ == "__main__":
     for i in range(0, _tree.GetEntries()):
 
         _tree.GetEntry(i)
-        #if i > 20: break
+        if i > 500000: break
 
         # Get electrons:
         nPromptEle = 0
@@ -252,7 +255,7 @@ if __name__ == "__main__":
             nPromptEle+=1
 
         # If there are no electrons we do NOT fill the TEfficiencies:
-        if len(var_values) < 2: continue
+        if len(var_values) != 2: continue
 
         # Sort by pt:
         var_values.sort(reverse = True, key = lambda x: x[0])
@@ -285,16 +288,19 @@ if __name__ == "__main__":
         Lxy1_cut = Lxy1 < 80
         Lxy2_cut = Lxy2 < 80
         resonance = mass < 100
+        prompt = Lxy1 < 1 and Lxy2 < 1
 
         #####################
         ####   Filling   ####
         #####################
         #if pt1_cut and pt2_cut and Lxy1_cut and Lxy2_cut: # pt + Lxy cuts
         #if pt1_cut and pt2_cut: # pt cuts only
-        #if pt2_cut: # pt2 cut
+        if pt2_cut: # pt2 cut
+        #if pt1_cut: # pt1 cut
         #if resonance: # check inside X resonance
         #if not resonance: # check outside X resonance
-        if True: # no cuts
+        #if prompt and pt1_cut: # no cuts
+        #if True:
 
             hist_Lxy1.Fill(Lxy1)
             hist_Lxy2.Fill(Lxy2)
@@ -313,6 +319,8 @@ if __name__ == "__main__":
             eff_Lxy1.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, Lxy1)
             eff_Lxy2.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, Lxy2)
             eff_Lxy_12.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, Lxy1, Lxy2)
+            eff_Lxy1_log.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, Lxy1)
+            eff_Lxy2_log.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, Lxy2)
 
             eff_pt1Lxy1.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, pt1, Lxy1)
             eff_pt2Lxy2.Fill(_tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15, pt2, Lxy2)
@@ -402,10 +410,35 @@ if __name__ == "__main__":
     EFF_pt.addRate(eff_pt2, 'AP, SAME', 'Subleading lepton', 'p', r.kBlue-7, True, 0, marker = 20)
     EFF_pt.save(1, 0, 0, '', '', outputDir = outputPath)
 
+    EFF_pt1 = Canvas.Canvas('EFF_pt1', 'png', 0.3, 0.84, 0.9, 0.89, 2)
+    EFF_pt1.addRate(eff_pt1, 'AP', '', 'p', r.kBlue+2, True, 0, marker = 20)
+    EFF_pt1.save(0, 0, 0, '', '', outputDir = outputPath)
+
+    EFF_pt2 = Canvas.Canvas('EFF_pt2', 'png', 0.3, 0.84, 0.9, 0.89, 2)
+    EFF_pt2.addRate(eff_pt2, 'AP', '', 'p', r.kBlue+2, True, 0, marker = 20)
+    EFF_pt2.save(0, 0, 0, '', '', outputDir = outputPath)
+
     EFF_Lxy = Canvas.Canvas('EFF_Lxy', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_Lxy.addRate(eff_Lxy1, 'AP', 'Leading lepton', 'p', r.kBlue+2, True, 0, marker = 20)
     EFF_Lxy.addRate(eff_Lxy2, 'AP, SAME', 'Subleading lepton', 'p', r.kBlue-7, True, 0, marker = 20)
     EFF_Lxy.save(1, 0, 0, '', '', outputDir = outputPath, xlog = False)
+
+    EFF_Lxy1 = Canvas.Canvas('EFF_Lxy1', 'png', 0.3, 0.84, 0.9, 0.89, 2)
+    EFF_Lxy1.addRate(eff_Lxy1, 'AP', 'Leading lepton', 'p', r.kBlue+2, True, 0, marker = 20)
+    EFF_Lxy1.save(0, 0, 0, '', '', outputDir = outputPath, xlog = False)
+
+    EFF_Lxy2 = Canvas.Canvas('EFF_Lxy2', 'png', 0.3, 0.84, 0.9, 0.89, 2)
+    EFF_Lxy2.addRate(eff_Lxy2, 'AP', 'Leading lepton', 'p', r.kBlue+2, True, 0, marker = 20)
+    EFF_Lxy2.save(0, 0, 0, '', '', outputDir = outputPath, xlog = False)
+
+
+    EFF_Lxy1_log = Canvas.Canvas('EFF_Lxy1_log', 'png', 0.3, 0.84, 0.9, 0.89, 2)
+    EFF_Lxy1_log.addRate(eff_Lxy1_log, 'AP', 'Leading lepton', 'p', r.kBlue+2, True, 0, marker = 20)
+    EFF_Lxy1_log.save(0, 0, 0, '', '', outputDir = outputPath, xlog = True)
+
+    EFF_Lxy2_log = Canvas.Canvas('EFF_Lxy2_log', 'png', 0.3, 0.84, 0.9, 0.89, 2)
+    EFF_Lxy2_log.addRate(eff_Lxy2_log, 'AP', 'Leading lepton', 'p', r.kBlue+2, True, 0, marker = 20)
+    EFF_Lxy2_log.save(0, 0, 0, '', '', outputDir = outputPath, xlog = True)
 
     EFF_dR = Canvas.Canvas('EFF_dR', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_dR.addRate(eff_dR, 'AP', '', 'p', r.kBlue+2, True, 0, marker = 20)
