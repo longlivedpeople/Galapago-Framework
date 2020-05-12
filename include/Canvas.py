@@ -39,7 +39,7 @@ class Canvas:
          newlabels.append(self.histos[il].GetName())
       self.labels = newlabels
 
-   def banner(self, isData, lumi):
+   def banner(self, isData, lumi, scy):
      
       latex = TLatex()
       latex.SetNDC();                         
@@ -48,8 +48,12 @@ class Canvas:
       latex.SetTextFont(42);                  
       latex.SetTextAlign(31);                 
       latex.SetTextSize(0.06);                
-      latex.DrawLatex(0.25, 0.93, "#bf{CMS}") 
-               
+      if not scy:
+          latex.DrawLatex(0.25, 0.93, "#bf{CMS}") 
+      else:               
+          latex.DrawLatex(0.34, 0.93, "#bf{CMS}") 
+
+         
       latexb = TLatex()                      
       latexb.SetNDC();
       latexb.SetTextAngle(0);
@@ -59,9 +63,15 @@ class Canvas:
       latexb.SetTextSize(0.04);            
 
       if(isData):
-         latexb.DrawLatex(0.44, 0.93, "#it{Preliminary}")
+         if not scy:
+             latexb.DrawLatex(0.43, 0.93, "#it{Preliminary}")
+         else:
+             latexb.DrawLatex(0.52, 0.93, "#it{Preliminary}")
       else:
-         latexb.DrawLatex(0.44, 0.93, "#it{Simulation}")
+         if not scy:
+             latexb.DrawLatex(0.43, 0.93, "#it{Simulation}")
+         else:
+             latexb.DrawLatex(0.52, 0.93, "#it{Simulation}")
 
       text_lumi = ''
       if isData:
@@ -76,7 +86,7 @@ class Canvas:
       latexc.SetTextSize(0.04);
       latexc.DrawLatex(0.90, 0.93, text_lumi)                
 
-   def banner2(self, isData, lumi):
+   def banner2(self, isData, lumi, scy = False):
     
       latex = TLatex()
       latex.SetNDC();
@@ -462,7 +472,7 @@ class Canvas:
       self.myCanvas.IsA().Destructor(self.myCanvas)                                                                                                                                            
 
 
-   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False, zlog = False):
+   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False, zlog = False, maxYnumbers = False):
 
       self.myCanvas.cd()
       
@@ -480,7 +490,7 @@ class Canvas:
                   #self.histos[i].SetMaximum(ymax)
 
               if str(type(self.histos[i])) == "<class 'ROOT.TEfficiency'>" and 'colz' not in self.options[i] and 'COLZ' not in self.options[i]:
-                  self.makeRate(self.histos[i], self.options[i])
+                  self.makeRate(self.histos[i], self.options[i])                   
               else:
                   self.histos[i].Draw(self.options[i])
 
@@ -514,8 +524,11 @@ class Canvas:
       lat.SetTextFont(42)
       lat.DrawLatex(0.46, 0.04, labelx)
       
-      
-      self.banner(isData, lumi)
+      if maxYnumbers:
+          r.TGaxis().SetMaxDigits(maxYnumbers) 
+          self.banner(isData, lumi, scy = True)
+      else:
+          self.banner(isData, lumi, scy = False)
 
       if not outputDir[-1] == '/': dirName = outputDir + '/'
       else: dirName = outputDir

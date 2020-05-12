@@ -21,7 +21,7 @@ def selectSamples(inputfile, selList, sType = 'DATA'):
     typeList    = []
 
     for line in f.readlines():
-        if '#' in line or not len(line.rstrip('\r')): continue
+        if '#'==line[0] or not len(line.rstrip('\r')): continue
         for _sample in selList:
             _sample = _sample.replace('*','.*')
             if _sample == line.split()[2] or re.search(_sample, line.split()[2]):
