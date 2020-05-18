@@ -1,5 +1,6 @@
 import os
 import time
+from datetime import datetime
 
 class Launcher:
 
@@ -12,7 +13,9 @@ class Launcher:
         self.queue = ''
 
         if env == 'gridui':
-            self.env = 'gridui'            
+            self.env = 'gridui' # deprecated (old gridui queue system)
+        elif env == 'slurm':
+            self.env = 'slurm'            
         elif env in ['espresso', 'microcentury', 'longlunch', 'workday', 'tomorrow', 'testmatch', 'nextweek']:
             self.env = 'condor'
             self.queue = env
@@ -36,7 +39,7 @@ class Launcher:
         # Define file names for job submission
         self.auxscript = self.workpath + '_auxScript'+str(ID)+'.py'
         self.auxsubmit = self.workpath + '_auxSubmit'+str(ID)+'.sh'
-        self.condorfile = self.workpath + '_auxCondorFile' + str(ID)+'.sh'
+        self.bashfile = self.workpath + '_auxBashFile' + str(ID)+'.sh'
         self.condorsub = self.workpath + '_auxCondorSub' + str(ID)+'.sh'
 
         # Define queue (only in condorCONDOR)
@@ -55,7 +58,10 @@ class Launcher:
         if self.env == 'gridui':
             self.makeGriduiSubmitFile()
         if self.env == 'condor': 
-            self.makeCondorSubmitFiles()
+            self.makeBashFile()
+            self.makeCondorSubmitFile()
+        if self.env == 'slurm':
+            self.makeBashFile()
 
 
     def makeGriduiSubmitFile(self):
@@ -97,25 +103,24 @@ python {1} --out {2}
         _auxSubmit.write(text.format(self.basename, self.auxscript, self.output))
         _auxSubmit.close()
 
-    def makeCondorSubmitFiles(self, submitfile = False):
+    def makeBashFile(self):
 
-        if not submitfile:
-            submitfile = self.auxscript
-
-        templateCONDOR = """#!/bin/bash
+        templateBASH = """#!/bin/bash
 pushd {0}
 eval `scramv1 runtime -sh`
 pushd
 """.format(self.cmssw)
 
-        templateCONDOR += 'python {0}'.format(submitfile)
+        templateBASH += 'python {0}'.format(self.auxscript)
         if self.output != '':
-            templateCONDOR += ' --out {0}'.format(self.output)
+            templateBASH += ' --out {0}'.format(self.output)
 
-        _f = open(self.condorfile, 'w')
-        _f.write(templateCONDOR)
+        _f = open(self.bashfile, 'w')
+        _f.write(templateBASH)
         _f.close()
 
+
+    def makeCondorSubmitFile(self):
 
         templateCONDORsub = """
 universe                = vanilla
@@ -129,7 +134,7 @@ queue filename matching {2}
 """
 
         _fs = open(self.condorsub, 'w')
-        _fs.write(templateCONDORsub.format(self.logs, self.queue, self.condorfile))
+        _fs.write(templateCONDORsub.format(self.logs, self.queue, self.bashfile))
         _fs.close()
 
 
@@ -167,11 +172,15 @@ queue filename matching {2}
         if self.env == 'gridui':
             os.system('chmod +x ' + submitfile)
             os.system('qsub -o '+ self.workpath + 'logs/gridui'+str(self.ID)+'.log -e ' + self.workpath + 'logs/gridui'+str(self.ID)+'.err ' + submitfile)
-        else:
-            os.system('chmod +x ' + self.condorfile)
+        elif self.env == 'condor':
+            os.system('chmod +x ' + self.bashfile)
             os.system('chmod +x ' + self.condorsub)
             os.system('condor_submit ' + self.condorsub)
-
+        elif self.env == 'slurm':
+            os.system('chmod +x ' + self.bashfile)
+            now = datetime.now()
+            time_code = now.strftime("_%d%m_%H%M%S")
+            os.system('sbatch -o ' + self.workpath +'logs/'+time_code+'.log -e '+self.workpath + 'logs/' + time_code + '.err --qos=gridui_sort --partition=cloudcms ' + self.bashfile)
 
     def clear(self):
 
