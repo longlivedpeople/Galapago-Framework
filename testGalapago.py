@@ -161,12 +161,12 @@ if __name__ == "__main__":
     ############# Background definition
     Backgrounds = []
     Backgrounds.append('DYJetsToLL_M-50') 
-    #Backgrounds.append('DYJetsToLL_M-10to50') 
-    #Backgrounds.append('WW') 
-    #Backgrounds.append('WZ') 
+    Backgrounds.append('DYJetsToLL_M-10to50') 
+    Backgrounds.append('WW') 
+    Backgrounds.append('WZ') 
     Backgrounds.append('ZZ') 
-    #Backgrounds.append('WJetsToLNu') 
-    Backgrounds.append('TTJets_DiLept') 
+    Backgrounds.append('WJetsToLNu') 
+    Backgrounds.append('TT') 
     #Backgrounds.append('QCD_Pt-30to40') 
     #Backgrounds.append('QCD_Pt-40toInf') 
 
@@ -179,8 +179,8 @@ if __name__ == "__main__":
     lumi = 35.9 # luminosity
 
     ############# Tree creation
-    treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/Samples.dat', Backgrounds, 'MC'), name = 'MC', isdata = 0 )
-    treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/Samples.dat', Signals, 'SI'), name = 'SI', isdata = 0 )
+    treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/Samples_cern_test.dat', Backgrounds, 'MC'), name = 'MC', isdata = 0 )
+    treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/Samples_cern_test.dat', Signals, 'SI'), name = 'SI', isdata = 0 )
     treeDATA = False
 
     ############# Cut definition
@@ -189,15 +189,12 @@ if __name__ == "__main__":
     EECR = cuts.AddListB([cuts.nTrack, cuts.EEChannel, cuts.haveEEBase, cuts.EECR_dPhi])
     EESRtailReg = cuts.AddListB([cuts.nTrack, cuts.EEChannel, cuts.haveEEBase, cuts.EESR_dPhi, cuts.EEtailRegime])
     EESRpromptReg = cuts.AddListB([cuts.nTrack, cuts.EEChannel, cuts.haveEEBase, cuts.EESR_dPhi, cuts.EEpromptRegime])
-    MMSR = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMMBase, cuts.MMSR_dPhi])
-    MMCR = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMMBase, cuts.MMCR_dPhi])
-    MMSRtailReg = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMMBase, cuts.MMSR_dPhi, cuts.MMtailRegime])
-    MMSRpromptReg = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMMBase, cuts.MMSR_dPhi, cuts.MMpromptRegime])
 
 
     ############# Plotting
     start_time = time.time()
 
+    makeSensitivity(opts.qenv, lumi, 'fabs(EEBase_trackIxy[EEBase_maxIxy])', 'sen_EEBase_trackIxy', 40, 0, 20, 'EE I_{xy}', 1, treeMC, treeSI, EESR, treeDATA = False, LLlabel = '')
 
     #make2DPlot(queue = opts.qenv, lumi = lumi, var = 'fabs(EEBase_dPhi[EEBase_maxIxy]):EEBase_trackIxy[EEBase_maxIxy]', name = '2DBackground', nbinx = 40, xmin =  0, xmax = 20, nbiny = 20, ymin = 0, ymax = 3.14, xlabel='EE I_{xy}', ylabel = 'Collinearity |#Delta#Phi|', tree = treeMC, cuts = cuts.AddListB([cuts.EEChannel, cuts.haveEEBase]), outtag = opts.out)
 #    make2DPlot(queue = opts.qenv, lumi = lumi, var = 'fabs(EEBase_dPhi[EEBase_maxIxy]):EEBase_trackIxy[EEBase_maxIxy]', name = '2D_350_148_173', nbinx = 15, xmin =  0, xmax = 60, nbiny = 6, ymin = 0, ymax = 3.14, xlabel='EE I_{xy}', ylabel = 'Collinearity |#Delta#Phi|', tree = treeSI, cuts = cuts.AddListB([cuts.EEChannel, cuts.haveEEBase]), outtag = opts.out)
@@ -211,7 +208,7 @@ if __name__ == "__main__":
     #makePlot(opts.qenv, lumi, 'nEE', 'nElectronCandidate', 4, 0, 4, 'Number of reconstructed dielectrons', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.EEChannel]), treeSI)
 
     #### Kinematis of electrons
-    makePlot(opts.qenv, lumi, 'ElectronCandidate_pt', 'EC_pt', 40, 0, 400, 'Transverse momentum p_{T} (GeV)', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.EEChannel]), opts.out, treeSI)
+    #makePlot(opts.qenv, lumi, 'ElectronCandidate_pt', 'EC_pt', 40, 0, 400, 'Transverse momentum p_{T} (GeV)', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.EEChannel]), opts.out, treeSI)
     #makePlot(opts.qenv, lumi, 'ElectronCandidate_et', 'EC_et', 40, 0, 400, 'Transverse energy E_{T} (GeV)', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.EEChannel]), treeSI)
     #makePlot(opts.qenv, lumi, 'ElectronCandidate_eta', 'EC_eta', 41, -2.5, 2.5, 'Pseudorapidity #eta', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.EEChannel]), treeSI)
     #makePlot(opts.qenv, lumi, 'fabs(IsoTrackSel_dxy[ElectronCandidate_isotrackIdx])', 'EC_dxy', 30, 0, 5.0, 'Transverse impact parameter |d_{xy}| (cm)', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.EEChannel]), treeSI)

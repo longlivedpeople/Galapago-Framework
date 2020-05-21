@@ -207,8 +207,8 @@ if __name__ == "__main__":
     """
 
     makePlot(opts.qenv, lumi, 'DMDMBase_relisoA[DMDMBase_maxIxy]', 'MM_relisoA', 30, 0.0, 0.3, 'RelIso muon A', True, treeMC, MMCR_OS, opts.out, treeSI)
-    makePlot(opts.qenv, lumi, 'DMDMBase_relisoB[DMDMBase_maxIxy]', 'MM_relisoB', 30, 0.0, 0.3, 'RelIso muon B', True, treeMC, MMCR_OS, opts.out, treeSI)
-    makePlot(opts.qenv, lumi, 'DGM_relPFiso', 'DGM_relPFiso', 50, 0.0, 0.5, 'DGM reliso', True, treeMC, cuts.MMChannel, opts.out, treeSI)
+    #makePlot(opts.qenv, lumi, 'DMDMBase_relisoB[DMDMBase_maxIxy]', 'MM_relisoB', 30, 0.0, 0.3, 'RelIso muon B', True, treeMC, MMCR_OS, opts.out, treeSI)
+    #makePlot(opts.qenv, lumi, 'DGM_relPFiso', 'DGM_relPFiso', 50, 0.0, 0.5, 'DGM reliso', True, treeMC, cuts.MMChannel, opts.out, treeSI)
 
 
     """

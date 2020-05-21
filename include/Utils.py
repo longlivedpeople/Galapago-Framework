@@ -436,16 +436,67 @@ def makeComparison(queue, lumi, tree, name, var1, var2, nbin, xmin, xmax, cuts1,
         plot.saveRatio(1, 0, log, lumi, h1, h2, label = title2, outputDir = WORKPATH + 'closurePlots_'+outtag+'/')
 
 
+
+
+
+##################################################################################################
+#################
+####   Function to compute the sensitivity histogram
+#
+#        * Input: Background [TH1F], Signal [TH1F]
+#        * Returns: Sensitivity [TH1F], Background cumulative [TH1F], Signal cumulative [TH1F]
+#
+
+def computeSensitivity(hBkg, hSig, Scolor = False):
+
+    Nbins = hBkg.GetNbinsX()
+
+    # Histogram booking:
+    cumBkg = r.TH1F('cumBkg', '', Nbins, hBkg.GetXaxis().GetXmin(), hBkg.GetXaxis().GetXmax()) # Background cumulative
+    cumSig = r.TH1F('cumSig', '', Nbins, hSig.GetXaxis().GetXmin(), hSig.GetXaxis().GetXmax()) # Signal cumulative
+    Sensitivity = r.TH1F('sens', '', Nbins, hSig.GetXaxis().GetXmin(), hSig.GetXaxis().GetXmax()) # Sensitivity
+
+    # Scan over axis:
+    for n in range(1, Nbins + 1):
+
+        Svalue = hSig.Integral(n, Nbins)
+        Bvalue = hBkg.Integral(n, Nbins)
+
+        if (Svalue + Bvalue == 0): 
+            sens = 0.0 # Avoid math error
+        else:
+            sens = Svalue/math.sqrt(Svalue + Bvalue)
+
+        cumSig.SetBinContent(n, Svalue)
+        cumBkg.SetBinContent(n, Bvalue)
+        Sensitivity.SetBinContent(n, sens)
+
+    # Histogram details:
+    if Scolor:
+        cumSig.SetLineColor(Scolor)
+        Sensitivity.SetLineColor(Scolor)
+
+    cumSig.SetLineWidth(2)
+    cumBkg.SetLineWidth(2)
+    Sensitivity.SetLineWidth(2)
+
+    # Set Y axis labels:
+    cumSig.GetYaxis().SetTitle('Yield')
+    cumBkg.GetYaxis().SetTitle('Yield')
+    Sensitivity.GetYaxis().SetTitle('S/#sqrt{S + B}')
+    # Set X labels:
+    cumSig.GetXaxis().SetTitle('min. ' + hSig.GetXaxis().GetTitle())
+    cumBkg.GetXaxis().SetTitle('min. ' + hBkg.GetXaxis().GetTitle())
+    Sensitivity.GetXaxis().SetTitle('min, ' + hSig.GetXaxis().GetTitle())
+
+    return Sensitivity, cumBkg, cumSig
+    
+
 def makeSensitivity(queue, lumi, var, name, nbin, xmin, xmax, xlabel, logx, treeMC, treeSI, cuts, outtag = '', treeDATA = False, LLlabel = ''):
 
     if queue:
 
-        launcher = Launcher.Launcher(script = os.path.dirname(os.path.abspath(__file__)) +'/'+ __file__, env = queue, ID = name, output = outtag)
-        order = "makeSensitivity(queue = False, lumi = {0}, var = '{1}', name = '{2}', nbin = {3}, xmin = {4}, xmax = {5}, xlabel = '{6}', logx = {7}, treeMC = treeMC, treeSI = treeSI, cuts = '{8}', treeDATA = False, LLlabel = '{9}')".format(lumi, var, name, nbin, xmin, xmax, xlabel, logx, cuts, LLlabel)
-        launcher.addOrder(order)
-        launcher.launch()
-        time.sleep(1.0)
-#        launcher.clear()
+        launchToQueue('makeSensitivity', queue, name, outtag)
 
     else:
         ### Get background histogram
@@ -532,7 +583,8 @@ def makeSensitivity(queue, lumi, var, name, nbin, xmin, xmax, xlabel, logx, tree
             plot.addLatex(0.17, 0.86, '#mu^{+}#mu^{-} channel')
 
         ### Save it
-        plot.save(1, 0, logx, luminosity, '', outputDir = WORKPATH + 'sensitivity_'+outtag+'/')
+        outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/sensitivity_' + outtag + '/'
+        plot.save(1, 0, logx, luminosity, '', outputDir = outdir)
 
         ### yield plot
         yieldplot = Canvas.Canvas('yields_'+name, 'png', 0.5, 0.7, 0.9, 0.9, 1)
@@ -542,7 +594,8 @@ def makeSensitivity(queue, lumi, var, name, nbin, xmin, xmax, xlabel, logx, tree
         for _i,sy in enumerate(signalYields):
             yieldplot.addHisto(sy, 'l, same', sy.GetTitle(), 'l', sy.GetLineColor(), 1, _i +1)
 
-        yieldplot.save(1, 0, logx, luminosity, '', outputDir = WORKPATH + 'yields_'+outtag+'/')
+        outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/yields_' + outtag + '/' # Redefinition
+        yieldplot.save(1, 0, logx, luminosity, '', outputDir = outdir)
 
         return
 

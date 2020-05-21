@@ -103,7 +103,13 @@ class bcolors:
 
 ################################# GLOBAL VARIABLES DEFINITION ####################################
 
-WORKPATH = os.path.abspath('./') + '/'
+runningfile = os.path.abspath(__file__)
+WORKPATH = ''
+for level in runningfile.split('/')[:-1]:
+    WORKPATH += level
+    WORKPATH += '/'
+
+print('runningfile: ' + runningfile)
 
 ##################################### FUNCTION DEFINITION ########################################
 
@@ -144,6 +150,7 @@ if __name__ == "__main__":
 
     gROOT.ProcessLine('.L ' + WORKPATH + 'include/tdrstyle.C')
     gROOT.SetBatch(1)
+    print('WORKPATH: ' + WORKPATH)
     r.setTDRStyle()
 
     ###########################
@@ -232,6 +239,7 @@ if __name__ == "__main__":
     hist_GM_ptRes = r.TH1F("hist_GM_ptRes", ";p_{T}^{reco}/p_{T}^{gen};PDF", 60, 0.0, 2.0)
     hist_DGM_ptRes = r.TH1F("hist_DGM_ptRes", ";p_{T}^{reco}/p_{T}^{gen};PDF", 60, 0.0, 2.0)
     hist_DGM_ptRes_zoom = r.TH1F("hist_DGM_ptRes_zoom", ";p_{T}^{reco}/p_{T}^{gen};PDF", 51, 0.8, 1.2)
+    hist_DGM_dxyRes_zoom = r.TH1F("hist_DGM_dxyRes_zoom", ";d_{xy}^{reco}/d_{xy}^{gen};PDF", 51, 0.95, 1.05)
     hist_SA_ptRes = r.TH1F("hist_SA_ptRes", ";p_{T}^{reco}/p_{T}^{gen};PDF", 60, 0.0, 2.0)
     hist_RSA_ptRes = r.TH1F("hist_RSA_ptRes", ";p_{T}^{reco}/p_{T}^{gen};PDF", 60, 0.0, 2.0)
     hist_DSA_ptRes = r.TH1F("hist_DSA_ptRes", ";p_{T}^{reco}/p_{T}^{gen};PDF", 60, 0.0, 2.0)
@@ -298,7 +306,8 @@ if __name__ == "__main__":
                 pt = _tree.GenLeptonSel_pt[j]
                 eta = _tree.GenLeptonSel_eta[j]
                 phi = _tree.GenLeptonSel_phi[j]
-                dxy = _tree.GenLeptonSel_dxy[j]
+                dxy = abs(_tree.GenLeptonSel_dxy[j])
+                if dxy < 0.000000001: dxy = 0.000000001
 
                 l = TVector3()
                 l.SetPtEtaPhi(pt, eta, phi)
@@ -484,6 +493,7 @@ if __name__ == "__main__":
                     eff_DGM_dxy.Fill(True, dxy)
                     hist_DGM_ptRes.Fill((_tree.DGM_pt[index])/pt)
                     hist_DGM_ptRes_zoom.Fill((_tree.DGM_pt[index])/pt)
+                    hist_DGM_dxyRes_zoom.Fill((abs(_tree.DGM_dxy[index]))/dxy)
                 else:
                     eff_DGM_pt.Fill(False, pt)
                     eff_DGM_eta.Fill(False, eta)
@@ -630,7 +640,7 @@ if __name__ == "__main__":
 
 
     if not os.path.exists('./efficiencies_'+opts.tag+'/'): os.makedirs('./efficiencies_'+opts.tag+'/')
-    outputFile = TFile('efficiencies_'+ opts.tag + '/MuonEfficiencies.root', 'RECREATE')
+    outputFile = TFile(WORKPATH +'efficiencies_'+ opts.tag + '/MuonEfficiencies.root', 'RECREATE')
 
 
     print("DSA global eff: ", eff_DSA_Lxy.GetTotalHistogram().GetEntries())
@@ -665,6 +675,7 @@ if __name__ == "__main__":
     eff_DSA_ptVSLxy.Write()
     hist_DGM_ptRes.Write()
     hist_DGM_ptRes_zoom.Write()
+    hist_DGM_dxyRes_zoom.Write()
 
     outputFile.Close()
 

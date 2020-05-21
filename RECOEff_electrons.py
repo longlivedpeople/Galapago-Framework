@@ -195,10 +195,10 @@ if __name__ == "__main__":
     
     hist_IFCA_ptRes = r.TH1F("hist_IFCA_ptRes", ";p_{T}^{reco}/p_{T}^{gen};Event density", 81, 0.2, 1.8)
     hist_CMSloose_ptRes = r.TH1F("hist_CMSloose_ptRes", ";p_{T}^{reco}/p_{T}^{gen};Event density", 81, 0.2, 1.8)
-    hist_IFCA_ptRes_zoom = r.TH1F("hist_IFCA_ptRes_zoom", ";p_{T}^{reco}/p_{T}^{gen};Event density", 81, 0.6, 1.4)
-    hist_IFCA_etRes_zoom = r.TH1F("hist_IFCA_etRes_zoom", ";E_{T}^{reco}/E_{T}^{gen};Event density", 81, 0.6, 1.4)
+    hist_IFCA_ptRes_zoom = r.TH1F("hist_IFCA_ptRes_zoom", ";p_{T}^{reco}/p_{T}^{gen};Event density", 81, 0.8, 1.2)
+    hist_IFCA_etRes_zoom = r.TH1F("hist_IFCA_etRes_zoom", ";E_{T}^{reco}/E_{T}^{gen};Event density", 81, 0.8, 1.2)
     hist_IFCA_dxyRes = r.TH1F("hist_IFCA_dxyRes", ";d_{xy}^{reco}/d_{xy}^{gen};Event density", 81, 0.0, 2.0)
-    hist_IFCA_dxyRes_zoom = r.TH1F("hist_IFCA_dxyRes_zoom", ";d_{xy}^{reco}/d_{xy}^{gen};Event density", 81, 0.6, 1.4)
+    hist_IFCA_dxyRes_zoom = r.TH1F("hist_IFCA_dxyRes_zoom", ";d_{xy}^{reco}/d_{xy}^{gen};Event density", 81, 0.8, 1.2)
     hist_CMSloose_ptRes_zoom = r.TH1F("hist_CMSloose_ptRes_zoom", ";p_{T}^{reco}/p_{T}^{gen};Event density", 81, 0.7, 1.3)
 
     #########################

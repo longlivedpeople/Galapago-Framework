@@ -147,11 +147,8 @@ if __name__ == "__main__":
     print '########################################################################' + bcolors.ENDC
 
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
-    parser.add_option('-n', '--name', action='store', type=str, dest='name', default='', help='Output name')
-    parser.add_option('-f', '--file', action='store', type=str, dest='file', default='', help='Input file')
-    parser.add_option('-H', '--histo', action='store', type=str, dest='histo', default='', help='Histogram')
-    parser.add_option('-m', '--fmin', action='store', type=float, dest='fmin', default=2.0, help='xmin of the fit range')
-    parser.add_option('-M', '--fmax', action='store', type=float, dest='fmax', default=0.0, help='xmax of the fit range')
+    parser.add_option('-n', '--name', action='store', type=str, dest='name', help='Output name')
+    parser.add_option('-i', '--input', action='store', type=str, dest='input', help='Input file')
     (opts, args) = parser.parse_args()
 
 
@@ -164,6 +161,20 @@ if __name__ == "__main__":
 
     ############# Sigma values:
     models = []
+    with open(opts.input, 'r') as _f:
+        model_lines = _f.readlines()
+        for line in model_lines:
+            if line[0] == '#': continue
+            model = []
+            model.append(int(line.split()[0]))
+            model.append(int(line.split()[1]))
+            model.append(int(line.split()[2]))
+            model.append(float(line.split()[3]))
+            model.append(float(line.split()[4]))
+            models.append(model)
+
+
+    """
     models.append([1000, 350, 35, 0.02276, 0.00006])
     models.append([1000, 350, 350, 0.02578, 0.00009])
     models.append([1000, 150, 10, 0.02007, 0.00005])
@@ -171,6 +182,7 @@ if __name__ == "__main__":
     models.append([400, 50, 4, 0.01821, 0.00004])
     models.append([400, 50, 40, 0.02109, 0.00006])
     models.append([400, 50, 400, 0.02485, 0.00015])
+    """
 
     ############# Get margins for the labels:
     leftMargin = 0.15
@@ -209,7 +221,7 @@ if __name__ == "__main__":
     histo.SetMaximum(1.2*histo.GetMaximum())
 
 
-    SIGMAS = Canvas.Canvas('MuonSigma', 'png', 0.7, 0.84, 0.9, 0.89, 1)
+    SIGMAS = Canvas.Canvas(opts.name, 'png', 0.7, 0.84, 0.9, 0.89, 1)
     SIGMAS.addHisto(histo, 'Hist', '', 'f', '', 1, 0)
 
     # labels:

@@ -176,6 +176,8 @@ if __name__ == "__main__":
     parser.add_option('--m1', action='store', type=int, dest='m1', default=0, help='Mass of major particle')
     parser.add_option('--m2', action='store', type=int, dest='m2', default=0, help='Mass of second particle')
     parser.add_option('--ctau', action='store', type=int, dest='ctau', default=0, help='lifetime of longlived particle')
+    parser.add_option('--xmin', action='store', type=float, dest='xmin', default=0, help='xmin in axis')
+    parser.add_option('--xmax', action='store', type=float, dest='xmax', default=0, help='xmax in axis')
     (opts, args) = parser.parse_args()
 
 
@@ -207,6 +209,7 @@ if __name__ == "__main__":
     f1.SetParameters(0.7*_h.GetMaximum(), _h.GetMean(), 0.05)
     _h.Fit('f1', '', '', opts.fmin, opts.fmax)
     _h.SetMaximum(1.3*_h.GetMaximum())
+    if not opts.xmin == opts.xmax: _h.GetXaxis().SetLimits(opts.xmin, opts.xmax)
 
     FIT = Canvas.Canvas(opts.name, 'png', 0.7, 0.84, 0.9, 0.89, 1)
     FIT.addHisto(_h, 'PE', '', 'p', r.kBlack, 1, 0)
