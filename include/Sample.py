@@ -154,9 +154,7 @@ class Sample:
       if(self.isData == 0):
          cut = cut + "* ( " + str(self.lumWeight*lumi) + " * genWeight/abs(genWeight) " + " )" 
 
-      print("Aqui empieza Project:")
       self.ttree.Project(h.GetName(), var, cut, options)
-      print("Aqui termina Project")
 
       for _bin in range(1, h.GetNbinsX()+2):
           h_of.SetBinContent(_bin, h.GetBinContent(_bin))
