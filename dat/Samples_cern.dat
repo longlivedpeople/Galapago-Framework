@@ -24,7 +24,7 @@ HXX_1000_350_350  r.kOrange+4     HXX_1000_350_350                HXX(1000,350,3
 HXX_1000_350_35   r.kOrange+5     HXX_1000_350_35                 HXX(1000,350,35)                   /eos/user/f/fernance/LLPNTuples/2016/HXX/v1/HXX_1000_350_35.root             0.3825   0
 HXX_1000_150_100  r.kRed+2        HXX_1000_150_100                HXX(1000,150,100)                  /eos/user/f/fernance/LLPNTuples/2016/HXX/v1/HXX_1000_150_100.root            0.7739   0
 HXX_1000_150_10   r.kRed-7        HXX_1000_150_10                 HXX(1000,150,10)                   /eos/user/f/fernance/LLPNTuples/2016/HXX/v1/HXX_1000_150_10.root             0.7739   0
-HXX_400_50_400    r.kGreen+3      HXX_400_150_400                 HXX(400,150,400)                   /eos/user/f/fernance/LLPNTuples/2016/HXX/v1/HXX_400_50_400.root              677.3    0
+HXX_400_150_400   r.kGreen+3      HXX_400_150_400                 HXX(400,150,400)                   /eos/user/f/fernance/LLPNTuples/2016/HXX/v1/HXX_400_150_400.root             677.3    0
 HXX_400_50_400    r.kGreen+2      HXX_400_50_400                  HXX(400,50,400)                    /eos/user/f/fernance/LLPNTuples/2016/HXX/v1/HXX_400_50_400.root              632.1    0
 HXX_400_50_40     r.kGreen-3      HXX_400_50_40                   HXX(400,50,40)                     /eos/user/f/fernance/LLPNTuples/2016/HXX/v1/HXX_400_50_40.root               632.1    0
 HXX_400_50_4      r.kGreen-7      HXX_400_50_4                    HXX(400,50,4)                      /eos/user/f/fernance/LLPNTuples/2016/HXX/v1/HXX_400_50_4.root                632.1    0
