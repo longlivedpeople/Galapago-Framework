@@ -234,7 +234,7 @@ def makePlot(queue, lumi, var, name, nbin, xmin, xmax, xlabel, logx, treeMC, cut
 
 
 
-def makeFullPlot(queue, lumi, var, name, nbin, xmin, xmax, xlabel, ylog, treeMC, treeDATA, treeSI, cuts, outtag = '', normed = False):
+def makeFullPlot(queue, lumi, var, name, nbin, xmin, xmax, xlabel, ylog, treeMC, treeDATA, treeSI, cuts, outtag = '', normed = False, yshift = 0.0):
 
     if queue:
 
@@ -325,28 +325,46 @@ def makeFullPlot(queue, lumi, var, name, nbin, xmin, xmax, xlabel, ylog, treeMC,
             hBKGtotal.SetMinimum(0.0)
             if treeSI:
                 for _h in s_histos: 
-                    _h.SetMaximum(1.3*maxVal)
+                    if not yshift:
+                        _h.SetMaximum(1.3*maxVal)
+                    else:
+                        _h.SetMaximum(yshift*maxVal)
                     _h.SetMinimum(0.0)
             if treeDATA:
-                hDATA.SetMaximum(1.3*maxVal)
+                if not yshift:
+                    hDATA.SetMaximum(1.3*maxVal)
+                else:
+                    hDATA.SetMaximum(yshift*maxVal)
                 hDATA.SetMinimum(0.0)
         else:
-            hBKG.SetMaximum(10.0*maxVal)
+            if not yshift:
+                hBKG.SetMaximum(10.0*maxVal)
+            else:
+                hBKG.SetMaximum(yshift*maxVal)
             hBKG.SetMinimum(0.1)
-            hBKGtotal.SetMaximum(10.0*maxVal)
+            if not yshift:
+                hBKGtotal.SetMaximum(10.0*maxVal)
+            else:
+                hBKGtotal.SetMaximum(yshift*maxVal)
             hBKGtotal.SetMinimum(0.1)
             if treeSI:
                 for _h in s_histos: 
-                    _h.SetMaximum(10.0*maxVal)
+                    if not yshift:
+                        _h.SetMaximum(10.0*maxVal)
+                    else:
+                        _h.SetMaximum(yshift*maxVal)
                     _h.SetMinimum(0.1)
             if treeDATA:
-                hDATA.SetMaximum(10.0*maxVal)
+                if not yshift:
+                    hDATA.SetMaximum(10.0*maxVal)
+                else:
+                    hDATA.SetMaximum(yshift*maxVal)
                 hDATA.SetMinimum(0.1)
     
     
         ### Canvas object
         if treeDATA:
-            plot = Canvas.Canvas('hist_'+name, 'png', 0.34, 0.68, 0.9, 0.9, 2)
+            plot = Canvas.Canvas('hist_'+name, 'png', 0.6, 0.5, 0.9, 0.9, 1)
         else:
             plot = Canvas.Canvas('hist_'+name, 'png', 0.6, 0.74, 0.9, 0.9, 1)
     
@@ -359,7 +377,7 @@ def makeFullPlot(queue, lumi, var, name, nbin, xmin, xmax, xlabel, ylog, treeMC,
                 plot.addHisto(_h, 'HIST, SAME', _h.GetTitle(), 'l', _h.GetFillColor(), 1, i+nBCK) # Signal
     
         if treeDATA:
-            plot.addHisto(hDATA, 'P, SAME', '', 'p', r.kBlack, 1, 4)
+            plot.addHisto(hDATA, 'P, SAME', '', 'p', r.kBlack, 1, nBCK + len(s_histos))
     
     
         ### Dilepton banner

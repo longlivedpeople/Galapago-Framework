@@ -36,3 +36,5 @@ Data          r.kBlack       DoubleEG_Run2016E                          Data    
 Data          r.kBlack       DoubleEG_Run2016F                          Data                              /eos/user/f/fernance/LLPNTuples/2016/DoubleEG/v1/DoubleEG_Run2016F.root    1    1
 Data          r.kBlack       DoubleEG_Run2016G                          Data                              /eos/user/f/fernance/LLPNTuples/2016/DoubleEG/v1/DoubleEG_Run2016G.root    1    1
 Data          r.kBlack       DoubleEG_Run2016H                          Data                              /eos/user/f/fernance/LLPNTuples/2016/DoubleEG/v1/DoubleEG_Run2016H.root    1    1
+###   DoubleMuon Data   ########################################################################
+Data          r.kBlack       DoubleMuon_Run2016F                        Data                              /eos/user/f/fernance/LLPNTuples/2016/DoubleMuon/DoubleMuon_Run2016F.root   1    1

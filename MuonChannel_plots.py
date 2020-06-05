@@ -149,6 +149,7 @@ if __name__ == "__main__":
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
     parser.add_option('-o', '--out', action='store', type=str, dest='out', default='', help='Output tag')
     parser.add_option('-q', '--qenv', action='store', type=str, dest='qenv', default='', help='Select if you want to send the job a condor queue')
+    parser.add_option('-t', '--test', action='store_true', dest='test', default='', help='Test tag')
     (opts, args) = parser.parse_args()
 
     if opts.qenv == '': opts.qenv = False
@@ -158,6 +159,11 @@ if __name__ == "__main__":
     r.gROOT.SetBatch(1)
     r.setTDRStyle()
 
+
+    ############# Muon data definition
+    DoubleMuon = []
+    DoubleMuon.append('DoubleMuon_Run2016F')
+
     ############# Background definition
     Backgrounds = []
     Backgrounds.append('DYJetsToLL_M-50') 
@@ -165,27 +171,37 @@ if __name__ == "__main__":
     Backgrounds.append('WW') 
     Backgrounds.append('WZ') 
     Backgrounds.append('ZZ') 
-    Backgrounds.append('WJetsToLNu') 
+    #Backgrounds.append('WJetsToLNu') 
     Backgrounds.append('TT') 
 
     ############# Signal definition
     Signals = []
     #Signals.append('DisplacedSUSY_350_148_173')
-    Signals.append('HXX_400_50_400')
-    Signals.append('HXX_400_50_40')
+    Signals.append('HXX_400_50_400mm')
+    Signals.append('HXX_400_50_40mm')
+    Signals.append('HXX_400_50_4mm')
 
     ############# Parameter definition
-    lumi = 35.9 # luminosity
+    lumiB = 5.79
+    lumiC = 2.57
+    lumiD = 4.25
+    lumiE = 4.01
+    lumiF = 3.10
+    lumiG = 7.54
+    lumiH = 8.61
+    lumi = lumiF # luminosity
+
+    filename = 'dat/Samples_cern_test.dat' if opts.test else 'dat/Samples_cern.dat'
 
     ############# Tree creation
-    treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/Samples.dat', Backgrounds, 'MC'), name = 'MC', isdata = 0 )
-    treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/Samples.dat', Signals, 'SI'), name = 'SI', isdata = 0 )
-    treeDATA = False
+    treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )
+    treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Signals, 'SI'), name = 'SI', isdata = 0 )
+    treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon, 'DATA'), name = 'DATA', isdata = 1 )
 
     ############# Cut definition
     cuts = CutManager.CutManager()
     MMSR = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMM, cuts.MMSR_dPhi])
-    MMCR = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMM, cuts.MMCR_dPhi])
+    MMCR = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMM, cuts.MMCR_dPhi, cuts.cosmicRejection])
     MMCR_OS = cuts.AddListB([MMCR, cuts.MM_OScharge])
 
 
@@ -194,27 +210,19 @@ if __name__ == "__main__":
 
 
     #### Kinematis of Dimuons
-    """
-    makePlot(opts.qenv, lumi, 'nDMDMBase', 'MM_number', 3, 0, 3, 'Number of #mu#mu candidates', True, treeMC, cuts.AddListB([cuts.nTrack, cuts.MMChannel]), opts.out, treeSI)
-    makePlot(opts.qenv, lumi, 'fabs(DMDMBase_trackIxy[DMDMBase_maxIxy])', 'MM_trackIxy', 20, 0, 20, 'Dimuon candidate |d_{0}|/#sigma', True, treeMC, MMCR_OS, opts.out, treeSI)
-    makePlot(opts.qenv, lumi, 'fabs(DMDMBase_trackDxy[DMDMBase_maxIxy])', 'MM_trackDxy', 20, 0, 5, 'Dimuon candidate |d_{0}| (cm)', True, treeMC, MMCR_OS, opts.out, treeSI)
-    makePlot(opts.qenv, lumi, 'fabs(DMDMBase_Lxy[DMDMBase_maxIxy])', 'MM_Lxy', 20, 0, 5, 'Dimuon candidate L_{xy} (cm)', True, treeMC, MMCR_OS, opts.out, treeSI)
-    makePlot(opts.qenv, lumi, 'fabs(DMDMBase_Ixy[DMDMBase_maxIxy])', 'MM_Ixy', 20, 0, 20, 'Dimuon vertex L_{xy}/#sigma', True, treeMC, MMCR_OS, opts.out, treeSI)
-    makePlot(opts.qenv, lumi, 'DMDMBase_mass[DMDMBase_maxIxy]', 'MM_mass', 35, 0, 200, 'Dimuon invariant mass m_{#mu#mu} (GeV)', True, treeMC, MMCR_OS, opts.out, treeSI)
-    makePlot(opts.qenv, lumi, 'DMDMBase_leadingPt[DMDMBase_maxIxy]', 'MM_leadingPt', 40, 0, 300, 'Leading muon transverse momentum p_{T} (GeV)', True, treeMC, MMCR_OS, opts.out, treeSI)
-    makePlot(opts.qenv, lumi, 'DMDMBase_subleadingPt[DMDMBase_maxIxy]', 'MM_subleadingPt', 40, 0, 300, 'Subleading muon transverse momentum p_{T} (GeV)', True, treeMC, MMCR_OS, opts.out, treeSI)
-    makePlot(opts.qenv, lumi, 'DMDMBase_cosAlpha[DMDMBase_maxIxy]', 'MM_cosAlpha', 25, -1.1, 1.1, 'Dimuon cos(#alpha_{#mu#mu})', True, treeMC, MMCR_OS, opts.out, treeSI)
-    """
 
-    makePlot(opts.qenv, lumi, 'DMDMBase_relisoA[DMDMBase_maxIxy]', 'MM_relisoA', 30, 0.0, 0.3, 'RelIso muon A', True, treeMC, MMCR_OS, opts.out, treeSI)
-    #makePlot(opts.qenv, lumi, 'DMDMBase_relisoB[DMDMBase_maxIxy]', 'MM_relisoB', 30, 0.0, 0.3, 'RelIso muon B', True, treeMC, MMCR_OS, opts.out, treeSI)
-    #makePlot(opts.qenv, lumi, 'DGM_relPFiso', 'DGM_relPFiso', 50, 0.0, 0.5, 'DGM reliso', True, treeMC, cuts.MMChannel, opts.out, treeSI)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_mass[DMDMBase_maxIxy]', name = 'DMDM_mass', nbin = 35, xmin = 0, xmax = 200, xlabel = 'Dimuon invariant mass m_{#mu#mu} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 800.0)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_cosAlpha[DMDMBase_maxIxy]', name = 'DMDM_cosAlpha', nbin = 21, xmin = -1.1, xmax = 1.0, xlabel = 'Dimuon cos(#alpha)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 100.0)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_trackIxy[DMDMBase_maxIxy]', name = 'DMDM_trackIxy', nbin = 20, xmin = 0, xmax = 20, xlabel = 'Dimuon candidate |d_{0}|/#sigma', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 100.0)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_Lxy[DMDMBase_maxIxy]', name = 'DMDM_Lxy', nbin = 20, xmin = 0, xmax = 10, xlabel = 'Dimuon vertex L_{xy} (cm)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'fabs(DMDMBase_trackDxy[DMDMBase_maxIxy])', name = 'DMDM_trackDxy', nbin = 20, xmin = 0, xmax = 10, xlabel = 'Dimuon candidate |d_{0}| (cm)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_Ixy[DMDMBase_maxIxy]', name = 'DMDM_Ixy', nbin = 20, xmin = 0, xmax = 20, xlabel = 'Dimuon vertex |L_{xy}|/#sigma', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 100.0)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_normalizedChi2[DMDMBase_maxIxy]', name = 'DMDM_Chi2', nbin = 10, xmin = 0, xmax = 10, xlabel = 'Dimuon vertex fit #chi^{2}/ndf', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_leadingPt[DMDMBase_maxIxy]', name = 'DMDM_leadingPt', nbin = 40, xmin = 0, xmax = 300, xlabel = 'Leading muon transverse momentum p_{T} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 100.0)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_subleadingPt[DMDMBase_maxIxy]', name = 'DMDM_subleadingPt', nbin = 40, xmin = 0, xmax = 300, xlabel = 'Subleading muon transverse momentum p_{T} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 100.0)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_relisoA[DMDMBase_maxIxy]', name = 'DMDM_relisoA', nbin = 20, xmin = 0, xmax = 0.2, xlabel = 'Leading muon relIso', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_relisoB[DMDMBase_maxIxy]', name = 'DMDM_relisoB', nbin = 20, xmin = 0, xmax = 0.2, xlabel = 'Subleading muon relIso', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out)
 
-
-    """
-    makeComparison(opts.qenv, lumi, treeMC, 'EEPUIxy', 'fabs(EEBase_trackIxy[EEBase_maxIxy])', 'fabs(EEBase_trackIxy[EEBase_maxIxy])', 40, 0, 20, cuts.AddListB([EESR, cuts.highPU]), cuts.AddListB([EESR, cuts.lowPU]), 'High PU', 'Low PU', 'EE |d_{0}|/#sigma', 'High PU / Low PU', True, True)
-    makeComparison(opts.qenv, lumi, treeMC, 'MMPUIxy', 'fabs(MMBase_trackIxy[MMBase_maxIxy])', 'fabs(MMBase_trackIxy[MMBase_maxIxy])', 40, 0, 20, cuts.AddListB([MMSR, cuts.highPU]), cuts.AddListB([MMSR, cuts.lowPU]), 'High PU', 'Low PU', 'MM |d_{0}|/#sigma', 'High PU / Low PU', True, True)
-    """
 
     print("--- %s seconds ---" % (time.time() - start_time))
 

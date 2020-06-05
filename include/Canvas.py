@@ -206,11 +206,12 @@ class Canvas:
 
       _h = eff.GetTotalHistogram()
       xmax = _h.GetXaxis().GetBinUpEdge(_h.GetNbinsX())
+      xmin = _h.GetXaxis().GetBinLowEdge(1)
 
       _g = eff.GetPaintedGraph()
       _g.SetMinimum(0.0)
       _g.SetMaximum(1.2)
-      _g.GetXaxis().SetLimits(0.,xmax)
+      _g.GetXaxis().SetLimits(xmin,xmax)
 
       return eff
 
@@ -425,14 +426,14 @@ class Canvas:
           tmp_ratio.GetXaxis().SetLabelOffset(0.08);
           tmp_ratio.GetXaxis().SetTitle('');
           tmp_ratio.SetMarkerStyle(20);
-          tmp_ratio.SetFillColorAlpha(r.kAzure-3,0.8)
-          tmp_ratio.SetFillStyle(3017)
+          #tmp_ratio.SetFillColorAlpha(r.kAzure-3,0.8)
+          #tmp_ratio.SetFillStyle(3017)
           tmp_ratio.SetMarkerColor(r.kBlack);
           tmp_ratio.SetMarkerSize(0.8);
           tmp_ratio.SetMarkerColor(r.kBlack if len(hMClist) == 1 else tmp_hMC.GetMarkerColor());
           tmp_ratio.SetLineColor  (r.kBlack if len(hMClist) == 1 else tmp_hMC.GetLineColor  ());
-          #tmp_ratio.SetLineColor(tmp_hMC.GetLineColor());
-          #tmp_ratio.SetLineStyle(tmp_hMC.GetLineStyle())
+          tmp_ratio.SetLineColor(tmp_hMC.GetLineColor());
+          tmp_ratio.SetLineStyle(tmp_hMC.GetLineStyle())
           ratios.append(tmp_ratio)
           xmin = tmp_ratio.GetBinLowEdge(1)
           xmax = tmp_ratio.GetBinLowEdge(tmp_ratio.GetNbinsX()+1)
@@ -440,7 +441,7 @@ class Canvas:
       #tmp_ratio.Draw("E,SAME");
       pad2.cd();  
       for rat in ratios:
-          rat.Draw('PE2,same');
+          rat.Draw('PE1,same');
 
       line = TLine(xmin, 1, xmax, 1)
       line.SetLineColor(r.kGray+2);

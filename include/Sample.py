@@ -138,7 +138,7 @@ class Sample:
           h_of = TH1F(name, "", _nbins+1, _newarr)                                     
       else:
            h = TH1F(name+'_noOF', "", nbin, xmin, xmax)
-           bw = int((xmax-xmin)/nbin)
+           bw = float((xmax-xmin)/nbin)
            ylabel = ylabel +"/ " + str(bw) + " GeV"
            h_of = TH1F(name, '', nbin+1, xmin, xmax+bw)
       h.Sumw2()

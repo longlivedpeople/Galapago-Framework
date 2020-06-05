@@ -149,6 +149,7 @@ if __name__ == "__main__":
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
     parser.add_option('-o', '--out', action='store', type=str, dest='out', default='', help='Output tag')
     parser.add_option('-q', '--qenv', action='store', type=str, dest='qenv', default='', help='Select if you want to send the job a condor queue')
+    parser.add_option('-t', '--test', action='store_true', dest='test', default='', help='Test tag')
     (opts, args) = parser.parse_args()
 
     if opts.qenv == '': opts.qenv = False
@@ -175,23 +176,32 @@ if __name__ == "__main__":
     Backgrounds.append('WW')
     Backgrounds.append('WZ')
     Backgrounds.append('ZZ')
-    Backgrounds.append('WJetsToLNu')
+#    Backgrounds.append('WJetsToLNu')
     Backgrounds.append('TT')
 
     ############# Signal definition
     Signals = []
-    #Signals.append('DisplacedSUSY_350_148_173')
-    Signals.append('HXX_400_50_400')
-
+    Signals.append('HXX_400_50_400mm')
+    Signals.append('HXX_400_50_40mm')
+    Signals.append('HXX_400_50_4mm')
 
 
     ############# Parameter definition
-    lumi = 35.9 # luminosity
+    lumiB = 5.79
+    lumiC = 2.57
+    lumiD = 4.25
+    lumiE = 4.01
+    lumiF = 3.10
+    lumiG = 7.54
+    lumiH = 8.61
+    lumi = 35.86 # luminosity
 
     ############# Tree creation
-    treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/Samples.dat', DoubleEG, 'DATA'), name = 'DATA', isdata = 1 )
-    treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/Samples.dat', Backgrounds, 'MC'), name = 'MC', isdata = 0 )
-    treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/Samples.dat', Signals, 'SI'), name = 'SI', isdata = 0 )
+    filename = 'dat/Samples_cern_test.dat' if opts.test else 'dat/Samples_cern.dat'
+
+    treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG, 'DATA'), name = 'DATA', isdata = 1 )
+    treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )
+    treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Signals, 'SI'), name = 'SI', isdata = 0 )
 
 
     ############# Cut definition
@@ -209,18 +219,18 @@ if __name__ == "__main__":
     start_time = time.time()
 
 
-    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_trackIxy[EEBase_maxIxy]', name = 'EE_trackIxy', nbin = 20, xmin = 0, xmax = 20, xlabel = 'Dielectron candidate |d_{0}|/#sigma', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out) 
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_trackIxy[EEBase_maxIxy]', name = 'EE_trackIxy', nbin = 20, xmin = 0, xmax = 20, xlabel = 'Dielectron candidate |d_{0}|/#sigma', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out, yshift = 100.0) 
     makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_Lxy[EEBase_maxIxy]', name = 'EE_Lxy', nbin = 20, xmin = 0, xmax = 10, xlabel = 'Dielectron vertex L_{xy} (cm)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out) 
     makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'fabs(EEBase_trackDxy[EEBase_maxIxy])', name = 'EE_trackDxy', nbin = 20, xmin = 0, xmax = 10, xlabel = 'Dielectron candidate |d_{0}| (cm)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out) 
     makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_Ixy[EEBase_maxIxy]', name = 'EE_Ixy', nbin = 20, xmin = 0, xmax = 20, xlabel = 'Dielectron vertex |L_{xy}|/#sigma', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out) 
-    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_mass[EEBase_maxIxy]', name = 'EE_mass', nbin = 35, xmin = 0, xmax = 200, xlabel = 'Dielectron invariant mass m_{ee} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out) 
-    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_normalizedChi2[EEBase_maxIxy]', name = 'EE_Chi2', nbin = 10, xmin = 0, xmax = 10, xlabel = 'Dielectron vertex fit #chi^{2}/ndf', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out) 
-    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_leadingPt[EEBase_maxIxy]', name = 'EE_leadingPt', nbin = 40, xmin = 0, xmax = 300, xlabel = 'Leading electron transverse momentum p_{T} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out) 
-    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_subleadingPt[EEBase_maxIxy]', name = 'EE_subleadingPt', nbin = 40, xmin = 0, xmax = 300, xlabel = 'Subleading electron transverse momentum p_{T} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out) 
-    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_leadingEt[EEBase_maxIxy]', name = 'EE_leadingEt', nbin = 40, xmin = 0, xmax = 300, xlabel = 'Leading electron transverse momentum p_{T} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out) 
-    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_subleadingEt[EEBase_maxIxy]', name = 'EE_subleadingEt', nbin = 40, xmin = 0, xmax = 300, xlabel = 'Subleading electron transverse momentum p_{T} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out) 
-    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_relisoA[EEBase_maxIxy]', name = 'EE_relisoA', nbin = 20, xmin = 0, xmax = 0.5, xlabel = 'Leading electron relIso', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out) 
-    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_relisoB[EEBase_maxIxy]', name = 'EE_relisoB', nbin = 20, xmin = 0, xmax = 0.5, xlabel = 'Subleading electron relIso', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out) 
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_mass[EEBase_maxIxy]', name = 'EE_mass', nbin = 35, xmin = 0, xmax = 200, xlabel = 'Dielectron invariant mass m_{ee} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out, yshift = 800.0) 
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_normalizedChi2[EEBase_maxIxy]', name = 'EE_Chi2', nbin = 10, xmin = 0, xmax = 10, xlabel = 'Dielectron vertex fit #chi^{2}/ndf', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out, yshift = 1000.0) 
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_leadingPt[EEBase_maxIxy]', name = 'EE_leadingPt', nbin = 40, xmin = 0, xmax = 300, xlabel = 'Leading electron transverse momentum p_{T} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out, yshift = 100.0) 
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_subleadingPt[EEBase_maxIxy]', name = 'EE_subleadingPt', nbin = 40, xmin = 0, xmax = 300, xlabel = 'Subleading electron transverse momentum p_{T} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out, yshift = 100.0) 
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_leadingEt[EEBase_maxIxy]', name = 'EE_leadingEt', nbin = 40, xmin = 0, xmax = 300, xlabel = 'Leading electron transverse momentum p_{T} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out, yshift = 100.0) 
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_subleadingEt[EEBase_maxIxy]', name = 'EE_subleadingEt', nbin = 40, xmin = 0, xmax = 300, xlabel = 'Subleading electron transverse momentum p_{T} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out, yshift = 100.0) 
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_relisoA[EEBase_maxIxy]', name = 'EE_relisoA', nbin = 20, xmin = 0, xmax = 0.2, xlabel = 'Leading electron relIso', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out, yshift = 100.0) 
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'EEBase_relisoB[EEBase_maxIxy]', name = 'EE_relisoB', nbin = 20, xmin = 0, xmax = 0.2, xlabel = 'Subleading electron relIso', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = EECR, outtag = opts.out, yshift = 100.0) 
 
     
     print("--- %s seconds ---" % (time.time() - start_time))
