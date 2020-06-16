@@ -144,19 +144,6 @@ def makePlot(queue, lumi, var, name, nbin, xmin, xmax, xlabel, logx, treeMC, cut
             for _i, _h in enumerate(hSIS.GetHists()):
                 s_histos.append(copy.deepcopy(_h))
     
-        """
-        ### Data histogram
-        if treeDATA:
-    
-            hDATA = treeDATA.getLoopTH1F('histDATA_'+name, regs[0] + '_' + var, xlabel)
-            for i in range(1, len(regs)):
-                if regs[i] == 'SR': continue # BLINDED
-                hDATA.Add(treeDATA.getLoopTH1F('histDATA_'+name, regs[i] + '_' + var, xlabel))
-    
-            hDATA.SetMarkerStyle(20)
-            hDATA.SetMarkerSize(0.8)
-            #hDATA.Scale(hMC.Integral()/hDATA.Integral())
-        """
     
         # Normalization
         if normed:
@@ -292,7 +279,7 @@ def makeFullPlot(queue, lumi, var, name, nbin, xmin, xmax, xlabel, ylog, treeMC,
         ### Signal histograms
         if treeSI:
     
-            hSIS = treeSI.getStack(lumi, "hMCS_%s"%(name), var, nbin, xmin, xmax, cuts, "", xlabel)
+            hSIS = treeSI.getStack(lumi, "hMCS_%s"%(name), var, nbin, xmin, xmax, OSRegion, "", xlabel)
     
             s_histos = []
             for _i, _h in enumerate(hSIS.GetHists()):
@@ -454,7 +441,93 @@ def makeComparison(queue, lumi, tree, name, var1, var2, nbin, xmin, xmax, cuts1,
         plot.saveRatio(1, 0, log, lumi, h1, h2, label = title2, outputDir = WORKPATH + 'closurePlots_'+outtag+'/')
 
 
+##################################################################################################
+#################
+####   Function to do the background validation closure test in Monte Carlo
+####   with charge-symmetric background contributions estimated from data
+#
+#        * Input: MC and DATA trees, cuts 1 and 2
+#
 
+def makeBkgClosureTestInMC(queue, lumi, var, name, nbin, xmin, xmax, xlabel, ylog, treeMC, treeDATA, cuts1, cuts2, outtag = '', normed = False, yshift = 0.0):
+
+    if queue:
+
+        launchToQueue('makeBkgClosureTestInMC', queue, name, outtag)
+
+    else:
+
+        luminosity = lumi
+
+        ### Get charged-symmetric background contributions from data:
+        SScut = ''
+        if 'EEBase' in var:
+            SScut = 'IsoTrackSel_charge[ElectronCandidate_isotrackIdx[EEBase_idxA[EEBase_maxIxy]]]*IsoTrackSel_charge[ElectronCandidate_isotrackIdx[EEBase_idxB[EEBase_maxIxy]]] > 0'
+        else:
+            SScut = 'DGM_charge[DMDMBase_idxA[DMDMBase_maxIxy]]*DGM_charge[DMDMBase_idxB[DMDMBase_maxIxy]] > 0' 
+        OScut = ''
+        if 'EEBase' in var:
+            OScut = 'IsoTrackSel_charge[ElectronCandidate_isotrackIdx[EEBase_idxA[EEBase_maxIxy]]]*IsoTrackSel_charge[ElectronCandidate_isotrackIdx[EEBase_idxB[EEBase_maxIxy]]] < 0'
+        else:
+            OScut = 'DGM_charge[DMDMBase_idxA[DMDMBase_maxIxy]]*DGM_charge[DMDMBase_idxB[DMDMBase_maxIxy]] < 0' 
+        
+
+        ### Cut definition:
+        cutManager = CutManager.CutManager()
+        SSRegion1 = cutManager.AddListB([cuts1, SScut]) # Same-sign in region 1
+        OSRegion1 = cutManager.AddListB([cuts1, OScut]) # Opposite-sign in region 1
+        SSRegion2 = cutManager.AddListB([cuts2, SScut]) # Same-sign in region 2
+        OSRegion2 = cutManager.AddListB([cuts2, OScut]) # Opposite-sign in region 2
+
+        ### Histogram definition
+        hSS1 = treeDATA.getTH1F(lumi, 'hSS1_%s'%(name), var, nbin, xmin, xmax, SSRegion1, '', xlabel)
+        hOS1 = treeMC.getTH1F(lumi, "hOS1_%s"%(name), var, nbin, xmin, xmax, OSRegion1, '', xlabel)
+        hSS2 = treeDATA.getTH1F(lumi, 'hSS2_%s'%(name), var, nbin, xmin, xmax, SSRegion2, '', xlabel)
+        hOS2 = treeMC.getTH1F(lumi, "hOS2_%s"%(name), var, nbin, xmin, xmax, OSRegion2, '', xlabel)
+
+        ### Final histograms by adding QCD contribution
+        hOS1.Add(hSS1)
+        hOS2.Add(hSS2)
+
+        ### Get maximum
+        maxVal = max([hOS1.GetMaximum(), hOS2.GetMaximum()])
+    
+        ### Set Maximum
+        if not ylog:
+            hOS1.SetMaximum(1.3*maxVal)
+            hOS2.SetMaximum(1.3*maxVal)
+            hOS1.SetMinimum(0)
+            hOS2.SetMinimum(0)
+        else:
+            hOS1.SetMaximum(10.0*maxVal)
+            hOS2.SetMaximum(10.0*maxVal)
+            hOS1.SetMinimum(0.1)
+            hOS2.SetMinimum(0.1)
+    
+        ### Histogram tunning:
+        hOS1.SetMarkerSize(1)
+        hOS2.SetMarkerSize(1)
+        hOS1.SetMarkerStyle(24)
+        hOS2.SetMarkerStyle(24)
+
+        ### Create canvas
+        plot = Canvas.Canvas('hist_'+name, 'png', 0.3, 0.79, 0.8, 0.9, 1) 
+        plot.addHisto(hOS1, 'P', 'Background estimation in SR (|#Delta#Phi| < #pi/2)', 'p', r.kBlue, 1, 0)
+        plot.addHisto(hOS2, 'P, SAME', 'Background estimation in CR (|#Delta#Phi| > #pi/2)', 'p', r.kRed, 1, 1)
+    
+        ### Dilepton banner
+        if 'EE' in var:
+            plot.addLatex(0.65, 0.65, 'e^{+}e^{-} channel')
+        if 'DMDM' in var:
+            plot.addLatex(0.65, 0.65, '#mu^{+}#mu^{-} channel')
+        
+
+        ### Save it
+        outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/ClosureTests_' + outtag + '/'
+        plot.saveRatio(1, 0, ylog, luminosity, hOS1, hOS2, label="SR/CR", outputDir = outdir)
+
+        del plot
+        return 
 
 
 ##################################################################################################

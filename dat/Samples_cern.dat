@@ -12,10 +12,10 @@
 #-----------------------------------------------------------
 # BLOCK     COLOR         NAME                       LABEL                       LOCATION OF FRIENDS                                                                   XSEC    ISDATA
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Diboson         r.kBlue-3       WJetsToLNu                                ZZ,WZ,WW,W+jets                       /eos/user/f/fernance/LLPNTuples/2016/MC/WJetsToLNu_0000.root                61526700   0 
-Diboson         r.kBlue-3       WW                                        ZZ,WZ,WW,W+jets                       /eos/user/f/fernance/LLPNTuples/2016/MC/WW.root                             118700      0 
-Diboson         r.kBlue-3       WZ                                        ZZ,WZ,WW,W+jets                       /eos/user/f/fernance/LLPNTuples/2016/MC/WZ.root                             47130      0 
-Diboson         r.kBlue-3       ZZ                                        ZZ,WZ,WW,W+jets                       /eos/user/f/fernance/LLPNTuples/2016/MC/ZZ.root                             16523      0 
+Diboson         r.kBlue-3       WJetsToLNu                                ZZ,WZ,WW                       /eos/user/f/fernance/LLPNTuples/2016/MC/WJetsToLNu_0000.root                61526700   0 
+Diboson         r.kBlue-3       WW                                        ZZ,WZ,WW                       /eos/user/f/fernance/LLPNTuples/2016/MC/WW.root                             118700      0 
+Diboson         r.kBlue-3       WZ                                        ZZ,WZ,WW                       /eos/user/f/fernance/LLPNTuples/2016/MC/WZ.root                             47130      0 
+Diboson         r.kBlue-3       ZZ                                        ZZ,WZ,WW                       /eos/user/f/fernance/LLPNTuples/2016/MC/ZZ.root                             16523      0 
 TTJets          r.kAzure-4      TT                                        t#bar{t}                              /eos/user/f/fernance/LLPNTuples/2016/MC/TT_1.root                           831760     0 
 DYJets          r.kAzure+10     DYJetsToLL_M-50                           Z/#gamma*#rightarrowl#bar{l}          /eos/user/f/fernance/LLPNTuples/2016/MC/DYJetsToLL_M-50.root                6077220    0 
 DYJets          r.kAzure+10     DYJetsToLL_M-10to50                       Z/#gamma*#rightarrowl#bar{l}          /eos/user/f/fernance/LLPNTuples/2016/MC/DYJetsToLL_M-10to50.root            18610000   0 

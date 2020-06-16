@@ -173,6 +173,7 @@ if __name__ == "__main__":
     ####   Parser object   ####
     ###########################
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
+    parser.add_option('-n', '--maxNumber', action='store', type=int, dest='maxNumber', default=0, help='Output tag')
     parser.add_option('-t', '--tag', action='store', type=str, dest='tag', default='', help='Output tag')
     parser.add_option('-f', '--filename', action='store', type=str, dest='filename', default='', help='Path to file')
     (opts, args) = parser.parse_args()
@@ -243,19 +244,20 @@ if __name__ == "__main__":
     for i in range(0, _tree.GetEntries()):
 
         _tree.GetEntry(i)
-        if i > 500000: break
+        if opts.maxNumber:
+            if i > opts.maxNumber: break
 
         # Get electrons:
         nPromptEle = 0
         var_values = []
         for l in range(_tree.nGenLepton):
-            if not _tree.GenLeptonSel_isPromptFinalState[l]: continue
             if not abs(_tree.GenLeptonSel_pdgId[l]) == 11: continue
+            if _tree.GenLeptonSel_isPromptFinalState[l]: nPromptEle+=1
             var_values.append((_tree.GenLeptonSel_pt[l], l))
-            nPromptEle+=1
 
         # If there are no electrons we do NOT fill the TEfficiencies:
-        if len(var_values) != 2: continue
+        #if len(var_values) != 2: continue
+        if nPromptEle != 2: continue
 
         # Sort by pt:
         var_values.sort(reverse = True, key = lambda x: x[0])
@@ -283,23 +285,27 @@ if __name__ == "__main__":
         ############################
         ####   Cut definition   ####
         ############################
-        pt1_cut = pt1 > 70
-        pt2_cut = pt2 > 50
+        pt1_cut = pt1 > 50
+        #pt2_cut = pt2 > 50
         Lxy1_cut = Lxy1 < 80
         Lxy2_cut = Lxy2 < 80
         resonance = mass < 100
         prompt = Lxy1 < 1 and Lxy2 < 1
+        eta1_cut = abs(eta1) < 2
+        eta2_cut = abs(eta2) < 2
+        dR_cut = dR > 0.2
 
         #####################
         ####   Filling   ####
         #####################
         #if pt1_cut and pt2_cut and Lxy1_cut and Lxy2_cut: # pt + Lxy cuts
         #if pt1_cut and pt2_cut: # pt cuts only
-        if pt2_cut: # pt2 cut
+        #if pt2_cut: # pt2 cut
         #if pt1_cut: # pt1 cut
         #if resonance: # check inside X resonance
         #if not resonance: # check outside X resonance
         #if prompt and pt1_cut: # no cuts
+        if eta1_cut and eta2_cut and dR_cut and pt1_cut:
         #if True:
 
             hist_Lxy1.Fill(Lxy1)
@@ -344,6 +350,14 @@ if __name__ == "__main__":
     OFhist_mass = makeOFHisto(hist_mass)
     OFhist_dR = makeOFHisto(hist_dR)
 
+
+    #######################
+    ####   Plot tags   ####
+    #######################
+    sampletag = 'Monte Carlo: DYJetsToLL_M-50'
+    #sampletag = 'Monte Carlo: H #rightarrow XX #rightarrow 2e2#mu'
+    cutstag = '|#eta_{1}|, |#eta_{2}| < 2, #DeltaR > 0.2'
+    #cutstag = '|#eta_{1}|, |#eta_{2}| < 2, #alpha_{12} < 2.5, #DeltaR > 0.2, p_{T2} > 40 GeV'
 
 
     ######################
@@ -405,17 +419,14 @@ if __name__ == "__main__":
     EFF_eta12.add2DRate(eff_eta_12, 'colz')
     EFF_eta12.save(0, 0, 0, '', '', outputDir = outputPath)
 
-    EFF_pt = Canvas.Canvas('EFF_pt', 'png', 0.3, 0.84, 0.9, 0.89, 2)
-    EFF_pt.addRate(eff_pt1, 'AP', 'Leading lepton', 'p', r.kBlue+2, True, 0, marker = 20)
-    EFF_pt.addRate(eff_pt2, 'AP, SAME', 'Subleading lepton', 'p', r.kBlue-7, True, 0, marker = 20)
-    EFF_pt.save(1, 0, 0, '', '', outputDir = outputPath)
-
     EFF_pt1 = Canvas.Canvas('EFF_pt1', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_pt1.addRate(eff_pt1, 'AP', '', 'p', r.kBlue+2, True, 0, marker = 20)
     EFF_pt1.save(0, 0, 0, '', '', outputDir = outputPath)
 
     EFF_pt2 = Canvas.Canvas('EFF_pt2', 'png', 0.3, 0.84, 0.9, 0.89, 2)
-    EFF_pt2.addRate(eff_pt2, 'AP', '', 'p', r.kBlue+2, True, 0, marker = 20)
+    EFF_pt2.addRate(eff_pt2, 'AP', '', 'p', r.kBlack, True, 0, marker = 24)
+    EFF_pt2.addLatex(0.17, 0.85, cutstag, size = 0.03, align = 11)
+    EFF_pt2.addLatex(0.9, 0.93, sampletag, size = 0.03, align = 31)
     EFF_pt2.save(0, 0, 0, '', '', outputDir = outputPath)
 
     EFF_Lxy = Canvas.Canvas('EFF_Lxy', 'png', 0.3, 0.84, 0.9, 0.89, 2)

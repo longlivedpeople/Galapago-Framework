@@ -397,8 +397,8 @@ class Canvas:
       for latex in self.latexs:
           lat = TLatex()
           lat.SetNDC()
-          lat.SetTextSize(latex[-1])
-          lat.SetTextFont(latex[-2])
+          lat.SetTextSize(latex[-2])
+          lat.SetTextFont(latex[-3])
           lat.DrawLatex(latex[0], latex[1], latex[2])
   
       
@@ -432,7 +432,7 @@ class Canvas:
           tmp_ratio.SetMarkerSize(0.8);
           tmp_ratio.SetMarkerColor(r.kBlack if len(hMClist) == 1 else tmp_hMC.GetMarkerColor());
           tmp_ratio.SetLineColor  (r.kBlack if len(hMClist) == 1 else tmp_hMC.GetLineColor  ());
-          tmp_ratio.SetLineColor(tmp_hMC.GetLineColor());
+          tmp_ratio.SetLineColor(r.kBlack);
           tmp_ratio.SetLineStyle(tmp_hMC.GetLineStyle())
           ratios.append(tmp_ratio)
           xmin = tmp_ratio.GetBinLowEdge(1)

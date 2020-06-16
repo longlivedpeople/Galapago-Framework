@@ -200,17 +200,29 @@ if __name__ == "__main__":
 
     ############# Cut definition
     cuts = CutManager.CutManager()
-    MMSR = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMM, cuts.MMSR_dPhi])
-    MMCR = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMM, cuts.MMCR_dPhi, cuts.cosmicRejection])
+    MMall = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMM, cuts.cosmicRejection])
+    MMSR = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMM, cuts.MMSR_dPhi, cuts.cosmicRejection])
+    #MMCR = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMM, cuts.MMCR_dPhi, cuts.cosmicRejection])
+    MMCR = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMM, cuts.MMCR_dPhi, cuts.cosmicRejection, cuts.MM_highpT])
+    MMCR_woutCosmicRej = cuts.AddListB([cuts.nTrack, cuts.MMChannel, cuts.haveMM, cuts.MMCR_dPhi])
     MMCR_OS = cuts.AddListB([MMCR, cuts.MM_OScharge])
 
 
     ############# Plotting
     start_time = time.time()
 
+    ###################
+    ####  Dimuons  ####
+    ###################
 
-    #### Kinematis of Dimuons
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'nDMDMBase', name = 'All_nDMDMBase', nbin = 4, xmin = 0, xmax = 4, xlabel = 'Number of dimuon candidates', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = cuts.AddListB([cuts.nTrack, cuts.MMChannel]), outtag = opts.out, yshift = 1000.0)
 
+    """
+
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_dPhi[DMDMBase_maxIxy]', name = 'All_DMDM_dPhi', nbin = 20, xmin = -3.3, xmax = 3.3, xlabel = 'Dimuon collinearity |#Delta#Phi|', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMall, outtag = opts.out, yshift = 1000.0)
+
+    ## Control region:
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_dPhi[DMDMBase_maxIxy]', name = 'CR_DMDM_dPhi', nbin = 20, xmin = -3.3, xmax = 3.3, xlabel = 'Dimuon collinearity |#Delta#Phi|', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 1000.0)
     makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_mass[DMDMBase_maxIxy]', name = 'DMDM_mass', nbin = 35, xmin = 0, xmax = 200, xlabel = 'Dimuon invariant mass m_{#mu#mu} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 800.0)
     makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_cosAlpha[DMDMBase_maxIxy]', name = 'DMDM_cosAlpha', nbin = 21, xmin = -1.1, xmax = 1.0, xlabel = 'Dimuon cos(#alpha)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 100.0)
     makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_trackIxy[DMDMBase_maxIxy]', name = 'DMDM_trackIxy', nbin = 20, xmin = 0, xmax = 20, xlabel = 'Dimuon candidate |d_{0}|/#sigma', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 100.0)
@@ -218,10 +230,37 @@ if __name__ == "__main__":
     makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'fabs(DMDMBase_trackDxy[DMDMBase_maxIxy])', name = 'DMDM_trackDxy', nbin = 20, xmin = 0, xmax = 10, xlabel = 'Dimuon candidate |d_{0}| (cm)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out)
     makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_Ixy[DMDMBase_maxIxy]', name = 'DMDM_Ixy', nbin = 20, xmin = 0, xmax = 20, xlabel = 'Dimuon vertex |L_{xy}|/#sigma', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 100.0)
     makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_normalizedChi2[DMDMBase_maxIxy]', name = 'DMDM_Chi2', nbin = 10, xmin = 0, xmax = 10, xlabel = 'Dimuon vertex fit #chi^{2}/ndf', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out)
-    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_leadingPt[DMDMBase_maxIxy]', name = 'DMDM_leadingPt', nbin = 40, xmin = 0, xmax = 300, xlabel = 'Leading muon transverse momentum p_{T} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 100.0)
-    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_subleadingPt[DMDMBase_maxIxy]', name = 'DMDM_subleadingPt', nbin = 40, xmin = 0, xmax = 300, xlabel = 'Subleading muon transverse momentum p_{T} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 100.0)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_leadingPt[DMDMBase_maxIxy]', name = 'DMDM_leadingPt', nbin = 30, xmin = 0, xmax = 300, xlabel = 'Leading muon transverse momentum p_{T} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 100.0)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_subleadingPt[DMDMBase_maxIxy]', name = 'DMDM_subleadingPt', nbin = 30, xmin = 0, xmax = 300, xlabel = 'Subleading muon transverse momentum p_{T} (GeV)', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 100.0)
     makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_relisoA[DMDMBase_maxIxy]', name = 'DMDM_relisoA', nbin = 20, xmin = 0, xmax = 0.2, xlabel = 'Leading muon relIso', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out)
     makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DMDMBase_relisoB[DMDMBase_maxIxy]', name = 'DMDM_relisoB', nbin = 20, xmin = 0, xmax = 0.2, xlabel = 'Subleading muon relIso', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out)
+
+    """
+
+    ################
+    ####  DG's  ####
+    ################
+    ### Control region:
+    # Eta:
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DGM_eta[DMDMBase_idxA[DMDMBase_maxIxy]]', name = 'CR_DGA_eta', nbin = 26, xmin = -2.6, xmax = 2.5, xlabel = 'Displaced global muon A #eta', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 1000.0)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DGM_eta[DMDMBase_idxB[DMDMBase_maxIxy]]', name = 'CR_DGB_eta', nbin = 26, xmin = -2.6, xmax = 2.5, xlabel = 'Displaced global muon B #eta', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 1000.0)
+    # dxy:
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DGM_dxy[DMDMBase_idxA[DMDMBase_maxIxy]]', name = 'CR_DGA_dxy', nbin = 17, xmin = -4.5, xmax = 4.0, xlabel = 'Displaced global muon A d_{xy}', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 1000.0)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DGM_dxy[DMDMBase_idxB[DMDMBase_maxIxy]]', name = 'CR_DGB_dxy', nbin = 17, xmin = -4.5, xmax = 4.0, xlabel = 'Displaced global muon B d_{xy}', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 1000.0)
+    # dxyError:
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DGM_dxyError[DMDMBase_idxA[DMDMBase_maxIxy]]', name = 'CR_DGA_dxyError', nbin = 70, xmin = 0, xmax = 0.01, xlabel = 'Displaced global muon A d_{xy}', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 1000.0)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DGM_dxyError[DMDMBase_idxB[DMDMBase_maxIxy]]', name = 'CR_DGB_dxyError', nbin = 70, xmin = 0, xmax = 0.01, xlabel = 'Displaced global muon B d_{xy}', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 1000.0)
+    # Charge
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DGM_charge[DMDMBase_idxA[DMDMBase_maxIxy]]', name = 'CR_DGA_charge', nbin = 3, xmin = -2, xmax = 1, xlabel = 'Displaced global muon A charge', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 1000.0)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DGM_charge[DMDMBase_idxB[DMDMBase_maxIxy]]', name = 'CR_DGB_charge', nbin = 3, xmin = -2, xmax = 1, xlabel = 'Displaced global muon B charge', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 1000.0)
+    # Number of valid hits
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DGM_numberOfValidHits[DMDMBase_idxA[DMDMBase_maxIxy]]', name = 'CR_DGA_numberOfValidHits', nbin = 80, xmin = 0, xmax = 80, xlabel = 'Displaced global muon A N_{hits}', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 1000.0)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DGM_numberOfValidHits[DMDMBase_idxB[DMDMBase_maxIxy]]', name = 'CR_DGB_numberOfValidHits', nbin = 80, xmin = 0, xmax = 80, xlabel = 'Displaced global muon B N_{valid}', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 1000.0)
+    # Chi2/ndof
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DGM_chi2[DMDMBase_idxA[DMDMBase_maxIxy]]/DGM_ndof[DMDMBase_idxA[DMDMBase_maxIxy]]', name = 'CR_DGA_normChi2', nbin = 15, xmin = 0, xmax = 15, xlabel = 'Displaced global muon A #chi^{2}/ndof', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 1000.0)
+    makeFullPlot(queue = opts.qenv, lumi = lumi, var = 'DGM_chi2[DMDMBase_idxB[DMDMBase_maxIxy]]/DGM_ndof[DMDMBase_idxB[DMDMBase_maxIxy]]', name = 'CR_DGB_normChi2', nbin = 15, xmin = 0, xmax = 15, xlabel = 'Displaced global muon B #chi^{2}/ndof', ylog = True, treeMC = treeMC, treeDATA = treeDATA, treeSI = treeSI, cuts = MMCR, outtag = opts.out, yshift = 1000.0)
+
+
 
 
     print("--- %s seconds ---" % (time.time() - start_time))

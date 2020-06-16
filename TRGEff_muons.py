@@ -103,7 +103,13 @@ class bcolors:
 
 ################################# GLOBAL VARIABLES DEFINITION ####################################
 
-WORKPATH = os.path.abspath('./') + '/'
+runningfile = os.path.abspath(__file__)
+WORKPATH = ''
+for level in runningfile.split('/')[:-1]:
+    WORKPATH += level
+    WORKPATH += '/'
+
+print('runningfile: ' + runningfile)
 
 ##################################### FUNCTION DEFINITION ########################################
 
@@ -173,6 +179,7 @@ if __name__ == "__main__":
     ####   Parser object   ####
     ###########################
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
+    parser.add_option('-n', '--maxNumber', action='store', type=int, dest='maxNumber', default=0, help='Output tag')
     parser.add_option('-t', '--tag', action='store', type=str, dest='tag', default='', help='Output tag')
     parser.add_option('-f', '--filename', action='store', type=str, dest='filename', default='', help='Path to file')
     (opts, args) = parser.parse_args()
@@ -183,17 +190,21 @@ if __name__ == "__main__":
     ####   TEfficiency binning   ####
     #################################
     dxy_bin = np.linspace(0.0, 100.0, 51)
-    Lxy_logbin = np.logspace(0.0, 4.0, 41)
+    dxy_bin_log = np.logspace(-2, 3.0, 51)
+    Lxy_logbin = np.logspace(-2, 4.0, 41)
     pt_bin = np.linspace(0.0, 300.0, 40)
-    Lxy_bin = np.linspace(0.0, 120.0, 22)
-
+    Lxy_bin = np.linspace(0.0, 100.0, 50)
+    Lxy_sep = np.array([0.0, 1.0, 20.0, 100.0])
+    dxy_sep = np.array([0.0, 1.0, 10.0, 100.0])
 
 
     #############################
     ####   Book Histograms   ####
     #############################
-    hist_Lxy1 = r.TH1F('hist_Lxy1', '; r (cm); Events', len(Lxy_bin)-1, Lxy_bin)
-    hist_Lxy2 = r.TH1F('hist_Lxy2', '; r (cm); Events', len(Lxy_bin)-1, Lxy_bin)
+    hist_Lxy1 = r.TH1F('hist_Lxy1', '; Production radius r (cm); Events', len(Lxy_bin)-1, Lxy_bin)
+    hist_Lxy2 = r.TH1F('hist_Lxy2', '; Production radius r (cm); Events', len(Lxy_bin)-1, Lxy_bin)
+    hist_dxy1 = r.TH1F('hist_dxy1', '; Transverse impact parameter |d_{xy}| (cm); Events', len(dxy_bin)-1, dxy_bin)
+    hist_dxy2 = r.TH1F('hist_dxy2', '; Transverse impact parameter |d_{xy}| (cm); Events', len(dxy_bin)-1, dxy_bin)
     hist_pt1 = r.TH1F('hist_pt1', '; Transverse momentum p_{T} (GeV); Events', len(pt_bin)-1, pt_bin)
     hist_pt2 = r.TH1F('hist_pt2', '; Transverse momentum p_{T} (GeV); Events', len(pt_bin)-1, pt_bin)
     hist_mass = r.TH1F('hist_mass', '; Mass(l1, l2) (GeV); Events', 40, 0, 500)
@@ -205,17 +216,25 @@ if __name__ == "__main__":
     ######################################
     ####   Book TEfficiency objects   ####
     ######################################
-    eff_pt1 = r.TEfficiency("eff_pt1", ";p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
-    eff_pt2 = r.TEfficiency("eff_pt1", ";p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
+    eff_pt1 = r.TEfficiency("eff_pt1", ";Leading muon p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
+    eff_pt2 = r.TEfficiency("eff_pt1", ";Subleading muon p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
+    eff_pt2_bin1 = r.TEfficiency("eff_pt2_bin1", ";Subleading muon p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
+    eff_pt2_bin2 = r.TEfficiency("eff_pt2_bin2", ";Subleading muon p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
+    eff_pt2_bin3 = r.TEfficiency("eff_pt2_bin3", ";Subleading muon p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
+    eff_pt2_bin1_dxy = r.TEfficiency("eff_pt2_bin1_dxy", ";Subleading muon p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
+    eff_pt2_bin2_dxy = r.TEfficiency("eff_pt2_bin2_dxy", ";Subleading muon p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
+    eff_pt2_bin3_dxy = r.TEfficiency("eff_pt2_bin3_dxy", ";Subleading muon p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
     eff_pt_12 = r.TEfficiency("eff_pt_12", ";Leading lepton p_{T} (GeV);Subleading lepton p_{T} GeV", len(pt_bin)-1, pt_bin, len(pt_bin) -1, pt_bin)
 
     eff_Lxy1 = r.TEfficiency("eff_Lxy1", ";Production radius r (cm);Efficiency", len(Lxy_bin)-1, Lxy_bin)
-    eff_Lxy2 = r.TEfficiency("eff_Lxy1", ";Production radius r (cm);Efficiency", len(Lxy_bin)-1, Lxy_bin)
+    eff_Lxy2 = r.TEfficiency("eff_Lxy2", ";Production radius r (cm);Efficiency", len(Lxy_bin)-1, Lxy_bin)
+    eff_dxy1 = r.TEfficiency("eff_dxy1", ";Transverse impact parameter |d_{xy}| (cm);Efficiency", len(dxy_bin_log)-1, dxy_bin_log)
+    eff_dxy2 = r.TEfficiency("eff_dxy2", ";;", len(dxy_bin_log)-1, dxy_bin_log)
     eff_Lxy_12 = r.TEfficiency("eff_Lxy_12", ";Leading lepton r (cm) ;Subleading lepton r (cm)", len(Lxy_bin)-1, Lxy_bin, len(Lxy_bin) -1, Lxy_bin)
 
     
     eff_Lxy1_log = r.TEfficiency("eff_Lxy1_log", ";Production radius r (cm);Efficiency", len(Lxy_logbin)-1, Lxy_logbin)
-    eff_Lxy2_log = r.TEfficiency("eff_Lxy1_log", ";Production radius r (cm);Efficiency", len(Lxy_logbin)-1, Lxy_logbin)
+    eff_Lxy2_log = r.TEfficiency("eff_Lxy2_log", ";Production radius r (cm);Efficiency", len(Lxy_logbin)-1, Lxy_logbin)
 
     eff_pt1Lxy1 = r.TEfficiency("eff_pt1Lxy1", ";Leading lepton p_{T} (GeV);Leading lepton r (cm)", len(pt_bin)-1, pt_bin, len(Lxy_bin) -1, Lxy_bin)
     eff_pt2Lxy2 = r.TEfficiency("eff_pt2Lxy2", ";Subleading lepton p_{T} (GeV);Subleading r (cm)", len(pt_bin)-1, pt_bin, len(Lxy_bin) -1, Lxy_bin)
@@ -231,9 +250,10 @@ if __name__ == "__main__":
     #########################
     ####   Load sample   ####
     #########################
-    _sampleName = opts.filename
-    _file = TFile(_sampleName)
-    _tree = _file.Get("Events")
+    _sampleNames = (opts.filename).split(',')
+    _tree = r.TChain('Events')
+    for _name in _sampleNames:
+        _tree.Add(_name)
     print("TTree with " + str(_tree.GetEntries()) + " entries")
 
 
@@ -244,7 +264,8 @@ if __name__ == "__main__":
     for i in range(0, _tree.GetEntries()):
 
         _tree.GetEntry(i)
-        #if i > 20: break
+        if opts.maxNumber:
+            if i > opts.maxNumber: break
 
         # Get electrons:
         nPromptEle = 0
@@ -266,18 +287,24 @@ if __name__ == "__main__":
         i2 = var_values[1][1]
         pt1 = _tree.GenLeptonSel_pt[i1]
         pt2 = _tree.GenLeptonSel_pt[i2]
+        dxy1 = abs(_tree.GenLeptonSel_dxy[i1])
+        dxy2 = abs(_tree.GenLeptonSel_dxy[i2])
         Lxy1 = math.sqrt((_tree.GenLeptonSel_vx[i1])**2 + (_tree.GenLeptonSel_vy[i1])**2)
         Lxy2 = math.sqrt((_tree.GenLeptonSel_vx[i2])**2 + (_tree.GenLeptonSel_vy[i2])**2)
         eta1 = _tree.GenLeptonSel_eta[i1]
         eta2 = _tree.GenLeptonSel_eta[i2]
+        Lxy = Lxy1
 
         ### Other variables:
         l1 = r.TLorentzVector()
         l2 = r.TLorentzVector()
         l1.SetPtEtaPhiM(_tree.GenLeptonSel_pt[i1], _tree.GenLeptonSel_eta[i1], _tree.GenLeptonSel_phi[i1], 0.510/1000.0)
         l2.SetPtEtaPhiM(_tree.GenLeptonSel_pt[i2], _tree.GenLeptonSel_eta[i2], _tree.GenLeptonSel_phi[i2], 0.510/1000.0)
+        l1_v3 = r.TVector3(l1.Px(), l1.Py(), l1.Pz())
+        l2_v3 = r.TVector3(l2.Px(), l2.Py(), l2.Pz())
 
         dR = l1.DeltaR(l2)
+        angle = l1_v3.Angle(l2_v3)
         mass = (l1+l2).M()
 
 
@@ -297,15 +324,19 @@ if __name__ == "__main__":
         ####   Filling   ####
         #####################
         #if pt1_cut and pt2_cut and Lxy1_cut and Lxy2_cut and eta1_cut and eta2_cut: # pt + Lxy cuts
-        if pt1_cut and pt2_cut and dRcut and eta1_cut and eta2_cut: # pt cuts only
+        #if pt1_cut and pt2_cut and dRcut and eta1_cut and eta2_cut: # pt cuts only
         #if pt2_cut: # pt2 cut
         #if pt1_cut: # pt1 cut
         #if resonance: # check inside X resonance
         #if not resonance: # check outside X resonance
+        if angle < 2.5 and eta1_cut and eta2_cut and dRcut and pt2_cut:
+        #if angle < 2.5 and eta1_cut and eta2_cut and dRcut:
         #if True: # no cuts
 
             hist_Lxy1.Fill(Lxy1)
             hist_Lxy2.Fill(Lxy2)
+            hist_dxy1.Fill(dxy1)
+            hist_dxy2.Fill(dxy2)
             hist_pt1.Fill(pt1)
             hist_pt2.Fill(pt2)
             hist_mass.Fill(mass)
@@ -320,6 +351,8 @@ if __name__ == "__main__":
 
             eff_Lxy1.Fill(_tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, Lxy1)
             eff_Lxy2.Fill(_tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, Lxy2)
+            eff_dxy1.Fill(_tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, dxy1)
+            eff_dxy2.Fill(_tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, dxy2)
             eff_Lxy1_log.Fill(_tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, Lxy1)
             eff_Lxy2_log.Fill(_tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, Lxy2)
             eff_Lxy_12.Fill(_tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, Lxy1, Lxy2)
@@ -335,6 +368,22 @@ if __name__ == "__main__":
 
             eff_pt2dR.Fill(_tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, pt2, dR)
 
+            if Lxy < Lxy_sep[1]:
+                eff_pt2_bin1.Fill(_tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, pt2)
+            elif Lxy > Lxy_sep[1] and Lxy < Lxy_sep[2]:
+                eff_pt2_bin2.Fill(_tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, pt2)
+            elif Lxy > Lxy_sep[1] and Lxy < Lxy_sep[3]:
+                eff_pt2_bin3.Fill(_tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, pt2)
+
+            if dxy2 < dxy_sep[1]:
+                eff_pt2_bin1_dxy.Fill(_tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, pt2)
+            elif dxy2 > dxy_sep[1] and dxy2 < dxy_sep[2]:
+                eff_pt2_bin2_dxy.Fill(_tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, pt2)
+            elif dxy2 > dxy_sep[1] and dxy2 < dxy_sep[3]:
+                eff_pt2_bin3_dxy.Fill(_tree.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, pt2)
+
+
+
 
     ###########################
     ####   OF histograms   ####
@@ -343,21 +392,44 @@ if __name__ == "__main__":
     OFhist_pt2 = makeOFHisto(hist_pt2)
     OFhist_Lxy1 = makeOFHisto(hist_Lxy1)
     OFhist_Lxy2 = makeOFHisto(hist_Lxy2)
+    OFhist_dxy1 = makeOFHisto(hist_dxy1)
+    OFhist_dxy2 = makeOFHisto(hist_dxy2)
     OFhist_mass = makeOFHisto(hist_mass)
     OFhist_dR = makeOFHisto(hist_dR)
 
+    print('Selected: ' + str(eff_pt1.GetTotalHistogram().GetEntries()) + ', passed: ' + str(eff_pt1.GetPassedHistogram().GetEntries()))
 
+
+    #######################
+    ####   Plot tags   ####
+    #######################
+    #sampletag = 'Monte Carlo: DYJetsToLL_M-50'
+    sampletag = 'Monte Carlo: H #rightarrow XX #rightarrow 2e2#mu'
+    #cutstag = '|#eta_{1}|, |#eta_{2}| < 2, #alpha_{12} < 2.5, #DeltaR > 0.2'
+    cutstag = '|#eta_{1}|, |#eta_{2}| < 2, #alpha_{12} < 2.5, #DeltaR > 0.2, p_{T2} > 40 GeV'
 
     ######################
     ####   Plotting   ####
     ######################
+    faketag = 'Sample: DYJetsToLL_M-50,  |#eta_{1}|, |#eta_{2}| < 2,  #alpha_{12} < 2.5' 
+
+
     valmax = OFhist_Lxy1.GetMaximum() if OFhist_Lxy1.GetMaximum() > OFhist_Lxy2.GetMaximum() else OFhist_Lxy2.GetMaximum()
     OFhist_Lxy1.SetMaximum(10.0*valmax)
     HIST_Lxy = Canvas.Canvas('hist_Lxy', 'png', 0.35, 0.84, 0.9, 0.89, 2)
-    HIST_Lxy.addHisto(OFhist_Lxy1, 'HIST', 'Leading lepton', 'l', r.kBlue+2, 1, 0)
-    HIST_Lxy.addHisto(OFhist_Lxy2, 'HIST, SAME', 'Subleading lepton', 'l', r.kBlue-7, 1, 1)
-    HIST_Lxy.addLatex(0.5, 0.935, 'l_{1} > 70 GeV, l_{2} > 50 GeV', size = 0.031)
-    HIST_Lxy.save(1, 0, 1, '', '', outputDir = outputPath)
+    HIST_Lxy.addHisto(OFhist_Lxy1, 'HIST', '', 'l', r.kBlack, 1, 0)
+    HIST_Lxy.addLatex(0.17, 0.85, cutstag, size = 0.03, align = 11)
+    HIST_Lxy.addLatex(0.9, 0.93, sampletag, size = 0.03, align = 31)
+    HIST_Lxy.save(0, 0, 1, '', '', outputDir = outputPath)
+
+    valmax = OFhist_dxy1.GetMaximum() if OFhist_dxy1.GetMaximum() > OFhist_dxy2.GetMaximum() else OFhist_dxy2.GetMaximum()
+    OFhist_dxy1.SetMaximum(10.0*valmax)
+    HIST_dxy = Canvas.Canvas('hist_dxy', 'png', 0.57, 0.7, 0.72, 0.8, 1)
+    HIST_dxy.addHisto(OFhist_dxy1, 'HIST', 'Leading muon', 'l', r.kBlue+2, 1, 0)
+    HIST_dxy.addHisto(OFhist_dxy2, 'HIST, same', 'Subleading muon', 'l', r.kRed-7, 1, 1)
+    HIST_dxy.addLatex(0.87, 0.85, cutstag, size = 0.03, align = 31)
+    HIST_dxy.addLatex(0.9, 0.93, sampletag, size = 0.03, align = 31)
+    HIST_dxy.save(1, 0, 1, '', '', outputDir = outputPath)
 
     valmax = OFhist_pt1.GetMaximum() if OFhist_pt1.GetMaximum() > OFhist_pt2.GetMaximum() else OFhist_pt2.GetMaximum()
     OFhist_pt1.SetMaximum(1.3*valmax)
@@ -384,6 +456,7 @@ if __name__ == "__main__":
 
     EFF_pt12 = Canvas.Canvas('EFF_pt12', 'png', 0.5, 0.84, 0.9, 0.89, 4)
     EFF_pt12.add2DRate(eff_pt_12, 'colz')
+    EFF_pt12.addLatex(0.9, 0.93, sampletag, size = 0.03, align = 31)
     EFF_pt12.save(0, 0, 0, '', '', outputDir = outputPath)
 
     EFF_Lxy12 = Canvas.Canvas('EFF_Lxy12', 'png', 0.5, 0.84, 0.9, 0.89, 4)
@@ -412,21 +485,50 @@ if __name__ == "__main__":
     EFF_pt.addRate(eff_pt2, 'AP, SAME', 'Subleading lepton', 'p', r.kBlue-7, True, 0, marker = 20)
     EFF_pt.save(1, 0, 0, '', '', outputDir = outputPath)
 
-    EFF_pt1 = Canvas.Canvas('EFF_pt1', 'png', 0.3, 0.84, 0.9, 0.89, 2)
-    EFF_pt1.addRate(eff_pt1, 'AP', '', 'p', r.kBlue+2, True, 0, marker = 20)
+    EFF_pt1 = Canvas.Canvas('EFF_pt1', 'png', 0.15, 0.84, 0.33, 0.89, 1)
+    EFF_pt1.addRate(eff_pt1, 'AP', '', 'p', r.kBlack, True, 0, marker = 24)
+    EFF_pt1.addLatex(0.17, 0.85, cutstag, size = 0.03, align = 11)
+    EFF_pt1.addLatex(0.9, 0.93, sampletag, size = 0.03, align = 31)
     EFF_pt1.save(0, 0, 0, '', '', outputDir = outputPath)
 
-    EFF_pt2 = Canvas.Canvas('EFF_pt2', 'png', 0.3, 0.84, 0.9, 0.89, 2)
-    EFF_pt2.addRate(eff_pt2, 'AP', '', 'p', r.kBlue+2, True, 0, marker = 20)
+    EFF_pt2 = Canvas.Canvas('EFF_pt2', 'png', 0.15, 0.84, 0.33, 0.89, 1)
+    EFF_pt2.addRate(eff_pt2, 'AP', '', 'p', r.kBlack, True, 0, marker = 24)
+    EFF_pt2.addLatex(0.15, 0.85, cutstag, size = 0.03, align = 11)
+    EFF_pt2.addLatex(0.9, 0.93, sampletag, size = 0.03, align = 31)
     EFF_pt2.save(0, 0, 0, '', '', outputDir = outputPath)
+
+    EFF_pt2 = Canvas.Canvas('EFF_pt2_Lxybin', 'png', 0.55, 0.15, 0.83, 0.27, 1)
+    EFF_pt2.addRate(eff_pt2_bin1, 'AP', 'L_{xy} < 1 (cm)', 'p', r.kBlack, True, 0, marker = 24)
+    EFF_pt2.addRate(eff_pt2_bin2, 'AP, same', '1 < L_{xy} < 20 (cm)', 'p', r.kBlue, True, 1, marker = 24)
+    EFF_pt2.addRate(eff_pt2_bin3, 'AP, same', '20 < L_{xy} < 100 (cm)', 'p', r.kRed, True, 2, marker = 24)
+    EFF_pt2.addLatex(0.17, 0.85, cutstag, size = 0.03, align = 11)
+    EFF_pt2.addLatex(0.9, 0.93, sampletag, size = 0.03, align = 31)
+    EFF_pt2.save(1, 0, 0, '', '', outputDir = outputPath)
+
+    EFF_pt2 = Canvas.Canvas('EFF_pt2_dxybin', 'png', 0.55, 0.15, 0.83, 0.27, 1)
+    EFF_pt2.addRate(eff_pt2_bin1_dxy, 'AP', '|d_{xy2}| < 1 (cm)', 'p', r.kBlack, True, 0, marker = 24)
+    EFF_pt2.addRate(eff_pt2_bin2_dxy, 'AP, same', '1 < |d_{xy2}| < 10 (cm)', 'p', r.kBlue, True, 1, marker = 24)
+    EFF_pt2.addRate(eff_pt2_bin3_dxy, 'AP, same', '10 < |d_{xy2}| < 100 (cm)', 'p', r.kRed, True, 2, marker = 24)
+    EFF_pt2.addLatex(0.17, 0.85, cutstag, size = 0.03, align = 11)
+    EFF_pt2.addLatex(0.9, 0.93, sampletag, size = 0.03, align = 31)
+    EFF_pt2.save(1, 0, 0, '', '', outputDir = outputPath)
 
     EFF_Lxy = Canvas.Canvas('EFF_Lxy', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_Lxy.addRate(eff_Lxy1, 'AP', 'Leading lepton', 'p', r.kBlue+2, True, 0, marker = 20)
     EFF_Lxy.addRate(eff_Lxy2, 'AP, SAME', 'Subleading lepton', 'p', r.kBlue-7, True, 0, marker = 20)
     EFF_Lxy.save(1, 0, 0, '', '', outputDir = outputPath, xlog = False)
 
+    EFF_dxy = Canvas.Canvas('EFF_dxy', 'png', 0.15, 0.16, 0.44, 0.26, 1)
+    EFF_dxy.addRate(eff_dxy1, 'AP', 'Leading muon', 'p', r.kBlue+2, True, 0, marker = 24)
+    EFF_dxy.addRate(eff_dxy2, 'AP, SAME', 'Subleading muon', 'p', r.kRed-7, True, 1, marker = 24)
+    EFF_dxy.addLatex(0.17, 0.85, cutstag, size = 0.03, align = 11)
+    EFF_dxy.addLatex(0.9, 0.93, sampletag, size = 0.03, align = 31)
+    EFF_dxy.save(1, 0, 0, '', '', outputDir = outputPath, xlog = True)
+
     EFF_Lxy1 = Canvas.Canvas('EFF_Lxy1', 'png', 0.3, 0.84, 0.9, 0.89, 2)
-    EFF_Lxy1.addRate(eff_Lxy1, 'AP', 'Leading lepton', 'p', r.kBlue+2, True, 0, marker = 20)
+    EFF_Lxy1.addRate(eff_Lxy1, 'AP', 'Leading lepton', 'p', r.kBlack, True, 0, marker = 24)
+    EFF_Lxy1.addLatex(0.17, 0.85, cutstag, size = 0.03, align = 11)
+    EFF_Lxy1.addLatex(0.9, 0.93, sampletag, size = 0.03, align = 31)
     EFF_Lxy1.save(0, 0, 0, '', '', outputDir = outputPath, xlog = False)
 
     EFF_Lxy2 = Canvas.Canvas('EFF_Lxy2', 'png', 0.3, 0.84, 0.9, 0.89, 2)
@@ -434,9 +536,11 @@ if __name__ == "__main__":
     EFF_Lxy2.save(0, 0, 0, '', '', outputDir = outputPath, xlog = False)
 
     EFF_Lxy_log = Canvas.Canvas('EFF_Lxy', 'png', 0.3, 0.84, 0.9, 0.89, 2)
-    EFF_Lxy_log.addRate(eff_Lxy1_log, 'AP', 'Leading lepton', 'p', r.kBlue+2, True, 0, marker = 20)
-    EFF_Lxy_log.addRate(eff_Lxy2_log, 'AP, SAME', 'Subleading lepton', 'p', r.kBlue-7, True, 0, marker = 20)
-    EFF_Lxy_log.save(1, 0, 0, '', '', outputDir = outputPath, xlog = True)
+    EFF_Lxy_log.addRate(eff_Lxy1_log, 'AP', 'Leading lepton', 'p', r.kBlack, True, 0, marker = 24)
+    EFF_Lxy_log.addLatex(0.17, 0.85, cutstag, size = 0.03, align = 11)
+    EFF_Lxy_log.addLatex(0.9, 0.93, sampletag, size = 0.03, align = 31)
+#    EFF_Lxy_log.addRate(eff_Lxy2_log, 'AP, SAME', 'Subleading lepton', 'p', r.kBlue-7, True, 0, marker = 20)
+    EFF_Lxy_log.save(0, 0, 0, '', '', outputDir = outputPath, xlog = True)
 
     EFF_dR = Canvas.Canvas('EFF_dR', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_dR.addRate(eff_dR, 'AP', '', 'p', r.kBlue+2, True, 0, marker = 20)
