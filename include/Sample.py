@@ -138,7 +138,7 @@ class Sample:
           h_of = TH1F(name, "", _nbins+1, _newarr)                                     
       else:
            h = TH1F(name+'_noOF', "", nbin, xmin, xmax)
-           bw = int((xmax-xmin)/nbin)
+           bw = float((xmax-xmin)/nbin)
            ylabel = ylabel +"/ " + str(bw) + " GeV"
            h_of = TH1F(name, '', nbin+1, xmin, xmax+bw)
       h.Sumw2()
@@ -154,9 +154,7 @@ class Sample:
       if(self.isData == 0):
          cut = cut + "* ( " + str(self.lumWeight*lumi) + " * genWeight/abs(genWeight) " + " )" 
 
-      print("Aqui empieza Project:")
       self.ttree.Project(h.GetName(), var, cut, options)
-      print("Aqui termina Project")
 
       for _bin in range(1, h.GetNbinsX()+2):
           h_of.SetBinContent(_bin, h.GetBinContent(_bin))
@@ -179,7 +177,7 @@ class Sample:
      h.GetYaxis().SetTitle(ylabel)
      
      if(self.isData == 0):
-        cut = cut + "* ( " + str(self.lumWeight*lumi) + " * genWeight/abs(genWeight) " 
+        cut = cut + "* ( " + str(self.lumWeight*lumi) + " * genWeight/abs(genWeight) )" 
      self.ttree.Project(name, var, cut, options) 
      return h
 
@@ -195,7 +193,7 @@ class Sample:
      h.GetZaxis().SetTitle(zlabel)
      
      if(self.isData == 0):
-        cut = cut + "* ( " + str(self.lumWeight*lumi) + " * genWeight/abs(genWeight) "
+        cut = cut + "* ( " + str(self.lumWeight*lumi) + " * genWeight/abs(genWeight) )"
      self.ttree.Project(name, var, cut, options) 
      return h
 
@@ -420,7 +418,7 @@ class Tree:
        
      return h
 
-   def getTH2F(self, lumi, name, var, nbinx, xmin, xmax, nbiny, ymin, ymax, cut, options, xlabel):
+   def getTH2F(self, lumi, name, var, nbinx, xmin, xmax, nbiny, ymin, ymax, cut, options, xlabel, ylabel):
      if cut == '':
        cut = '(1)'
      if(xmin == xmax) and (ymax == ymin):

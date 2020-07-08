@@ -19,12 +19,18 @@ def selectSamples(inputfile, selList, sType = 'DATA'):
 
     checkedList = []
     typeList    = []
+    print "selectSamples for ", sType, ": List Of Samples:" , selList
+
 
     for line in f.readlines():
-        if '#' in line or not len(line.rstrip('\r')): continue
+        if '#'==line[0] or not len(line.rstrip('\r')): continue
         for _sample in selList:
             _sample = _sample.replace('*','.*')
+
+            cond_std = _sample == line.split()[2]
+            cond_re = re.search(_sample, line.split()[2]) != 0
             if _sample == line.split()[2] or re.search(_sample, line.split()[2]):
+                print "---> Found a match for", _sample, ":",  line.split()[2], " ", line.split()[3], line.split()[4], line.split()[5], ", matchesName_=", cond_std, ", matchesRegExp", cond_re 
                 if not sType == 'SYNCH':
                     tmp_file.write(line)
                 else:
