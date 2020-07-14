@@ -82,6 +82,7 @@ from array import array
 from ROOT import TTree, TFile, TCut, TH1F, TH2F, TH3F, THStack, TCanvas, SetOwnership
 from include.processHandler import processHandler
 import copy
+import os
 
 ########################################################################################
 ########################################################################################
@@ -90,26 +91,36 @@ import copy
 ########################################################################################
 class Sample:
    'Common base class for all Samples'
-   def __init__(self, name, label, color, friendlocation, xsection, isdata):
+   def __init__(self, name, label, color, location, xsection, isdata):
 
       self.name = name
       self.label = label
       self.color = eval(color)
-      self.location = friendlocation
+      self.location = location if location[-1] == '/' else location + '/'
       self.xSection = xsection
       self.isData = isdata
-      ftfileloc = friendlocation 
-      self.ftfile = TFile(ftfileloc)
-      self.ttree = self.ftfile.Get('Events')
+      self.ftpaths = []
+      self.ftfiles = []
+      self.ttrees = []
+      self.count = 0.0
+
+      for _file in os.listdir(self.location):
+        ftfile = TFile(location + _file)
+        ttree = ftfile.Get('Events')
+        self.ftpaths.append(location + _file)
+        self.ftfiles.append(ftfile)
+        self.ttrees.append(ttree)
 
       if not self.isData:
         gw = 0.
-        for i in self.ttree:
-            gw = abs(i.genWeight)
+        for i,ttree in enumerate(self.ttrees):
+          for j in ttree:
+            gw = abs(j.genWeight)
             if gw: break
-        self.count = self.ftfile.Get('sum2Weights').GetBinContent(1)/abs(gw)
+          self.count = self.count + self.ftfiles[i].Get('sum2Weights').GetBinContent(1)/abs(gw)
       else:
-          self.count = self.ftfile.Get('Events').GetEntries()
+        for ttree in self.ttrees:
+          self.count = self.count + ttree.GetEntries()
 
       if not self.isData:
         self.lumWeight = self.xSection / self.count
@@ -298,13 +309,12 @@ class Block:
 class Tree:
    'Common base class for a physics meaningful tree'
 
-   def __init__(self, fileName, name, isdata, loopFile = 'default.root'):
+   def __init__(self, fileName, name, isdata):
       #print fileName
       self.name  = name
       self.isData = isdata
       self.blocks = []
       self.parseFileName(fileName)
-      self.loopFile = loopFile
 
    def parseFileName(self, fileName):
       f = open(fileName)
@@ -336,9 +346,7 @@ class Tree:
           newBlock = Block(block, label, color, isdata)
           newBlock.addSample(sample)
           self.addBlock(newBlock)
-
         else:
-
           coincidentBlock[0].addSample(sample)
 
 
@@ -466,22 +474,16 @@ class Tree:
      return h   
 
 
-   def Loop(self, lumi, filename = False, maxNumber = False):
+   def Loop(self, lumi, outdir):
         
-     if filename: self.loopFile = filename
-
      for b in self.blocks:
        for s in b.samples:
          print("Reading samples: " + s.name)
-         process = processHandler(self.loopFile, self.name, b.name, s.name)
-         for n,ev in enumerate(s.ttree):
-           if maxNumber:
-               if n > maxNumber: break #### OJOO esto es auxiliar, al cortar la normalizacion no se cumple 
-           if s.isData:
-             process.processEvent(ev, 1, True)
-           else:                 
-             process.processEvent(ev, lumi*s.lumWeight, False)
-         process.Write()
+         for t,ttree in enumerate(s.ttrees):
+           process = processHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, s.isData)
+           for n,ev in enumerate(ttree):
+               process.processDimuons(ev)
+           process.Write()
 
 
    def getLoopStack(self, name, var, xlabel):

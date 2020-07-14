@@ -1,4 +1,5 @@
 import math
+import os
 import ROOT as r
 from ROOT import TVector3, TLorentzVector
 import include.CutManager as CutManager
@@ -7,128 +8,31 @@ import include.CutManager as CutManager
 
 class processHandler:
 
-    def __init__(self, fileName, treename, blockname, samplename):
-        self.fileName = fileName
+    def __init__(self, outdir, treename, blockname, samplename, samplenumber, lumiweight, isdata):
+
+        ### outdir: Path where the root file will be stored
+        ### treename: Name of the (Galapago) Tree (MC; DATA; SI)
+        ### blockname: Name of the (Galapago) Block
+        ### samplename: Name of the sample
+        ### samplenumber: Number of the sample file/ttree
+
+        self.outdir = outdir
+        if self.outdir[-1] != '/': self.outdir = self.outdir + '/' 
+        self.filename = self.outdir + '{0}_{1}_{2}_{3}.root'.format(treename, blockname, samplename, str(samplenumber))
         self.treename = treename
         self.blockname = blockname
         self.samplename = samplename
+        self.samplenumber = samplenumber
+        self.lumiweight = lumiweight
+        self.isdata = isdata
         self.cutManager = CutManager.CutManager()
 
-        self.hcounts = r.TH1F('hcounts_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 1, 0, 1)
-        self.hchannel = r.TH1F('hchannel_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 0, 0, 3) # 0: None, 1: Electron, 2: Muon
+        self.hcounts = r.TH1F('hcounts_{0}_{1}_{2}'.format(treename, blockname, samplename, str(samplenumber)), '', 1, 0, 1)
 
-        # Generation histograms
-        self.hgenMM_cosAlpha = r.TH1F('hgenMM_cosAlpha_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 22, -1.1, 1.1)
-
-        # Single electron histograms
-        self.hE1_pt = r.TH1F('hE1_pt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 100)
-        self.hE2_pt = r.TH1F('hE2_pt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 100)
-        self.hE1_et = r.TH1F('hE1_et_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 100)
-        self.hE2_et = r.TH1F('hE2_et_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 100)
-        self.hE1_eta = r.TH1F('hE1_eta_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, -3, 3)
-        self.hE2_eta = r.TH1F('hE2_eta_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, -3, 3)
-        self.hE1_reliso = r.TH1F('hE1_reliso_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 1)
-        self.hE2_reliso = r.TH1F('hE2_reliso_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 1)
-
-        # Single muon histograms
-        self.hM1_pt = r.TH1F('hM1_pt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 100)
-        self.hM2_pt = r.TH1F('hM2_pt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 100)
-        self.hM1_triggerPt = r.TH1F('hM1_triggerPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 100)
-        self.hM2_triggerPt = r.TH1F('hM2_triggerPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 100)
-        self.hM1_eta = r.TH1F('hM1_eta_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, -3, 3)
-        self.hM2_eta = r.TH1F('hM2_eta_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, -3, 3)
-        self.hM1_reliso = r.TH1F('hM1_reliso_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 1)
-        self.hM2_reliso = r.TH1F('hM2_reliso_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 1)
-
-        # Dilepton numbers 
-        self.hnLL = r.TH1F('hnLL_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 5, 0, 5)
-        self.hnEE = r.TH1F('hnEE_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 5, 0, 5)
-        self.hnMM = r.TH1F('hnMM_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 5, 0, 5)
-
-        ############## -> Original histograms
-
-        # Dielectron selection (Signal Region SR)
-        self.hSR_EEsel_minIxy = r.TH1F('hSR_EEsel_minIxy_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 20)
-        self.hSR_EEsel_invMass = r.TH1F('hSR_EEsel_invMass_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 500)
-        self.hSR_EEsel_Chi2 = r.TH1F('hSR_EEsel_Chi2_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 20, 0, 20)
-        self.hSR_EEsel_dPhi = r.TH1F('hSR_EEsel_dPhi_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, math.pi)
-        self.hSR_EEsel_leadingPt = r.TH1F('hSR_EEsel_leadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        self.hSR_EEsel_subleadingPt = r.TH1F('hSR_EEsel_subleadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 700)
-        self.hSR_EEsel_Ptll = r.TH1F('hSR_EEsel_Ptll_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        
-        # Dimuon selection (Signal Region SR)
-        self.hSR_MMsel_minIxy = r.TH1F('hSR_MMsel_minIxy_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 20)
-        self.hSR_MMsel_invMass = r.TH1F('hSR_MMsel_invMass_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 500)
-        self.hSR_MMsel_Chi2 = r.TH1F('hSR_MMsel_Chi2_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 20, 0, 20)
-        self.hSR_MMsel_dPhi = r.TH1F('hSR_MMsel_dPhi_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, math.pi)
-        self.hSR_MMsel_leadingPt = r.TH1F('hSR_MMsel_leadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        self.hSR_MMsel_subleadingPt = r.TH1F('hSR_MMsel_subleadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 700)
-        self.hSR_MMsel_Ptll = r.TH1F('hSR_MMsel_Ptll_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        self.hSR_MMsel_cosAlpha = r.TH1F('hSR_MMsel_cosAlpha_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 22, -1.1, 1.1)
-
-        # Dielectron selection (Control Region CR1A)
-        self.hCR1A_EEsel_minIxy = r.TH1F('hCR1A_EEsel_minIxy_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 20)
-        self.hCR1A_EEsel_invMass = r.TH1F('hCR1A_EEsel_invMass_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 500)
-        self.hCR1A_EEsel_Chi2 = r.TH1F('hCR1A_EEsel_Chi2_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 20, 0, 20)
-        self.hCR1A_EEsel_dPhi = r.TH1F('hCR1A_EEsel_dPhi_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, math.pi)
-        self.hCR1A_EEsel_leadingPt = r.TH1F('hCR1A_EEsel_leadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        self.hCR1A_EEsel_subleadingPt = r.TH1F('hCR1A_EEsel_subleadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 700)
-        self.hCR1A_EEsel_Ptll = r.TH1F('hCR1A_EEsel_Ptll_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        
-        # Dimuon selection (Control Region CR1A)
-        self.hCR1A_MMsel_minIxy = r.TH1F('hCR1A_MMsel_minIxy_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 20)
-        self.hCR1A_MMsel_invMass = r.TH1F('hCR1A_MMsel_invMass_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 500)
-        self.hCR1A_MMsel_Chi2 = r.TH1F('hCR1A_MMsel_Chi2_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 20, 0, 20)
-        self.hCR1A_MMsel_dPhi = r.TH1F('hCR1A_MMsel_dPhi_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, math.pi)
-        self.hCR1A_MMsel_leadingPt = r.TH1F('hCR1A_MMsel_leadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        self.hCR1A_MMsel_subleadingPt = r.TH1F('hCR1A_MMsel_subleadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 700)
-        self.hCR1A_MMsel_Ptll = r.TH1F('hCR1A_MMsel_Ptll_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        self.hCR1A_MMsel_cosAlpha = r.TH1F('hCR1A_MMsel_cosAlpha_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 22, -1.1, 1.1)
-
-        # Dielectron selection (Control Region CR1B)
-        self.hCR1B_EEsel_minIxy = r.TH1F('hCR1B_EEsel_minIxy_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 20)
-        self.hCR1B_EEsel_invMass = r.TH1F('hCR1B_EEsel_invMass_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 500)
-        self.hCR1B_EEsel_Chi2 = r.TH1F('hCR1B_EEsel_Chi2_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 20, 0, 20)
-        self.hCR1B_EEsel_dPhi = r.TH1F('hCR1B_EEsel_dPhi_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, math.pi)
-        self.hCR1B_EEsel_leadingPt = r.TH1F('hCR1B_EEsel_leadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        self.hCR1B_EEsel_subleadingPt = r.TH1F('hCR1B_EEsel_subleadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 700)
-        self.hCR1B_EEsel_Ptll = r.TH1F('hCR1B_EEsel_Ptll_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        
-        # Dimuon selection (Control Region CR1B)
-        self.hCR1B_MMsel_minIxy = r.TH1F('hCR1B_MMsel_minIxy_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 20)
-        self.hCR1B_MMsel_invMass = r.TH1F('hCR1B_MMsel_invMass_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 500)
-        self.hCR1B_MMsel_Chi2 = r.TH1F('hCR1B_MMsel_Chi2_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 20, 0, 20)
-        self.hCR1B_MMsel_dPhi = r.TH1F('hCR1B_MMsel_dPhi_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, math.pi)
-        self.hCR1B_MMsel_leadingPt = r.TH1F('hCR1B_MMsel_leadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        self.hCR1B_MMsel_subleadingPt = r.TH1F('hCR1B_MMsel_subleadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 700)
-        self.hCR1B_MMsel_Ptll = r.TH1F('hCR1B_MMsel_Ptll_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        self.hCR1B_MMsel_cosAlpha = r.TH1F('hCR1B_MMsel_cosAlpha_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 22, -1.1, 1.1)
-
-        # Dielectron selection (Control Region CR2)
-        self.hCR2_EEsel_minIxy = r.TH1F('hCR2_EEsel_minIxy_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 20)
-        self.hCR2_EEsel_invMass = r.TH1F('hCR2_EEsel_invMass_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 500)
-        self.hCR2_EEsel_Chi2 = r.TH1F('hCR2_EEsel_Chi2_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 20, 0, 20)
-        self.hCR2_EEsel_dPhi = r.TH1F('hCR2_EEsel_dPhi_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, math.pi)
-        self.hCR2_EEsel_leadingPt = r.TH1F('hCR2_EEsel_leadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        self.hCR2_EEsel_subleadingPt = r.TH1F('hCR2_EEsel_subleadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 700)
-        self.hCR2_EEsel_Ptll = r.TH1F('hCR2_EEsel_Ptll_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        
-        # Dimuon selection (Control Region CR2)
-        self.hCR2_MMsel_minIxy = r.TH1F('hCR2_MMsel_minIxy_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 20)
-        self.hCR2_MMsel_invMass = r.TH1F('hCR2_MMsel_invMass_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 50, 0, 500)
-        self.hCR2_MMsel_Chi2 = r.TH1F('hCR2_MMsel_Chi2_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 20, 0, 20)
-        self.hCR2_MMsel_dPhi = r.TH1F('hCR2_MMsel_dPhi_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, math.pi)
-        self.hCR2_MMsel_leadingPt = r.TH1F('hCR2_MMsel_leadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        self.hCR2_MMsel_subleadingPt = r.TH1F('hCR2_MMsel_subleadingPt_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 700)
-        self.hCR2_MMsel_Ptll = r.TH1F('hCR2_MMsel_Ptll_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 1000)
-        self.hCR2_MMsel_cosAlpha = r.TH1F('hCR2_MMsel_cosAlpha_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 22, -1.1, 1.1)
-
-
-        ############## -> Signal free (SiF) histograms
-        self.hSR_SiF_EEsel_minIxy = r.TH1F('hSR_SiF_EEsel_minIxy_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 20)
-        self.hSR_SiF_MMsel_minIxy = r.TH1F('hSR_SiF_MMsel_minIxy_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 20)
-        self.hCR_SiF_EEsel_minIxy = r.TH1F('hCR_SiF_EEsel_minIxy_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 20)
-        self.hCR_SiF_MMsel_minIxy = r.TH1F('hCR_SiF_MMsel_minIxy_{0}_{1}_{2}'.format(treename, blockname, samplename), '', 40, 0, 20)
+        ###########################
+        ###  DiMuon Histograms  ###
+        ###########################
+        self.hMM_dPhi = r.TH1F('hMM_dPhi_{0}_{1}_{2}_{3}'.format(treename, blockname, samplename, str(samplenumber)), '', 20, -3.3, 3.3)
 
 
         for attr, value in self.__dict__.iteritems():
@@ -139,7 +43,6 @@ class processHandler:
     def processEvent(self, ev, lumiweight, isData):
 
         if not isData:
-            #weight = lumiweight
             weight = lumiweight*ev.wPU
         else: 
             weight = 1
@@ -147,236 +50,6 @@ class processHandler:
         #### Generation variables
 
         self.hcounts.Fill(0, weight)
-
-        if (ev.nGenLepton == 4):
-
-            ## Pair indentification
-            gPair = [[], []] 
-
-            for i in range(0, ev.nGenLepton):
-                gPair[ev.GenLeptonSel_motherIdx[i]].append(i)
-
-
-            ## cos(alpha) studies
-            for p in range(0, len(gPair)):
-                if abs(ev.GenLeptonSel_pdgId[gPair[p][0]]) == 13:
-                    m0 = TVector3()
-                    m1 = TVector3()
-                    m0.SetPtEtaPhi(ev.GenLeptonSel_pt[gPair[p][0]], ev.GenLeptonSel_eta[gPair[p][0]], ev.GenLeptonSel_phi[gPair[p][0]])
-                    m1.SetPtEtaPhi(ev.GenLeptonSel_pt[gPair[p][1]], ev.GenLeptonSel_eta[gPair[p][1]], ev.GenLeptonSel_phi[gPair[p][1]])
- 
-                    self.hgenMM_cosAlpha.Fill(math.cos(m0.Angle(m1)), weight)
-
-
-
-        #### Dielectron channel
-        if ev.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15 and not ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 and ev.nElectronCandidate > 1:            
-
-            # Single electron histograms
-            ei = list(range(0, ev.nElectronCandidate))
-            ei = sorted(ei, reverse=True, key=lambda x: ev.ElectronCandidate_pt[x]) # sort electrons by p
-            self.hE1_pt.Fill(ev.ElectronCandidate_pt[ei[0]])
-            self.hE2_pt.Fill(ev.ElectronCandidate_pt[ei[1]])
-            self.hE1_et.Fill(ev.ElectronCandidate_et[ei[0]])
-            self.hE2_et.Fill(ev.ElectronCandidate_et[ei[1]])
-            self.hE1_eta.Fill(ev.ElectronCandidate_eta[ei[0]])
-            self.hE2_eta.Fill(ev.ElectronCandidate_eta[ei[1]])
-            self.hE1_reliso.Fill(ev.IsoTrackSel_relPfIsolationDR03[ev.ElectronCandidate_isotrackIdx[ei[0]]])
-            self.hE2_reliso.Fill(ev.IsoTrackSel_relPfIsolationDR03[ev.ElectronCandidate_isotrackIdx[ei[1]]])
-
-
-
-            
-            # Dielectron candidates
-
-            self.hnEE.Fill(ev.nEE, weight)
-
-            maxIxy = -1
-            maxIxyi = -99
-
-            for ee in range(0, ev.nEE):
-
-                if abs(ev.ElectronCandidate_eta[ev.EE_idxA[ee]]) > 1.4442: continue
-                if abs(ev.ElectronCandidate_eta[ev.EE_idxB[ee]]) > 1.4442: continue
-                if ev.EE_relisoA[ee] > 0.1 or ev.EE_relisoB[ee] > 0.1: continue
-                if ev.EE_normalizedChi2[ee] > 10: continue
-                if ev.EE_leadingPt[ee] < 41: continue
-                if ev.EE_subleadingPt[ee] < 24: continue
-                if ev.EE_leadingEt[ee] < 45: continue
-                if ev.EE_subleadingEt[ee] < 28: continue
-                if ev.EE_invMass[ee] < 15: continue
-                #if abs(ev.EE_dPhi[ee]) > math.pi/2.0: continue
-
-                IxyA = ev.ElectronCandidate_dxySignificance[ev.EE_idxA[ee]]
-                IxyB = ev.ElectronCandidate_dxySignificance[ev.EE_idxB[ee]]
-
-                mIxy = IxyA if IxyA < IxyB else IxyB
-
-
-                if mIxy > maxIxy:
-                    maxIxy = mIxy
-                    maxIxyi = ee
-
-            if maxIxyi > -1: 
-
-                eA = TLorentzVector()
-                eB = TLorentzVector()
-                eA.SetPtEtaPhiM(ev.ElectronCandidate_pt[ev.EE_idxA[maxIxyi]], ev.ElectronCandidate_eta[ev.EE_idxA[maxIxyi]], ev.ElectronCandidate_phi[ev.EE_idxA[maxIxyi]], 510E-6)
-                eB.SetPtEtaPhiM(ev.ElectronCandidate_pt[ev.EE_idxB[maxIxyi]], ev.ElectronCandidate_eta[ev.EE_idxB[maxIxyi]], ev.ElectronCandidate_phi[ev.EE_idxB[maxIxyi]], 510E-6)
-
-                if abs(ev.EE_dPhi[maxIxyi]) < math.pi/2.0:
-
-                    if maxIxy > 5:
-                        self.hSR_EEsel_minIxy.Fill(maxIxy, weight)
-                        self.hSR_EEsel_invMass.Fill(ev.EE_invMass[maxIxyi], weight)
-                        self.hSR_EEsel_dPhi.Fill(ev.EE_dPhi[maxIxyi], weight)
-                        self.hSR_EEsel_leadingPt.Fill(ev.EE_leadingPt[maxIxyi], weight)
-                        self.hSR_EEsel_subleadingPt.Fill(ev.EE_subleadingPt[maxIxyi], weight)
-                        self.hSR_EEsel_Chi2.Fill(ev.EE_normalizedChi2[maxIxyi], weight)
-                        self.hSR_EEsel_Ptll.Fill((eA+eB).Pt(), weight)
-                    if maxIxy < 5:
-                        self.hCR2_EEsel_minIxy.Fill(maxIxy, weight)
-                        self.hCR2_EEsel_invMass.Fill(ev.EE_invMass[maxIxyi], weight)
-                        self.hCR2_EEsel_dPhi.Fill(ev.EE_dPhi[maxIxyi], weight)
-                        self.hCR2_EEsel_leadingPt.Fill(ev.EE_leadingPt[maxIxyi], weight)
-                        self.hCR2_EEsel_subleadingPt.Fill(ev.EE_subleadingPt[maxIxyi], weight)
-                        self.hCR2_EEsel_Chi2.Fill(ev.EE_normalizedChi2[maxIxyi], weight)
-                        self.hCR2_EEsel_Ptll.Fill((eA+eB).Pt(), weight)
-
-                    if maxIxy < 5:
-                        self.hSR_SiF_EEsel_minIxy.Fill(maxIxy, weight)
-
-
-
-                if abs(ev.EE_dPhi[maxIxyi]) > math.pi/2.0:
-
-                    if maxIxy > 5:
-                        self.hCR1B_EEsel_minIxy.Fill(maxIxy, weight)
-                        self.hCR1B_EEsel_invMass.Fill(ev.EE_invMass[maxIxyi], weight)
-                        self.hCR1B_EEsel_dPhi.Fill(ev.EE_dPhi[maxIxyi], weight)
-                        self.hCR1B_EEsel_leadingPt.Fill(ev.EE_leadingPt[maxIxyi], weight)
-                        self.hCR1B_EEsel_subleadingPt.Fill(ev.EE_subleadingPt[maxIxyi], weight)
-                        self.hCR1B_EEsel_Chi2.Fill(ev.EE_normalizedChi2[maxIxyi], weight)
-                        self.hCR1B_EEsel_Ptll.Fill((eA+eB).Pt(), weight)
-                    if maxIxy < 5:
-                        self.hCR1A_EEsel_minIxy.Fill(maxIxy, weight)
-                        self.hCR1A_EEsel_invMass.Fill(ev.EE_invMass[maxIxyi], weight)
-                        self.hCR1A_EEsel_dPhi.Fill(ev.EE_dPhi[maxIxyi], weight)
-                        self.hCR1A_EEsel_leadingPt.Fill(ev.EE_leadingPt[maxIxyi], weight)
-                        self.hCR1A_EEsel_subleadingPt.Fill(ev.EE_subleadingPt[maxIxyi], weight)
-                        self.hCR1A_EEsel_Chi2.Fill(ev.EE_normalizedChi2[maxIxyi], weight)
-                        self.hCR1A_EEsel_Ptll.Fill((eA+eB).Pt(), weight)
-
-                    if maxIxy < 6:
-                        self.hCR_SiF_EEsel_minIxy.Fill(maxIxy, weight)
-
-
-        #### Dimuon channel
-        if ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 and ev.nMuonCandidate > 1:
-
-            # Single dimuon histograms
-            mi = list(range(0, ev.nMuonCandidate))
-            mi = sorted(mi, reverse=True, key=lambda x: ev.MuonCandidate_pt[x]) # sort muons by p
-            self.hM1_pt.Fill(ev.MuonCandidate_pt[mi[0]])
-            self.hM2_pt.Fill(ev.MuonCandidate_pt[mi[1]])
-            self.hM1_triggerPt.Fill(ev.MuonCandidate_triggerPt[mi[0]])
-            self.hM2_triggerPt.Fill(ev.MuonCandidate_triggerPt[mi[1]])
-            self.hM1_eta.Fill(ev.MuonCandidate_eta[mi[0]])
-            self.hM2_eta.Fill(ev.MuonCandidate_eta[mi[1]])
-            self.hM1_reliso.Fill(ev.IsoTrackSel_relPfIsolationDR03[ev.MuonCandidate_isotrackIdx[mi[0]]])
-            self.hM2_reliso.Fill(ev.IsoTrackSel_relPfIsolationDR03[ev.MuonCandidate_isotrackIdx[mi[1]]])
-
-            
-            # Dimuon histograms
-            self.hnMM.Fill(ev.nMM, weight)
-
-            maxIxy = -1
-            maxIxyi = -99
-
-            for mm in range(0, ev.nMM):
-
-                if abs(ev.MuonCandidate_eta[ev.MM_idxA[mm]]) > 2: continue
-                if abs(ev.MuonCandidate_eta[ev.MM_idxB[mm]]) > 2: continue
-                if ev.MM_relisoA[mm] > 0.1 or ev.MM_relisoB[mm] > 0.1: continue
-                if ev.MM_normalizedChi2[mm] > 5: continue
-                if ev.MM_leadingPt[mm] < 31: continue
-                if ev.MM_subleadingPt[mm] < 31: continue
-                if ev.MM_invMass[mm] < 15: continue
-                if ev.MM_cosAlpha[mm] < -0.79: continue
-                if ev.IsoTrackSel_charge[ev.MuonCandidate_isotrackIdx[ev.MM_idxA[mm]]]*ev.IsoTrackSel_charge[ev.MuonCandidate_isotrackIdx[ev.MM_idxB[mm]]] > 1: continue
-                
-                va = r.TVector3()
-                vb = r.TVector3()
-                va.SetPtEtaPhi(ev.MuonCandidate_pt[ev.MM_idxA[mm]], ev.MuonCandidate_eta[ev.MM_idxA[mm]], ev.MuonCandidate_phi[ev.MM_idxA[mm]])
-                vb.SetPtEtaPhi(ev.MuonCandidate_pt[ev.MM_idxB[mm]], ev.MuonCandidate_eta[ev.MM_idxB[mm]], ev.MuonCandidate_phi[ev.MM_idxB[mm]])
-                if va.DeltaR(vb) < 0.2: continue
-
-                IxyA = ev.MuonCandidate_dxySignificance[ev.MM_idxA[mm]]
-                IxyB = ev.MuonCandidate_dxySignificance[ev.MM_idxB[mm]]
-
-                mIxy = IxyA if IxyA < IxyB else IxyB
-
-
-                if mIxy > maxIxy:
-                    maxIxy = mIxy
-                    maxIxyi = mm
-
-            if maxIxyi > -1: 
-
-                mA = TLorentzVector()
-                mB = TLorentzVector()
-                mA.SetPtEtaPhiM(ev.MuonCandidate_pt[ev.MM_idxA[maxIxyi]], ev.MuonCandidate_eta[ev.MM_idxA[maxIxyi]], ev.MuonCandidate_phi[ev.MM_idxA[maxIxyi]], 510E-6)
-                mB.SetPtEtaPhiM(ev.MuonCandidate_pt[ev.MM_idxB[maxIxyi]], ev.MuonCandidate_eta[ev.MM_idxB[maxIxyi]], ev.MuonCandidate_phi[ev.MM_idxB[maxIxyi]], 510E-6)
-   
-
-                if abs(ev.MM_dPhi[maxIxyi]) < math.pi/2.0: 
-
-                    if maxIxy > 3.5:
-                        self.hSR_MMsel_minIxy.Fill(maxIxy, weight)
-                        self.hSR_MMsel_invMass.Fill(ev.MM_invMass[maxIxyi], weight)
-                        self.hSR_MMsel_dPhi.Fill(ev.MM_dPhi[maxIxyi], weight)
-                        self.hSR_MMsel_leadingPt.Fill(ev.MM_leadingPt[maxIxyi], weight)
-                        self.hSR_MMsel_subleadingPt.Fill(ev.MM_subleadingPt[maxIxyi], weight)
-                        self.hSR_MMsel_Chi2.Fill(ev.MM_normalizedChi2[maxIxyi], weight)
-                        self.hSR_MMsel_cosAlpha.Fill(ev.MM_cosAlpha[maxIxyi], weight)
-                        self.hSR_MMsel_Ptll.Fill((mA+mB).Pt(), weight)
-                    if maxIxy < 3.5:
-                        self.hCR2_MMsel_minIxy.Fill(maxIxy, weight)
-                        self.hCR2_MMsel_invMass.Fill(ev.MM_invMass[maxIxyi], weight)
-                        self.hCR2_MMsel_dPhi.Fill(ev.MM_dPhi[maxIxyi], weight)
-                        self.hCR2_MMsel_leadingPt.Fill(ev.MM_leadingPt[maxIxyi], weight)
-                        self.hCR2_MMsel_subleadingPt.Fill(ev.MM_subleadingPt[maxIxyi], weight)
-                        self.hCR2_MMsel_Chi2.Fill(ev.MM_normalizedChi2[maxIxyi], weight)
-                        self.hCR2_MMsel_cosAlpha.Fill(ev.MM_cosAlpha[maxIxyi], weight)
-                        self.hCR2_MMsel_Ptll.Fill((mA+mB).Pt(), weight)
-        
-                    if maxIxy < 4.5:
-                        self.hSR_SiF_MMsel_minIxy.Fill(maxIxy, weight)
-
-                if abs(ev.MM_dPhi[maxIxyi]) > math.pi/2.0: 
-
-                    if maxIxy > 3.5:
-                        self.hCR1B_MMsel_minIxy.Fill(maxIxy, weight)
-                        self.hCR1B_MMsel_invMass.Fill(ev.MM_invMass[maxIxyi], weight)
-                        self.hCR1B_MMsel_dPhi.Fill(ev.MM_dPhi[maxIxyi], weight)
-                        self.hCR1B_MMsel_leadingPt.Fill(ev.MM_leadingPt[maxIxyi], weight)
-                        self.hCR1B_MMsel_subleadingPt.Fill(ev.MM_subleadingPt[maxIxyi], weight)
-                        self.hCR1B_MMsel_Chi2.Fill(ev.MM_normalizedChi2[maxIxyi], weight)
-                        self.hCR1B_MMsel_cosAlpha.Fill(ev.MM_cosAlpha[maxIxyi], weight)
-                        self.hCR1B_MMsel_Ptll.Fill((mA+mB).Pt(), weight)
-                    if maxIxy < 3.5:
-                        self.hCR1A_MMsel_minIxy.Fill(maxIxy, weight)
-                        self.hCR1A_MMsel_invMass.Fill(ev.MM_invMass[maxIxyi], weight)
-                        self.hCR1A_MMsel_dPhi.Fill(ev.MM_dPhi[maxIxyi], weight)
-                        self.hCR1A_MMsel_leadingPt.Fill(ev.MM_leadingPt[maxIxyi], weight)
-                        self.hCR1A_MMsel_subleadingPt.Fill(ev.MM_subleadingPt[maxIxyi], weight)
-                        self.hCR1A_MMsel_Chi2.Fill(ev.MM_normalizedChi2[maxIxyi], weight)
-                        self.hCR1A_MMsel_cosAlpha.Fill(ev.MM_cosAlpha[maxIxyi], weight)
-                        self.hCR1A_MMsel_Ptll.Fill((mA+mB).Pt(), weight)
-
-                    if maxIxy < 4.5:
-                        self.hCR_SiF_MMsel_minIxy.Fill(maxIxy, weight)
-
 
         """ CUT EXAMPLE
         if eval(self.cutManager.twoElectrons):
@@ -387,10 +60,33 @@ class processHandler:
             self.hLL.Fill(ev.nEE)
             self.hLL.Fill(ev.nMM)
         """
+    def processDimuons(self, ev):
+
+        if not self.isdata:
+            weight = self.lumiweight*ev.wPU
+        else: 
+            weight = 1
+
+        if ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 and ev.nDMDMBase > 0:
+
+            self.hMM_dPhi.Fill(ev.DMDMBase_dPhi[ev.DMDMBase_maxIxy], weight)
+
 
     def Write(self):
     
-        output = r.TFile(self.fileName, 'UPDATE')
+        while True:
+            d = os.path.dirname(self.filename)
+            try:
+                if not os.path.exists(d): os.makedirs(d)
+                break
+            except OSError, e:
+                if e.errno != os.errno.EEXIST:
+                    raise
+                print("Sleeping...")
+                time.sleep(1.0)
+                pass
+
+        output = r.TFile(self.filename, 'RECREATE')
 
         for attr, value in self.__dict__.iteritems():
             if attr[0] == 'h': value.Write()
