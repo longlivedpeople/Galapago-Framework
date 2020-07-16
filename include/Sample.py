@@ -486,74 +486,124 @@ class Tree:
            process.Write()
 
 
-   def getLoopStack(self, name, var, xlabel):
-     
-     hs = THStack(name, "")
-     SetOwnership(hs, 0 ) 
+   def getTH1FsFromDir(self, inputdir):
 
-     _file = r.TFile(self.loopFile)
+     #
+     # Function to get the histo list available in a dir with root files
+     # by exploring the content of the first file.
+     #
+
+     absdir = inputdir if inputdir[-1] == '/' else inputdir + '/'
+
+     for _f in os.listdir(absdir):
+       if '.root' in _f:
+         file0 = absdir + _f
+         break
+
+     _tf = r.TFile(file0)
+
+     histos = []
+     for _key in _tf.GetListOfKeys():
+       key = _key.GetName()
+       ktype = str(type(_tf.Get(key)))
+       if 'TH1F' in ktype:
+         histos.append(key.split('__')[0])
+
+     print(histos)
+     return histos
+
+
+   def getLoopStack(self, inputdir, hname):
+     
+     ## Correct input dir absolute path:
+     inputdir = inputdir + '/' if inputdir[-1] != '/' else inputdir
+
+     ## Init Stacked histograms:
+     hstack = THStack(hname + "_stacked", "")
+     SetOwnership(hstack, 0)
 
      for b in self.blocks:
-
-       #print('> h'+var+'_'+self.name+'_'+b.name+'_'+b.samples[0].name)
-       hblock_aux = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+b.samples[0].name)
-       hblock_clone = hblock_aux.Clone()
-       hblock = copy.deepcopy(hblock_clone)
-       hblock.SetTitle(b.label)
-       SetOwnership(hblock, 0)
-       xmin = hblock.GetXaxis().GetXmin()
-       xmax = hblock.GetXaxis().GetXmax()
-       nbin = hblock.GetXaxis().GetNbins()
-       hblock.SetFillColor(b.color) 
  
        for si,s in enumerate(b.samples):
   
-         hsample = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
-         #print('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
+         ## Init Sample histogram:
+         _f0 = r.TFile(inputdir + '{0}__{1}__{2}__0.root'.format(self.name, b.name, s.name))
+         hsample = copy.deepcopy(_f0.Get(hname + '__{0}__{1}__{2}__0'.format(self.name, b.name, s.name)))
+         _f0.Close()
 
-         if si == 0: 
-             continue
-         else:
-             hblock.Add(hsample)
+         ## Constuct Sample histogram:
+         for t in range(0, len(s.ttrees)):
+           if t == 0: continue
+           _ft = r.TFile(inputdir + '{0}__{1}__{2}__{3}.root'.format(self.name, b.name, s.name, str(t)))
+           _haux = _ft.Get(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
+           _h = _haux.Clone()
+           hsample.Add(_h)
+           _ft.Close()
 
-       hs.Add(hblock)
+         ## Add sample histogram to block histogram:
+         if not si: 
+           hblock = hsample.Clone()
+           SetOwnership(hblock, 0)
+           hblock.SetFillColor(b.color)
+           hblock.SetLineColor(r.kBlack)
+         else: 
+           hblock.Add(hsample)
+
+       ## Add block histogram to stack histogram:
+       hstack.Add(hblock)
 
 
-     can_aux = TCanvas("can_%s_%s"%(name, b.name))
+     can_aux = TCanvas("can_{0}".format(hname))
      can_aux.cd()
-     hs.Draw()
+     hstack.Draw('')
 
+     ## Get some values:
+     xmin = float(hstack.GetXaxis().GetXmin())
+     xmax = float(hstack.GetXaxis().GetXmax())
+     nbin = hstack.GetXaxis().GetNbins()
+
+     ## Correct y axis
      ylabel = "Events"
-     if xmax != xmin:
-       hs.GetXaxis().SetTitle(xlabel)
-       b = int((xmax-xmin)/nbin)
-       ylabel = "Events / " + str(b) + " units"
-     else:     
-       ylabel = "Events"
+     b = (xmax-xmin)/float(nbin)
+     ylabel = "Events / " + "{:.2f}".format(b) + " units"
+     hstack.GetYaxis().SetTitle(ylabel)
+
+     return hstack 
+
    
-     hs.GetYaxis().SetTitle(ylabel)
-     _file.Close()
-     return hs   
-
-
-   def getLoopTH1F(self, name, var, xlabel):
+   def getLoopTH1F(self, inputdir, hname):
      
-     _file = r.TFile(self.loopFile)
+     ## Correct input dir absolute path:
+     inputdir = inputdir + '/' if inputdir[-1] != '/' else inputdir
 
-     for bi,b in enumerate(self.blocks):
-       for si,s in enumerate(b.samples):
-         AuxName = "auxh1_block_" + name + "_" + b.name + s.name
-         haux = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
-         print('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
-         if not bi and not si:
-           h = haux.Clone(name+'_treeHisto')
-           h.SetTitle(s.label)
-         else:
-           h.Add(haux)
-         del haux
+     ## Init histogram:
+     _f0 = r.TFile(inputdir + '{0}__{1}__{2}__0.root'.format(self.name, self.blocks[0].name, self.blocks[0].samples[0].name))
+     hth1f = copy.deepcopy(_f0.Get(hname + '__{0}__{1}__{2}__0'.format(self.name, self.blocks[0].name, self.blocks[0].samples[0].name)))
+     _f0.Close()
+     SetOwnership(hth1f, 0)
 
-     h2 = copy.deepcopy(h)
-     h2.GetXaxis().SetTitle(xlabel)
-     return h2
+     ## Loop over files:
+     for _b,b in enumerate(self.blocks):
+       for _s,s in enumerate(b.samples):
+         for t in range(0, len(s.ttrees)):
+           if t == 0 and _s == 0 and _b == 0: continue
+           _ft = r.TFile(inputdir + '{0}__{1}__{2}__{3}.root'.format(self.name, b.name, s.name, str(t)))
+           _haux = _ft.Get(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
+           _h = _haux.Clone()
+           hth1f.Add(_h)
+           _ft.Close()
+
+     ## Get some values:
+     xmin = float(hth1f.GetXaxis().GetXmin())
+     xmax = float(hth1f.GetXaxis().GetXmax())
+     nbin = hth1f.GetXaxis().GetNbins()
+
+     ## Correct y axis
+     ylabel = "Events"
+     b = (xmax-xmin)/float(nbin)
+     ylabel = "Events / " + "{:.2f}".format(b) + " units"
+     hth1f.GetYaxis().SetTitle(ylabel)
+
+     return hth1f
 
 

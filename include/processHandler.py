@@ -18,7 +18,7 @@ class processHandler:
 
         self.outdir = outdir
         if self.outdir[-1] != '/': self.outdir = self.outdir + '/' 
-        self.filename = self.outdir + '{0}_{1}_{2}_{3}.root'.format(treename, blockname, samplename, str(samplenumber))
+        self.filename = self.outdir + '{0}__{1}__{2}__{3}.root'.format(treename, blockname, samplename, str(samplenumber))
         self.treename = treename
         self.blockname = blockname
         self.samplename = samplename
@@ -27,12 +27,12 @@ class processHandler:
         self.isdata = isdata
         self.cutManager = CutManager.CutManager()
 
-        self.hcounts = r.TH1F('hcounts_{0}_{1}_{2}'.format(treename, blockname, samplename, str(samplenumber)), '', 1, 0, 1)
+        self.hcounts = r.TH1F('hcounts__{0}__{1}__{2}'.format(treename, blockname, samplename, str(samplenumber)), '', 1, 0, 1)
 
         ###########################
         ###  DiMuon Histograms  ###
         ###########################
-        self.hMM_dPhi = r.TH1F('hMM_dPhi_{0}_{1}_{2}_{3}'.format(treename, blockname, samplename, str(samplenumber)), '', 20, -3.3, 3.3)
+        self.hMM_dPhi = r.TH1F('hMM_dPhi__{0}__{1}__{2}__{3}'.format(treename, blockname, samplename, str(samplenumber)), '', 20, -3.3, 3.3)
 
 
         for attr, value in self.__dict__.iteritems():
