@@ -37,8 +37,10 @@ class CutManager:
       self.MMSR_dPhi = self.brackets('fabs(DMDMBase_dPhi[DMDMBase_maxIxy])< 3.14/2.0')
       self.MMCR_dPhi = self.brackets('fabs(DMDMBase_dPhi[DMDMBase_maxIxy])> 3.14/2.0')
       self.MM_highpT = self.brackets('DMDMBase_leadingPt[DMDMBase_maxIxy] > 40 && DMDMBase_subleadingPt[DMDMBase_maxIxy] > 40')
-      self.MMCR_charge = self.brackets('DGM_charge[DMDMBase_idxA[DMDMBase_maxIxy]]*DGM_charge[DMDMBase_idxB[DMDMBase_maxIxy]] > 0')
+      self.MM_SScharge = self.brackets('DGM_charge[DMDMBase_idxA[DMDMBase_maxIxy]]*DGM_charge[DMDMBase_idxB[DMDMBase_maxIxy]] > 0')
       self.MM_OScharge = self.brackets('DGM_charge[DMDMBase_idxA[DMDMBase_maxIxy]]*DGM_charge[DMDMBase_idxB[DMDMBase_maxIxy]] < 0')
+      self.LoopMM_SScharge = self.brackets('ev.DGM_charge[ev.DMDMBase_idxA[ev.DMDMBase_maxIxy]]*ev.DGM_charge[ev.DMDMBase_idxB[ev.DMDMBase_maxIxy]] > 0')
+      self.LoopMM_OScharge = self.brackets('ev.DGM_charge[ev.DMDMBase_idxA[ev.DMDMBase_maxIxy]]*ev.DGM_charge[ev.DMDMBase_idxB[ev.DMDMBase_maxIxy]] < 0')
       self.cosmicRejection = self.brackets('DMDMBase_cosAlpha[DMDMBase_maxIxy] > -0.80')
 
    def donotB(self, cut):

@@ -480,7 +480,10 @@ class Tree:
        for s in b.samples:
          print("Reading samples: " + s.name)
          for t,ttree in enumerate(s.ttrees):
-           process = processHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, s.isData)
+           if s.isData:
+               process = processHandler(outdir, self.name, b.name, s.name, t, 1, True)
+           else:
+               process = processHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False)
            for n,ev in enumerate(ttree):
                process.processDimuons(ev)
            process.Write()
@@ -513,7 +516,7 @@ class Tree:
      return histos
 
 
-   def getLoopStack(self, inputdir, hname):
+   def getLoopStack(self, inputdir, hname, doOF = True):
      
      ## Correct input dir absolute path:
      inputdir = inputdir + '/' if inputdir[-1] != '/' else inputdir
@@ -529,6 +532,7 @@ class Tree:
          ## Init Sample histogram:
          _f0 = r.TFile(inputdir + '{0}__{1}__{2}__0.root'.format(self.name, b.name, s.name))
          hsample = copy.deepcopy(_f0.Get(hname + '__{0}__{1}__{2}__0'.format(self.name, b.name, s.name)))
+         if doOF: hsample.SetBinContent(hsample.GetNbinsX(), hsample.GetBinContent(hsample.GetNbinsX()) + hsample.GetBinContent(hsample.GetNbinsX() + 1) )
          _f0.Close()
 
          ## Constuct Sample histogram:
@@ -537,12 +541,14 @@ class Tree:
            _ft = r.TFile(inputdir + '{0}__{1}__{2}__{3}.root'.format(self.name, b.name, s.name, str(t)))
            _haux = _ft.Get(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
            _h = _haux.Clone()
+           if doOF: _h.SetBinContent(_h.GetNbinsX(), _h.GetBinContent(_h.GetNbinsX()) + _h.GetBinContent(_h.GetNbinsX() + 1) )
            hsample.Add(_h)
            _ft.Close()
 
          ## Add sample histogram to block histogram:
          if not si: 
            hblock = hsample.Clone()
+           hblock.SetTitle(b.label)
            SetOwnership(hblock, 0)
            hblock.SetFillColor(b.color)
            hblock.SetLineColor(r.kBlack)
@@ -567,11 +573,12 @@ class Tree:
      b = (xmax-xmin)/float(nbin)
      ylabel = "Events / " + "{:.2f}".format(b) + " units"
      hstack.GetYaxis().SetTitle(ylabel)
+     hstack.GetXaxis().SetTitle(hsample.GetXaxis().GetTitle())
 
      return hstack 
 
    
-   def getLoopTH1F(self, inputdir, hname):
+   def getLoopTH1F(self, inputdir, hname, doOF = True):
      
      ## Correct input dir absolute path:
      inputdir = inputdir + '/' if inputdir[-1] != '/' else inputdir
@@ -579,6 +586,7 @@ class Tree:
      ## Init histogram:
      _f0 = r.TFile(inputdir + '{0}__{1}__{2}__0.root'.format(self.name, self.blocks[0].name, self.blocks[0].samples[0].name))
      hth1f = copy.deepcopy(_f0.Get(hname + '__{0}__{1}__{2}__0'.format(self.name, self.blocks[0].name, self.blocks[0].samples[0].name)))
+     if doOF: hth1f.SetBinContent(hth1f.GetNbinsX(), hth1f.GetBinContent(hth1f.GetNbinsX()) + hth1f.GetBinContent(hth1f.GetNbinsX() + 1) )
      _f0.Close()
      SetOwnership(hth1f, 0)
 
@@ -590,6 +598,7 @@ class Tree:
            _ft = r.TFile(inputdir + '{0}__{1}__{2}__{3}.root'.format(self.name, b.name, s.name, str(t)))
            _haux = _ft.Get(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
            _h = _haux.Clone()
+           if doOF: _h.SetBinContent(_h.GetNbinsX(), hth1f.GetBinContent(_h.GetNbinsX()) + _h.GetBinContent(_h.GetNbinsX() + 1) )
            hth1f.Add(_h)
            _ft.Close()
 
