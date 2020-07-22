@@ -83,6 +83,7 @@ from ROOT import TTree, TFile, TCut, TH1F, TH2F, TH3F, THStack, TCanvas, SetOwne
 from include.processHandler import processHandler
 import copy
 import os
+import __main__
 
 ########################################################################################
 ########################################################################################
@@ -475,6 +476,13 @@ class Tree:
 
 
    def Loop(self, lumi, outdir):
+
+     #
+     # Runs a loop over all the events of the trees, of the samples, of the blocks 
+     # declared in the Tree, filling the histograms defined in include/processHandler.py
+     # and saving them in a file
+     #
+
         
      for b in self.blocks:
        for s in b.samples:
@@ -487,6 +495,83 @@ class Tree:
            for n,ev in enumerate(ttree):
                process.processDimuons(ev)
            process.Write()
+
+
+   def launchLoop(self, lumi, outdir, queue = 'espresso'):
+
+     #
+     # Launches Loop function in CONDOR
+     # TTree <------> Job
+     #
+
+     outdir = outdir + '/' if outdir[-1] != '/' else outdir # outdir correction
+
+     # Get absdir:
+     absdir = ''
+     for _p,path in enumerate(os.path.abspath(__main__.__file__).split('/')):
+       if _p == len(os.path.abspath(__main__.__file__).split('/')) - 1: break
+       absdir += path + '/'
+
+     # Get command to launch:
+     command = 'python {0}runLoop.py -f {1} -o {2} -n {3} -b {4} -s {5} -t {6} -l {7} '
+
+     # Get cmssw release:
+     cmssw = ''
+     for level in absdir.split('/'):
+            cmssw += level + '/'
+            if 'CMSSW' in level:
+                cmssw += 'src'
+                break
+
+     # Get bash file template:
+     bashfile = """#!/bin/bash
+pushd {0}
+eval `scramv1 runtime -sh`
+pushd
+{1}""".format(cmssw, '{0}')
+
+     # Get condor submission file template:
+     subfile = """
+universe                = vanilla
+executable              = $(filename)
+output                  = {1}.out
+error                   = {1}.err
+log                     = {1}.log
+Notify_user             = fernance@cern.ch
++JobFlavour = "{0}" 
+queue filename matching {2}
+""".format(queue, '{0}', '{1}')
+
+     for b in self.blocks:
+       for s in b.samples:
+         for t,ttree in enumerate(s.ttrees):
+
+           if s.isData:
+               scommand = command.format(absdir, s.ftpaths[t], outdir, self.name, b.name, s.name, str(t), str(1.0))
+               scommand += '-d'
+           else:
+               scommand = command.format(absdir, s.ftpaths[t], outdir, self.name, b.name, s.name, str(t), str(lumi*s.lumWeight))
+
+           #print(scommand)
+
+           ## Bash file
+           _bashname = absdir + 'bash/' + 'bash_{0}_{1}_{2}_{3}.sh'.format(self.name, b.name, s.name, str(t))
+           _bashfile = open(_bashname, 'w')
+           _bashfile.write(bashfile.format(scommand))
+           _bashfile.close()
+
+           ## Submission file
+           _subname = absdir + 'sub_{0}_{1}_{2}_{3}.sh'.format(self.name, b.name, s.name, str(t))
+           _subfile = open(_subname, 'w')
+           _subtext = subfile.format(outdir + '{0}_{1}_{2}_{3}'.format(self.name, b.name, s.name, str(t)), _bashname)
+           _subfile.write(_subtext)
+           _subfile.close()
+
+           ## Launch and clear
+           os.system('chmod +x ' + _bashname)
+           os.system('chmod +x ' + _subname)
+           os.system('condor_submit ' + _subname)
+           os.system('rm ' + _subname)
 
 
    def getTH1FsFromDir(self, inputdir):
