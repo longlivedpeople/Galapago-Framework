@@ -397,6 +397,7 @@ class Canvas:
       for latex in self.latexs:
           lat = TLatex()
           lat.SetNDC()
+          lat.SetTextAlign(latex[-1])
           lat.SetTextSize(latex[-2])
           lat.SetTextFont(latex[-3])
           lat.DrawLatex(latex[0], latex[1], latex[2])

@@ -61,16 +61,45 @@ class processHandler:
 
 
 
-    def processEvent(self, ev, lumiweight, isData):
+    def processEvent(self, ev):
 
-        if not isData:
-            weight = lumiweight*ev.wPU
+        if not self.isdata:
+            weight = self.lumiweight*ev.wPU
         else: 
             weight = 1
 
         #### Generation variables
 
         self.hcounts.Fill(0, weight)
+
+
+        ###############################
+        ####   Dimuon histograms   ####
+        ###############################
+
+        if ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 and ev.nDMDMBase > 0:
+
+            if eval(self.cutManager.LoopMM_OScharge):
+
+                self.hMM_dPhi.Fill(ev.DMDMBase_dPhi[ev.DMDMBase_maxIxy], weight)
+                self.hMM_mass.Fill(ev.DMDMBase_mass[ev.DMDMBase_maxIxy], weight)
+                self.hMM_trackIxy.Fill(ev.DMDMBase_trackIxy[ev.DMDMBase_maxIxy], weight)
+                self.hMM_trackDxy.Fill(ev.DMDMBase_trackDxy[ev.DMDMBase_maxIxy], weight)
+                self.hMM_Lxy.Fill(ev.DMDMBase_Lxy[ev.DMDMBase_maxIxy], weight)
+                self.hMM_Ixy.Fill(ev.DMDMBase_Ixy[ev.DMDMBase_maxIxy], weight)
+                self.hMM_cosAlpha.Fill(ev.DMDMBase_cosAlpha[ev.DMDMBase_maxIxy], weight)
+
+
+
+            if self.isdata and eval(self.cutManager.LoopMM_SScharge):
+
+                self.hMM_dPhi_SS.Fill(ev.DMDMBase_dPhi[ev.DMDMBase_maxIxy], weight)
+                self.hMM_mass_SS.Fill(ev.DMDMBase_mass[ev.DMDMBase_maxIxy], weight)
+                self.hMM_trackIxy_SS.Fill(ev.DMDMBase_trackIxy[ev.DMDMBase_maxIxy], weight)
+                self.hMM_trackDxy_SS.Fill(ev.DMDMBase_trackDxy[ev.DMDMBase_maxIxy], weight)
+                self.hMM_Lxy_SS.Fill(ev.DMDMBase_Lxy[ev.DMDMBase_maxIxy], weight)
+                self.hMM_Ixy_SS.Fill(ev.DMDMBase_Ixy[ev.DMDMBase_maxIxy], weight)
+                self.hMM_cosAlpha_SS.Fill(ev.DMDMBase_cosAlpha[ev.DMDMBase_maxIxy], weight)
 
         """ CUT EXAMPLE
         if eval(self.cutManager.twoElectrons):
@@ -81,22 +110,7 @@ class processHandler:
             self.hLL.Fill(ev.nEE)
             self.hLL.Fill(ev.nMM)
         """
-    def processDimuons(self, ev):
 
-        if not self.isdata:
-            weight = self.lumiweight*ev.wPU
-        else: 
-            weight = 1
-
-        if ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 and ev.nDMDMBase > 0:
-
-            if eval(self.cutManager.LoopMM_OScharge):
-
-                self.hMM_dPhi.Fill(ev.DMDMBase_dPhi[ev.DMDMBase_maxIxy], weight)
-
-            if self.isdata and eval(self.cutManager.LoopMM_SScharge):
-
-                self.hMM_dPhi_SS.Fill(ev.DMDMBase_dPhi[ev.DMDMBase_maxIxy], weight)
 
 
     def Write(self):

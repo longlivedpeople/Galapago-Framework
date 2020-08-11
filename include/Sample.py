@@ -493,7 +493,7 @@ class Tree:
            else:
                process = processHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False)
            for n,ev in enumerate(ttree):
-               process.processDimuons(ev)
+               process.processEvent(ev)
            process.Write()
 
 
@@ -625,9 +625,14 @@ queue filename matching {2}
            if t == 0: continue
            _ft = r.TFile(inputdir + '{0}__{1}__{2}__{3}.root'.format(self.name, b.name, s.name, str(t)))
            _haux = _ft.Get(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
-           _h = _haux.Clone()
-           if doOF: _h.SetBinContent(_h.GetNbinsX(), _h.GetBinContent(_h.GetNbinsX()) + _h.GetBinContent(_h.GetNbinsX() + 1) )
-           hsample.Add(_h)
+
+           try:
+               _h = _haux.Clone()
+               if doOF: _h.SetBinContent(_h.GetNbinsX(), _h.GetBinContent(_h.GetNbinsX()) + _h.GetBinContent(_h.GetNbinsX() + 1) )
+               hsample.Add(_h)
+           except ReferenceError:
+               print(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)) + ' cannot be accesed: Skipping')
+               pass
            _ft.Close()
 
          ## Add sample histogram to block histogram:
@@ -682,8 +687,9 @@ queue filename matching {2}
            if t == 0 and _s == 0 and _b == 0: continue
            _ft = r.TFile(inputdir + '{0}__{1}__{2}__{3}.root'.format(self.name, b.name, s.name, str(t)))
            _haux = _ft.Get(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
+           print(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
            _h = _haux.Clone()
-           if doOF: _h.SetBinContent(_h.GetNbinsX(), hth1f.GetBinContent(_h.GetNbinsX()) + _h.GetBinContent(_h.GetNbinsX() + 1) )
+           if doOF: _h.SetBinContent(_h.GetNbinsX(), _h.GetBinContent(_h.GetNbinsX()) + _h.GetBinContent(_h.GetNbinsX() + 1) )
            hth1f.Add(_h)
            _ft.Close()
 
