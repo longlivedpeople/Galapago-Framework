@@ -687,10 +687,14 @@ queue filename matching {2}
            if t == 0 and _s == 0 and _b == 0: continue
            _ft = r.TFile(inputdir + '{0}__{1}__{2}__{3}.root'.format(self.name, b.name, s.name, str(t)))
            _haux = _ft.Get(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
-           print(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
-           _h = _haux.Clone()
-           if doOF: _h.SetBinContent(_h.GetNbinsX(), _h.GetBinContent(_h.GetNbinsX()) + _h.GetBinContent(_h.GetNbinsX() + 1) )
-           hth1f.Add(_h)
+           #print(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
+           try:
+               _h = _haux.Clone()
+               if doOF: _h.SetBinContent(_h.GetNbinsX(), _h.GetBinContent(_h.GetNbinsX()) + _h.GetBinContent(_h.GetNbinsX() + 1) )
+               hth1f.Add(_h)
+           except ReferenceError:
+               print(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)) + ' cannot be accesed: Skipping')
+               pass
            _ft.Close()
 
      ## Get some values:

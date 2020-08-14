@@ -27,21 +27,37 @@ class CutManager:
 
 
       self.MMChannel = self.brackets('Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 == 1')
-      #self.haveMMBase = self.brackets('nMMBase > 0')
-      #self.MM_etaConstrained = self.brackets('fabs(MuonCandidate_eta[MMBase_idxA[MMBase_maxIxy]])< 1.4442 && fabs(MuonCandidate_eta[MMBase_idxB[MMBase_maxIxy]])< 1.4442')
-      #self.MMtailRegime = self.brackets('fabs(MMBase_trackIxy[MMBase_maxIxy])> 5.0')
-      #self.MMpromptRegime = self.brackets('fabs(MMBase_trackIxy[MMBase_maxIxy])< 5.0')
-      #self.MMSR_dPhi = self.brackets('fabs(MMBase_dPhi[MMBase_maxIxy])< 3.14/2.0')
-      #self.MMCR_dPhi = self.brackets('fabs(MMBase_dPhi[MMBase_maxIxy]) > 3.14/2.0')
       self.haveMM = self.brackets('nDMDMBase > 0')
       self.MMSR_dPhi = self.brackets('fabs(DMDMBase_dPhi[DMDMBase_maxIxy])< 3.14/2.0')
       self.MMCR_dPhi = self.brackets('fabs(DMDMBase_dPhi[DMDMBase_maxIxy])> 3.14/2.0')
       self.MM_highpT = self.brackets('DMDMBase_leadingPt[DMDMBase_maxIxy] > 40 && DMDMBase_subleadingPt[DMDMBase_maxIxy] > 40')
       self.MM_SScharge = self.brackets('DGM_charge[DMDMBase_idxA[DMDMBase_maxIxy]]*DGM_charge[DMDMBase_idxB[DMDMBase_maxIxy]] > 0')
       self.MM_OScharge = self.brackets('DGM_charge[DMDMBase_idxA[DMDMBase_maxIxy]]*DGM_charge[DMDMBase_idxB[DMDMBase_maxIxy]] < 0')
+      self.cosmicRejection = self.brackets('DMDMBase_cosAlpha[DMDMBase_maxIxy] > -0.80')
+
+      #########################
+      ######  Loop Cuts  ######
+      #########################
+      self.EEChannel = self.brackets('Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15 == 1 && Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 == 0')
+      self.LoopHaveEEBase = self.brackets('ev.nEEBase > 0')
+      self.LoopEESR_dPhi = self.brackets('abs(ev.EEBase_dPhi[ev.EEBase_maxIxy])< 3.14/2.0')
+      self.LoopEECR_dPhi = self.brackets('abs(ev.EEBase_dPhi[ev.EEBase_maxIxy]) > 3.14/2.0')
+      self.LoopEE_pT = self.brackets('ev.EEBase_leadingPt[EEBase_maxIxy] > 50 && ev.EEBase_subleadingPt[ev.EEBase_maxIxy] > 40')
+      self.LoopEE_ET = self.brackets('ev.EEBase_leadingEt[EEBase_maxIxy] > 50 && ev.EEBase_subleadingEt[ev.EEBase_maxIxy] > 40')
+      self.LoopEE_SScharge = self.brackets('ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EEBase_idxA[ev.EEBase_maxIxy]]]*ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EEBase_idxB[ev.EEBase_maxIxy]]] > 0')
+      self.LoopEE_OScharge = self.brackets('ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EEBase_idxA[ev.EEBase_maxIxy]]]*ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EEBase_idxB[ev.EEBase_maxIxy]]] < 0')
+
+
+      self.LoopMMChannel = self.brackets('ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 == 1')
+      self.LoopHaveMM = self.brackets('ev.nDMDMBase > 0')
+      self.LoopMMSR_dPhi = self.brackets('abs(ev.DMDMBase_dPhi[ev.DMDMBase_maxIxy])< 3.14/2.0')
+      self.LoopMMCR_dPhi = self.brackets('abs(ev.DMDMBase_dPhi[ev.DMDMBase_maxIxy])> 3.14/2.0')
       self.LoopMM_SScharge = self.brackets('ev.DGM_charge[ev.DMDMBase_idxA[ev.DMDMBase_maxIxy]]*ev.DGM_charge[ev.DMDMBase_idxB[ev.DMDMBase_maxIxy]] > 0')
       self.LoopMM_OScharge = self.brackets('ev.DGM_charge[ev.DMDMBase_idxA[ev.DMDMBase_maxIxy]]*ev.DGM_charge[ev.DMDMBase_idxB[ev.DMDMBase_maxIxy]] < 0')
-      self.cosmicRejection = self.brackets('DMDMBase_cosAlpha[DMDMBase_maxIxy] > -0.80')
+      self.LoopCosmicRejection = self.brackets('ev.DMDMBase_cosAlpha[ev.DMDMBase_maxIxy] > -0.80')
+
+      
+
 
    def donotB(self, cut):
      return '(!' + self.brackets(cut) + ')'

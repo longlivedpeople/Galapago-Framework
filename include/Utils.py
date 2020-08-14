@@ -241,6 +241,7 @@ def makeDataMCPlot(lumi, hname, ylog, treeMC, treeDATA, treeSI, inputdir, xlabel
     hBKG.Add(copy.deepcopy(hSS))
 
     for _h in hOS.GetHists():
+        _h.Scale(lumi/35.87)
         hBKG.Add(copy.deepcopy(_h))
         hBKGtotal.Add(copy.deepcopy(_h))
 
