@@ -555,13 +555,15 @@ queue filename matching {2}
            #print(scommand)
 
            ## Bash file
+           if not os.path.exists(absdir + 'bash/'): os.makedirs(absdir + 'bash/')
            _bashname = absdir + 'bash/' + 'bash_{0}_{1}_{2}_{3}.sh'.format(self.name, b.name, s.name, str(t))
            _bashfile = open(_bashname, 'w')
            _bashfile.write(bashfile.format(scommand))
            _bashfile.close()
 
            ## Submission file
-           _subname = absdir + 'sub_{0}_{1}_{2}_{3}.sh'.format(self.name, b.name, s.name, str(t))
+           if not os.path.exists(absdir + 'sub/'): os.makedirs(absdir + 'sub/')
+           _subname = absdir + 'sub/' +'sub_{0}_{1}_{2}_{3}.sh'.format(self.name, b.name, s.name, str(t))
            _subfile = open(_subname, 'w')
            _subtext = subfile.format(outdir + '{0}_{1}_{2}_{3}'.format(self.name, b.name, s.name, str(t)), _bashname)
            _subfile.write(_subtext)
@@ -571,7 +573,7 @@ queue filename matching {2}
            os.system('chmod +x ' + _bashname)
            os.system('chmod +x ' + _subname)
            os.system('condor_submit ' + _subname)
-           os.system('rm ' + _subname)
+           #os.system('rm ' + _subname)
 
 
    def getTH1FsFromDir(self, inputdir):
@@ -676,7 +678,9 @@ queue filename matching {2}
      ## Init histogram:
      _f0 = r.TFile(inputdir + '{0}__{1}__{2}__0.root'.format(self.name, self.blocks[0].name, self.blocks[0].samples[0].name))
      hth1f = copy.deepcopy(_f0.Get(hname + '__{0}__{1}__{2}__0'.format(self.name, self.blocks[0].name, self.blocks[0].samples[0].name)))
-     if doOF: hth1f.SetBinContent(hth1f.GetNbinsX(), hth1f.GetBinContent(hth1f.GetNbinsX()) + hth1f.GetBinContent(hth1f.GetNbinsX() + 1) )
+     if doOF: 
+         hth1f.SetBinContent(hth1f.GetNbinsX(), hth1f.GetBinContent(hth1f.GetNbinsX()) + hth1f.GetBinContent(hth1f.GetNbinsX() + 1) )
+         hth1f.SetBinError(hth1f.GetNbinsX(), hth1f.GetBinError(hth1f.GetNbinsX()) + hth1f.GetBinError(hth1f.GetNbinsX() + 1) )
      _f0.Close()
      SetOwnership(hth1f, 0)
 
@@ -690,7 +694,9 @@ queue filename matching {2}
            #print(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
            try:
                _h = _haux.Clone()
-               if doOF: _h.SetBinContent(_h.GetNbinsX(), _h.GetBinContent(_h.GetNbinsX()) + _h.GetBinContent(_h.GetNbinsX() + 1) )
+               if doOF: 
+                   _h.SetBinContent(_h.GetNbinsX(), _h.GetBinContent(_h.GetNbinsX()) + _h.GetBinContent(_h.GetNbinsX() + 1) )
+                   _h.SetBinError(_h.GetNbinsX(), _h.GetBinError(_h.GetNbinsX()) + _h.GetBinError(_h.GetNbinsX() + 1) )
                hth1f.Add(_h)
            except ReferenceError:
                print(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)) + ' cannot be accesed: Skipping')

@@ -40,21 +40,21 @@ class CutManager:
       #########################
       self.EEChannel = self.brackets('Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15 == 1 && Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 == 0')
       self.LoopHaveEEBase = self.brackets('ev.nEEBase > 0')
-      self.LoopEESR_dPhi = self.brackets('abs(ev.EEBase_dPhi[ev.EEBase_maxIxy])< 3.14/2.0')
-      self.LoopEECR_dPhi = self.brackets('abs(ev.EEBase_dPhi[ev.EEBase_maxIxy]) > 3.14/2.0')
-      self.LoopEE_pT = self.brackets('ev.EEBase_leadingPt[EEBase_maxIxy] > 50 && ev.EEBase_subleadingPt[ev.EEBase_maxIxy] > 40')
-      self.LoopEE_ET = self.brackets('ev.EEBase_leadingEt[EEBase_maxIxy] > 50 && ev.EEBase_subleadingEt[ev.EEBase_maxIxy] > 40')
-      self.LoopEE_SScharge = self.brackets('ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EEBase_idxA[ev.EEBase_maxIxy]]]*ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EEBase_idxB[ev.EEBase_maxIxy]]] > 0')
-      self.LoopEE_OScharge = self.brackets('ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EEBase_idxA[ev.EEBase_maxIxy]]]*ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EEBase_idxB[ev.EEBase_maxIxy]]] < 0')
+      self.LoopEESR_dPhi = self.brackets('abs(ev.EEBase_dPhi[ee_maxIxy])< 3.14/2.0')
+      self.LoopEECR_dPhi = self.brackets('abs(ev.EEBase_dPhi[ee_maxIxy]) > 3.14/2.0')
+      self.LoopEE_pT = self.brackets('ev.EEBase_leadingPt[ee_maxIxy] > 50 && ev.EEBase_subleadingPt[ee_maxIxy] > 40')
+      self.LoopEE_ET = self.brackets('ev.EEBase_leadingEt[ee_maxIxy] > 50 && ev.EEBase_subleadingEt[ee_maxIxy] > 40')
+      self.LoopEE_SScharge = self.brackets('ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EEBase_idxA[ee_maxIxy]]]*ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EEBase_idxB[ee_maxIxy]]] > 0')
+      self.LoopEE_OScharge = self.brackets('ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EEBase_idxA[ee_maxIxy]]]*ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EEBase_idxB[ee_maxIxy]]] < 0')
 
 
       self.LoopMMChannel = self.brackets('ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 == 1')
       self.LoopHaveMM = self.brackets('ev.nDMDMBase > 0')
-      self.LoopMMSR_dPhi = self.brackets('abs(ev.DMDMBase_dPhi[ev.DMDMBase_maxIxy])< 3.14/2.0')
-      self.LoopMMCR_dPhi = self.brackets('abs(ev.DMDMBase_dPhi[ev.DMDMBase_maxIxy])> 3.14/2.0')
-      self.LoopMM_SScharge = self.brackets('ev.DGM_charge[ev.DMDMBase_idxA[ev.DMDMBase_maxIxy]]*ev.DGM_charge[ev.DMDMBase_idxB[ev.DMDMBase_maxIxy]] > 0')
-      self.LoopMM_OScharge = self.brackets('ev.DGM_charge[ev.DMDMBase_idxA[ev.DMDMBase_maxIxy]]*ev.DGM_charge[ev.DMDMBase_idxB[ev.DMDMBase_maxIxy]] < 0')
-      self.LoopCosmicRejection = self.brackets('ev.DMDMBase_cosAlpha[ev.DMDMBase_maxIxy] > -0.80')
+      self.LoopMMSR_dPhi = self.brackets('abs(ev.DMDMBase_dPhi[mm_maxIxy])< 3.14/2.0')
+      self.LoopMMCR_dPhi = self.brackets('abs(ev.DMDMBase_dPhi[mm_maxIxy])> 3.14/2.0')
+      self.LoopMM_SScharge = self.brackets('ev.DGM_charge[ev.DMDMBase_idxA[mm_maxIxy]]*ev.DGM_charge[ev.DMDMBase_idxB[mm_maxIxy]] > 0')
+      self.LoopMM_OScharge = self.brackets('ev.DGM_charge[ev.DMDMBase_idxA[mm_maxIxy]]*ev.DGM_charge[ev.DMDMBase_idxB[mm_maxIxy]] < 0')
+      self.LoopCosmicRejection = self.brackets('ev.DMDMBase_cosAlpha[mm_maxIxy] > -0.80')
 
       
 

@@ -163,7 +163,9 @@ if __name__ == "__main__":
     ############# Muon data definition
     DoubleMuon = []
     DoubleMuon.append('DoubleMuon_Run2016B')
+    DoubleMuon.append('DoubleMuon_Run2016C')
     DoubleMuon.append('DoubleMuon_Run2016D')
+    DoubleMuon.append('DoubleMuon_Run2016E')
     DoubleMuon.append('DoubleMuon_Run2016F')
     DoubleMuon.append('DoubleMuon_Run2016G')
     DoubleMuon.append('DoubleMuon_Run2016H')
@@ -189,9 +191,14 @@ if __name__ == "__main__":
     ############# Signal definition
     Signals = []
     #Signals.append('DisplacedSUSY_350_148_173')
+    Signals.append('HXX_400_50_4mm')
+    Signals.append('HXX_400_50_40mm')
     Signals.append('HXX_400_50_400mm')
-    #Signals.append('HXX_400_50_40mm')
-    #Signals.append('HXX_400_50_4mm')
+    Signals.append('HXX_400_150_400mm')
+    Signals.append('HXX_1000_150_10mm')
+    Signals.append('HXX_1000_150_100mm')
+    Signals.append('HXX_1000_350_35mm')
+    Signals.append('HXX_1000_350_350mm')
 
     ############# Parameter definition
     lumiB = 5.79
@@ -203,7 +210,8 @@ if __name__ == "__main__":
     lumiH = 8.61
     lumi =  lumiB + lumiC + lumiD + lumiE + lumiF + lumiG + lumiH# luminosity
 
-    filename = 'dat/Samples_cern_filling_test.dat' if opts.test else 'dat/Samples_cern_filling.dat'
+    filename = 'dat/Samples_cern_fillEG.dat' if opts.test else 'dat/Samples_cern_filling.dat'
+    #filename = 'dat/Samples_cern_fillEG.dat' if opts.test else 'dat/Samples_cern_fillEG.dat'
 
     ############# Tree creation
     treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )

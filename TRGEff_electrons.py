@@ -182,6 +182,11 @@ if __name__ == "__main__":
     parser.add_option('-n', '--maxNumber', action='store', type=int, dest='maxNumber', default=0, help='Output tag')
     parser.add_option('-t', '--tag', action='store', type=str, dest='tag', default='', help='Output tag')
     parser.add_option('-f', '--filename', action='store', type=str, dest='filename', default='', help='Path to file')
+    parser.add_option('--eta1', action='store', type=float, dest='eta1', default=0.0, help='Eta1')
+    parser.add_option('--eta2', action='store', type=float, dest='eta2', default=0.0, help='Eta2')
+    parser.add_option('--pt1', action='store', type=float, dest='pt1', default=0.0, help='pt1')
+    parser.add_option('--pt2', action='store', type=float, dest='pt2', default=0.0, help='pt2')
+    parser.add_option('--Lxy', action='store', type=float, dest='Lxy', default=0.0, help='Lxy')
     (opts, args) = parser.parse_args()
 
     outputPath =  WORKPATH + 'TRGEff_electrons/' if not opts.tag else WORKPATH + 'TRGEff_electrons_' + opts.tag + '/'
@@ -332,10 +337,20 @@ if __name__ == "__main__":
         #if resonance: # check inside X resonance
         #if not resonance: # check outside X resonance
         #if prompt and pt1_cut: # no cuts
-        if eta1_cut and eta2_cut and dR_cut and pt2_cut and pt1_cut:
+        #if eta1_cut and eta2_cut and dR_cut and pt2_cut and pt1_cut:
         #if eta1_cut and eta2_cut and dR_cut and pt1_cut:
         #if eta1_cut and eta2_cut and dR_cut and pt2_cut:
         #if True:
+ 
+        if dR < 0.2: continue
+        if opts.Lxy and Lxy1 > opts.Lxy: continue
+        if opts.eta1 and abs(eta1) > opts.eta1: continue
+        if opts.eta2 and abs(eta2) > opts.eta2: continue
+        if opts.pt1 and pt1 < opts.pt1: continue
+        if opts.pt2 and pt2 < opts.pt2: continue
+
+
+        if True:
 
             hist_Lxy1.Fill(Lxy1)
             hist_Lxy2.Fill(Lxy2)
@@ -404,11 +419,18 @@ if __name__ == "__main__":
     eff_pt2_bin3_dxy.Write()
     eff_Lxy1.Write()
     eff_Lxy1_log.Write()
-
+    hist_pt1.Write()
+    hist_pt2.Write()
+    hist_Lxy1.Write()
+    hist_Lxy2.Write()
+    hist_dxy1.Write()
+    hist_dxy2.Write()
+    hist_mass.Write()
+    hist_dR.Write()
 
     outputFile.Close()
 
-
+    """
     ###########################
     ####   OF histograms   ####
     ###########################
@@ -469,6 +491,7 @@ if __name__ == "__main__":
     HIST_mass.save(0, 0, 0, '', '', outputDir = outputPath)
 
     """
+    """
     HIST_dRnEle = Canvas.Canvas('hist_dRnEle', 'png', 0.6, 0.84, 0.9, 0.89, 2)
     HIST_dRnEle.addHisto(hist2D_dRnEle, 'colz', '', 'l', r.kBlue+2, 1, 0)
     HIST_dRnEle.save(0, 0, 0, '', '', outputDir = outputPath)
@@ -476,7 +499,7 @@ if __name__ == "__main__":
     HIST_pt2dR = Canvas.Canvas('hist_pt2dR', 'png', 0.6, 0.84, 0.9, 0.89, 2)
     HIST_pt2dR.addHisto(hist2D_pt2dR, 'colz', '', 'l', r.kBlue+2, 1, 0)
     HIST_pt2dR.save(0, 0, 0, '', '', outputDir = outputPath)
-    """
+    
 
     EFF_pt12 = Canvas.Canvas('EFF_pt12', 'png', 0.5, 0.84, 0.9, 0.89, 4)
     EFF_pt12.add2DRate(eff_pt_12, 'colz')
@@ -487,7 +510,7 @@ if __name__ == "__main__":
     #EFF_Lxy12.addLatex(0.5, 0.935, 'l_{1} > 70 GeV, l_{2} > 50 GeV', size = 0.031)
     EFF_Lxy12.save(0, 0, 0, '', '', outputDir = outputPath)
 
-    """
+    
     EFF_pt1Lxy1 = Canvas.Canvas('EFF_pt1Lxy1', 'png', 0.5, 0.84, 0.9, 0.89, 4)
     EFF_pt1Lxy1.add2DRate(eff_pt1Lxy1, 'colz')
     EFF_pt1Lxy1.save(0, 0, 0, '', '', outputDir = outputPath)
@@ -504,7 +527,7 @@ if __name__ == "__main__":
     EFF_eta12 = Canvas.Canvas('EFF_eta12', 'png', 0.5, 0.84, 0.9, 0.89, 4)
     EFF_eta12.add2DRate(eff_eta_12, 'colz')
     EFF_eta12.save(0, 0, 0, '', '', outputDir = outputPath)
-    """
+    
 
     EFF_pt1 = Canvas.Canvas('EFF_pt1', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_pt1.addRate(eff_pt1, 'AP', '', 'p', r.kBlack, True, 0, marker = 24)
@@ -535,7 +558,7 @@ if __name__ == "__main__":
     EFF_pt2.save(1, 0, 0, '', '', outputDir = outputPath)
 
 
-
+    
     EFF_Lxy = Canvas.Canvas('EFF_Lxy', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_Lxy.addRate(eff_Lxy1, 'AP', 'Leading lepton', 'p', r.kBlue+2, True, 0, marker = 20)
     EFF_Lxy.addRate(eff_Lxy2, 'AP, SAME', 'Subleading lepton', 'p', r.kBlue-7, True, 0, marker = 20)
@@ -548,7 +571,7 @@ if __name__ == "__main__":
     EFF_Lxy2 = Canvas.Canvas('EFF_Lxy2', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_Lxy2.addRate(eff_Lxy2, 'AP', 'Leading lepton', 'p', r.kBlue+2, True, 0, marker = 20)
     EFF_Lxy2.save(0, 0, 0, '', '', outputDir = outputPath, xlog = False)
-
+    
 
     EFF_Lxy1_log = Canvas.Canvas('EFF_Lxy1_log', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_Lxy1_log.addRate(eff_Lxy1_log, 'AP', 'Leading lepton', 'p', r.kBlack, True, 0, marker = 24)
@@ -563,12 +586,13 @@ if __name__ == "__main__":
     EFF_dxy.addLatex(0.9, 0.93, sampletag, size = 0.03, align = 31)
     EFF_dxy.save(1, 0, 0, '', '', outputDir = outputPath, xlog = True)
 
-
+    
     EFF_Lxy2_log = Canvas.Canvas('EFF_Lxy2_log', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_Lxy2_log.addRate(eff_Lxy2_log, 'AP', 'Leading lepton', 'p', r.kBlue+2, True, 0, marker = 20)
     EFF_Lxy2_log.save(0, 0, 0, '', '', outputDir = outputPath, xlog = True)
+    
 
-    """
+    
     EFF_dR = Canvas.Canvas('EFF_dR', 'png', 0.3, 0.84, 0.9, 0.89, 2)
     EFF_dR.addRate(eff_dR, 'AP', '', 'p', r.kBlue+2, True, 0, marker = 20)
     EFF_dR.save(0, 0, 0, '', '', outputDir = outputPath)
@@ -577,4 +601,4 @@ if __name__ == "__main__":
     EFF_mass.addRate(eff_mass, 'AP', '', 'p', r.kBlue+2, True, 0, marker = 20)
     EFF_mass.save(0, 0, 0, '', '', outputDir = outputPath)
     """
-
+    

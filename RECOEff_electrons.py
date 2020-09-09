@@ -165,25 +165,43 @@ if __name__ == "__main__":
     #################################
     ####   TEfficiency binning   ####
     #################################
-    Lxy_bin = np.array([0.0, 0.5, 1.0, 2.0, 4.0, 8.0, 12.0, 16.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 70.0, 80.0, 90.0, 100.0, 110.0])
+    Lxy_bin = np.array([0.0, 0.5, 1.0, 2.0, 4.0, 8.0, 12.0, 16.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 55.0, 60.0, 70.0, 80.0, 90.0, 100.0])
     #Lxy_bin = np.linspace(0.0, 100.0, 51)
-    dxy_bin = np.linspace(0.0, 100.0, 51)
-    Lxy_logbin = np.logspace(0.0, 3.0, 101)
+    dxy_bin = np.linspace(0.0, 40.0, 80)
+    Lxy_small = np.linspace(0.0, 1.0, 30)
+    Lxy_logbin = np.logspace(-2, 2, 60)
+    dxy_logbin = np.logspace(-2, 2, 60)
     pt_bin = np.linspace(0.0, 300.0, 70)
+    dxy_sep = np.array([0.0, 1.0, 20.0])
+    Lxy_sep = np.array([0.0, 1.0, 20.0])
     
 
     ######################################
     ####   Book TEfficiency objects   ####
     ######################################
     eff_IFCA_pt = r.TEfficiency("eff_IFCA_pt", ";Generated electron p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
+    eff_IFCA_pt_dxybin1 = r.TEfficiency("eff_IFCA_pt_dxybin1", ";Generated electron p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
+    eff_IFCA_pt_dxybin2 = r.TEfficiency("eff_IFCA_pt_dxybin2", ";Generated electron p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
+    eff_IFCA_pt_dxybin3 = r.TEfficiency("eff_IFCA_pt_dxybin3", ";Generated electron p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
+    eff_IFCA_pt_Lxybin1 = r.TEfficiency("eff_IFCA_pt_Lxybin1", ";Generated electron p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
+    eff_IFCA_pt_Lxybin2 = r.TEfficiency("eff_IFCA_pt_Lxybin2", ";Generated electron p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
+    eff_IFCA_pt_Lxybin3 = r.TEfficiency("eff_IFCA_pt_Lxybin3", ";Generated electron p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
     eff_IFCA_Lxy = r.TEfficiency("eff_IFCA_Lxy", ";Generated electron L_{xy} (cm);Efficiency", len(Lxy_bin)-1, Lxy_bin)
     eff_IFCA_dxy = r.TEfficiency("eff_IFCA_dxy", ";Generated electron d_{xy} (cm);Efficiency", len(dxy_bin)-1, dxy_bin)
+    eff_IFCA_Lxy_reduced = r.TEfficiency("eff_IFCA_Lxy_reduced", ";Generated electron d_{xy} (cm);Efficiency", len(Lxy_small)-1, Lxy_small)
+    eff_IFCA_dxy_reduced = r.TEfficiency("eff_IFCA_dxy_reduced", ";Generated electron d_{xy} (cm);Efficiency", len(Lxy_small)-1, Lxy_small)
+    eff_IFCA_Lxy_log = r.TEfficiency("eff_IFCA_Lxy_log", ";Generated electron L_{xy} (cm);Efficiency", len(Lxy_logbin)-1, Lxy_logbin)
+    eff_IFCA_dxy_log = r.TEfficiency("eff_IFCA_dxy_log", ";Generated electron d_{xy} (cm);Efficiency", len(dxy_logbin)-1, dxy_logbin)
     eff_IFCA_eta = r.TEfficiency("eff_IFCA_eta", "; Generated electron #eta;Efficiency", 51, -2.1, 2.1)
     eff_IFCA_dR = r.TEfficiency("eff_IFCA_dR", ";Generated electron #DeltaR;Efficiency", 10, 0.0, 1.0)
 
     eff_CMSloose_pt = r.TEfficiency("eff_CMSloose_pt", ";Generated electron p_{T} (GeV);Efficiency", len(pt_bin)-1, pt_bin)
     eff_CMSloose_Lxy = r.TEfficiency("eff_CMSloose_Lxy", ";Generated electron L_{xy} (cm);Efficiency", len(Lxy_bin)-1, Lxy_bin)
     eff_CMSloose_dxy = r.TEfficiency("eff_CMSloose_dxy", ";Generated electron d_{xy} (cm);Efficiency", len(dxy_bin)-1, dxy_bin)
+    eff_CMSloose_Lxy_log = r.TEfficiency("eff_CMSloose_Lxy_log", ";Generated electron L_{xy} (cm);Efficiency", len(Lxy_logbin)-1, Lxy_logbin)
+    eff_CMSloose_dxy_log = r.TEfficiency("eff_CMSloose_dxy_log", ";Generated electron d_{xy} (cm);Efficiency", len(dxy_logbin)-1, dxy_logbin)
+    eff_CMSloose_Lxy_reduced = r.TEfficiency("eff_CMSloose_Lxy_reduced", ";Generated electron d_{xy} (cm);Efficiency", len(Lxy_small)-1, Lxy_small)
+    eff_CMSloose_dxy_reduced = r.TEfficiency("eff_CMSloose_dxy_reduced", ";Generated electron d_{xy} (cm);Efficiency", len(Lxy_small)-1, Lxy_small)
     eff_CMSloose_eta = r.TEfficiency("eff_CMSloose_eta", "; Generated electron #eta;Efficiency", 51, -2.1, 2.1)
     eff_CMSloose_dR = r.TEfficiency("eff_CMSloose_dR", ";Generated electron #DeltaR;Efficiency", 10, 0.0, 1.0)
 
@@ -195,18 +213,28 @@ if __name__ == "__main__":
     
     hist_IFCA_ptRes = r.TH1F("hist_IFCA_ptRes", ";p_{T}^{reco}/p_{T}^{gen};Event density", 81, 0.2, 1.8)
     hist_CMSloose_ptRes = r.TH1F("hist_CMSloose_ptRes", ";p_{T}^{reco}/p_{T}^{gen};Event density", 81, 0.2, 1.8)
-    hist_IFCA_ptRes_zoom = r.TH1F("hist_IFCA_ptRes_zoom", ";p_{T}^{reco}/p_{T}^{gen};Event density", 81, 0.8, 1.2)
+    hist_IFCA_ptRes_zoom = r.TH1F("hist_IFCA_ptRes_zoom", ";p_{T}^{reco}/p_{T}^{gen};Event density", 81, -0.2, 0.2)
     hist_IFCA_etRes_zoom = r.TH1F("hist_IFCA_etRes_zoom", ";E_{T}^{reco}/E_{T}^{gen};Event density", 81, 0.8, 1.2)
     hist_IFCA_dxyRes = r.TH1F("hist_IFCA_dxyRes", ";d_{xy}^{reco}/d_{xy}^{gen};Event density", 81, 0.0, 2.0)
-    hist_IFCA_dxyRes_zoom = r.TH1F("hist_IFCA_dxyRes_zoom", ";d_{xy}^{reco}/d_{xy}^{gen};Event density", 81, 0.8, 1.2)
-    hist_CMSloose_ptRes_zoom = r.TH1F("hist_CMSloose_ptRes_zoom", ";p_{T}^{reco}/p_{T}^{gen};Event density", 81, 0.7, 1.3)
+    hist_IFCA_dxyRes_zoom = r.TH1F("hist_IFCA_dxyRes_zoom", ";d_{xy}^{reco}/d_{xy}^{gen};Event density", 81, -0.2, 0.2)
+    hist_CMSloose_ptRes_zoom = r.TH1F("hist_CMSloose_ptRes_zoom", ";p_{T}^{reco}/p_{T}^{gen};Event density", 81, -0.2, 0.2)
+    hist_CMSloose_dxyRes = r.TH1F("hist_CMSloose_dxyRes", ";d_{xy}^{reco}/d_{xy}^{gen};Event density", 81, 0.0, 2.0)
+    hist_CMSloose_dxyRes_zoom = r.TH1F("hist_CMSloose_dxyRes_zoom", ";p_{T}^{reco}/p_{T}^{gen};Event density", 81, -0.2, 0.2)
+
+
+    #####################################
+    ####   Book Resolution objects   ####
+    #####################################
+    hist_gen_Lxy = r.TH1F("hist_gen_Lxy", "Generated L_{xy};Event density", len(Lxy_small)-1, Lxy_small)
+    hist_gen_dxy = r.TH1F("hist_gen_dxy", "Generated L_{xy};Event density", len(Lxy_small)-1, Lxy_small)
 
     #########################
     ####   Load sample   ####
     #########################
-    _sampleName = opts.filename
-    _file = TFile(_sampleName)
-    _tree = _file.Get("Events")
+    _sampleNames = (opts.filename).split(',')
+    _tree = r.TChain('Events')
+    for _name in _sampleNames:
+        _tree.Add(_name)
     print("TTree with " + str(_tree.GetEntries()) + " entries")
 
 
@@ -256,9 +284,10 @@ if __name__ == "__main__":
 
                 if not partner: continue
                 lldR = l.DeltaR(ll)
-                if lldR < 0.7: continue
+                #if lldR < 0.2: continue
 
-                
+                hist_gen_Lxy.Fill(Lxy) 
+                hist_gen_dxy.Fill(dxy) 
 
 
                 ####################
@@ -282,19 +311,57 @@ if __name__ == "__main__":
                     eff_IFCA_eta.Fill(True, eta)
                     eff_IFCA_Lxy.Fill(True, Lxy)
                     eff_IFCA_dxy.Fill(True, dxy)
+                    eff_IFCA_Lxy_reduced.Fill(True, Lxy)
+                    eff_IFCA_dxy_reduced.Fill(True, dxy)
+                    eff_IFCA_Lxy_log.Fill(True, Lxy)
+                    eff_IFCA_dxy_log.Fill(True, dxy)
                     eff_IFCA_dR.Fill(True, lldR)
                     prof_IFCA_deltaPt_vs_pt.Fill(pt, _tree.ElectronCandidate_pt[index]/pt)
                     hist_IFCA_ptRes.Fill(_tree.ElectronCandidate_pt[index]/pt)
-                    hist_IFCA_ptRes_zoom.Fill(_tree.ElectronCandidate_pt[index]/pt)
+                    hist_IFCA_ptRes_zoom.Fill((_tree.ElectronCandidate_pt[index]-pt)/pt)
                     hist_IFCA_etRes_zoom.Fill(_tree.ElectronCandidate_et[index]/et)
-                    hist_IFCA_dxyRes.Fill(_tree.ElectronCandidate_dxy[index]/dxy)
-                    hist_IFCA_dxyRes_zoom.Fill(_tree.ElectronCandidate_dxy[index]/dxy)
+                    hist_IFCA_dxyRes.Fill((_tree.ElectronCandidate_dxy[index]- dxy)/dxy)
+                    hist_IFCA_dxyRes_zoom.Fill((_tree.ElectronCandidate_dxy[index]- dxy)/dxy)
+
+                    if Lxy < Lxy_sep[1]:
+                        eff_IFCA_pt_Lxybin1.Fill(True, pt)
+                    elif Lxy > Lxy_sep[1] and Lxy < Lxy_sep[2]:
+                        eff_IFCA_pt_Lxybin2.Fill(True, pt)
+                    elif Lxy > Lxy_sep[2]:
+                        eff_IFCA_pt_Lxybin3.Fill(True, pt)
+
+                    if dxy < dxy_sep[1]:
+                        eff_IFCA_pt_dxybin1.Fill(True, pt)
+                    elif dxy > dxy_sep[1] and dxy < dxy_sep[2]:
+                        eff_IFCA_pt_dxybin2.Fill(True, pt)
+                    elif dxy > dxy_sep[2]:
+                        eff_IFCA_pt_dxybin3.Fill(True, pt)
+
+
                 else:
                     eff_IFCA_pt.Fill(False, pt)
                     eff_IFCA_eta.Fill(False, eta)
                     eff_IFCA_Lxy.Fill(False, Lxy)
                     eff_IFCA_dxy.Fill(False, dxy)
+                    eff_IFCA_Lxy_reduced.Fill(False, Lxy)
+                    eff_IFCA_dxy_reduced.Fill(False, dxy)
+                    eff_IFCA_Lxy_log.Fill(False, Lxy)
+                    eff_IFCA_dxy_log.Fill(False, dxy)
                     eff_IFCA_dR.Fill(False, lldR)
+
+                    if Lxy < Lxy_sep[1]:
+                        eff_IFCA_pt_Lxybin1.Fill(False, pt)
+                    elif Lxy > Lxy_sep[1] and Lxy < Lxy_sep[2]:
+                        eff_IFCA_pt_Lxybin2.Fill(False, pt)
+                    elif Lxy > Lxy_sep[2]:
+                        eff_IFCA_pt_Lxybin3.Fill(False, pt)
+
+                    if dxy < dxy_sep[1]:
+                        eff_IFCA_pt_dxybin1.Fill(False, pt)
+                    elif dxy > dxy_sep[1] and dxy < dxy_sep[2]:
+                        eff_IFCA_pt_dxybin2.Fill(False, pt)
+                    elif dxy > dxy_sep[2]:
+                        eff_IFCA_pt_dxybin3.Fill(False, pt)
 
 
                 ###################
@@ -318,15 +385,25 @@ if __name__ == "__main__":
                     eff_CMSloose_eta.Fill(True, eta)
                     eff_CMSloose_Lxy.Fill(True, Lxy)
                     eff_CMSloose_dxy.Fill(True, dxy)
+                    eff_CMSloose_Lxy_reduced.Fill(True, Lxy)
+                    eff_CMSloose_dxy_reduced.Fill(True, dxy)
+                    eff_CMSloose_Lxy_log.Fill(True, Lxy)
+                    eff_CMSloose_dxy_log.Fill(True, dxy)
                     eff_CMSloose_dR.Fill(True, lldR)
                     prof_CMSloose_deltaPt_vs_pt.Fill(pt, _tree.ElectronSel_pt[index]/pt)
                     hist_CMSloose_ptRes.Fill(_tree.ElectronSel_pt[index]/pt)
-                    hist_CMSloose_ptRes_zoom.Fill(_tree.ElectronSel_pt[index]/pt)
+                    hist_CMSloose_dxyRes.Fill(_tree.ElectronSel_dB[index]/dxy - 1)
+                    hist_CMSloose_ptRes_zoom.Fill((_tree.ElectronSel_pt[index]- pt)/pt)
+                    hist_CMSloose_dxyRes_zoom.Fill(_tree.ElectronSel_dB[index]/dxy - 1)
                 else:
                     eff_CMSloose_pt.Fill(False, pt)
                     eff_CMSloose_eta.Fill(False, eta)
                     eff_CMSloose_Lxy.Fill(False, Lxy)
                     eff_CMSloose_dxy.Fill(False, dxy)
+                    eff_CMSloose_Lxy_reduced.Fill(False, Lxy)
+                    eff_CMSloose_dxy_reduced.Fill(False, dxy)
+                    eff_CMSloose_Lxy_log.Fill(False, Lxy)
+                    eff_CMSloose_dxy_log.Fill(False, dxy)
                     eff_CMSloose_dR.Fill(False, lldR)
 
 
@@ -339,23 +416,45 @@ if __name__ == "__main__":
 
     #### Write everything to use later:
     eff_IFCA_pt.Write()
+    eff_IFCA_pt_dxybin1.Write()
+    eff_IFCA_pt_dxybin2.Write()
+    eff_IFCA_pt_dxybin3.Write()
+    eff_IFCA_pt_Lxybin1.Write()
+    eff_IFCA_pt_Lxybin2.Write()
+    eff_IFCA_pt_Lxybin3.Write()
     eff_IFCA_eta.Write()
     eff_IFCA_Lxy.Write()
+    eff_IFCA_dxy.Write()
+    eff_IFCA_Lxy_reduced.Write()
+    eff_IFCA_dxy_reduced.Write()
+    eff_IFCA_Lxy_log.Write()
+    eff_IFCA_dxy_log.Write()
     eff_CMSloose_pt.Write()
     eff_CMSloose_eta.Write()
     eff_CMSloose_Lxy.Write()
+    eff_CMSloose_dxy.Write()
+    eff_CMSloose_Lxy_reduced.Write()
+    eff_CMSloose_dxy_reduced.Write()
+    eff_CMSloose_Lxy_log.Write()
+    eff_CMSloose_dxy_log.Write()
     hist_IFCA_ptRes.Write()
     hist_CMSloose_ptRes.Write()
     hist_IFCA_ptRes_zoom.Write()
     hist_IFCA_etRes_zoom.Write()
     hist_CMSloose_ptRes_zoom.Write()
+    hist_CMSloose_dxyRes_zoom.Write()
     hist_IFCA_dxyRes.Write()
+    hist_CMSloose_dxyRes.Write()
     hist_IFCA_dxyRes_zoom.Write()
+    
+    hist_gen_Lxy.Write()
+    hist_gen_dxy.Write()
 
     outputFile.Close()
 
     #### Plot some of the efficiencies:
     # This is dummy plotting yo:
+    """
     ELE_algoVSpt = Canvas.Canvas('ELE_algoVSpt', 'png', 0.46, 0.84, 0.9, 0.89, 2)
     ELE_algoVSpt.addRate(eff_IFCA_pt, 'AP', 'IFCA (#DeltaR < 0.1)', 'p', r.kBlue+2, True, 0, marker = 34)
     ELE_algoVSpt.addRate(eff_CMSloose_pt, 'AP, same', 'CMS loose', 'p', r.kRed+1, True, 1, marker = 20)
@@ -377,13 +476,13 @@ if __name__ == "__main__":
     ELE_ptResvsPt.addProf(prof_CMSloose_deltaPt_vs_pt, 'P, same', 'CMS loose', 'p', r.kRed+1, True, 1, marker = 20)
     ELE_ptResvsPt.save(1, 0, 0, '', '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
 
-    """
+   
     hist_IFCA_ptRes.Scale(1.0/hist_IFCA_ptRes.Integral())
     hist_CMSloose_ptRes.Scale(1.0/hist_CMSloose_ptRes.Integral())
     hist_IFCA_ptRes.SetLineWidth(2)
     hist_CMSloose_ptRes.SetLineWidth(2)
     hist_IFCA_ptRes.SetMaximum(1.0)
-    """
+    
     ELE_ptRes_histo = Canvas.Canvas('ELE_ptRes_histo', 'png', 0.46, 0.84, 0.9, 0.89, 2)
     ELE_ptRes_histo.addHisto(hist_IFCA_ptRes_zoom, 'HIST', 'IFCA (#DeltaR < 0.1)', 'p', r.kBlack, 1, 0, normed = False)
     #ELE_ptRes_histo.addHisto(hist_CMSloose_ptRes, 'HIST, SAME', 'CMS loose', 'l', r.kRed+1, 1, 0, normed = False)
@@ -394,4 +493,4 @@ if __name__ == "__main__":
     ELE_dxyRes_histo.addHisto(hist_IFCA_dxyRes, 'HIST', 'IFCA (#DeltaR < 0.1)', 'p', r.kBlack, 1, 0, normed = False)
     #ELE_ptRes_histo.addHisto(hist_CMSloose_ptRes, 'HIST, SAME', 'CMS loose', 'l', r.kRed+1, 1, 0, normed = False)
     ELE_dxyRes_histo.save(0, 0, 0, '', '', outputDir = WORKPATH + 'efficiencies_'+opts.tag+'/')
-
+    """

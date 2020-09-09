@@ -118,7 +118,7 @@ class Canvas:
       latexc.SetTextFont(42);
       latexc.SetTextAlign(31);
       latexc.SetTextSize(0.05);
-      latexc.DrawLatex(0.90, 0.93, text_lumi)
+      if lumi != '': latexc.DrawLatex(0.90, 0.93, text_lumi)
 
    def banner3(self, isData, lumi):
      
@@ -378,7 +378,10 @@ class Canvas:
               #self.histos[i].SetMinimum(0.1)
               #self.histos[i].SetMinimum(0.0001)
               #self.histos[i].SetMaximum(0.5)
-              self.histos[i].Draw(self.options[i])
+              if str(type(self.histos[i])) == "<class 'ROOT.TEfficiency'>":
+                  self.makeRate(self.histos[i], self.options[i])
+              else:
+                  self.histos[i].Draw(self.options[i])
 
       if(legend):
           self.makeLegend()
@@ -411,9 +414,22 @@ class Canvas:
 
       for tmp_hMC in hMClist:
           ind = hMClist.index(tmp_hMC)
-          tmp_ratio = hdata.Clone(tmp_hMC.GetName()+'_ratio')
-          tmp_ratio.Divide(tmp_hMC)
 
+          if str(type(tmp_hMC)) == "<class 'ROOT.TEfficiency'>":
+              tmp_den = tmp_hMC.GetTotalHistogram().Clone()
+              tmp_num = hdata.GetTotalHistogram().Clone()
+              for n in range(0,tmp_num.GetNbinsX()):
+                  tmp_den.SetBinContent(n+1, tmp_hMC.GetEfficiency(n+1))
+                  tmp_num.SetBinContent(n+1, hdata.GetEfficiency(n+1))
+                  #tmp_num.SetBinErrorUp(n+1, tmp_hMC.GetEfficiencyErrorUp(n+1))
+                  tmp_den.SetBinError(n+1, tmp_hMC.GetEfficiencyErrorLow(n+1))
+                  #tmp_den.SetBinErrorUp(n+1, hdata.GetEfficiencyErrorUp(n+1))
+                  tmp_num.SetBinError(n+1, hdata.GetEfficiencyErrorLow(n+1))
+              tmp_ratio = tmp_num.Clone(tmp_hMC.GetName()+'_ratio')
+              tmp_ratio.Divide(tmp_den)
+          else:
+              tmp_ratio = hdata.Clone(tmp_hMC.GetName()+'_ratio')
+              tmp_ratio.Divide(tmp_hMC)
           tmp_ratio.SetTitle("")
           tmp_ratio.GetYaxis().SetRangeUser(r_ymin, r_ymax);
           tmp_ratio.GetYaxis().SetTitle(label);
@@ -491,7 +507,7 @@ class Canvas:
                   self.histos[i].GetYaxis().SetRangeUser(ymin, ymax)
                   #self.histos[i].SetMaximum(ymax)
 
-              if str(type(self.histos[i])) == "<class 'ROOT.TEfficiency'>" and 'colz' not in self.options[i] and 'COLZ' not in self.options[i]:
+              if 'TEfficiency' in str(type(self.histos[i])) and 'colz' not in self.options[i] and 'COLZ' not in self.options[i]:
                   self.makeRate(self.histos[i], self.options[i])                   
               else:
                   self.histos[i].Draw(self.options[i])
