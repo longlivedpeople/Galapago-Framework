@@ -34,6 +34,8 @@ class processHandler:
         ###  Bin definition  ###
         ########################
         Ixy_bin = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 12.0, 18.0, 26.0, 34.0])
+        dxy_logbin = np.logspace(-3,0, 60)
+        Ixy_logbin = np.logspace(-2,2, 60)
 
         #######################
         ###  PU Histograms  ###
@@ -52,10 +54,14 @@ class processHandler:
         self.hMM_mass = r.TH1F('hMM_mass' + self.sufix, ';Dimuon invariant mass m_{#mu#mu} (GeV);', 35, 0, 200)
         self.hMM_cosAlpha = r.TH1F('hMM_cosAlpha' + self.sufix, ';Dimuon cos(#alpha_{#mu#mu});', 22, -1.1, 1.1) 
         self.hMM_trackIxy = r.TH1F('hMM_trackIxy' + self.sufix, ';Dimuon |d_{0}|/#sigma_{d};', 20, 0, 20)
+        self.hMM_trackIxy_log = r.TH1F('hMM_trackIxy_log' + self.sufix, ';Dimuon |d_{0}|/#sigma_{d};', len(Ixy_logbin)-1, Ixy_logbin)
         self.hMM_trackIxy_bin = r.TH1F('hMM_trackIxy_bin' + self.sufix, ';Dimuon |d_{0}|/#sigma_{d};', len(Ixy_bin)-1, Ixy_bin)
         self.hMM_trackDxy = r.TH1F('hMM_trackDxy' + self.sufix, ';Dimuon |d_{0}| (cm);', 30, 0, 0.5)
+        self.hMM_trackDxy_log = r.TH1F('hMM_trackDxy_log' + self.sufix, ';Dimuon |d_{0}| (cm);', len(dxy_logbin)-1, dxy_logbin)
         self.hMM_Lxy = r.TH1F('hMM_Lxy' + self.sufix, ';Dimuon vertex |L_{xy}| (cm);', 20, 0, 10)
+        self.hMM_Lxy_log = r.TH1F('hMM_Lxy_log' + self.sufix, ';Dimuon vertex |L_{xy}| (cm);', len(dxy_logbin)-1, dxy_logbin)
         self.hMM_Ixy = r.TH1F('hMM_Ixy' + self.sufix, ';Dimuon vertex |L_{xy}|/#sigma_{L};', 20, 0, 20)
+        self.hMM_Ixy_log = r.TH1F('hMM_Ixy_log' + self.sufix, ';Dimuon vertex |L_{xy}|/#sigma_{L};', len(Ixy_logbin)-1, Ixy_logbin)
         self.hMM_leadingPt = r.TH1F('hMM_leadingPt' + self.sufix, ';Dimuon leading p_{T};', 30, 0, 300)
         self.hMM_subleadingPt = r.TH1F('hMM_subleadingPt' + self.sufix, ';Dimuon subleading p_{T};', 30, 0, 300)
         self.hMM_normalizedChi2 = r.TH1F('hMM_normalizedChi2' + self.sufix, ';Dimuon vertex fit #chi^{2}/ndof;', 20, 0, 10)
@@ -95,6 +101,10 @@ class processHandler:
         self.hEE_subleadingPt = r.TH1F('hEE_subleadingPt' + self.sufix, ';Dielectron subleading p_{T};', 30, 0, 300)
         self.hEE_normalizedChi2 = r.TH1F('hEE_normalizedChi2' + self.sufix, ';Dielectron vertex fit #chi^{2}/ndof;', 30, 0, 15)
         self.hEE_vx_vy = r.TH2F('hMM_vx_vy' + self.sufix, ';Dielectron vertex v_{x} (cm); Dielectron vertex v_{y} (cm)', 50, 0, 4, 50, 0, 4)
+        self.hEE_trackIxy_log = r.TH1F('hEE_trackIxy_log' + self.sufix, ';Dielectron |d_{0}|/#sigma_{d};', len(Ixy_logbin)-1, Ixy_logbin)
+        self.hEE_trackDxy_log = r.TH1F('hEE_trackDxy_log' + self.sufix, ';Dielectron |d_{0}| (cm);', len(dxy_logbin)-1, dxy_logbin)
+        self.hEE_Lxy_log = r.TH1F('hEE_Lxy_log' + self.sufix, ';Dielectron vertex |L_{xy}| (cm);', len(dxy_logbin)-1, dxy_logbin)
+        self.hEE_Ixy_log = r.TH1F('hEE_Ixy_log' + self.sufix, ';Dielectron vertex |L_{xy}|/#sigma_{L};', len(Ixy_logbin)-1, Ixy_logbin)
         # -> Dielectron members
         self.hE_eta = r.TH1F('hE_eta' + self.sufix, ';Electron #eta;', 27, -2.6, 2.6)
         self.hE_dxy = r.TH1F('hE_dxy' + self.sufix, ';Electron transverse impact parameter d_{xy};', 30, 0.0, 0.5)
@@ -128,6 +138,10 @@ class processHandler:
             self.hMM_leadingPt_SS = r.TH1F('hMM_leadingPt_SS' + self.sufix, ';Dimuon leading p_{T};', 30, 0, 300)
             self.hMM_subleadingPt_SS = r.TH1F('hMM_subleadingPt_SS' + self.sufix, ';Dimuon subleading p_{T};', 30, 0, 300)
             self.hMM_normalizedChi2_SS = r.TH1F('hMM_normalizedChi2_SS' + self.sufix, ';Dimuon vertex fit #chi^{2}/ndof;', 20, 0, 10)
+            self.hMM_trackIxy_log_SS = r.TH1F('hMM_trackIxy_log_SS' + self.sufix, ';Dimuon |d_{0}|/#sigma_{d};', len(Ixy_logbin)-1, Ixy_logbin)
+            self.hMM_trackDxy_log_SS = r.TH1F('hMM_trackDxy_log_SS' + self.sufix, ';Dimuon |d_{0}| (cm);', len(dxy_logbin)-1, dxy_logbin)
+            self.hMM_Lxy_log_SS = r.TH1F('hMM_Lxy_log_SS' + self.sufix, ';Dimuon vertex |L_{xy}| (cm);', len(dxy_logbin)-1, dxy_logbin)
+            self.hMM_Ixy_log_SS = r.TH1F('hMM_Ixy_log_SS' + self.sufix, ';Dimuon vertex |L_{xy}|/#sigma_{L};', len(Ixy_logbin)-1, Ixy_logbin)
 
             self.hMM_trackIxy_lowPU_SS = r.TH1F('hMM_trackIxy_lowPU_SS' + self.sufix, ';Dimuon |d_{0}|/#sigma_{d};', 20, 0, 20)
             self.hMM_trackIxy_highPU_SS = r.TH1F('hMM_trackIxy_highPU_SS' + self.sufix, ';Dimuon |d_{0}|/#sigma_{d};', 20, 0, 20)
@@ -157,6 +171,10 @@ class processHandler:
             self.hEE_leadingPt_SS = r.TH1F('hEE_leadingPt_SS' + self.sufix, ';Dielectron leading p_{T};', 30, 0, 300)
             self.hEE_subleadingPt_SS = r.TH1F('hEE_subleadingPt_SS' + self.sufix, ';Dielectron subleading p_{T};', 30, 0, 300)
             self.hEE_normalizedChi2_SS = r.TH1F('hEE_normalizedChi2_SS' + self.sufix, ';Dielectron vertex fit #chi^{2}/ndof;', 30, 0, 15)
+            self.hEE_trackIxy_log_SS = r.TH1F('hEE_trackIxy_log_SS' + self.sufix, ';Dielectron |d_{0}|/#sigma_{d};', len(Ixy_logbin)-1, Ixy_logbin)
+            self.hEE_trackDxy_log_SS = r.TH1F('hEE_trackDxy_log_SS' + self.sufix, ';Dielectron |d_{0}| (cm);', len(dxy_logbin)-1, dxy_logbin)
+            self.hEE_Lxy_log_SS = r.TH1F('hEE_Lxy_log_SS' + self.sufix, ';Dielectron vertex |L_{xy}| (cm);', len(dxy_logbin)-1, dxy_logbin)
+            self.hEE_Ixy_log_SS = r.TH1F('hEE_Ixy_log_SS' + self.sufix, ';Dielectron vertex |L_{xy}|/#sigma_{L};', len(Ixy_logbin)-1, Ixy_logbin)
 
             self.hE_eta_SS = r.TH1F('hE_eta_SS' + self.sufix, ';Electron #eta;', 27, -2.6, 2.6)
             self.hE_dxy_SS = r.TH1F('hE_dxy_SS' + self.sufix, ';Electron transverse impact parameter d_{xy};', 30, 0.0, 0.5)
@@ -263,6 +281,10 @@ class processHandler:
                 self.hMM_subleadingPt.Fill(ev.DMDMBase_subleadingPt[mm_maxIxy], weight)
                 self.hMM_normalizedChi2.Fill(ev.DMDMBase_normalizedChi2[mm_maxIxy], weight)
                 self.hMM_vx_vy.Fill(ev.DMDMBase_vx[mm_maxIxy], ev.DMDMBase_vy[mm_maxIxy], weight)
+                self.hMM_trackIxy_log.Fill(ev.DMDMBase_trackIxy[mm_maxIxy], weight)
+                self.hMM_trackDxy_log.Fill(ev.DMDMBase_trackDxy[mm_maxIxy], weight)
+                self.hMM_Lxy_log.Fill(ev.DMDMBase_Lxy[mm_maxIxy], weight)
+                self.hMM_Ixy_log.Fill(ev.DMDMBase_Ixy[mm_maxIxy], weight)
 
                 self.hM_eta.Fill(ev.DGM_eta[ev.DMDMBase_idxA[mm_maxIxy]], weight)
                 self.hM_eta.Fill(ev.DGM_eta[ev.DMDMBase_idxB[mm_maxIxy]], weight)
@@ -304,6 +326,10 @@ class processHandler:
                 self.hMM_leadingPt_SS.Fill(ev.DMDMBase_leadingPt[mm_maxIxy], weight)
                 self.hMM_subleadingPt_SS.Fill(ev.DMDMBase_subleadingPt[mm_maxIxy], weight)
                 self.hMM_normalizedChi2_SS.Fill(ev.DMDMBase_normalizedChi2[mm_maxIxy], weight)
+                self.hMM_trackIxy_log_SS.Fill(ev.DMDMBase_trackIxy[mm_maxIxy], weight)
+                self.hMM_trackDxy_log_SS.Fill(ev.DMDMBase_trackDxy[mm_maxIxy], weight)
+                self.hMM_Lxy_log_SS.Fill(ev.DMDMBase_Lxy[mm_maxIxy], weight)
+                self.hMM_Ixy_log_SS.Fill(ev.DMDMBase_Ixy[mm_maxIxy], weight)
 
                 self.hM_eta_SS.Fill(ev.DGM_eta[ev.DMDMBase_idxA[mm_maxIxy]], weight)
                 self.hM_eta_SS.Fill(ev.DGM_eta[ev.DMDMBase_idxB[mm_maxIxy]], weight)
@@ -365,6 +391,10 @@ class processHandler:
                 self.hEE_subleadingPt.Fill(ev.EEBase_subleadingPt[ee_maxIxy], weight)
                 self.hEE_normalizedChi2.Fill(ev.EEBase_normalizedChi2[ee_maxIxy], weight)
                 self.hEE_vx_vy.Fill(ev.EEBase_vx[ee_maxIxy], ev.EEBase_vy[ee_maxIxy], weight)
+                self.hEE_trackIxy_log.Fill(ev.EEBase_trackIxy[ee_maxIxy], weight)
+                self.hEE_trackDxy_log.Fill(ev.EEBase_trackDxy[ee_maxIxy], weight)
+                self.hEE_Lxy_log.Fill(ev.EEBase_Lxy[ee_maxIxy], weight)
+                self.hEE_Ixy_log.Fill(ev.EEBase_Ixy[ee_maxIxy], weight)
 
                 self.hE_eta.Fill(ev.ElectronCandidate_eta[ev.EEBase_idxA[ee_maxIxy]], weight)
                 self.hE_eta.Fill(ev.ElectronCandidate_eta[ev.EEBase_idxB[ee_maxIxy]], weight)
@@ -394,6 +424,10 @@ class processHandler:
                 self.hEE_leadingPt_SS.Fill(ev.EEBase_leadingPt[ee_maxIxy], weight)
                 self.hEE_subleadingPt_SS.Fill(ev.EEBase_subleadingPt[ee_maxIxy], weight)
                 self.hEE_normalizedChi2_SS.Fill(ev.EEBase_normalizedChi2[ee_maxIxy], weight)
+                self.hEE_trackIxy_log_SS.Fill(ev.EEBase_trackIxy[ee_maxIxy], weight)
+                self.hEE_trackDxy_log_SS.Fill(ev.EEBase_trackDxy[ee_maxIxy], weight)
+                self.hEE_Lxy_log_SS.Fill(ev.EEBase_Lxy[ee_maxIxy], weight)
+                self.hEE_Ixy_log_SS.Fill(ev.EEBase_Ixy[ee_maxIxy], weight)
 
                 self.hE_eta_SS.Fill(ev.ElectronCandidate_eta[ev.EEBase_idxA[ee_maxIxy]], weight)
                 self.hE_eta_SS.Fill(ev.ElectronCandidate_eta[ev.EEBase_idxB[ee_maxIxy]], weight)
