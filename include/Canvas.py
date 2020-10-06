@@ -356,7 +356,7 @@ class Canvas:
               time.sleep(1.0)
               pass
 
-   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, label ="Data/Prediction", outputDir = 'plots/'):
+   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, label ="Data/Prediction", outputDir = 'plots/', xlog = False):
 
       self.myCanvas.cd()
 
@@ -371,6 +371,9 @@ class Canvas:
       pad1.cd()
       if(log):
           pad1.SetLogy(1)
+      if(xlog):
+          pad1.SetLogx(1)
+          pad2.SetLogx(1)
 
       for i in range(0, len(self.histos)):
           if(self.ToDraw[i] != 0):
