@@ -210,13 +210,16 @@ if __name__ == "__main__":
     lumiH = 8.61
     lumi =  lumiB + lumiC + lumiD + lumiE + lumiF + lumiG + lumiH# luminosity
 
-    filename = 'dat/Samples_cern_fillEG.dat' if opts.test else 'dat/Samples_cern_filling.dat'
+   # filename = 'dat/Samples_cern_fillEG.dat' if opts.test else 'dat/Samples_cern_filling.dat'
+    filename = 'dat/Samples_cern_filling_test.dat' if opts.test else 'dat/Samples_cern_filling.dat'
     #filename = 'dat/Samples_cern_fillEG.dat' if opts.test else 'dat/Samples_cern_fillEG.dat'
 
+    DoubleData = DoubleMuon + DoubleEG
+    #DoubleData = DoubleEG
     ############# Tree creation
     treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )
     treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Signals, 'SI'), name = 'SI', isdata = 0 )
-    treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon + DoubleEG, 'DATA'), name = 'DATA', isdata = 1 )
+    treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleData, 'DATA'), name = 'DATA', isdata = 1 )
 
     ############# Cut definition
 

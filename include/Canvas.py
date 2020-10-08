@@ -492,6 +492,123 @@ class Canvas:
       self.myLegend.IsA().Destructor(self.myLegend)
       self.myCanvas.IsA().Destructor(self.myCanvas)                                                                                                                                            
 
+   def saveSigmaDev(self, legend, isData, log, lumi, hdata, hMC, r_ymin=-8, r_ymax=8, label ="(Data - MC)/#sigma(MC)", outputDir = 'plots/', xlog = False):
+
+      self.myCanvas.cd()
+
+      pad1 = TPad("pad1", "pad1", 0, 0.25, 1, 1.0)
+      pad1.SetBottomMargin(0.12)
+      pad1.Draw()                                     
+      pad2 = TPad("pad2", "pad2", 0, 0.05, 1, 0.25)
+      pad2.SetTopMargin(0.1);
+      pad2.SetBottomMargin(0.3);
+      pad2.Draw();                                      
+
+      pad1.cd()
+      if(log):
+          pad1.SetLogy(1)
+      if(xlog):
+          pad1.SetLogx(1)
+          pad2.SetLogx(1)
+
+      for i in range(0, len(self.histos)):
+          if(self.ToDraw[i] != 0):
+              if str(type(self.histos[i])) == "<class 'ROOT.TEfficiency'>":
+                  self.makeRate(self.histos[i], self.options[i])
+              else:
+                  self.histos[i].Draw(self.options[i])
+
+      if(legend):
+          self.makeLegend()
+          self.myLegend.SetTextSize(0.035) # Modify the legend size
+          self.myLegend.Draw()
+
+      for band in self.bands:
+          band.Draw('f')
+  
+      for line in self.lines:
+          line.Draw()
+  
+      for arrow in self.arrows:
+          arrow.Draw()
+  
+      for latex in self.latexs:
+          lat = TLatex()
+          lat.SetNDC()
+          lat.SetTextAlign(latex[-1])
+          lat.SetTextSize(latex[-2])
+          lat.SetTextFont(latex[-3])
+          lat.DrawLatex(latex[0], latex[1], latex[2])
+  
+      
+      if type(hMC) != list:
+          hMClist = [hMC]
+      else: hMClist = hMC
+
+      devs = []
+
+      for tmp_hMC in hMClist:
+          ind = hMClist.index(tmp_hMC)
+
+          tmp_dev = hdata.Clone(tmp_hMC.GetName()+'_ratio')
+          for n in range(1, tmp_dev.GetNbinsX() + 1):
+              data_value = hdata.GetBinContent(n)
+              MC_value = tmp_hMC.GetBinContent(n)
+              MC_err = tmp_hMC.GetBinError(n)
+              tmp_dev.SetBinContent(n, (data_value - MC_value)/MC_err)
+
+          tmp_dev.SetTitle("")
+          tmp_dev.GetYaxis().SetRangeUser(r_ymin, r_ymax);
+          tmp_dev.GetYaxis().SetTitle(label);
+          tmp_dev.GetYaxis().CenterTitle();
+          tmp_dev.GetYaxis().SetLabelSize(0.12);
+          tmp_dev.GetXaxis().SetLabelSize(0.12);
+          tmp_dev.GetYaxis().SetTitleOffset(0.3);
+          tmp_dev.GetYaxis().SetNdivisions(4);
+          tmp_dev.GetYaxis().SetTitleSize(0.12);
+          tmp_dev.GetXaxis().SetTitleSize(0.12);
+          tmp_dev.GetXaxis().SetLabelOffset(0.08);
+          tmp_dev.GetXaxis().SetTitle('');
+          tmp_dev.SetFillColor(r.kRed+1)
+          tmp_dev.SetLineColor(r.kBlack)
+          devs.append(tmp_dev)
+          xmin = tmp_dev.GetBinLowEdge(1)
+          xmax = tmp_dev.GetBinLowEdge(tmp_dev.GetNbinsX()+1)
+
+      #tmp_ratio.Draw("E,SAME");
+      pad2.cd();  
+      for dev in devs:
+          dev.Draw('hist,same');
+
+      line = TLine(xmin, 0, xmax, 0)
+      line.SetLineColor(r.kGray+2);
+      line.Draw('');
+
+      pad1.cd()
+      self.banner2(isData, lumi)
+
+      if not outputDir[-1] == '/': dirName = outputDir + '/'
+      else: dirName = outputDir
+
+      for i,plotName in enumerate(self.plotNames):
+          pad1.cd()
+          pad1.SetLogy(0)
+          path    = dirName+plotName
+          pathlog = dirName+self.plotNamesLog[i]
+          self.ensurePath(path)
+          self.myCanvas.SaveAs(path)
+          """
+          if not '.root' in pathlog:
+              pad1.cd()
+              pad1.SetLogy()
+              self.myCanvas.SaveAs(pathlog)
+          """
+          
+
+      pad1.IsA().Destructor(pad1) 
+      pad2.IsA().Destructor(pad2) 
+      self.myLegend.IsA().Destructor(self.myLegend)
+      self.myCanvas.IsA().Destructor(self.myCanvas)                                                                                                                                            
 
    def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False, zlog = False, maxYnumbers = False):
 

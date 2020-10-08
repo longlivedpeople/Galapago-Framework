@@ -48,10 +48,10 @@ class processHandler:
         self.dielectronRegions.append(['BaseLine', '1'])
         self.dielectronRegions.append(['SS0', EE_SS0cut])
         self.dielectronRegions.append(['OS0', EE_OS0cut])
-        self.dielectronRegions.append(['SSI', EE_SSIcut])
-        self.dielectronRegions.append(['OSI', EE_OSIcut])
-        self.dielectronRegions.append(['SSII', EE_SSIIcut])
-        self.dielectronRegions.append(['OSII', EE_OSIIcut])
+        #self.dielectronRegions.append(['SSI', EE_SSIcut])
+        #self.dielectronRegions.append(['OSI', EE_OSIcut])
+        #self.dielectronRegions.append(['SSII', EE_SSIIcut])
+        #self.dielectronRegions.append(['OSII', EE_OSIIcut])
 
 
 
@@ -74,10 +74,10 @@ class processHandler:
         self.dimuonRegions.append(['BaseLine', '1'])
         self.dimuonRegions.append(['SS0', MM_SS0cut])
         self.dimuonRegions.append(['OS0', MM_OS0cut])
-        self.dimuonRegions.append(['SSI', MM_SSIcut])
-        self.dimuonRegions.append(['OSI', MM_OSIcut])
-        self.dimuonRegions.append(['SSII', MM_SSIIcut])
-        self.dimuonRegions.append(['OSII', MM_OSIIcut])
+        #self.dimuonRegions.append(['SSI', MM_SSIcut])
+        #self.dimuonRegions.append(['OSI', MM_OSIcut])
+        #self.dimuonRegions.append(['SSII', MM_SSIIcut])
+        #self.dimuonRegions.append(['OSII', MM_OSIIcut])
 
 
 
@@ -118,9 +118,9 @@ class processHandler:
         nTracks = ev.RefittedPV_nPFTrack + ev.RefittedPV_nLostTrack + ev.RefittedPV_nExcludedTrack
         if nTracks < 4: return
 
-        self.processDimuons(ev, weight)
-        self.processDielectrons(ev, weight)
-        """
+        #self.processDimuons(ev, weight)
+        #self.processDielectrons(ev, weight)
+        
         try:
             self.processDimuons(ev, weight)
         except AttributeError:
@@ -130,7 +130,7 @@ class processHandler:
             self.processDielectrons(ev, weight)
         except AttributeError:
             print('There is some collections missed in this file: Dielectron histograms will be empty')
-        """
+        
 
 
 
@@ -158,12 +158,13 @@ class processHandler:
         for i in range(0, ev.nDMDMBase):
             if abs(ev.DGM_eta[ev.DMDMBase_idxA[i]]) > 2: continue
             if abs(ev.DGM_eta[ev.DMDMBase_idxB[i]]) > 2: continue
-            if ev.DGM_pt[ev.DMDMBase_idxA[i]] < 40: continue
-            if ev.DGM_pt[ev.DMDMBase_idxB[i]] < 40: continue
+            if ev.DGM_pt[ev.DMDMBase_idxA[i]] < 31: continue
+            if ev.DGM_pt[ev.DMDMBase_idxB[i]] < 31: continue
             if ev.DGM_chi2[ev.DMDMBase_idxA[i]]/ev.DGM_ndof[ev.DMDMBase_idxA[i]] > 10: continue
             if ev.DGM_chi2[ev.DMDMBase_idxB[i]]/ev.DGM_ndof[ev.DMDMBase_idxB[i]] > 10: continue
             if ev.DGM_numberOfValidHits[ev.DMDMBase_idxA[i]] < 22: continue
             if ev.DGM_numberOfValidHits[ev.DMDMBase_idxB[i]] < 22: continue
+            if ev.DMDMBase_cosAlpha[i] < -0.80: continue
             #if abs(90 - ev.DMDMBase_mass[i]) < 10: continue
 
             nGoodMM+=1
@@ -195,7 +196,8 @@ class processHandler:
 
     def fillDimuons(self, ev, weight, region, mm_maxIxy, nGoodMM):
 
-        exec("self.hMM{0}_dPhi.Fill(ev.DMDMBase_dPhi[mm_maxIxy], weight)".format(region))
+        exec("self.hMM{0}_nGoodMM.Fill(nGoodMM, weight)".format(region))
+        exec("self.hMM{0}_dPhi.Fill(abs(ev.DMDMBase_dPhi[mm_maxIxy]), weight)".format(region))
         exec("self.hMM{0}_mass.Fill(ev.DMDMBase_mass[mm_maxIxy], weight)".format(region))
         exec("self.hMM{0}_trackIxy.Fill(ev.DMDMBase_trackIxy[mm_maxIxy], weight)".format(region))
         exec("self.hMM{0}_trackDxy.Fill(ev.DMDMBase_trackDxy[mm_maxIxy], weight)".format(region))
@@ -204,7 +206,7 @@ class processHandler:
         exec("self.hMM{0}_cosAlpha.Fill(ev.DMDMBase_cosAlpha[mm_maxIxy], weight)".format(region))
         exec("self.hMM{0}_leadingPt.Fill(ev.DMDMBase_leadingPt[mm_maxIxy], weight)".format(region))
         exec("self.hMM{0}_dPhi.Fill(ev.DMDMBase_dPhi[mm_maxIxy], weight)".format(region))
-        exec("self.hMM{0}_dPhi.Fill(ev.DMDMBase_dPhi[mm_maxIxy], weight)".format(region))
+        exec("self.hMM{0}_cosAlpha_dPhi.Fill(ev.DMDMBase_cosAlpha[mm_maxIxy], abs(ev.DMDMBase_dPhi[mm_maxIxy]), weight)".format(region))
 
         for i in range(0, ev.nDGM):
 
@@ -236,10 +238,10 @@ class processHandler:
         for i in range(0, ev.nEEBase):
             if abs(ev.ElectronCandidate_eta[ev.EEBase_idxA[i]]) > 2.0: continue
             if abs(ev.ElectronCandidate_eta[ev.EEBase_idxB[i]]) > 2.0: continue
-            if ev.EEBase_leadingPt[i] < 50: continue
-            if ev.EEBase_leadingEt[i] < 50: continue
-            if ev.EEBase_subleadingPt[i] < 30: continue
-            if ev.EEBase_subleadingEt[i] < 30: continue
+            if ev.EEBase_leadingPt[i] < 48: continue
+            if ev.EEBase_leadingEt[i] < 48: continue
+            if ev.EEBase_subleadingPt[i] < 28: continue
+            if ev.EEBase_subleadingEt[i] < 28: continue
             #if abs(90 - ev.EEBase_mass[i]) < 10: continue
 
             nGoodEE+=1
@@ -272,7 +274,8 @@ class processHandler:
     def fillDielectrons(self, ev, weight, region, ee_maxIxy, nGoodEE):
 
 
-        exec("self.hEE{0}_dPhi.Fill(ev.EEBase_dPhi[ee_maxIxy], weight)".format(region))
+        exec("self.hEE{0}_nGoodEE.Fill(nGoodEE, weight)".format(region))
+        exec("self.hEE{0}_dPhi.Fill(abs(ev.EEBase_dPhi[ee_maxIxy]), weight)".format(region))
         exec("self.hEE{0}_mass.Fill(ev.EEBase_mass[ee_maxIxy], weight)".format(region))
         exec("self.hEE{0}_trackDxy.Fill(ev.EEBase_trackDxy[ee_maxIxy], weight)".format(region))
         exec("self.hEE{0}_trackIxy.Fill(ev.EEBase_trackIxy[ee_maxIxy], weight)".format(region))
@@ -283,6 +286,7 @@ class processHandler:
         exec("self.hEE{0}_leadingEt.Fill(ev.EEBase_leadingEt[ee_maxIxy], weight)".format(region))
         exec("self.hEE{0}_subleadingEt.Fill(ev.EEBase_subleadingEt[ee_maxIxy], weight)".format(region))
         exec("self.hEE{0}_normalizedChi2.Fill(ev.EEBase_normalizedChi2[ee_maxIxy], weight)".format(region))
+        exec("self.hEE{0}_cosAlpha_dPhi.Fill(ev.EEBase_cosAlpha[ee_maxIxy], abs(ev.EEBase_dPhi[ee_maxIxy]), weight)".format(region))
 
         for i in range(0, ev.nElectronCandidate):
 
@@ -308,8 +312,9 @@ class processHandler:
         #### ---------------
         #### ---- MM plots
         #### ---------------
+        exec("self.hMM{0}_nGoodMM = r.TH1F('hMM{0}_nGoodMM' + self.sufix, ';Number of MM candidates;', 0, 0, 4)".format(region))
         exec("self.hMM{0}_nPU = r.TH1F('hMM{0}_nPU' + self.sufix, ';Number of true primary vertices;', 40, 0, 80)".format(region))
-        exec("self.hMM{0}_dPhi = r.TH1F('hMM{0}_dPhi' + self.sufix, ';Dimuon collinearity |#Delta#Phi|;', 20, -3.3, 3.3)".format(region))
+        exec("self.hMM{0}_dPhi = r.TH1F('hMM{0}_dPhi' + self.sufix, ';Dimuon collinearity |#Delta#Phi|;', 29, 0, 3.14)".format(region))
         exec("self.hMM{0}_mass = r.TH1F('hMM{0}_mass' + self.sufix, ';Dimuon invariant mass m_{{#mu#mu}} (GeV);', 55, 0, 500)".format(region))
         exec("self.hMM{0}_cosAlpha = r.TH1F('hMM{0}_cosAlpha' + self.sufix, ';Dimuon cos(#alpha_{{#mu#mu}});', 22, -1.1, 1.1)".format(region))
         exec("self.hMM{0}_trackIxy = r.TH1F('hMM{0}_trackIxy' + self.sufix, ';Dimuon |d_{{0}}|/#sigma_{{d}};', 20, 0, 20)".format(region))
@@ -319,6 +324,7 @@ class processHandler:
         exec("self.hMM{0}_leadingPt = r.TH1F('hMM{0}_leadingPt' + self.sufix, ';Dimuon leading p_{{T}};', 30, 0, 300)".format(region))
         exec("self.hMM{0}_subleadingPt = r.TH1F('hMM{0}_subleadingPt' + self.sufix, ';Dimuon subleading p_{{T}};', 30, 0, 300)".format(region))
         exec("self.hMM{0}_normalizedChi2 = r.TH1F('hMM{0}_normalizedChi2' + self.sufix, ';Dimuon vertex fit #chi^{{2}}/ndof;', 20, 0, 10)".format(region))
+        exec("self.hMM{0}_cosAlpha_dPhi = r.TH2F('hMM{0}_cosAlpha_dPhi' + self.sufix, ';Dimuon cos(#alpha_{{#mu#mu}}) ; Dimuon collinearity |#Delta#Phi|', 20, -1.0, 1.0, 20, 0, 3.14)".format(region))
 
 
         #### ----------------------
@@ -338,10 +344,11 @@ class processHandler:
         #### ---- EE plots
         #### ---------------
 
+        exec("self.hEE{0}_nGoodEE = r.TH1F('hEE{0}_nGoodEE' + self.sufix, ';Number of EE candidates;', 0, 0, 4)".format(region))
         exec("self.hEE{0}_nPU = r.TH1F('hEE{0}_nPU' + self.sufix, ';Number of true primary vertices;', 40, 0, 80)".format(region))
-        exec("self.hEE{0}_dPhi = r.TH1F('hEE{0}_dPhi' + self.sufix, ';Dielectron collinearity |#Delta#Phi|;', 20, -3.3, 3.3)".format(region))
-        exec("self.hEE{0}_mass = r.TH1F('hEE{0}_mass' + self.sufix, ';Dielectron invariant mass m_{{#mu#mu}} (GeV);', 55, 0, 500)".format(region))
-        exec("self.hEE{0}_cosAlpha = r.TH1F('hEE{0}_cosAlpha' + self.sufix, ';Dielectron cos(#alpha_{{#mu#mu}});', 22, -1.1, 1.1)".format(region))
+        exec("self.hEE{0}_dPhi = r.TH1F('hEE{0}_dPhi' + self.sufix, ';Dielectron collinearity |#Delta#Phi|;', 29, 0, 3.14)".format(region))
+        exec("self.hEE{0}_mass = r.TH1F('hEE{0}_mass' + self.sufix, ';Dielectron invariant mass m_{{ee}} (GeV);', 55, 0, 500)".format(region))
+        exec("self.hEE{0}_cosAlpha = r.TH1F('hEE{0}_cosAlpha' + self.sufix, ';Dielectron cos(#alpha_{{ee}});', 22, -1.1, 1.1)".format(region))
         exec("self.hEE{0}_trackIxy = r.TH1F('hEE{0}_trackIxy' + self.sufix, ';Dielectron |d_{{0}}|/#sigma_{{d}};', 20, 0, 20)".format(region))
         exec("self.hEE{0}_trackDxy = r.TH1F('hEE{0}_trackDxy' + self.sufix, ';Dielectron |d_{{0}}| (cm);', 30, 0, 0.5)".format(region))
         exec("self.hEE{0}_Lxy = r.TH1F('hEE{0}_Lxy' + self.sufix, ';Dielectron vertex |L_{{xy}}| (cm);', 20, 0, 10)".format(region))
@@ -351,6 +358,7 @@ class processHandler:
         exec("self.hEE{0}_leadingEt = r.TH1F('hEE{0}_leadingEt' + self.sufix, ';Dielectron leading E_{{T}};', 30, 0, 300)".format(region))
         exec("self.hEE{0}_subleadingEt = r.TH1F('hEE{0}_subleadingEt' + self.sufix, ';Dielectron subleading E_{{T}};', 30, 0, 300)".format(region))
         exec("self.hEE{0}_normalizedChi2 = r.TH1F('hEE{0}_normalizedChi2' + self.sufix, ';Dielectron vertex fit #chi^{{2}}/ndof;', 20, 0, 10)".format(region))
+        exec("self.hEE{0}_cosAlpha_dPhi = r.TH2F('hMM{0}_cosAlpha_dPhi' + self.sufix, ';Dielectron cos(#alpha_{{ee}}) ; Dielectron collinearity |#Delta#Phi|', 20, -1.0, 1.0, 20, 0, 3.14)".format(region))
 
         #### ---------------------
         #### ---- Single E plots
