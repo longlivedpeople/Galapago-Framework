@@ -211,7 +211,7 @@ if __name__ == "__main__":
     lumi =  lumiB + lumiC + lumiD + lumiE + lumiF + lumiG + lumiH# luminosity
 
    # filename = 'dat/Samples_cern_fillEG.dat' if opts.test else 'dat/Samples_cern_filling.dat'
-    filename = 'dat/Samples_cern_filling_test.dat' if opts.test else 'dat/Samples_cern_filling.dat'
+    filename = 'dat/Samples_cern_filling_test.dat' if opts.test else 'dat/Samples_cern_fillingv2.dat'
     #filename = 'dat/Samples_cern_fillEG.dat' if opts.test else 'dat/Samples_cern_fillEG.dat'
 
     DoubleData = DoubleMuon + DoubleEG
@@ -234,7 +234,7 @@ if __name__ == "__main__":
     ####  Dimuons  ####
     ###################
 
-    #treeMC.Loop(lumi, WORKPATH + opts.out + '/')
+#    treeMC.Loop(lumi, WORKPATH + opts.out + '/')
     #treeSI.Loop(lumi, WORKPATH + opts.out + '/')
     #treeDATA.Loop(lumi, WORKPATH + opts.out + '/')
     treeMC.launchLoop(lumi, WORKPATH +  opts.out + '/', queue = 'longlunch')
