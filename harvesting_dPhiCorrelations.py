@@ -192,14 +192,14 @@ if __name__ == "__main__":
 
     treeEG = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_list, 'DATA'), name = 'DATA', isdata = 1 )
     #treeMuon = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_list, 'DATA'), name = 'DATA', isdata = 1 )
-    makeLinearFit(lumi_total, 'hEESS0_dPhi', 0, treeEG, WORKPATH + opts.input, 'DoubleEG_Run2016[B-H] (SS0 Region)', 'DATAEG_hEESS0_dPhi_corr', 1)
-    makeLinearFit(lumi_total, ['hEESSI_dPhi', 'hEEOSI_dPhi'], 0, treeEG, WORKPATH + opts.input, 'DoubleEG_Run2016[B-H] (OSI + SSI Regions)', 'DATAEG_hEEOSSSI_dPhi_corr', 1)
-    makeLinearFit(lumi_total, ['hEESSII_dPhi', 'hEEOSII_dPhi'], 0, treeEG, WORKPATH + opts.input, 'DoubleEG_Run2016[B-H] (OSII + SSII Regions)', 'DATAEG_hEEOSSSII_dPhi_corr', 1)
+#    makeLinearFit(lumi_total, 'hEESS0_dPhi', 0, treeEG, WORKPATH + opts.input, 'DoubleEG_Run2016[B-H] (SS0 Region)', 'DATAEG_hEESS0_dPhi_corr', 1)
+#    makeLinearFit(lumi_total, ['hEESSI_dPhi', 'hEEOSI_dPhi'], 0, treeEG, WORKPATH + opts.input, 'DoubleEG_Run2016[B-H] (OSI + SSI Regions)', 'DATAEG_hEEOSSSI_dPhi_corr', 1)
+#    makeLinearFit(lumi_total, ['hEESSII_dPhi', 'hEEOSII_dPhi'], 0, treeEG, WORKPATH + opts.input, 'DoubleEG_Run2016[B-H] (OSII + SSII Regions)', 'DATAEG_hEEOSSSII_dPhi_corr', 1)
 #    makeLinearFit(lumi_total, 'hEEOSI_dPhi', 0, treeEG, WORKPATH + opts.input, 'DoubleEG_Run2016[B-H] (OSI Region)', 'DATAEG_hEEOSI_dPhi_corr', 1)
 #    makeLinearFit(lumi_total, 'hEEOSII_dPhi', 0, treeEG, WORKPATH + opts.input, 'DoubleEG_Run2016[B-H] (OSII Region)', 'DATAEG_hEEOSII_dPhi_corr', 1)
 #    makeLinearFit(lumi_total, 'hEESSI_dPhi', 0, treeEG, WORKPATH + opts.input, 'DoubleEG_Run2016[B-H] (SSI Region)', 'DATAEG_hEESSI_dPhi_corr', 1)
 #    makeLinearFit(lumi_total, 'hEESSII_dPhi', 0, treeEG, WORKPATH + opts.input, 'DoubleEG_Run2016[B-H] (SSII Region)', 'DATAEG_hEESSII_dPhi_corr', 1)
-    #makeLinearFit(lumi_total, 'hMMSS0_dPhi', 0, treeMuon, WORKPATH + opts.input, 'DoubleMuon_Run2016[B-H] (SS0 Region)', 'DATAMuon_hMM_dPhi_corr', 1)
+#    makeLinearFit(lumi_total, 'hMMSS0_dPhi', 0, treeMuon, WORKPATH + opts.input, 'DoubleMuon_Run2016[B-H] (SS0 Region)', 'DATAMuon_hMM_dPhi_corr', 1)
 
     
     #
@@ -207,8 +207,8 @@ if __name__ == "__main__":
     #
 
     treeDY = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-50', 'DYJetsToLL_M-10to50'], 'MC'), name = 'MC', isdata = 0 )
-    makeLinearFit(lumi_total, 'hEEOS0_dPhi', 0, treeDY, WORKPATH + opts.input, 'Monte Carlo: DYJetsToLL_[M-50 + M-10to50] (OS0 Region)', 'DY_hEE_dPhi_corr', 0)
-    #makeLinearFit(lumi_total, 'hMMOS0_dPhi', 0, treeDY, WORKPATH + opts.input, 'Monte Carlo: DYJetsToLL_[M-50 + M-10to50] (OS0 Region)', 'DY_hMM_dPhi_corr', 0)
+    makeLinearFit(lumi_total, 'hEEOS0disp_dPhi', 0, treeDY, WORKPATH + opts.input, 'Monte Carlo: DYJetsToLL_[M-50 + M-10to50] (OS0 Region)', 'DY_hEE_dPhi_corr', 0)
+    makeLinearFit(lumi_total, 'hMMOS0disp_dPhi', 0, treeDY, WORKPATH + opts.input, 'Monte Carlo: DYJetsToLL_[M-50 + M-10to50] (OS0 Region)', 'DY_hMM_dPhi_corr', 0)
 
 
     #
@@ -216,16 +216,16 @@ if __name__ == "__main__":
     #
 
     treeTT = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TT'], 'MC'), name = 'MC', isdata = 0 )
-    makeLinearFit(lumi_total, 'hEEOS0_dPhi', 0, treeTT, WORKPATH + opts.input, 'Monte Carlo: TT (OS0 Region)', 'TT_hEE_dPhi_corr', 0)
-    #makeLinearFit(lumi_total, 'hMMOS0_dPhi', 0, treeTT, WORKPATH + opts.input, 'Monte Carlo: TT (OS0 Region)', 'TT_hMM_dPhi_corr', 0)
+    makeLinearFit(lumi_total, 'hEEOS0disp_dPhi', 0, treeTT, WORKPATH + opts.input, 'Monte Carlo: TT (OS0 Region)', 'TT_hEE_dPhi_corr', 0)
+    makeLinearFit(lumi_total, 'hMMOS0disp_dPhi', 0, treeTT, WORKPATH + opts.input, 'Monte Carlo: TT (OS0 Region)', 'TT_hMM_dPhi_corr', 0)
 
     #
     # -- Diboson Correlation
     #
 
     treeVV = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['WW', 'WZ', 'ZZ'], 'MC'), name = 'MC', isdata = 0 )
-    makeLinearFit(lumi_total, 'hEEOS0_dPhi', 0, treeVV, WORKPATH + opts.input, 'Monte Carlo: WW + WZ + ZZ (OS0 Region)', 'Diboson_hEE_dPhi_corr', 0)
-    #makeLinearFit(lumi_total, 'hMMOS0_dPhi', 0, treeVV, WORKPATH + opts.input, 'Monte Carlo: WW + WZ + ZZ (OS0 Region)', 'Diboson_hMM_dPhi_corr', 0)
+    makeLinearFit(lumi_total, 'hEEOS0disp_dPhi', 0, treeVV, WORKPATH + opts.input, 'Monte Carlo: WW + WZ + ZZ (OS0 Region)', 'Diboson_hEE_dPhi_corr', 0)
+    makeLinearFit(lumi_total, 'hMMOS0disp_dPhi', 0, treeVV, WORKPATH + opts.input, 'Monte Carlo: WW + WZ + ZZ (OS0 Region)', 'Diboson_hMM_dPhi_corr', 0)
     
     
 

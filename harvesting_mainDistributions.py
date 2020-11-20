@@ -16,14 +16,13 @@ import include.CutManager as CutManager
 
 
 
-def makeDataMCPlot(lumi, hname, ylog, treeMC, treeDATA, inputdir, treeSI = False, xlabel = '', outtag = '', yshift = 100.0, LLlabel = '', DATAlabel = '', extralabel = ''):
+def makeDataMCPlot(lumi, hname, hnameDATA, ylog, treeMC, treeDATA, inputdir, treeSI = False, xlabel = '', outtag = '', yshift = 100.0, LLlabel = '', DATAlabel = '', extralabel = '', xlog = False):
 
 
     
     luminosity = lumi
-    SShname = hname.split('__')[0] + '_SS'
 
-    hSS = treeDATA.getLoopTH1F(inputdir, SShname)
+    hSS = treeDATA.getLoopTH1F(inputdir, hnameDATA)
     hOS = treeMC.getLoopStack(inputdir, hname)
 
     # hSS tunning:
@@ -150,7 +149,7 @@ def makeDataMCPlot(lumi, hname, ylog, treeMC, treeDATA, inputdir, treeSI = False
     ### Save it
     outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/Plots_' + outtag + '/'
     if treeDATA:
-        plot.saveRatio(1, 0, ylog, luminosity, hDATA, hBKGtotal, label="Data/BKG", outputDir = outdir)
+        plot.saveRatio(1, 0, ylog, luminosity, hDATA, hBKGtotal, label="Data/BKG", outputDir = outdir, xlog = xlog)
     else:
         plot.save(1, 0, ylog, luminosity, '', outputDir = outdir)
     
@@ -225,7 +224,7 @@ if __name__ == "__main__":
     ############# Signal definition
     Signals = []
     #Signals.append('DisplacedSUSY_350_148_173')
-    Signals.append('HXX_400_50_400mm')
+    Signals.append('HXX_1000_150_100mm')
     #Signals.append('HXX_400_50_40mm')
     #Signals.append('HXX_400_50_4mm')
 
@@ -271,7 +270,7 @@ if __name__ == "__main__":
     ################################
     ######## DoubleEG Plots ########
     ################################
-        
+    """ 
     for i in range(0, len(DoubleEG_list)):
         dataset = DoubleEG_list[i]
         lumi = lumiEG[dataset]
@@ -289,6 +288,10 @@ if __name__ == "__main__":
         makeDataMCPlot(lumiEG[dataset], 'hEE_trackDxy', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = dataset, LLlabel = 'EE', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
         makeDataMCPlot(lumiEG[dataset], 'hEE_Lxy', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = dataset, LLlabel = 'EE', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
         makeDataMCPlot(lumiEG[dataset], 'hEE_Ixy', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = dataset, LLlabel = 'EE', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
+        makeDataMCPlot(lumiEG[dataset], 'hEE_trackIxy', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = dataset, LLlabel = 'EE', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
+        makeDataMCPlot(lumiEG[dataset], 'hEE_trackDxy', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = dataset, LLlabel = 'EE', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
+        makeDataMCPlot(lumiEG[dataset], 'hEE_Lxy', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = dataset, LLlabel = 'EE', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
+        makeDataMCPlot(lumiEG[dataset], 'hEE_Ixy', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = dataset, LLlabel = 'EE', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
         makeDataMCPlot(lumiEG[dataset], 'hEE_leadingPt', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = dataset, LLlabel = 'EE', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
         makeDataMCPlot(lumiEG[dataset], 'hEE_subleadingPt', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = dataset, LLlabel = 'EE', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
         makeDataMCPlot(lumiEG[dataset], 'hEE_normalizedChi2', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = dataset, LLlabel = 'EE', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
@@ -296,35 +299,24 @@ if __name__ == "__main__":
         makeDataMCPlot(lumiEG[dataset], 'hE_dxy', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = dataset, LLlabel = 'EE', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
         makeDataMCPlot(lumiEG[dataset], 'hE_dxyError', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = dataset, LLlabel = 'EE', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
         makeDataMCPlot(lumiEG[dataset], 'hE_charge', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = dataset, LLlabel = 'EE', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
-    
+    """
 
     ##### Joint luminosity
     
     treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )
     treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_list, 'DATA'), name = 'DATA', isdata = 1 )
 
-    makeDataMCPlot(lumi_EG, 'hEE_nPU_weighted', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
-    makeDataMCPlot(lumi_EG, 'hEE_nPU_unweighted', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
-    makeDataMCPlot(lumi_EG, 'hEE_dPhi', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2', yshift = 10000.0)
-    makeDataMCPlot(lumi_EG, 'hEE_mass', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2' )
-    makeDataMCPlot(lumi_EG, 'hEE_trackIxy', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
-    makeDataMCPlot(lumi_EG, 'hEE_trackDxy', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
-    makeDataMCPlot(lumi_EG, 'hEE_Lxy', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
-    makeDataMCPlot(lumi_EG, 'hEE_Ixy', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
-    makeDataMCPlot(lumi_EG, 'hEE_leadingPt', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
-    makeDataMCPlot(lumi_EG, 'hEE_subleadingPt', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
-    makeDataMCPlot(lumi_EG, 'hEE_normalizedChi2', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
-    makeDataMCPlot(lumi_EG, 'hE_eta', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2', yshift = 10000.0)
-    makeDataMCPlot(lumi_EG, 'hE_dxy', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
-    makeDataMCPlot(lumi_EG, 'hE_dxyError', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
-    makeDataMCPlot(lumi_EG, 'hE_charge', True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2', yshift = 10000.0)
+    makeDataMCPlot(lumi_EG, 'hEEOS0_dPhi', 'hEESS0_dPhi',True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2', yshift = 10000.0)
+    makeDataMCPlot(lumi_EG, 'hEEOS0_mass', 'hEESS0_mass',True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
+    makeDataMCPlot(lumi_EG, 'hEEOS0_trackIxy', 'hEESS0_trackIxy',True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
+    makeDataMCPlot(lumi_EG, 'hEEOS0_Ixy', 'hEESS0_Ixy',True, treeMC, treeDATA, WORKPATH + opts.EGinput, outtag = 'DoubleEG_Full2016', LLlabel = 'EE', DATAlabel = 'DoubleEG_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
     
     
 
     ##################################
     ######## DoubleMuon Plots ########
     ##################################
-    
+    """
     for i in range(0, len(DoubleMuon_list)):
         dataset = DoubleMuon_list[i]
         lumi = lumiMuon[dataset]
@@ -352,9 +344,10 @@ if __name__ == "__main__":
         makeDataMCPlot(lumiMuon[dataset], 'hM_charge', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = dataset, LLlabel = 'MM', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
         makeDataMCPlot(lumiMuon[dataset], 'hM_numberOfValidHits', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = dataset, LLlabel = 'MM', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
         makeDataMCPlot(lumiMuon[dataset], 'hM_normChi2', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = dataset, LLlabel = 'MM', DATAlabel = dataset, extralabel = '|Control region #Delta#Phi| > #pi/2')
+    """
     
-
     ## Full luminosity
+    """
     treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )
     treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_list, 'DATA'), name = 'DATA', isdata = 1 )
 
@@ -367,6 +360,10 @@ if __name__ == "__main__":
     makeDataMCPlot(lumi_Muon, 'hMM_trackDxy', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = 'DoubleMuon_Full2016', LLlabel = 'MM', DATAlabel = 'DoubleMuon_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
     makeDataMCPlot(lumi_Muon, 'hMM_Lxy', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = 'DoubleMuon_Full2016', LLlabel = 'MM', DATAlabel = 'DoubleMuon_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
     makeDataMCPlot(lumi_Muon, 'hMM_Ixy', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = 'DoubleMuon_Full2016', LLlabel = 'MM', DATAlabel = 'DoubleMuon_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
+    makeDataMCPlot(lumi_Muon, 'hMM_trackIxy_log', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = 'DoubleMuon_Full2016', LLlabel = 'MM', DATAlabel = 'DoubleMuon_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2', xlog = True)
+    makeDataMCPlot(lumi_Muon, 'hMM_trackDxy_log', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = 'DoubleMuon_Full2016', LLlabel = 'MM', DATAlabel = 'DoubleMuon_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2', xlog = True)
+    makeDataMCPlot(lumi_Muon, 'hMM_Lxy_log', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = 'DoubleMuon_Full2016', LLlabel = 'MM', DATAlabel = 'DoubleMuon_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2', xlog = True)
+    makeDataMCPlot(lumi_Muon, 'hMM_Ixy_log', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = 'DoubleMuon_Full2016', LLlabel = 'MM', DATAlabel = 'DoubleMuon_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2', xlog = True)
     makeDataMCPlot(lumi_Muon, 'hMM_leadingPt', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = 'DoubleMuon_Full2016', LLlabel = 'MM', DATAlabel = 'DoubleMuon_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
     makeDataMCPlot(lumi_Muon, 'hMM_subleadingPt', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = 'DoubleMuon_Full2016', LLlabel = 'MM', DATAlabel = 'DoubleMuon_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
     makeDataMCPlot(lumi_Muon, 'hMM_normalizedChi2', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = 'DoubleMuon_Full2016', LLlabel = 'MM', DATAlabel = 'DoubleMuon_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
@@ -376,6 +373,6 @@ if __name__ == "__main__":
     makeDataMCPlot(lumi_Muon, 'hM_charge', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = 'DoubleMuon_Full2016', LLlabel = 'MM', DATAlabel = 'DoubleMuon_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2', yshift = 10000.0)
     makeDataMCPlot(lumi_Muon, 'hM_numberOfValidHits', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = 'DoubleMuon_Full2016', LLlabel = 'MM', DATAlabel = 'DoubleMuon_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2', yshift = 1000.0)
     makeDataMCPlot(lumi_Muon, 'hM_normChi2', True, treeMC, treeDATA, WORKPATH + opts.Muoninput, outtag = 'DoubleMuon_Full2016', LLlabel = 'MM', DATAlabel = 'DoubleMuon_Full2016', extralabel = '|Control region #Delta#Phi| > #pi/2')
-    
+    """
 
 

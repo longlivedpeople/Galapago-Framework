@@ -30,7 +30,6 @@ class Canvas:
       self.myLegend.SetLineWidth(0)
       self.myLegend.SetBorderSize(0)
       self.myLegend.SetNColumns(c)              
-      #r.gStyle.SetPadRightMargin(0.05)
 
    def changeLabelsToNames(self):
       newlabels = []
@@ -39,7 +38,7 @@ class Canvas:
          newlabels.append(self.histos[il].GetName())
       self.labels = newlabels
 
-   def banner(self, isData, lumi, scy):
+   def banner(self, isData, lumi, scy, inProgress = False):
      
       latex = TLatex()
       latex.SetNDC();                         
@@ -68,14 +67,21 @@ class Canvas:
          else:
              latexb.DrawLatex(0.52, 0.93, "#it{Preliminary}")
       else:
-         if not scy:
-             latexb.DrawLatex(0.43, 0.93, "#it{Simulation}")
+         if not inProgress:
+             if not scy:
+                 latexb.DrawLatex(0.43, 0.93, "#it{Simulation}")
+             else:
+                 latexb.DrawLatex(0.52, 0.93, "#it{Simulation}")
          else:
-             latexb.DrawLatex(0.52, 0.93, "#it{Simulation}")
+             if not scy:
+                 latexb.DrawLatex(0.54, 0.93, "#it{Work in progress}")
+             else:
+                 latexb.DrawLatex(0.63, 0.93, "#it{Work in progress}")
 
       text_lumi = ''
-      if isData:
-          text_lumi = str(lumi)+" fb^{-1}  (13 TeV)"
+      #if isData:
+      #    text_lumi = str(lumi)+" fb^{-1}  (13 TeV)"
+      if lumi: text_lumi = str(lumi)+" fb^{-1}  (13 TeV)"
      
       latexc = TLatex()
       latexc.SetNDC();
@@ -179,8 +185,8 @@ class Canvas:
           arrow.SetLineWidth(thickness)
       self.arrows.append(arrow)
 
-   def addLatex(self, x1, y1, text, font=42, size = 0.04, align = 11):
-      lat = [x1, y1, text, font, size, align]
+   def addLatex(self, x1, y1, text, font=42, size = 0.04, align = 11, color = r.kBlack):
+      lat = [x1, y1, text, font, size, align, color]
       self.latexs.append(lat)
 
    def makeOFHisto(self, histo):
@@ -216,7 +222,7 @@ class Canvas:
       return eff
 
  
-   def addHisto(self, h, option, label, labelOption, color, ToDraw, orderForLegend, doOF = False, normed = False):
+   def addHisto(self, h, option, label, labelOption, color, ToDraw, orderForLegend, marker = False, doOF = False, normed = False):
 
       if(color != ""):
           h.SetLineColor(color)
@@ -227,6 +233,8 @@ class Canvas:
 
       if normed:
           h.Scale(1.0/h.Integral())
+      if marker:
+          h.SetMarkerStyle(marker)
       self.histos.append(h if not doOF else self.makeOFHisto(h))
       self.options.append(option)
       self.labels.append(label)
@@ -356,7 +364,7 @@ class Canvas:
               time.sleep(1.0)
               pass
 
-   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, label ="Data/Prediction", outputDir = 'plots/', xlog = False):
+   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, label ="Data/Prediction", outputDir = 'plots/', xlog = False, maxYnumbers = False, inProgress = False):
 
       self.myCanvas.cd()
 
@@ -403,9 +411,10 @@ class Canvas:
       for latex in self.latexs:
           lat = TLatex()
           lat.SetNDC()
-          lat.SetTextAlign(latex[-1])
-          lat.SetTextSize(latex[-2])
-          lat.SetTextFont(latex[-3])
+          lat.SetTextColor(latex[-1])
+          lat.SetTextAlign(latex[-2])
+          lat.SetTextSize(latex[-3])
+          lat.SetTextFont(latex[-4])
           lat.DrawLatex(latex[0], latex[1], latex[2])
   
       
@@ -468,7 +477,14 @@ class Canvas:
       line.Draw('');
 
       pad1.cd()
-      self.banner2(isData, lumi)
+      #self.banner2(isData, lumi)
+
+      if maxYnumbers:
+          r.TGaxis().SetMaxDigits(maxYnumbers)
+          self.banner(isData, lumi, scy = True, inProgress = inProgress)
+      else:
+          self.banner(isData, lumi, scy = False, inProgress = inProgress)
+
 
       if not outputDir[-1] == '/': dirName = outputDir + '/'
       else: dirName = outputDir
@@ -492,7 +508,7 @@ class Canvas:
       self.myLegend.IsA().Destructor(self.myLegend)
       self.myCanvas.IsA().Destructor(self.myCanvas)                                                                                                                                            
 
-   def saveSigmaDev(self, legend, isData, log, lumi, hdata, hMC, r_ymin=-8, r_ymax=8, label ="(Data - MC)/#sigma(MC)", outputDir = 'plots/', xlog = False):
+   def saveSigmaDev(self, legend, isData, log, lumi, hdata, hMC, r_ymin=-8, r_ymax=8, label ="(Data - MC)/#sigma(MC)", outputDir = 'plots/', xlog = False, maxYnumbers = False):
 
       self.myCanvas.cd()
 
@@ -610,7 +626,7 @@ class Canvas:
       self.myLegend.IsA().Destructor(self.myLegend)
       self.myCanvas.IsA().Destructor(self.myCanvas)                                                                                                                                            
 
-   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False, zlog = False, maxYnumbers = False):
+   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False, zlog = False, maxYnumbers = False, inProgress = False):
 
       self.myCanvas.cd()
       
@@ -647,9 +663,10 @@ class Canvas:
       for latex in self.latexs:
           lat = TLatex()
           lat.SetNDC()
-          lat.SetTextAlign(latex[-1])
-          lat.SetTextSize(latex[-2])
-          lat.SetTextFont(latex[-3])
+          lat.SetTextColor(latex[-1])
+          lat.SetTextAlign(latex[-2])
+          lat.SetTextSize(latex[-3])
+          lat.SetTextFont(latex[-4])
           lat.DrawLatex(latex[0], latex[1], latex[2])
   
       if(legend):
@@ -664,9 +681,9 @@ class Canvas:
       
       if maxYnumbers:
           r.TGaxis().SetMaxDigits(maxYnumbers) 
-          self.banner(isData, lumi, scy = True)
+          self.banner(isData, lumi, scy = True, inProgress = inProgress)
       else:
-          self.banner(isData, lumi, scy = False)
+          self.banner(isData, lumi, scy = False, inProgress = inProgress)
 
       if not outputDir[-1] == '/': dirName = outputDir + '/'
       else: dirName = outputDir

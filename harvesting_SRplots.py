@@ -229,7 +229,7 @@ if __name__ == "__main__":
        
     treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_list, 'DATA'), name = 'DATA', isdata = 1 )
 
-    makeBlindedPlot(lumi = lumi_EG, hname = 'hEE_trackIxy_bin', ylog = True, treeDATA = treeDATA, inputdir_SR = 'leptons_SR', inputdir_CR = 'leptons_CR', treeSI = treeSI, limit = 6, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi_EG, hname = 'hEE_trackIxy_bin', ylog = True, treeDATA = treeDATA, inputdir_SR = 'SR_massExclusion', inputdir_CR = 'CR_massExclusion', treeSI = treeSI, limit = 6, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
 
     ##################################
     ######## DoubleMuon Plots ########
@@ -237,5 +237,6 @@ if __name__ == "__main__":
     
     treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_list, 'DATA'), name = 'DATA', isdata = 1 )
 
-    makeBlindedPlot(lumi = lumi_Muon, hname = 'hMM_trackIxy_bin', ylog = True, treeDATA = treeDATA, inputdir_SR = 'leptons_SR', inputdir_CR = 'leptons_CR', treeSI = treeSI, limit = 6, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi_Muon, hname = 'hMM_trackIxy_bin', ylog = True, treeDATA = treeDATA, inputdir_SR = 'SR_massExclusion', inputdir_CR = 'CR_massExclusion', treeSI = treeSI, limit = 6, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi_Muon, hname = 'hMM_mass', ylog = True, treeDATA = treeDATA, inputdir_SR = 'SR_massExclusion', inputdir_CR = 'CR_massExclusion', treeSI = treeSI, limit = -1, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
     

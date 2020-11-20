@@ -504,6 +504,7 @@ class Tree:
      # TTree <------> Job
      #
 
+
      outdir = outdir + '/' if outdir[-1] != '/' else outdir # outdir correction
 
      # Get absdir:
@@ -691,7 +692,6 @@ queue filename matching {2}
            if t == 0 and _s == 0 and _b == 0: continue
            _ft = r.TFile(inputdir + '{0}__{1}__{2}__{3}.root'.format(self.name, b.name, s.name, str(t)))
            _haux = _ft.Get(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
-           #print(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
            try:
                _h = _haux.Clone()
                if doOF: 
@@ -715,5 +715,35 @@ queue filename matching {2}
      hth1f.GetYaxis().SetTitle(ylabel)
 
      return hth1f
+
+
+   def getLoopTH2F(self, inputdir, hname):
+     
+     ## Correct input dir absolute path:
+     inputdir = inputdir + '/' if inputdir[-1] != '/' else inputdir
+
+     ## Init histogram:
+     _f0 = r.TFile(inputdir + '{0}__{1}__{2}__0.root'.format(self.name, self.blocks[0].name, self.blocks[0].samples[0].name))
+     hth2f = copy.deepcopy(_f0.Get(hname + '__{0}__{1}__{2}__0'.format(self.name, self.blocks[0].name, self.blocks[0].samples[0].name)))
+     _f0.Close()
+     SetOwnership(hth2f, 0)
+
+     ## Loop over files:
+     for _b,b in enumerate(self.blocks):
+       for _s,s in enumerate(b.samples):
+         for t in range(0, len(s.ttrees)):
+           if t == 0 and _s == 0 and _b == 0: continue
+           _ft = r.TFile(inputdir + '{0}__{1}__{2}__{3}.root'.format(self.name, b.name, s.name, str(t)))
+           _haux = _ft.Get(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
+           try:
+               _h = _haux.Clone()
+               hth2f.Add(_h)
+           except ReferenceError:
+               print(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)) + ' cannot be accesed: Skipping')
+               pass
+           _ft.Close()
+
+     return hth2f
+
 
 

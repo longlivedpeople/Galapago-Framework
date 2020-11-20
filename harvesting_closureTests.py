@@ -16,24 +16,25 @@ import include.CutManager as CutManager
 
 
 
-def makeClosureTestMC(lumi, hname, ylog, treeMC, treeDATA, inputdir_A, inputdir_B, labelA = 'A', labelB = 'B', xlabel = '', outtag = '', yshift = 0.0, LLlabel = '', DATAlabel = '', extralabel = ''):
+def makeClosureTestMC(lumi, name, hBKG_A, hBKG_B, ylog, tree, inputdir, labelA = 'A', labelB = 'B', xlabel = '', outtag = '', yshift = 0.0, LLlabel = '', DATAlabel = '', extralabel = '', rmin = 0.0, rmax = 2.0):
 
+    print(rmin, rmax)
 
     ### Get histograms
     luminosity = lumi
-    SShname = hname.split('__')[0] + '_SS'
 
-    hSS_A = treeDATA.getLoopTH1F(inputdir_A, SShname)
-    hBKG_A = treeMC.getLoopTH1F(inputdir_A, hname)
-    hSS_B = treeDATA.getLoopTH1F(inputdir_B, SShname)
-    hBKG_B = treeMC.getLoopTH1F(inputdir_B, hname)
+    #hBKG_A = treeMC.getLoopTH1F(inputdir, Aname)
+    #hBKG_B = treeMC.getLoopTH1F(inputdir, Bname)
     
-    hBKG_A.Add(hSS_A)
-    hBKG_B.Add(hSS_B)
 
     ### Initialize cumulative histograms
-    cumA = r.TH1F('cumA', '', hBKG_A.GetNbinsX(), hBKG_A.GetXaxis().GetXmin(), hBKG_A.GetXaxis().GetXmax())
-    cumB = r.TH1F('cumB', '', hBKG_B.GetNbinsX(), hBKG_B.GetXaxis().GetXmin(), hBKG_B.GetXaxis().GetXmax())
+    cumA = hBKG_A.Clone('cumA')
+    cumB = hBKG_B.Clone('cumB')
+    cumA.Reset()
+    cumB.Reset()
+
+    #cumA = r.TH1F('cumA', '', hBKG_A.GetNbinsX(), hBKG_A.GetXaxis().GetXmin(), hBKG_A.GetXaxis().GetXmax())
+    #cumB = r.TH1F('cumB', '', hBKG_B.GetNbinsX(), hBKG_B.GetXaxis().GetXmin(), hBKG_B.GetXaxis().GetXmax())
     cumA.SetTitle(';min('+xlabel+');Number of events with '+xlabel+ ' > ('+xlabel+')_{min}')
 
     ### Set cumulative values
@@ -55,16 +56,16 @@ def makeClosureTestMC(lumi, hname, ylog, treeMC, treeDATA, inputdir_A, inputdir_
     ### Histogram tuning 
     cumA.SetMarkerStyle(24)
     cumA.SetMarkerSize(0.8)
-    cumA.SetMarkerColor(r.kRed)
-    cumB.SetMarkerStyle(24)
+    cumA.SetMarkerColor(r.kBlue)
+    cumB.SetMarkerStyle(25)
     cumB.SetMarkerSize(0.8)
-    cumB.SetMarkerColor(r.kBlue)
-    hBKG_A.SetMarkerStyle(25)
+    cumB.SetMarkerColor(r.kRed)
+    hBKG_A.SetMarkerStyle(24)
     hBKG_A.SetMarkerSize(0.8)
-    hBKG_A.SetMarkerColor(r.kRed)
+    hBKG_A.SetMarkerColor(r.kBlue)
     hBKG_B.SetMarkerStyle(25)
     hBKG_B.SetMarkerSize(0.8)
-    hBKG_B.SetMarkerColor(r.kBlue)
+    hBKG_B.SetMarkerColor(r.kRed)
     
     
     ### Get maximum
@@ -98,9 +99,9 @@ def makeClosureTestMC(lumi, hname, ylog, treeMC, treeDATA, inputdir_A, inputdir_
         hBKG_B.SetMaximum(0.1)
 
     ### Canvas object
-    plot = Canvas.Canvas('closuretest_'+hname, 'png', 0.5, 0.75, 0.7, 0.87, 1)
-    plot.addHisto(cumA, 'P', labelA, 'p', r.kRed, 1, 0)
-    plot.addHisto(cumB, 'P, SAME', labelB, 'p', r.kBlue, 1, 1)
+    plot = Canvas.Canvas('closuretest_'+name, 'png', 0.5, 0.75, 0.7, 0.87, 1)
+    plot.addHisto(cumA, 'P', labelA, 'p', r.kBlue, 1, 0)
+    plot.addHisto(cumB, 'P, SAME', labelB, 'p', r.kRed, 1, 1)
     
     ### Channel banner:
     if LLlabel == 'EE':
@@ -113,10 +114,10 @@ def makeClosureTestMC(lumi, hname, ylog, treeMC, treeDATA, inputdir_A, inputdir_
 
     ### Save it
     outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/ClosureTests_' + outtag + '/'
-    plot.saveRatio(1, 0, ylog, luminosity, cumA, cumB, r_ymin = 0, r_ymax = 2.5, label="SR/CR", outputDir = outdir)
+    plot.saveRatio(1, 0, ylog, luminosity, cumA, cumB, r_ymin = rmin, r_ymax = rmax, label="r_{SR/CR}", outputDir = outdir)
 
     ### Main comparison
-    cplot = Canvas.Canvas('plaincomparison_'+hname, 'png', 0.5, 0.75, 0.7, 0.87, 1)
+    cplot = Canvas.Canvas('plaincomparison_'+name, 'png', 0.5, 0.75, 0.7, 0.87, 1)
     cplot.addHisto(hBKG_A, 'P', labelA, 'p', r.kRed, 1, 0)
     cplot.addHisto(hBKG_B, 'P, SAME', labelB, 'p', r.kBlue, 1, 1)
     if LLlabel == 'EE':
@@ -164,7 +165,7 @@ if __name__ == "__main__":
     DoubleEG_list.append(DoubleEGE)
     DoubleEG_list.append(DoubleEGF)
     DoubleEG_list.append(DoubleEGG)
-    DoubleEG_list.append(DoubleEGH)
+    #DoubleEG_list.append(DoubleEGH)
 
     ############# Muon data definition
     DoubleMuonB = 'DoubleMuon_Run2016B'
@@ -176,13 +177,13 @@ if __name__ == "__main__":
     DoubleMuonH = 'DoubleMuon_Run2016H'
 
     DoubleMuon_list = []
-    DoubleMuon_list.append(DoubleMuonB)
+    #DoubleMuon_list.append(DoubleMuonB)
     DoubleMuon_list.append(DoubleMuonC)
     DoubleMuon_list.append(DoubleMuonD)
-    DoubleMuon_list.append(DoubleMuonE)
+    #DoubleMuon_list.append(DoubleMuonE)
     DoubleMuon_list.append(DoubleMuonF)
-    DoubleMuon_list.append(DoubleMuonG)
-    DoubleMuon_list.append(DoubleMuonH)
+    #DoubleMuon_list.append(DoubleMuonG)
+    #DoubleMuon_list.append(DoubleMuonH)
 
 
     ############# Background definition
@@ -209,6 +210,9 @@ if __name__ == "__main__":
     lumiF = 3.10
     lumiG = 7.54
     lumiH = 8.61
+
+    lumiTotal = lumiB + lumiC + lumiD + lumiE + lumiF + lumiG + lumiH
+
 
     lumiEG = {}
     lumiEG['DoubleEG_Run2016B'] = lumiB
@@ -238,23 +242,110 @@ if __name__ == "__main__":
 
 
 
-    filename = 'dat/Samples_cern_filling.dat'
+    filename = 'dat/Samples_cern_fillingv2.dat'
 
     ################################
     ######## DoubleEG Plots ########
     ################################
-       
-    treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )
-    treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_list, 'DATA'), name = 'DATA', isdata = 1 )
-
-    makeClosureTestMC(lumi = lumi_EG, hname = 'hEE_trackIxy', ylog = True, treeMC = treeMC, treeDATA = treeDATA, inputdir_A = 'lepton_highPt_CR', inputdir_B ='lepton_highPt_SR', labelA = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelB = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', extralabel = '')
-   
-
-    ##################################
-    ######## DoubleMuon Plots ########
-    ##################################
-    treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )
-    treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_list, 'DATA'), name = 'DATA', isdata = 1 )
-
-    makeClosureTestMC(lumi = lumi_EG, hname = 'hMM_trackIxy', ylog = True, treeMC = treeMC, treeDATA = treeDATA, inputdir_A = 'lepton_highPt_CR', inputdir_B ='lepton_highPt_SR', labelA = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelB = 'Signal Region: |#Delta#Phi|_{#mu#mu} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', extralabel = '')
     
+    #
+    # -- DY Closure
+    #
+    treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-50', 'DYJetsToLL_M-10to50'], 'MC'), name = 'MC', isdata = 0 )
+    hBKG_A = treeMC.getLoopTH1F(opts.input, 'hEESROS_trackIxy')
+    hBKG_B = treeMC.getLoopTH1F(opts.input, 'hEECROS_trackIxy')
+
+    makeClosureTestMC(lumi = lumiTotal, name = 'EEDY', hBKG_A = hBKG_A, hBKG_B = hBKG_B, ylog = True, tree = treeMC, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', extralabel = '')
+
+    hBKG_A = treeMC.getLoopTH1F(opts.input, 'hMMSROS_trackIxy')
+    hBKG_B = treeMC.getLoopTH1F(opts.input, 'hMMCROS_trackIxy')
+
+    makeClosureTestMC(lumi = lumiTotal, name = 'MMDY', hBKG_A = hBKG_A, hBKG_B = hBKG_B, ylog = True, tree = treeMC, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{#mu#mu} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', extralabel = '')
+
+    #
+    # -- ttbar Closure
+    #
+    treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TT'], 'MC'), name = 'MC', isdata = 0 )
+    hBKG_A = treeMC.getLoopTH1F(opts.input, 'hEESROS_trackIxy')
+    hBKG_B = treeMC.getLoopTH1F(opts.input, 'hEECROS_trackIxy')
+    newbin = np.array((0.0, 1.0, 2.0, 3.0, 5.0, 8.0, 14.0, 20.0))
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+
+
+    makeClosureTestMC(lumi = lumiTotal, name = 'TT', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeMC, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', extralabel = '', rmin = 0.5, rmax = 2.1)
+
+    hBKG_A = treeMC.getLoopTH1F(opts.input, 'hMMSROS_trackIxy')
+    hBKG_B = treeMC.getLoopTH1F(opts.input, 'hMMCROS_trackIxy')
+    newbin = np.array((0.0, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0))
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+
+
+    makeClosureTestMC(lumi = lumiTotal, name = 'TT', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeMC, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{#mu#mu} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', extralabel = '')
+
+    #
+    # -- Diboson Closure
+    #
+    treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['WW', 'WZ', 'ZZ'], 'MC'), name = 'MC', isdata = 0 )
+    hBKG_A = treeMC.getLoopTH1F(opts.input, 'hEESROS_trackIxy')
+    hBKG_B = treeMC.getLoopTH1F(opts.input, 'hEECROS_trackIxy')
+    newbin = np.array([0.0, 1.0, 2.0, 4.0, 20.0])
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, hBKG_A.GetName()+'_rebined', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, hBKG_B.GetName()+'_rebined', newbin)
+
+    makeClosureTestMC(lumi = lumiTotal, name = 'Diboson', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeMC, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', extralabel = '')
+    
+    hBKG_A = treeMC.getLoopTH1F(opts.input, 'hMMSROS_trackIxy')
+    hBKG_B = treeMC.getLoopTH1F(opts.input, 'hMMCROS_trackIxy')
+    newbin = np.array([0.0, 1.0, 2.0, 4.0, 20.0])
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, hBKG_A.GetName()+'_rebined', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, hBKG_B.GetName()+'_rebined', newbin)
+
+    makeClosureTestMC(lumi = lumiTotal, name = 'Diboson', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeMC, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{#mu#mu} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', extralabel = '')
+
+
+    #
+    # -- QCD Correlation
+    #
+    treeEG = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_list, 'DATA'), name = 'DATA', isdata = 1 )
+    treeMuon = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_list, 'DATA'), name = 'DATA', isdata = 1 )
+
+    hBKG_A = treeEG.getLoopTH1F(opts.input, 'hEESRII_trackIxy')
+    hBKG_B = treeEG.getLoopTH1F(opts.input, 'hEECRII_trackIxy')
+    newbin = np.array([0.0, 1.0, 2.0, 4.0, 7.0, 10.0, 14.0, 20.0])
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, hBKG_A.GetName()+'_rebined', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, hBKG_B.GetName()+'_rebined', newbin)
+
+    makeClosureTestMC(lumi = lumi_EG, name = 'QCDEst', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeEG, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', extralabel = '')
+
+    hBKG_A = treeMuon.getLoopTH1F(opts.input, 'hMMSRII_trackIxy')
+    hBKG_B = treeMuon.getLoopTH1F(opts.input, 'hMMCRII_trackIxy')
+    newbin = np.array([0.0, 1.0, 2.0, 4.0, 7.0, 10.0, 14.0, 20.0])
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, hBKG_A.GetName()+'_rebined', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, hBKG_B.GetName()+'_rebined', newbin)
+
+    makeClosureTestMC(lumi = lumi_EG, name = 'QCDEst', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeMuon, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{#mu#mu} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', extralabel = '')
+
+    #
+    # -- Wjets Correlation
+    #
+    hBKG_A = treeEG.getLoopTH1F(opts.input, 'hEESRI_trackIxy')
+    hBKG_B = treeEG.getLoopTH1F(opts.input, 'hEECRI_trackIxy')
+    newbin = np.array([0.0, 1.0, 2.0, 3.0, 6.0, 10.0, 20.0])
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, hBKG_A.GetName()+'_rebined', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, hBKG_B.GetName()+'_rebined', newbin)
+
+    makeClosureTestMC(lumi = lumi_EG, name = 'WjetsEst', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeEG, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', extralabel = '', rmin = 0.5, rmax = 1.5)
+
+    hBKG_A = treeMuon.getLoopTH1F(opts.input, 'hMMSRI_trackIxy')
+    hBKG_B = treeMuon.getLoopTH1F(opts.input, 'hMMCRI_trackIxy')
+    newbin = np.array([0.0, 1.0, 2.0, 3.0, 6.0, 10.0, 20.0])
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, hBKG_A.GetName()+'_rebined', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, hBKG_B.GetName()+'_rebined', newbin)
+
+    makeClosureTestMC(lumi = lumi_Muon, name = 'WjetsEst', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeMuon, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{#mu#mu} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', extralabel = '', rmin = 0.5, rmax = 1.5)
+
+
+
+

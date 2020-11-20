@@ -45,11 +45,17 @@ class processHandler:
         EE_OS0cut = self.cutManager.AddList([EE_OScut, EE_IsoAcut, EE_IsoBcut])
         EE_SSIcut = self.cutManager.OR( self.cutManager.AddList([EE_SScut, 'not '+EE_IsoAcut, EE_IsoBcut]), self.cutManager.AddList([EE_SScut, EE_IsoAcut, 'not '+EE_IsoBcut]) )
         EE_OSIcut = self.cutManager.OR( self.cutManager.AddList([EE_OScut, 'not '+EE_IsoAcut, EE_IsoBcut]), self.cutManager.AddList([EE_OScut, EE_IsoAcut, 'not '+EE_IsoBcut]) )
+        EE_Icut = self.cutManager.OR(self.cutManager.AddList(['not '+EE_IsoAcut, EE_IsoBcut]), self.cutManager.AddList([EE_IsoAcut, 'not '+EE_IsoBcut]) )
         EE_SSIIcut = self.cutManager.AddList([EE_SScut, 'not '+EE_IsoAcut, 'not '+EE_IsoBcut])
         EE_OSIIcut = self.cutManager.AddList([EE_OScut, 'not '+EE_IsoAcut, 'not '+EE_IsoBcut])
+        EE_IIcut = self.cutManager.AddList(['not '+EE_IsoAcut, 'not '+EE_IsoBcut])
         EE_OSCRcut = self.cutManager.AddList([EE_OScut, EE_IsoAcut, EE_IsoBcut, EE_CRdPhicut])
         EE_SSCRcut = self.cutManager.AddList([EE_SScut, EE_IsoAcut, EE_IsoBcut, EE_CRdPhicut])
         EE_OSSRcut = self.cutManager.AddList([EE_OScut, EE_IsoAcut, EE_IsoBcut, EE_SRdPhicut])
+        EE_SRIcut = self.cutManager.AddList([EE_SRdPhicut, EE_Icut])
+        EE_CRIcut = self.cutManager.AddList([EE_CRdPhicut, EE_Icut])
+        EE_SRIIcut = self.cutManager.AddList([EE_SRdPhicut, EE_IIcut])
+        EE_CRIIcut = self.cutManager.AddList([EE_CRdPhicut, EE_IIcut])
         EE_OS0Dispcut = self.cutManager.AddList([EE_OScut, EE_IsoAcut, EE_IsoBcut, EE_disp])
         EE_SSCRmaskedcut = self.cutManager.AddList([EE_SScut, EE_IsoAcut, EE_IsoBcut, EE_CRdPhicut, EE_masked])
         EE_OSSRmaskedcut = self.cutManager.AddList([EE_OScut, EE_IsoAcut, EE_IsoBcut, EE_SRdPhicut, EE_masked])
@@ -65,8 +71,10 @@ class processHandler:
         self.dielectronRegions.append(['CROS', EE_OSCRcut])
         self.dielectronRegions.append(['CRSS', EE_SSCRcut])
         self.dielectronRegions.append(['SROS', EE_OSSRcut])
-        #self.dielectronRegions.append(['SROSmasked', EE_OSCRcut])
-        #self.dielectronRegions.append(['CROSmasked', EE_OSCRcut])
+        self.dielectronRegions.append(['SRI', EE_SRIcut])
+        self.dielectronRegions.append(['CRI', EE_CRIcut])
+        self.dielectronRegions.append(['SRII', EE_SRIIcut])
+        self.dielectronRegions.append(['CRII', EE_CRIIcut])
         self.dielectronRegions.append(['OS0disp', EE_OS0Dispcut])
 
 
@@ -86,11 +94,17 @@ class processHandler:
         MM_OS0cut = self.cutManager.AddList([MM_OScut, MM_IsoAcut, MM_IsoBcut])
         MM_SSIcut = self.cutManager.OR( self.cutManager.AddList([MM_SScut, 'not '+MM_IsoAcut, MM_IsoBcut]), self.cutManager.AddList([MM_SScut, MM_IsoAcut, 'not '+MM_IsoBcut]) )
         MM_OSIcut = self.cutManager.OR( self.cutManager.AddList([MM_OScut, 'not '+MM_IsoAcut, MM_IsoBcut]), self.cutManager.AddList([MM_OScut, MM_IsoAcut, 'not '+MM_IsoBcut]) )
+        MM_Icut = self.cutManager.OR(self.cutManager.AddList(['not '+MM_IsoAcut, MM_IsoBcut]), self.cutManager.AddList([MM_IsoAcut, 'not '+MM_IsoBcut]))
         MM_SSIIcut = self.cutManager.AddList([MM_SScut, 'not '+MM_IsoAcut, 'not '+MM_IsoBcut])
         MM_OSIIcut = self.cutManager.AddList([MM_OScut, 'not '+MM_IsoAcut, 'not '+MM_IsoBcut])
+        MM_IIcut = self.cutManager.AddList(['not '+MM_IsoAcut, 'not '+MM_IsoBcut])
         MM_OSCRcut = self.cutManager.AddList([MM_OScut, MM_IsoAcut, MM_IsoBcut, MM_CRdPhicut])
         MM_SSCRcut = self.cutManager.AddList([MM_SScut, MM_IsoAcut, MM_IsoBcut, MM_CRdPhicut])
         MM_OSSRcut = self.cutManager.AddList([MM_OScut, MM_IsoAcut, MM_IsoBcut, MM_SRdPhicut])
+        MM_SRIcut = self.cutManager.AddList([MM_SRdPhicut, MM_Icut])
+        MM_CRIcut = self.cutManager.AddList([MM_CRdPhicut, MM_Icut])
+        MM_SRIIcut = self.cutManager.AddList([MM_SRdPhicut, MM_IIcut])
+        MM_CRIIcut = self.cutManager.AddList([MM_CRdPhicut, MM_IIcut])
         MM_OS0Dispcut = self.cutManager.AddList([MM_OScut, MM_IsoAcut, MM_IsoBcut, MM_disp])
 
         self.dimuonRegions = [] # region name : region cut
@@ -104,8 +118,15 @@ class processHandler:
         self.dimuonRegions.append(['CROS', MM_OSCRcut])
         self.dimuonRegions.append(['CRSS', MM_SSCRcut])
         self.dimuonRegions.append(['SROS', MM_OSSRcut])
+        self.dimuonRegions.append(['SRI', MM_SRIcut])
+        self.dimuonRegions.append(['CRI', MM_CRIcut])
+        self.dimuonRegions.append(['SRII', MM_SRIIcut])
+        self.dimuonRegions.append(['CRII', MM_CRIIcut])
         self.dimuonRegions.append(['OS0disp', MM_OS0Dispcut])
 
+
+        ## Init histogram efficiencies
+        self.declareEfficiencies()
 
 
         #### -------------------------------
@@ -199,10 +220,15 @@ class processHandler:
             if ev.DGM_numberOfValidHits[ev.DMDM_idxB[i]] < 22: continue
             # Selection cuts
             if ev.DMDM_cosAlpha[i] < -0.80: continue
-            #if ev.DMDM_relisoA[i] < 0.1: continue
-            #if ev.DMDM_relisoB[i] < 0.1: continue
             if ev.DMDM_normalizedChi2[i] > 10: continue
             if ev.DMDM_mass[i] < 15: continue
+
+            l1 = TVector3()
+            l2 = TVector3()
+            l1.SetPtEtaPhi(ev.DGM_pt[ev.DMDM_idxA[i]], ev.DGM_eta[ev.DMDM_idxA[i]], ev.DGM_phi[ev.DMDM_idxA[i]])
+            l2.SetPtEtaPhi(ev.DGM_pt[ev.DMDM_idxB[i]], ev.DGM_eta[ev.DMDM_idxB[i]], ev.DGM_phi[ev.DMDM_idxB[i]])
+            if abs(l1.DeltaR(l2)) < 0.2: continue
+
 
             nGoodMM+=1
 
@@ -233,6 +259,12 @@ class processHandler:
 
     def fillDimuons(self, ev, weight, region, mm_maxIxy, nGoodMM):
 
+        l1 = TVector3()
+        l2 = TVector3()
+        l1.SetPtEtaPhi(ev.DGM_pt[ev.DMDM_idxA[mm_maxIxy]], ev.DGM_eta[ev.DMDM_idxA[mm_maxIxy]], ev.DGM_phi[ev.DMDM_idxA[mm_maxIxy]])
+        l2.SetPtEtaPhi(ev.DGM_pt[ev.DMDM_idxB[mm_maxIxy]], ev.DGM_eta[ev.DMDM_idxB[mm_maxIxy]], ev.DGM_phi[ev.DMDM_idxB[mm_maxIxy]])
+        deltaPhi = abs(l1.DeltaPhi(l2))
+
         exec("self.hMM{0}_nGoodMM.Fill(nGoodMM, weight)".format(region))
         exec("self.hMM{0}_dPhi.Fill(abs(ev.DMDM_dPhi[mm_maxIxy]), weight)".format(region))
         exec("self.hMM{0}_mass.Fill(ev.DMDM_mass[mm_maxIxy], weight)".format(region))
@@ -247,20 +279,8 @@ class processHandler:
         exec("self.hMM{0}_cosAlpha.Fill(ev.DMDM_cosAlpha[mm_maxIxy], weight)".format(region))
         exec("self.hMM{0}_leadingPt.Fill(ev.DMDM_leadingPt[mm_maxIxy], weight)".format(region))
         exec("self.hMM{0}_cosAlpha_dPhi.Fill(ev.DMDM_cosAlpha[mm_maxIxy], abs(ev.DMDM_dPhi[mm_maxIxy]), weight)".format(region))
+        exec("self.hMM{0}_DeltaPhi_dPhi.Fill(deltaPhi, abs(ev.DMDM_dPhi[mm_maxIxy]), weight)".format(region))
 
-        """
-        for i in range(0, ev.nDGM):
-
-           
-            exec("self.hM{0}_pt.Fill(ev.DGM_pt[i], weight)".format(region))
-            exec("self.hM{0}_eta.Fill(ev.DGM_eta[i], weight)".format(region))
-            exec("self.hM{0}_dxy.Fill(ev.DGM_dxy[i], weight)".format(region))
-            exec("self.hM{0}_dxyError.Fill(ev.DGM_dxyError[i], weight)".format(region))
-            exec("self.hM{0}_charge.Fill(ev.DGM_charge[i], weight)".format(region))
-            exec("self.hM{0}_numberOfValidHits.Fill(ev.DGM_numberOfValidHits[i], weight)".format(region))
-            exec("self.hM{0}_normChi2.Fill(ev.DGM_chi2[i]/ev.DGM_ndof[i], weight)".format(region))
-            exec("self.hM{0}_reliso.Fill(ev.DGM_relPFiso[i], weight)".format(region))
-        """
 
 
     #### ----------------------------
@@ -280,8 +300,8 @@ class processHandler:
         for i in range(0, ev.nEE):
             if abs(ev.ElectronCandidate_eta[ev.EE_idxA[i]]) > 2.0: continue
             if abs(ev.ElectronCandidate_eta[ev.EE_idxB[i]]) > 2.0: continue
-            if ev.EE_leadingPt[i] < 48: continue
-            if ev.EE_leadingEt[i] < 48: continue
+            if ev.EE_leadingPt[i] < 45: continue
+            if ev.EE_leadingEt[i] < 45: continue
             if ev.EE_subleadingPt[i] < 28: continue
             if ev.EE_subleadingEt[i] < 28: continue
             if ev.EE_mass[i] < 15: continue
@@ -318,6 +338,12 @@ class processHandler:
 
     def fillDielectrons(self, ev, weight, region, ee_maxIxy, nGoodEE):
 
+        l1 = TVector3()
+        l2 = TVector3()
+        l1.SetPtEtaPhi(ev.ElectronCandidate_pt[ev.EE_idxA[ee_maxIxy]], ev.ElectronCandidate_eta[ev.EE_idxA[ee_maxIxy]], ev.ElectronCandidate_phi[ev.EE_idxA[ee_maxIxy]])
+        l2.SetPtEtaPhi(ev.ElectronCandidate_pt[ev.EE_idxB[ee_maxIxy]], ev.ElectronCandidate_eta[ev.EE_idxB[ee_maxIxy]], ev.ElectronCandidate_phi[ev.EE_idxB[ee_maxIxy]])
+        deltaPhi = abs(l1.DeltaPhi(l2))
+
 
         exec("self.hEE{0}_nGoodEE.Fill(nGoodEE, weight)".format(region))
         exec("self.hEE{0}_dPhi.Fill(abs(ev.EE_dPhi[ee_maxIxy]), weight)".format(region))
@@ -337,18 +363,173 @@ class processHandler:
         exec("self.hEE{0}_normalizedChi2.Fill(ev.EE_normalizedChi2[ee_maxIxy], weight)".format(region))
         exec("self.hEE{0}_cosAlpha_dPhi.Fill(ev.EE_cosAlpha[ee_maxIxy], abs(ev.EE_dPhi[ee_maxIxy]), weight)".format(region))
         exec("self.hEE{0}_Lxy_dPhi.Fill(abs(ev.EE_Lxy_PV[ee_maxIxy]), abs(ev.EE_dPhi[ee_maxIxy]), weight)".format(region))
+        exec("self.hEE{0}_DeltaPhi_dPhi.Fill(deltaPhi, abs(ev.EE_dPhi[ee_maxIxy]), weight)".format(region))
 
-        """
-        for i in range(0, ev.nElectronCandidate):
 
-            exec("self.hE{0}_eta.Fill(ev.ElectronCandidate_eta[i], weight)".format(region))
-            exec("self.hE{0}_pt.Fill(ev.ElectronCandidate_pt[i], weight)".format(region))
-            exec("self.hE{0}_dxy.Fill(ev.ElectronCandidate_dxy_BS[i], weight)".format(region))
-            exec("self.hE{0}_dxyError.Fill(ev.ElectronCandidate_dxyError_BS[i], weight)".format(region))
-            exec("self.hE{0}_charge.Fill(ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[i]], weight)".format(region))
-            exec("self.hE{0}_reliso.Fill(ev.IsoTrackSel_pfIsolationDR03[ev.ElectronCandidate_isotrackIdx[i]], weight)".format(region))
-        """
+    #### -----------------------
+    #### --
+    #### ---- fillEfficiencies
+    #### --
+    #### -----------------------
+    def countLLs(self, ev):
 
+        if not self.isdata:
+            weight = self.lumiweight*ev.wPU*ev.genWeight/abs(ev.genWeight)
+            weightnoPU = self.lumiweight*ev.genWeight/abs(ev.genWeight)
+        else:
+            weight = 1
+
+
+        ### EE Channel
+        if not ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 and ev.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15:
+
+            self.hEE_cutEfficiency.Fill(0, weight) 
+
+            if not ev.PV_passAcceptance: return
+            self.hEE_cutEfficiency.Fill(1, weight)
+
+            if ev.nEE < 1: return
+            self.hEE_cutEfficiency.Fill(2, weight)
+
+            pass_ptmin = False
+            pass_etmin = False
+            pass_etamax = False
+            pass_massmin = False
+            pass_relisomax = False
+            pass_normChi2max = False
+            pass_oscharge = False
+            pass_dPhiSR = False
+            pass_Ixymin = False
+
+            for i in range(0, ev.nEE):
+
+                if ev.EE_leadingPt[i] < 45: continue
+                if ev.EE_subleadingPt[i] < 28: continue
+                pass_ptmin = True
+
+                if ev.EE_leadingEt[i] < 45: continue
+                if ev.EE_subleadingEt[i] < 28: continue
+                pass_etmin = True
+
+                if abs(ev.ElectronCandidate_eta[ev.EE_idxA[i]]) > 2.0: continue
+                if abs(ev.ElectronCandidate_eta[ev.EE_idxB[i]]) > 2.0: continue
+                pass_etamax = True
+
+                if ev.EE_mass[i] < 15: continue
+                pass_massmin = True
+
+                if (ev.IsoTrackSel_pfIsolationDR03[ev.ElectronCandidate_isotrackIdx[ev.EE_idxA[i]]]/ev.IsoTrackSel_pt[ev.ElectronCandidate_isotrackIdx[ev.EE_idxA[i]]] > 0.2): continue
+                if (ev.IsoTrackSel_pfIsolationDR03[ev.ElectronCandidate_isotrackIdx[ev.EE_idxB[i]]]/ev.IsoTrackSel_pt[ev.ElectronCandidate_isotrackIdx[ev.EE_idxB[i]]] > 0.2): continue
+                pass_relisomax = True
+
+                if ev.EE_normalizedChi2[i] > 10: continue
+                pass_normChi2max = True 
+
+                if ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EE_idxA[i]]]*ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EE_idxB[i]]] > 0: continue
+                pass_oscharge = True
+
+                if abs(ev.EE_dPhi[i]) > 3.14/2.0: continue
+                pass_dPhiSR = True
+
+                if abs(ev.EE_trackIxy_PV[i]) < 6: continue
+                pass_Ixymin = True
+
+            if pass_ptmin: self.hEE_cutEfficiency.Fill(3, weight)
+            if pass_etmin: self.hEE_cutEfficiency.Fill(4, weight)
+            if pass_etamax: self.hEE_cutEfficiency.Fill(5, weight)
+            if pass_massmin: self.hEE_cutEfficiency.Fill(6, weight)
+            if pass_relisomax: self.hEE_cutEfficiency.Fill(7, weight)
+            if pass_normChi2max: self.hEE_cutEfficiency.Fill(8, weight)
+            if pass_oscharge: self.hEE_cutEfficiency.Fill(9, weight)
+            if pass_dPhiSR: self.hEE_cutEfficiency.Fill(10, weight)
+            if pass_Ixymin: self.hEE_cutEfficiency.Fill(11, weight)
+
+
+        ### MM Channel
+        if ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10:
+
+            self.hMM_cutEfficiency.Fill(0, weight) 
+
+            if not ev.PV_passAcceptance: return
+            self.hMM_cutEfficiency.Fill(1, weight)
+
+            if ev.nDMDM < 1: return
+            self.hMM_cutEfficiency.Fill(2, weight)
+
+            pass_ptmin = False
+            pass_etamax = False
+            pass_dRmin = False
+            pass_massmin = False
+            pass_relisomax = False
+            pass_cosAlphamin = False
+            pass_normChi2max = False
+            pass_oscharge = False
+            pass_dPhiSR = False
+            pass_Ixymin = False
+
+            for i in range(0, ev.nDMDM):
+
+                if ev.DMDM_leadingPt[i] < 31: continue
+                if ev.DMDM_subleadingPt[i] < 31: continue
+                pass_ptmin = True
+
+                if abs(ev.DGM_eta[ev.DMDM_idxA[i]]) > 2: continue
+                if abs(ev.DGM_eta[ev.DMDM_idxB[i]]) > 2: continue
+                pass_etamax = True
+
+                l1 = TVector3()
+                l2 = TVector3()
+                l1.SetPtEtaPhi(ev.DGM_pt[ev.DMDM_idxA[i]], ev.DGM_eta[ev.DMDM_idxA[i]], ev.DGM_phi[ev.DMDM_idxA[i]])
+                l2.SetPtEtaPhi(ev.DGM_pt[ev.DMDM_idxB[i]], ev.DGM_eta[ev.DMDM_idxB[i]], ev.DGM_phi[ev.DMDM_idxB[i]])
+                if abs(l1.DeltaR(l2)) < 0.2: continue
+                pass_dRmin = True
+
+                if ev.DMDM_mass[i] < 15: continue
+                pass_massmin = True
+
+                if ev.DGM_relPFiso[ev.DMDM_idxA[i]] > 0.2: continue
+                if ev.DGM_relPFiso[ev.DMDM_idxB[i]] > 0.2: continue
+                pass_relisomax = True
+
+                if ev.DMDM_cosAlpha[i] < -0.80: continue
+                pass_cosAlphamin = True
+
+                if ev.DMDM_normalizedChi2[i] > 10: continue
+                pass_normChi2max = True 
+
+                if ev.DGM_charge[ev.DMDM_idxA[i]]*ev.DGM_charge[ev.DMDM_idxB[i]] > 0: continue
+                pass_oscharge = True
+
+                if abs(ev.DMDM_dPhi[i]) > 3.14/2.0: continue
+                pass_dPhiSR = True
+
+                if abs(ev.DMDM_trackIxy_PV[i]) < 6: continue
+                pass_Ixymin = True
+
+            if pass_ptmin: self.hMM_cutEfficiency.Fill(3, weight)
+            if pass_etamax: self.hMM_cutEfficiency.Fill(4, weight)
+            if pass_dRmin: self.hMM_cutEfficiency.Fill(5, weight)
+            if pass_massmin: self.hMM_cutEfficiency.Fill(6, weight)
+            if pass_relisomax: self.hMM_cutEfficiency.Fill(7, weight)
+            if pass_cosAlphamin: self.hMM_cutEfficiency.Fill(8, weight)
+            if pass_normChi2max: self.hMM_cutEfficiency.Fill(9, weight)
+            if pass_oscharge: self.hMM_cutEfficiency.Fill(10, weight)
+            if pass_dPhiSR: self.hMM_cutEfficiency.Fill(11, weight)
+            if pass_Ixymin: self.hMM_cutEfficiency.Fill(12, weight)
+
+
+
+
+    #### --------------------------
+    #### --
+    #### ---- declare Efficiencies
+    #### --
+    #### --------------------------
+
+    def declareEfficiencies(self):
+
+        self.hEE_cutEfficiency = r.TH1F('hEE_cutEfficiency' + self.sufix, ';; Events with EE / Category', 12, 0, 12)
+        self.hMM_cutEfficiency = r.TH1F('hMM_cutEfficiency' + self.sufix, ';; Events with MM / Category', 13, 0, 13)
 
 
 
@@ -380,20 +561,8 @@ class processHandler:
         exec("self.hMM{0}_subleadingPt = r.TH1F('hMM{0}_subleadingPt' + self.sufix, ';Dimuon subleading p_{{T}};', 30, 0, 300)".format(region))
         exec("self.hMM{0}_normalizedChi2 = r.TH1F('hMM{0}_normalizedChi2' + self.sufix, ';Dimuon vertex fit #chi^{{2}}/ndof;', 20, 0, 10)".format(region))
         exec("self.hMM{0}_cosAlpha_dPhi = r.TH2F('hMM{0}_cosAlpha_dPhi' + self.sufix, ';Dimuon cos(#alpha_{{#mu#mu}}) ; Dimuon collinearity |#Delta#Phi|', 20, -1.0, 1.0, 20, 0, 3.14)".format(region))
+        exec("self.hMM{0}_DeltaPhi_dPhi = r.TH2F('hMM{0}_DeltaPhi_dPhi' + self.sufix, ';Dimuon #Delta#Phi(ll) ; Dimuon collinearity |#Delta#Phi|', 20, 0.0, 3.14, 20, 0, 3.14)".format(region))
 
-
-        #### ----------------------
-        #### ---- Single DG plots
-        #### ----------------------
-
-        exec("self.hM{0}_pt = r.TH1F('hM{0}_pt' + self.sufix, ';DG p_{{T}};', 50, 0, 200)".format(region))
-        exec("self.hM{0}_eta = r.TH1F('hM{0}_eta' + self.sufix, ';DG #eta;', 27, -2.6, 2.6)".format(region))
-        exec("self.hM{0}_dxy = r.TH1F('hM{0}_dxy' + self.sufix, ';DG transverse impact parameter |d_{{xy}}|;', 30, 0.0, 0.5)".format(region))
-        exec("self.hM{0}_dxyError = r.TH1F('hM{0}_dxyError' + self.sufix, ';DG #sigma_{{d}};', 70, 0.0, 0.01)".format(region))
-        exec("self.hM{0}_charge = r.TH1F('hM{0}_charge' + self.sufix, ';DG charge q;', 5, -2.5, 2.5)".format(region))
-        exec("self.hM{0}_numberOfValidHits = r.TH1F('hM{0}_numberOfValidHits' + self.sufix, ';DG N_{{Hits}};', 80, 0.0, 80.0)".format(region))
-        exec("self.hM{0}_normChi2 = r.TH1F('hM{0}_normChi2' + self.sufix, ';DG #chi^{{2}}/ndof;', 30, 0.0, 15.0)".format(region))
-        exec("self.hM{0}_reliso = r.TH1F('hM{0}_reliso' + self.sufix, ';DG RelIso;', 15, 0.0, 0.15)".format(region))
 
         #### ---------------
         #### ---- EE plots
@@ -419,17 +588,7 @@ class processHandler:
         exec("self.hEE{0}_normalizedChi2 = r.TH1F('hEE{0}_normalizedChi2' + self.sufix, ';Dielectron vertex fit #chi^{{2}}/ndof;', 20, 0, 10)".format(region))
         exec("self.hEE{0}_cosAlpha_dPhi = r.TH2F('hEE{0}_cosAlpha_dPhi' + self.sufix, ';Dielectron cos(#alpha_{{ee}}) ; Dielectron collinearity |#Delta#Phi|', 20, -1.0, 1.0, 20, 0, 3.14)".format(region))
         exec("self.hEE{0}_Lxy_dPhi = r.TH2F('hEE{0}_Lxy_dPhi' + self.sufix, ';Dielectron |L_{{xy}}| (cm) ; Dielectron collinearity |#Delta#Phi|', 20, 0.0, 1.0, 20, 0, 3.14)".format(region))
-
-        #### ---------------------
-        #### ---- Single E plots
-        #### ---------------------
-
-        exec("self.hE{0}_pt = r.TH1F('hE{0}_pt' + self.sufix, ';Electron p_{{T}};', 50, 0, 200)".format(region))
-        exec("self.hE{0}_eta = r.TH1F('hE{0}_eta' + self.sufix, ';Electron #eta;', 27, -2.6, 2.6)".format(region))
-        exec("self.hE{0}_dxy = r.TH1F('hE{0}_dxy' + self.sufix, ';Electron transverse impact parameter |d_{{xy}}|;', 30, 0.0, 0.5)".format(region))
-        exec("self.hE{0}_dxyError = r.TH1F('hE{0}_dxyError' + self.sufix, ';Electron #sigma_{{d}};', 70, 0.0, 0.01)".format(region))
-        exec("self.hE{0}_charge = r.TH1F('hE{0}_charge' + self.sufix, ';Electron charge q;', 5, -2.5, 2.5)".format(region))
-        exec("self.hE{0}_reliso = r.TH1F('hE{0}_reliso' + self.sufix, ';Electron RelIso;', 15, 0.0, 0.15)".format(region))
+        exec("self.hEE{0}_DeltaPhi_dPhi = r.TH2F('hEE{0}_DeltaPhi_dPhi' + self.sufix, ';Dielectron #Delta#Phi(ll) ; Dielectron collinearity |#Delta#Phi|', 20, 0.0, 3.14, 20, 0, 3.14)".format(region))
 
 
 
@@ -449,8 +608,12 @@ class processHandler:
 
         output = r.TFile(self.filename, 'RECREATE')
 
-        for attr, value in self.__dict__.iteritems():
-            if attr[0] == 'h': value.Write()
+        if self.hEE_cutEfficiency.GetEntries() > 0:
+            self.hEE_cutEfficiency.Write()
+            self.hMM_cutEfficiency.Write()
+        else:
+            for attr, value in self.__dict__.iteritems():
+                if attr[0] == 'h': value.Write()
 
         
         output.Close()

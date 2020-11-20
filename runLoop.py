@@ -35,7 +35,7 @@ else:
 
 for n,ev in enumerate(ttree):
 
-    process.processEvent(ev)
+    process.countLLs(ev)
 
 
 process.Write()
