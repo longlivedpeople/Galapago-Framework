@@ -342,5 +342,5 @@ if __name__ == "__main__":
     EElabels.append('Displaced: |d_{0}|/#sigma_{d} > 6')
 
     makeEffPlotStack(lumi_EG, 'BKG_EEefficiency_2016', 'hEE_cutEfficiency', False, treeMC, WORKPATH + opts.Muoninput, EElabels, outtag = 'LLefficiencies', LLlabel = 'EE')
-    makeEffPlotJoint(lumi_EG, 'SI_EEefficiency_2016', 'hEE_cutEfficiency', False, treeSI, WORKPATH + opts.Muoninput, MMlabels, outtag = 'LLefficiencies', LLlabel = 'EE')
+    makeEffPlotJoint(lumi_EG, 'SI_EEefficiency_2016', 'hEE_cutEfficiency', False, treeSI, WORKPATH + opts.Muoninput, EElabels, outtag = 'LLefficiencies', LLlabel = 'EE')
 

@@ -162,10 +162,10 @@ if __name__ == "__main__":
 
     ############# Muon data definition
     DoubleMuon = []
-    DoubleMuon.append('DoubleMuon_Run2016B')
+    #DoubleMuon.append('DoubleMuon_Run2016B')
     DoubleMuon.append('DoubleMuon_Run2016C')
     DoubleMuon.append('DoubleMuon_Run2016D')
-    DoubleMuon.append('DoubleMuon_Run2016E')
+    #DoubleMuon.append('DoubleMuon_Run2016E')
     DoubleMuon.append('DoubleMuon_Run2016F')
     DoubleMuon.append('DoubleMuon_Run2016G')
     DoubleMuon.append('DoubleMuon_Run2016H')
@@ -237,7 +237,7 @@ if __name__ == "__main__":
 #    treeMC.Loop(lumi, WORKPATH + opts.out + '/')
     #treeSI.Loop(lumi, WORKPATH + opts.out + '/')
     #treeDATA.Loop(lumi, WORKPATH + opts.out + '/')
-    treeMC.launchLoop(lumi, WORKPATH +  opts.out + '/', queue = 'longlunch')
+    #treeMC.launchLoop(lumi, WORKPATH +  opts.out + '/', queue = 'longlunch')
     treeSI.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch')
     treeDATA.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch')
 

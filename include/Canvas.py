@@ -92,7 +92,7 @@ class Canvas:
       latexc.SetTextSize(0.04);
       latexc.DrawLatex(0.90, 0.93, text_lumi)                
 
-   def banner2(self, isData, lumi, scy = False):
+   def banner2(self, isData, lumi, scy = False, inProgress = False):
     
       latex = TLatex()
       latex.SetNDC();
@@ -481,9 +481,9 @@ class Canvas:
 
       if maxYnumbers:
           r.TGaxis().SetMaxDigits(maxYnumbers)
-          self.banner(isData, lumi, scy = True, inProgress = inProgress)
+          self.banner2(isData, lumi, scy = True, inProgress = inProgress)
       else:
-          self.banner(isData, lumi, scy = False, inProgress = inProgress)
+          self.banner2(isData, lumi, scy = False, inProgress = inProgress)
 
 
       if not outputDir[-1] == '/': dirName = outputDir + '/'

@@ -16,7 +16,7 @@ import include.CutManager as CutManager
 
 
 
-def makeBlindedPlot(lumi, hname_SR, hname_CR, ylog, treeDATA, inputdir, treeSI = False, hname_SI = '', rebin = False, limit = 0.0, lines = [], xlabel = '', outtag = '', yshift = 0.0, LLlabel = '', DATAlabel = '', extralabel = ''):
+def makePromptBKGPlot(lumi, hname_SR, hname_CR, ylog, treeDATA, inputdir, rebin = False, limit = 0.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = '', DATAlabel = '', extralabel = '', xlog = False):
 
 
     ### Get histograms
@@ -37,51 +37,26 @@ def makeBlindedPlot(lumi, hname_SR, hname_CR, ylog, treeDATA, inputdir, treeSI =
         hSR = hSR_.Clone()
         hCR = hCR_.Clone()
 
-    ### Initialize blinded histogram
-    hSRblinded = hSR.Clone()
-
-    Bover = 0.0
-    for n in range(hSR.GetNbinsX() + 1):
-        if limit and hSR.GetBinLowEdge(n) >= limit:
-            hSRblinded.SetBinContent(n, 0.0)
-            hSRblinded.SetBinError(n, 0.0)
-            Bover += hCR.GetBinContent(n)
-        else:
-            hSRblinded.SetBinContent(n, hSR.GetBinContent(n))
-            hSRblinded.SetBinError(n, hSR.GetBinError(n))
-    print('B:', Bover)
+    ### Blinding limits:
+    if limit:
+        for n in range(1, hSR.GetNbinsX()):
+            if hSR.GetBinLowEdge(n) > limit: hSR.SetBinContent(n, 0.0)
+            #if hCR_.GetBinLowEdge(n) > limit: hCR_.SetBinContent(n, 0.0)
 
     hCR.SetFillColorAlpha(r.kCyan-6, 0.8) 
-    hCR.SetLineColor(r.kCyan-6) 
+    hCR.SetLineColor(r.kCyan+3) 
+    hSR.SetMarkerStyle(20)
+    hSR.SetMarkerSize(0.8)
+    hSR.SetMarkerColor(r.kBlack)
     hCR.GetXaxis().SetTitleSize(0.045)
+    hSR.GetXaxis().SetTitleSize(0.045)
     hCR.GetYaxis().SetTitleSize(0.045)
-    hSRblinded.SetMarkerStyle(20)
-    hSRblinded.SetMarkerSize(0.8)
-    hSRblinded.SetMarkerColor(r.kBlack)
-
-    ### Signal histograms
-    s_histos = []
-    if hname_SI == '': hname_SI = hname_SR
-    if treeSI:
-
-        hSIS = treeSI.getLoopStack(inputdir, hname_SI)
-
-        for _i, _h in enumerate(hSIS.GetHists()):
-            _h.Scale(lumi/35.87)
-            s_histos.append(copy.deepcopy(_h))
-            Sover = 0.0
-            for n in range(_h.GetNbinsX() + 1):
-                if limit and _h.GetBinLowEdge(n) >= limit:
-                    Sover += _h.GetBinContent(n)
-            print(_h.GetTitle(), Sover, Sover/math.sqrt(Bover+Sover))
-
-
+    hSR.GetYaxis().SetTitleSize(0.045)
 
     ### Get maximum
-    maxValSR = hSRblinded.GetMaximum()
+    maxValSR = hSR.GetMaximum()
     maxValCR = hCR.GetMaximum()
-    maxValSI = 0 if not treeSI else max([s_histos[i].GetMaximum() for i in range(0, len(s_histos))])
-    maxVal = max([maxValSR, maxValCR, maxValSI])
+    maxVal = max([maxValSR, maxValCR])
 
     ### Set Maximum
     if not ylog:
@@ -92,33 +67,21 @@ def makeBlindedPlot(lumi, hname_SR, hname_CR, ylog, treeDATA, inputdir, treeSI =
  
 
     ### Canvas object
-    plot = Canvas.Canvas('SR_'+hname_SR, 'png', 0.35, 0.5, 0.6, 0.87, 1)
+    plot = Canvas.Canvas('BKGVal_'+hname_SR, 'png', 0.53, 0.79, 0.7, 0.87, 1)
     plot.addHisto(hCR, 'HIST', 'Background (Data-driven)', 'f', '', 1, 0)
-    
-    ### Add signals:
-    if treeSI:
-        for i,_h in enumerate(s_histos):
-            _h.SetLineWidth(2) # provisional
-            masses = eval(_h.GetTitle()[3:])
-            print(masses)
-            legend = 'm_{H} = '+str(masses[0])+' GeV, m_{X} = '+str(masses[1])+' GeV, c#tau = '+str(masses[2])+' mm'
-            plot.addHisto(_h, 'HIST, SAME', legend, 'l', _h.GetFillColor(), 1, i+1) # Signal
-
-    plot.addHisto(hSRblinded, 'P, SAME', 'Data', 'p', '', 1, len(s_histos)+1)
-    for line in lines:
-        plot.addLine(line, hCR.GetMinimum(), line, hCR.GetMaximum(), r.kBlack)
+    plot.addHisto(hSR, 'P, SAME', 'Data', 'p', '', 1, 1)
+    plot.addLatex(0.17, 0.85, extralabel, font = 62)
 
     ### Channel banner:
     if LLlabel == 'EE':
         plot.addLatex(0.17, 0.81, 'e^{+}e^{-} channel', font = 42)
     if LLlabel == 'MM':
         plot.addLatex(0.17, 0.81, '#mu^{+}#mu^{-} channel', font = 42)
-    plot.addLatex(0.17, 0.85, extralabel, font = 62)
 
 
     ### Save it
-    outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/SRPlots_' + outtag + '/'
-    plot.saveRatio(1, 0, ylog, luminosity, hSRblinded, hCR, r_ymin = 0.9, r_ymax = 1.1, label="Data/Est.Bkg", outputDir = outdir)
+    outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/BKGVal_' + outtag + '/'
+    plot.saveRatio(1, 0, ylog, luminosity, hSR, hCR, r_ymin = 0.95, r_ymax = 1.05, label="Data/Background", outputDir = outdir, xlog = xlog)
 
     
 
@@ -239,18 +202,23 @@ if __name__ == "__main__":
     filename = 'dat/Samples_cern_fillingv2.dat'
 
 
-    ### Tree SI Tree
-    treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Signals, 'SI'), name = 'SI', isdata = 0 )
-
     ################################
     ######## DoubleEG Plots ########
     ################################
        
     treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_list, 'DATA'), name = 'DATA', isdata = 1 )
 
-    makeBlindedPlot(lumi = lumi_EG, hname_SR = 'hEEoffZSR_trackIxy', hname_CR = 'hEEoffZCR_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, limit = 6, lines = [6.0], xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'Signal region') 
-    makeBlindedPlot(lumi = lumi_EG, hname_SR = 'hEESROS_trackIxy', hname_CR = 'hEECROS_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, limit = 6, lines = [6.0], xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'Signal region') 
-    #makeBlindedPlot(lumi = lumi_EG, hname_SR = 'hEEonZSR_mass', hname_CR = 'hEECROS_mass', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, hname_SI = 'hEESROS_mass',limit = 0.0, lines = [80.0, 100.0], xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    #### Prompt validation
+
+    makePromptBKGPlot(lumi = lumi_EG, hname_SR = 'hEEpromptSR_trackIxy_log', hname_CR = 'hEECROS_trackIxy_log', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '', xlog = True) 
+    makePromptBKGPlot(lumi = lumi_EG, hname_SR = 'hEEpromptSR_mass', hname_CR = 'hEEpromptCR_mass', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '', xlog = False) 
+
+    #### On-Z validation
+
+    makePromptBKGPlot(lumi = lumi_EG, hname_SR = 'hEEonZSR_mass', hname_CR = 'hEECROS_mass', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '', xlog = False) 
+    makePromptBKGPlot(lumi = lumi_EG, hname_SR = 'hEEonZSR_trackIxy_log', hname_CR = 'hEEonZCR_trackIxy_log', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'On-Z control region', xlog = True) 
+    makePromptBKGPlot(lumi = lumi_EG, hname_SR = 'hEEoffZSR_trackIxy_log', hname_CR = 'hEEoffZCR_trackIxy_log', ylog = True, treeDATA = treeDATA, inputdir = opts.input, limit = 6.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '', xlog = True) 
+    
 
     ##################################
     ######## DoubleMuon Plots ########
@@ -258,7 +226,15 @@ if __name__ == "__main__":
     
     treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_list, 'DATA'), name = 'DATA', isdata = 1 )
 
-    makeBlindedPlot(lumi = lumi_Muon, hname_SR = 'hMMoffZSR_trackIxy', hname_CR = 'hMMoffZCR_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, limit = 6, lines = [6.0], xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'Signal region') 
-    makeBlindedPlot(lumi = lumi_Muon, hname_SR = 'hMMSROS_trackIxy', hname_CR = 'hMMCROS_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, limit = 6, lines = [6.0], xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'Signal region') 
+    #### Prompt validation
 
-    #makeBlindedPlot(lumi = lumi_Muon, hname_SR = 'hMMonZSR_mass', hname_CR = 'hMMCROS_mass', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, hname_SI = 'hMMSROS_mass',limit = 0.0, lines = [80.0, 100.0], xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makePromptBKGPlot(lumi = lumi_Muon, hname_SR = 'hMMpromptSR_trackIxy_log', hname_CR = 'hMMCROS_trackIxy_log', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'Prompt control region', xlog = True) 
+    makePromptBKGPlot(lumi = lumi_Muon, hname_SR = 'hMMpromptSR_mass', hname_CR = 'hMMpromptCR_mass', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'Prompt control region', xlog = False) 
+    #makePromptBKGPlot(lumi = lumi_Muon, hname_SR = 'hMMpromptSR_leadingPt', hname_CR = 'hMMpromptCR_leadingPt', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '', xlog = False) 
+
+    
+    #### On-Z validation
+
+    makePromptBKGPlot(lumi = lumi_Muon, hname_SR = 'hMMonZSR_mass', hname_CR = 'hMMCROS_mass', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '', xlog = False) 
+    makePromptBKGPlot(lumi = lumi_Muon, hname_SR = 'hMMonZSR_trackIxy_log', hname_CR = 'hMMonZCR_trackIxy_log', ylog = True, treeDATA = treeDATA, inputdir = opts.input,  xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'On-Z control region', xlog = True) 
+    makePromptBKGPlot(lumi = lumi_Muon, hname_SR = 'hMMoffZSR_trackIxy_log', hname_CR = 'hMMoffZCR_trackIxy_log', ylog = True, treeDATA = treeDATA, inputdir = opts.input, limit = 6.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'Off-Z (prompt) control region', extralabel = '', xlog = True) 

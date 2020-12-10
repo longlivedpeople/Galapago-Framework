@@ -99,7 +99,7 @@ def makeClosureTestMC(lumi, name, hBKG_A, hBKG_B, ylog, tree, inputdir, labelA =
         hBKG_B.SetMaximum(0.1)
 
     ### Canvas object
-    plot = Canvas.Canvas('closuretest_'+name, 'png', 0.5, 0.75, 0.7, 0.87, 1)
+    plot = Canvas.Canvas('closuretest_'+name, 'png,pdf', 0.5, 0.75, 0.7, 0.87, 1)
     plot.addHisto(cumA, 'P', labelA, 'p', r.kBlue, 1, 0)
     plot.addHisto(cumB, 'P, SAME', labelB, 'p', r.kRed, 1, 1)
     
@@ -117,7 +117,7 @@ def makeClosureTestMC(lumi, name, hBKG_A, hBKG_B, ylog, tree, inputdir, labelA =
     plot.saveRatio(1, 0, ylog, luminosity, cumA, cumB, r_ymin = rmin, r_ymax = rmax, label="r_{SR/CR}", outputDir = outdir)
 
     ### Main comparison
-    cplot = Canvas.Canvas('plaincomparison_'+name, 'png', 0.5, 0.75, 0.7, 0.87, 1)
+    cplot = Canvas.Canvas('plaincomparison_'+name, 'png,pdf', 0.5, 0.75, 0.7, 0.87, 1)
     cplot.addHisto(hBKG_A, 'P', labelA, 'p', r.kRed, 1, 0)
     cplot.addHisto(hBKG_B, 'P, SAME', labelB, 'p', r.kBlue, 1, 1)
     if LLlabel == 'EE':
