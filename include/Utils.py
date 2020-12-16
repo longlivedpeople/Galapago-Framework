@@ -220,6 +220,146 @@ def makePlot(queue, lumi, var, name, nbin, xmin, xmax, xlabel, logx, treeMC, cut
         return 
 
 
+def makeDataMCPlot(lumi, hname, ylog, treeMC, treeDATA, treeSI, inputdir, xlabel = '', outtag = '', yshift = 0.0):
+
+
+    luminosity = lumi
+    SShname = hname.split('__')[0] + '_SS'
+    for n in range(1, len(hname.split('__'))): OShname = OShname + hname.split('__')[n]
+
+    hSS = treeDATA.getLoopTH1F(inputdir, SShname)
+    hOS = treeMC.getLoopStack(inputdir, hname)
+
+    # hSS tunning:
+    hSS.SetLineColor(r.kBlack)
+    hSS.SetFillColor(r.kMagenta+1)
+    hSS.SetTitle('QCD, W+jets')
+
+    ### Combine SS + OS contributions:
+    hBKG = r.THStack('hBKG_%s'%(hname), '') # Background stacked
+    hBKGtotal = copy.deepcopy(hSS) # Background total (for ratio)
+    hBKG.Add(copy.deepcopy(hSS))
+
+    for _h in hOS.GetHists():
+        _h.Scale(lumi/35.87)
+        hBKG.Add(copy.deepcopy(_h))
+        hBKGtotal.Add(copy.deepcopy(_h))
+
+    ### Axis definition
+    can_aux = TCanvas("can_%s"%(hname))
+    can_aux.cd()
+    hBKG.Draw()
+    hBKG.GetXaxis().SetTitle(hOS.GetXaxis().GetTitle())
+    hBKG.GetYaxis().SetTitle(hOS.GetYaxis().GetTitle())
+    del can_aux
+
+    nBCK = len(hOS.GetHists()) + 1
+    hBKGtotal.SetMarkerStyle(20) # Auxiliar to save the ratio correctly 
+    
+    
+    ### Signal histograms
+    if treeSI:
+    
+        hSIS = treeSI.getLoopStack(inputdir, hname)
+    
+        s_histos = []
+        for _i, _h in enumerate(hSIS.GetHists()):
+            s_histos.append(copy.deepcopy(_h))
+   
+        
+    ### Data histogram
+    hDATA = treeDATA.getLoopTH1F(inputdir, hname)
+    hDATA.SetMarkerStyle(20)
+    hDATA.SetMarkerSize(0.8)
+        
+    
+    ### Get maximum
+    maxValMC = hBKGtotal.GetMaximum()
+    maxValSI = 0 if not treeSI else max([s_histos[i].GetMaximum() for i in range(0, len(s_histos))])
+    maxValDATA = 0 if not treeDATA else hDATA.GetMaximum()
+    maxVal = max([maxValMC, maxValSI, maxValDATA])
+    
+        ### Set Maximum
+    if not ylog:
+        hBKG.SetMaximum(1.3*maxVal)
+        hBKG.SetMinimum(0.0)
+        hBKGtotal.SetMaximum(1.3*maxVal)
+        hBKGtotal.SetMinimum(0.0)
+        if treeSI:
+            for _h in s_histos: 
+                if not yshift:
+                    _h.SetMaximum(1.3*maxVal)
+                else:
+                    _h.SetMaximum(yshift*maxVal)
+                _h.SetMinimum(0.0)
+        if treeDATA:
+            if not yshift:
+                hDATA.SetMaximum(1.3*maxVal)
+            else:
+                hDATA.SetMaximum(yshift*maxVal)
+            hDATA.SetMinimum(0.0)
+    else:
+        if not yshift:
+            hBKG.SetMaximum(10.0*maxVal)
+        else:
+            hBKG.SetMaximum(yshift*maxVal)
+        hBKG.SetMinimum(0.1)
+        if not yshift:
+            hBKGtotal.SetMaximum(10.0*maxVal)
+        else:
+            hBKGtotal.SetMaximum(yshift*maxVal)
+        hBKGtotal.SetMinimum(0.1)
+        if treeSI:
+            for _h in s_histos: 
+                if not yshift:
+                    _h.SetMaximum(10.0*maxVal)
+                else:
+                    _h.SetMaximum(yshift*maxVal)
+                _h.SetMinimum(0.1)
+        if treeDATA:
+            if not yshift:
+                hDATA.SetMaximum(10.0*maxVal)
+            else:
+                hDATA.SetMaximum(yshift*maxVal)
+            hDATA.SetMinimum(0.1)
+    
+    
+    ### Canvas object
+    if treeDATA:
+        plot = Canvas.Canvas(hname, 'png', 0.6, 0.5, 0.9, 0.9, 1)
+    else:
+        plot = Canvas.Canvas(hname, 'png', 0.6, 0.74, 0.9, 0.9, 1)
+    
+    plot.addStack(hBKG, 'HIST', 1, 0) # Background
+    
+    if treeSI:
+        for i,_h in enumerate(s_histos):
+            _h.SetLineWidth(2) # provisional
+            plot.addHisto(_h, 'HIST, SAME', _h.GetTitle(), 'l', _h.GetFillColor(), 1, i+nBCK) # Signal
+    
+    if treeDATA:
+        plot.addHisto(hDATA, 'P, SAME', '', 'p', r.kBlack, 1, nBCK + len(s_histos))
+    
+    
+        ### Dilepton banner
+        """
+        if LLlabel == 'EE':
+            plot.addLatex(0.17, 0.86, 'e^{+}e^{-} channel')
+        if LLlabel == 'MM':
+            plot.addLatex(0.17, 0.86, '#mu^{+}#mu^{-} channel')
+        """
+
+    ### Save it
+    outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/Plots_' + outtag + '/'
+    if treeDATA:
+        plot.saveRatio(1, 0, ylog, luminosity, hDATA, hBKGtotal, label="Data/BKG", outputDir = outdir)
+    else:
+        plot.save(1, 0, ylog, luminosity, '', outputDir = outdir)
+
+
+    del plot
+    return 
+
 
 def makeFullPlot(queue, lumi, var, name, nbin, xmin, xmax, xlabel, ylog, treeMC, treeDATA, treeSI, cuts, outtag = '', normed = False, yshift = 0.0):
 

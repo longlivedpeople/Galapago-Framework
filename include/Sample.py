@@ -82,6 +82,8 @@ from array import array
 from ROOT import TTree, TFile, TCut, TH1F, TH2F, TH3F, THStack, TCanvas, SetOwnership
 from include.processHandler import processHandler
 import copy
+import os
+import __main__
 
 ########################################################################################
 ########################################################################################
@@ -90,26 +92,36 @@ import copy
 ########################################################################################
 class Sample:
    'Common base class for all Samples'
-   def __init__(self, name, label, color, friendlocation, xsection, isdata):
+   def __init__(self, name, label, color, location, xsection, isdata):
 
       self.name = name
       self.label = label
       self.color = eval(color)
-      self.location = friendlocation
+      self.location = location if location[-1] == '/' else location + '/'
       self.xSection = xsection
       self.isData = isdata
-      ftfileloc = friendlocation 
-      self.ftfile = TFile(ftfileloc)
-      self.ttree = self.ftfile.Get('Events')
+      self.ftpaths = []
+      self.ftfiles = []
+      self.ttrees = []
+      self.count = 0.0
+
+      for _file in os.listdir(self.location):
+        ftfile = TFile(location + _file)
+        ttree = ftfile.Get('Events')
+        self.ftpaths.append(location + _file)
+        self.ftfiles.append(ftfile)
+        self.ttrees.append(ttree)
 
       if not self.isData:
         gw = 0.
-        for i in self.ttree:
-            gw = abs(i.genWeight)
+        for i,ttree in enumerate(self.ttrees):
+          for j in ttree:
+            gw = abs(j.genWeight)
             if gw: break
-        self.count = self.ftfile.Get('sum2Weights').GetBinContent(1)/abs(gw)
+          self.count = self.count + self.ftfiles[i].Get('sum2Weights').GetBinContent(1)/abs(gw)
       else:
-          self.count = self.ftfile.Get('Events').GetEntries()
+        for ttree in self.ttrees:
+          self.count = self.count + ttree.GetEntries()
 
       if not self.isData:
         self.lumWeight = self.xSection / self.count
@@ -298,13 +310,12 @@ class Block:
 class Tree:
    'Common base class for a physics meaningful tree'
 
-   def __init__(self, fileName, name, isdata, loopFile = 'default.root'):
+   def __init__(self, fileName, name, isdata):
       #print fileName
       self.name  = name
       self.isData = isdata
       self.blocks = []
       self.parseFileName(fileName)
-      self.loopFile = loopFile
 
    def parseFileName(self, fileName):
       f = open(fileName)
@@ -336,9 +347,7 @@ class Tree:
           newBlock = Block(block, label, color, isdata)
           newBlock.addSample(sample)
           self.addBlock(newBlock)
-
         else:
-
           coincidentBlock[0].addSample(sample)
 
 
@@ -466,92 +475,275 @@ class Tree:
      return h   
 
 
-   def Loop(self, lumi, filename = False, maxNumber = False):
-        
-     if filename: self.loopFile = filename
+   def Loop(self, lumi, outdir):
 
+     #
+     # Runs a loop over all the events of the trees, of the samples, of the blocks 
+     # declared in the Tree, filling the histograms defined in include/processHandler.py
+     # and saving them in a file
+     #
+
+        
      for b in self.blocks:
        for s in b.samples:
          print("Reading samples: " + s.name)
-         process = processHandler(self.loopFile, self.name, b.name, s.name)
-         for n,ev in enumerate(s.ttree):
-           if maxNumber:
-               if n > maxNumber: break #### OJOO esto es auxiliar, al cortar la normalizacion no se cumple 
+         for t,ttree in enumerate(s.ttrees):
            if s.isData:
-             process.processEvent(ev, 1, True)
-           else:                 
-             process.processEvent(ev, lumi*s.lumWeight, False)
-         process.Write()
+               process = processHandler(outdir, self.name, b.name, s.name, t, 1, True)
+           else:
+               process = processHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False)
+           for n,ev in enumerate(ttree):
+               process.processEvent(ev)
+           process.Write()
 
 
-   def getLoopStack(self, name, var, xlabel):
-     
-     hs = THStack(name, "")
-     SetOwnership(hs, 0 ) 
+   def launchLoop(self, lumi, outdir, queue = 'espresso'):
 
-     _file = r.TFile(self.loopFile)
+     #
+     # Launches Loop function in CONDOR
+     # TTree <------> Job
+     #
+
+
+     outdir = outdir + '/' if outdir[-1] != '/' else outdir # outdir correction
+
+     # Get absdir:
+     absdir = ''
+     for _p,path in enumerate(os.path.abspath(__main__.__file__).split('/')):
+       if _p == len(os.path.abspath(__main__.__file__).split('/')) - 1: break
+       absdir += path + '/'
+
+     # Get command to launch:
+     command = 'python {0}runLoop.py -f {1} -o {2} -n {3} -b {4} -s {5} -t {6} -l {7} '
+
+     # Get cmssw release:
+     cmssw = ''
+     for level in absdir.split('/'):
+            cmssw += level + '/'
+            if 'CMSSW' in level:
+                cmssw += 'src'
+                break
+
+     # Get bash file template:
+     bashfile = """#!/bin/bash
+pushd {0}
+eval `scramv1 runtime -sh`
+pushd
+{1}""".format(cmssw, '{0}')
+
+     # Get condor submission file template:
+     subfile = """
+universe                = vanilla
+executable              = $(filename)
+output                  = {1}.out
+error                   = {1}.err
+log                     = {1}.log
+Notify_user             = fernance@cern.ch
++JobFlavour = "{0}" 
+queue filename matching {2}
+""".format(queue, '{0}', '{1}')
 
      for b in self.blocks:
+       for s in b.samples:
+         for t,ttree in enumerate(s.ttrees):
 
-       #print('> h'+var+'_'+self.name+'_'+b.name+'_'+b.samples[0].name)
-       hblock_aux = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+b.samples[0].name)
-       hblock_clone = hblock_aux.Clone()
-       hblock = copy.deepcopy(hblock_clone)
-       hblock.SetTitle(b.label)
-       SetOwnership(hblock, 0)
-       xmin = hblock.GetXaxis().GetXmin()
-       xmax = hblock.GetXaxis().GetXmax()
-       nbin = hblock.GetXaxis().GetNbins()
-       hblock.SetFillColor(b.color) 
+           if s.isData:
+               scommand = command.format(absdir, s.ftpaths[t], outdir, self.name, b.name, s.name, str(t), str(1.0))
+               scommand += '-d'
+           else:
+               scommand = command.format(absdir, s.ftpaths[t], outdir, self.name, b.name, s.name, str(t), str(lumi*s.lumWeight))
+
+           #print(scommand)
+
+           ## Bash file
+           if not os.path.exists(absdir + 'bash/'): os.makedirs(absdir + 'bash/')
+           _bashname = absdir + 'bash/' + 'bash_{0}_{1}_{2}_{3}.sh'.format(self.name, b.name, s.name, str(t))
+           _bashfile = open(_bashname, 'w')
+           _bashfile.write(bashfile.format(scommand))
+           _bashfile.close()
+
+           ## Submission file
+           if not os.path.exists(absdir + 'sub/'): os.makedirs(absdir + 'sub/')
+           _subname = absdir + 'sub/' +'sub_{0}_{1}_{2}_{3}.sh'.format(self.name, b.name, s.name, str(t))
+           _subfile = open(_subname, 'w')
+           _subtext = subfile.format(outdir + '{0}_{1}_{2}_{3}'.format(self.name, b.name, s.name, str(t)), _bashname)
+           _subfile.write(_subtext)
+           _subfile.close()
+
+           ## Launch and clear
+           os.system('chmod +x ' + _bashname)
+           os.system('chmod +x ' + _subname)
+           os.system('condor_submit ' + _subname)
+           #os.system('rm ' + _subname)
+
+
+   def getTH1FsFromDir(self, inputdir):
+
+     #
+     # Function to get the histo list available in a dir with root files
+     # by exploring the content of the first file.
+     #
+
+     absdir = inputdir if inputdir[-1] == '/' else inputdir + '/'
+
+     for _f in os.listdir(absdir):
+       if '.root' in _f:
+         file0 = absdir + _f
+         break
+
+     _tf = r.TFile(file0)
+
+     histos = []
+     for _key in _tf.GetListOfKeys():
+       key = _key.GetName()
+       ktype = str(type(_tf.Get(key)))
+       if 'TH1F' in ktype:
+         histos.append(key.split('__')[0])
+
+     print(histos)
+     return histos
+
+
+   def getLoopStack(self, inputdir, hname, doOF = True):
+     
+     ## Correct input dir absolute path:
+     inputdir = inputdir + '/' if inputdir[-1] != '/' else inputdir
+
+     ## Init Stacked histograms:
+     hstack = THStack(hname + "_stacked", "")
+     SetOwnership(hstack, 0)
+
+     for b in self.blocks:
  
        for si,s in enumerate(b.samples):
   
-         hsample = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
-         #print('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
+         ## Init Sample histogram:
+         _f0 = r.TFile(inputdir + '{0}__{1}__{2}__0.root'.format(self.name, b.name, s.name))
+         hsample = copy.deepcopy(_f0.Get(hname + '__{0}__{1}__{2}__0'.format(self.name, b.name, s.name)))
+         if doOF: hsample.SetBinContent(hsample.GetNbinsX(), hsample.GetBinContent(hsample.GetNbinsX()) + hsample.GetBinContent(hsample.GetNbinsX() + 1) )
+         _f0.Close()
 
-         if si == 0: 
-             continue
-         else:
-             hblock.Add(hsample)
+         ## Constuct Sample histogram:
+         for t in range(0, len(s.ttrees)):
+           if t == 0: continue
+           _ft = r.TFile(inputdir + '{0}__{1}__{2}__{3}.root'.format(self.name, b.name, s.name, str(t)))
+           _haux = _ft.Get(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
 
-       hs.Add(hblock)
+           try:
+               _h = _haux.Clone()
+               if doOF: _h.SetBinContent(_h.GetNbinsX(), _h.GetBinContent(_h.GetNbinsX()) + _h.GetBinContent(_h.GetNbinsX() + 1) )
+               hsample.Add(_h)
+           except ReferenceError:
+               print(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)) + ' cannot be accesed: Skipping')
+               pass
+           _ft.Close()
+
+         ## Add sample histogram to block histogram:
+         if not si: 
+           hblock = hsample.Clone()
+           hblock.SetTitle(b.label)
+           SetOwnership(hblock, 0)
+           hblock.SetFillColor(b.color)
+           hblock.SetLineColor(r.kBlack)
+         else: 
+           hblock.Add(hsample)
+
+       ## Add block histogram to stack histogram:
+       hstack.Add(hblock)
 
 
-     can_aux = TCanvas("can_%s_%s"%(name, b.name))
+     can_aux = TCanvas("can_{0}".format(hname))
      can_aux.cd()
-     hs.Draw()
+     hstack.Draw('')
 
+     ## Get some values:
+     xmin = float(hstack.GetXaxis().GetXmin())
+     xmax = float(hstack.GetXaxis().GetXmax())
+     nbin = hstack.GetXaxis().GetNbins()
+
+     ## Correct y axis
      ylabel = "Events"
-     if xmax != xmin:
-       hs.GetXaxis().SetTitle(xlabel)
-       b = int((xmax-xmin)/nbin)
-       ylabel = "Events / " + str(b) + " units"
-     else:     
-       ylabel = "Events"
+     b = (xmax-xmin)/float(nbin)
+     ylabel = "Events / " + "{:.2f}".format(b) + " units"
+     hstack.GetYaxis().SetTitle(ylabel)
+     hstack.GetXaxis().SetTitle(hsample.GetXaxis().GetTitle())
+
+     return hstack 
+
    
-     hs.GetYaxis().SetTitle(ylabel)
-     _file.Close()
-     return hs   
-
-
-   def getLoopTH1F(self, name, var, xlabel):
+   def getLoopTH1F(self, inputdir, hname, doOF = True):
      
-     _file = r.TFile(self.loopFile)
+     ## Correct input dir absolute path:
+     inputdir = inputdir + '/' if inputdir[-1] != '/' else inputdir
 
-     for bi,b in enumerate(self.blocks):
-       for si,s in enumerate(b.samples):
-         AuxName = "auxh1_block_" + name + "_" + b.name + s.name
-         haux = _file.Get('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
-         print('h'+var+'_'+self.name+'_'+b.name+'_'+s.name)
-         if not bi and not si:
-           h = haux.Clone(name+'_treeHisto')
-           h.SetTitle(s.label)
-         else:
-           h.Add(haux)
-         del haux
+     ## Init histogram:
+     _f0 = r.TFile(inputdir + '{0}__{1}__{2}__0.root'.format(self.name, self.blocks[0].name, self.blocks[0].samples[0].name))
+     hth1f = copy.deepcopy(_f0.Get(hname + '__{0}__{1}__{2}__0'.format(self.name, self.blocks[0].name, self.blocks[0].samples[0].name)))
+     if doOF: 
+         hth1f.SetBinContent(hth1f.GetNbinsX(), hth1f.GetBinContent(hth1f.GetNbinsX()) + hth1f.GetBinContent(hth1f.GetNbinsX() + 1) )
+         hth1f.SetBinError(hth1f.GetNbinsX(), hth1f.GetBinError(hth1f.GetNbinsX()) + hth1f.GetBinError(hth1f.GetNbinsX() + 1) )
+     _f0.Close()
+     SetOwnership(hth1f, 0)
 
-     h2 = copy.deepcopy(h)
-     h2.GetXaxis().SetTitle(xlabel)
-     return h2
+     ## Loop over files:
+     for _b,b in enumerate(self.blocks):
+       for _s,s in enumerate(b.samples):
+         for t in range(0, len(s.ttrees)):
+           if t == 0 and _s == 0 and _b == 0: continue
+           _ft = r.TFile(inputdir + '{0}__{1}__{2}__{3}.root'.format(self.name, b.name, s.name, str(t)))
+           _haux = _ft.Get(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
+           try:
+               _h = _haux.Clone()
+               if doOF: 
+                   _h.SetBinContent(_h.GetNbinsX(), _h.GetBinContent(_h.GetNbinsX()) + _h.GetBinContent(_h.GetNbinsX() + 1) )
+                   _h.SetBinError(_h.GetNbinsX(), _h.GetBinError(_h.GetNbinsX()) + _h.GetBinError(_h.GetNbinsX() + 1) )
+               hth1f.Add(_h)
+           except ReferenceError:
+               print(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)) + ' cannot be accesed: Skipping')
+               pass
+           _ft.Close()
+
+     ## Get some values:
+     xmin = float(hth1f.GetXaxis().GetXmin())
+     xmax = float(hth1f.GetXaxis().GetXmax())
+     nbin = hth1f.GetXaxis().GetNbins()
+
+     ## Correct y axis
+     ylabel = "Events"
+     b = (xmax-xmin)/float(nbin)
+     ylabel = "Events / " + "{:.2f}".format(b) + " units"
+     hth1f.GetYaxis().SetTitle(ylabel)
+
+     return hth1f
+
+
+   def getLoopTH2F(self, inputdir, hname):
+     
+     ## Correct input dir absolute path:
+     inputdir = inputdir + '/' if inputdir[-1] != '/' else inputdir
+
+     ## Init histogram:
+     _f0 = r.TFile(inputdir + '{0}__{1}__{2}__0.root'.format(self.name, self.blocks[0].name, self.blocks[0].samples[0].name))
+     hth2f = copy.deepcopy(_f0.Get(hname + '__{0}__{1}__{2}__0'.format(self.name, self.blocks[0].name, self.blocks[0].samples[0].name)))
+     _f0.Close()
+     SetOwnership(hth2f, 0)
+
+     ## Loop over files:
+     for _b,b in enumerate(self.blocks):
+       for _s,s in enumerate(b.samples):
+         for t in range(0, len(s.ttrees)):
+           if t == 0 and _s == 0 and _b == 0: continue
+           _ft = r.TFile(inputdir + '{0}__{1}__{2}__{3}.root'.format(self.name, b.name, s.name, str(t)))
+           _haux = _ft.Get(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)))
+           try:
+               _h = _haux.Clone()
+               hth2f.Add(_h)
+           except ReferenceError:
+               print(hname + '__{0}__{1}__{2}__{3}'.format(self.name, b.name, s.name, str(t)) + ' cannot be accesed: Skipping')
+               pass
+           _ft.Close()
+
+     return hth2f
+
 
 
