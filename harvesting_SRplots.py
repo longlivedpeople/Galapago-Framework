@@ -16,7 +16,7 @@ import include.CutManager as CutManager
 
 
 
-def makeBlindedPlot(lumi, hname_SR, hname_CR, ylog, treeDATA, inputdir, treeSI = False, hname_SI = '', rebin = False, limit = 0.0, lines = [], xlabel = '', outtag = '', yshift = 0.0, LLlabel = '', DATAlabel = '', extralabel = ''):
+def makeBlindedPlot(lumi, hname_SR, hname_CR, ylog, treeDATA, inputdir, treeSI = False, hname_SI = '', rebin = False, limit = 0.0, lines = [], xlabel = '', outtag = '', ymax = 0.0, LLlabel = '', DATAlabel = '', extralabel = ''):
 
 
     ### Get histograms
@@ -69,12 +69,13 @@ def makeBlindedPlot(lumi, hname_SR, hname_CR, ylog, treeDATA, inputdir, treeSI =
         for _i, _h in enumerate(hSIS.GetHists()):
             _h.Scale(lumi/35.87)
             s_histos.append(copy.deepcopy(_h))
+            """
             Sover = 0.0
             for n in range(_h.GetNbinsX() + 1):
                 if limit and _h.GetBinLowEdge(n) >= limit:
                     Sover += _h.GetBinContent(n)
             print(_h.GetTitle(), Sover, Sover/math.sqrt(Bover+Sover))
-
+            """
 
 
     ### Get maximum
@@ -89,7 +90,9 @@ def makeBlindedPlot(lumi, hname_SR, hname_CR, ylog, treeDATA, inputdir, treeSI =
     else:
         hCR.SetMaximum(100.0*maxVal)
         hCR.SetMinimum(0.1)
- 
+
+    if ymax: hCR.SetMaximum(ymax) 
+
 
     ### Canvas object
     plot = Canvas.Canvas('SR_'+hname_SR, 'png', 0.35, 0.5, 0.6, 0.87, 1)
@@ -248,9 +251,10 @@ if __name__ == "__main__":
        
     treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_list, 'DATA'), name = 'DATA', isdata = 1 )
 
-    makeBlindedPlot(lumi = lumi_EG, hname_SR = 'hEEoffZSR_trackIxy', hname_CR = 'hEEoffZCR_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, limit = 6, lines = [6.0], xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'Signal region') 
-    makeBlindedPlot(lumi = lumi_EG, hname_SR = 'hEESROS_trackIxy', hname_CR = 'hEECROS_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, limit = 6, lines = [6.0], xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'Signal region') 
-    #makeBlindedPlot(lumi = lumi_EG, hname_SR = 'hEEonZSR_mass', hname_CR = 'hEECROS_mass', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, hname_SI = 'hEESROS_mass',limit = 0.0, lines = [80.0, 100.0], xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi_EG, hname_SR = 'hEEoffZSR_nBSEE', hname_CR = 'hEEoffZCR_nBSEE', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_withCounters', treeSI = treeSI, limit = False, lines = [0], xlabel = '', outtag = '', ymax = 1e13, LLlabel = 'EE', DATAlabel = '', extralabel = 'Signal region') 
+    makeBlindedPlot(lumi = lumi_EG, hname_SR = 'hEEoffZSR_trackIxy', hname_CR = 'hEEoffZCR_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, limit = 6, lines = [6.0], xlabel = '', outtag = '', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'Signal region') 
+    makeBlindedPlot(lumi = lumi_EG, hname_SR = 'hEESROS_trackIxy', hname_CR = 'hEECROS_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, limit = 6, lines = [6.0], xlabel = '', outtag = '', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'Signal region') 
+    #makeBlindedPlot(lumi = lumi_EG, hname_SR = 'hEEonZSR_mass', hname_CR = 'hEECROS_mass', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, hname_SI = 'hEESROS_mass',limit = 0.0, lines = [80.0, 100.0], xlabel = '', outtag = '', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
 
     ##################################
     ######## DoubleMuon Plots ########
@@ -258,7 +262,8 @@ if __name__ == "__main__":
     
     treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_list, 'DATA'), name = 'DATA', isdata = 1 )
 
-    makeBlindedPlot(lumi = lumi_Muon, hname_SR = 'hMMoffZSR_trackIxy', hname_CR = 'hMMoffZCR_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, limit = 6, lines = [6.0], xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'Signal region') 
-    makeBlindedPlot(lumi = lumi_Muon, hname_SR = 'hMMSROS_trackIxy', hname_CR = 'hMMCROS_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, limit = 6, lines = [6.0], xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'Signal region') 
+    makeBlindedPlot(lumi = lumi_Muon, hname_SR = 'hMMoffZSR_nBSMM', hname_CR = 'hMMoffZCR_nBSMM', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_withCounters', treeSI = treeSI, limit = False, lines = [0], xlabel = '', outtag = '', ymax = 1e13, LLlabel = 'MM', DATAlabel = '', extralabel = 'Signal region') 
+    makeBlindedPlot(lumi = lumi_Muon, hname_SR = 'hMMoffZSR_trackIxy', hname_CR = 'hMMoffZCR_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, limit = 6, lines = [6.0], xlabel = '', outtag = '', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'Signal region') 
+    makeBlindedPlot(lumi = lumi_Muon, hname_SR = 'hMMSROS_trackIxy', hname_CR = 'hMMCROS_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, limit = 6, lines = [6.0], xlabel = '', outtag = '', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'Signal region') 
 
-    #makeBlindedPlot(lumi = lumi_Muon, hname_SR = 'hMMonZSR_mass', hname_CR = 'hMMCROS_mass', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, hname_SI = 'hMMSROS_mass',limit = 0.0, lines = [80.0, 100.0], xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    #makeBlindedPlot(lumi = lumi_Muon, hname_SR = 'hMMonZSR_mass', hname_CR = 'hMMCROS_mass', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_newElectronVariables', treeSI = treeSI, hname_SI = 'hMMSROS_mass',limit = 0.0, lines = [80.0, 100.0], xlabel = '', outtag = '', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 

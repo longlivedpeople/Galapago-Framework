@@ -162,10 +162,10 @@ if __name__ == "__main__":
 
     ############# Muon data definition
     DoubleMuon = []
-    #DoubleMuon.append('DoubleMuon_Run2016B')
+    DoubleMuon.append('DoubleMuon_Run2016B')
     DoubleMuon.append('DoubleMuon_Run2016C')
     DoubleMuon.append('DoubleMuon_Run2016D')
-    #DoubleMuon.append('DoubleMuon_Run2016E')
+    DoubleMuon.append('DoubleMuon_Run2016E')
     DoubleMuon.append('DoubleMuon_Run2016F')
     DoubleMuon.append('DoubleMuon_Run2016G')
     DoubleMuon.append('DoubleMuon_Run2016H')
