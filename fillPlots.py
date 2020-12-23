@@ -191,14 +191,14 @@ if __name__ == "__main__":
     ############# Signal definition
     Signals = []
     #Signals.append('DisplacedSUSY_350_148_173')
-    Signals.append('HXX_400_50_4mm')
-    Signals.append('HXX_400_50_40mm')
-    Signals.append('HXX_400_50_400mm')
-    Signals.append('HXX_400_150_400mm')
-    Signals.append('HXX_1000_150_10mm')
+    #Signals.append('HXX_400_50_4mm')
+    #Signals.append('HXX_400_50_40mm')
+    #Signals.append('HXX_400_50_400mm')
+    #Signals.append('HXX_400_150_400mm')
+    #Signals.append('HXX_1000_150_10mm')
     Signals.append('HXX_1000_150_100mm')
-    Signals.append('HXX_1000_350_35mm')
-    Signals.append('HXX_1000_350_350mm')
+    #Signals.append('HXX_1000_350_35mm')
+    #Signals.append('HXX_1000_350_350mm')
 
     ############# Parameter definition
     lumiB = 5.79
@@ -235,11 +235,11 @@ if __name__ == "__main__":
     ###################
 
 #    treeMC.Loop(lumi, WORKPATH + opts.out + '/')
-    #treeSI.Loop(lumi, WORKPATH + opts.out + '/')
+    treeSI.Loop(lumi, WORKPATH + opts.out + '/')
     #treeDATA.Loop(lumi, WORKPATH + opts.out + '/')
     #treeMC.launchLoop(lumi, WORKPATH +  opts.out + '/', queue = 'longlunch')
-    treeSI.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch')
-    treeDATA.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch')
+    #treeSI.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch')
+    #treeDATA.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch')
 
 
     print("--- %s seconds ---" % (time.time() - start_time))
