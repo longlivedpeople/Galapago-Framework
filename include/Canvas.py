@@ -34,7 +34,7 @@ class Canvas:
    def changeLabelsToNames(self):
       newlabels = []
       for il,lab in enumerate(self.labels):
-         print 'changing label %s to %s'%(lab, self.histos[il].GetName())
+         print('changing label %s to %s'%(lab, self.histos[il].GetName()))
          newlabels.append(self.histos[il].GetName())
       self.labels = newlabels
 
@@ -357,7 +357,7 @@ class Canvas:
               if not os.path.exists(d):
                   os.makedirs(d)
               break
-          except OSError, e:
+          except OSError as e:
               if e.errno != os.errno.EEXIST:
                   raise
               print("Sleeping...")

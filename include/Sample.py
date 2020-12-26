@@ -129,13 +129,13 @@ class Sample:
 
 
    def printSample(self):
-      print "#################################"
-      print "Sample Name: ", self.name
-      print "Sample Location: ", self.location
-      print "Sample XSection: ", self.xSection
-      print "Sample IsData: ", self.isData
-      print "Sample LumWeight: ", self.lumWeight
-      print "#################################"
+      print("#################################")
+      print("Sample Name: ", self.name)
+      print("Sample Location: ", self.location)
+      print("Sample XSection: ", self.xSection)
+      print("Sample IsData: ", self.isData)
+      print("Sample LumWeight: ", self.lumWeight)
+      print("#################################")
 
 
    def getTH1F(self, lumi, name, var, nbin, xmin, xmax, cut, options, xlabel):
@@ -227,12 +227,12 @@ class Block:
 
    def printBlock(self):
 
-      print "####################"
-      print "Block Name: ", self.name
-      print "Block Color: ", self.color
-      print "Block IsData: ", self.isData
-      print "####################"
-      print "This block contains the following Samples"
+      print("####################")
+      print("Block Name: ", self.name)
+      print("Block Color: ", self.color)
+      print("Block IsData: ", self.isData)
+      print("####################")
+      print("This block contains the following Samples")
 
       for l in self.samples:
         l.printSample()
@@ -352,11 +352,11 @@ class Tree:
 
 
    def printTree(self):
-      print "######"
-      print "Tree Name: ", self.name
-      print "Tree IsData: ", self.isData
-      print "######"
-      print "This Tree contains the following Blocks"
+      print("######")
+      print("Tree Name: ", self.name)
+      print("Tree IsData: ", self.isData)
+      print("######")
+      print("This Tree contains the following Blocks")
 
       for l in self.blocks:
         l.printBlock()

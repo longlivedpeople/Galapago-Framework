@@ -29,59 +29,19 @@ class processHandler:
         self.sufix = '__{0}__{1}__{2}__{3}'.format(treename, blockname, samplename, str(samplenumber))
 
 
-        #### ---------------------------
-        #### ---- EE Region definition
-        #### ---------------------------
-
-        EE_OSSRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_dPhiforward])
-        EE_OSCRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_dPhibackward])
-        EE_offZCRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_OffZ, self.cm.EE_dPhibackward])
-        EE_offZSRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_OffZ, self.cm.EE_dPhiforward])
-        EE_onZCRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_OnZ, self.cm.EE_dPhibackward])
-        EE_onZSRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_OnZ, self.cm.EE_dPhiforward])
-        EE_promptSRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_Ixy6prompt, self.cm.EE_dPhiforward])
-        EE_promptCRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_Ixy6prompt, self.cm.EE_dPhibackward])
-
-
-        self.dielectronRegions = [] # region name : region cut
-        self.dielectronRegions.append(['CROS', EE_OSCRcut])
-        self.dielectronRegions.append(['SROS', EE_OSSRcut])
-        self.dielectronRegions.append(['promptCR', EE_promptCRcut])
-        self.dielectronRegions.append(['promptSR', EE_promptSRcut])
-        self.dielectronRegions.append(['onZCR', EE_onZCRcut])
-        self.dielectronRegions.append(['onZSR', EE_onZSRcut])
-        self.dielectronRegions.append(['offZCR', EE_offZCRcut])
-        self.dielectronRegions.append(['offZSR', EE_offZSRcut])
-
-
-
-        #### ---------------------------
-        #### ---- MM Region definition
-        #### ---------------------------
-
-        MM_OSSRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_dPhiforward])
-        MM_OSCRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_dPhibackward])
-        MM_offZCRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_OffZ, self.cm.MM_dPhibackward])
-        MM_offZSRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_OffZ, self.cm.MM_dPhiforward])
-        MM_onZCRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_OnZ, self.cm.MM_dPhibackward])
-        MM_onZSRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_OnZ, self.cm.MM_dPhiforward])
-        MM_promptSRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_Ixy6prompt, self.cm.MM_dPhiforward])
-        MM_promptCRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_Ixy6prompt, self.cm.MM_dPhibackward])
-
-
-        self.dimuonRegions = [] # region name : region cut
-        self.dimuonRegions.append(['CROS', MM_OSCRcut])
-        self.dimuonRegions.append(['SROS', MM_OSSRcut])
-        self.dimuonRegions.append(['promptCR', MM_promptCRcut])
-        self.dimuonRegions.append(['promptSR', MM_promptSRcut])
-        self.dimuonRegions.append(['onZCR', MM_onZCRcut])
-        self.dimuonRegions.append(['onZSR', MM_onZSRcut])
-        self.dimuonRegions.append(['offZCR', MM_offZCRcut])
-        self.dimuonRegions.append(['offZSR', MM_offZSRcut])
-
 
         ## Init histogram efficiencies
         self.declareEfficiencies()
+
+        #### ------------------------------
+        #### ---- Regions initialization
+        #### ------------------------------
+    
+        self.dielectronRegions = [] # region name : region cut
+        self.declareDielectronRegions()
+        
+        self.dimuonRegions = [] # region name : region cut
+        self.declareDimuonRegions()
 
 
         #### -------------------------------
@@ -100,8 +60,130 @@ class processHandler:
         #### ---- Apply sumw2 to histograms
         #### --------------------------------
 
-        for attr, value in self.__dict__.iteritems():
+        for attr, value in self.__dict__.items():
             if attr[0] == 'h': value.Sumw2()
+
+
+
+    #### ------------------------
+    #### --
+    #### ---- declareHistograms
+    #### --
+    #### ------------------------
+
+    def declareDimuonHistograms(self, region):
+
+        binlog_Ixy = np.logspace(-2, 2, 50)
+
+        #### ---------------
+        #### ---- MM plots
+        #### ---------------
+
+        exec("self.hMM{0}_nBSMM = r.TH1F('hMM{0}_nBSMM' + self.sufix, ';Number of MM candidates;', 4, 0, 4)".format(region))
+        exec("self.hMM{0}_nPU = r.TH1F('hMM{0}_nPU' + self.sufix, ';Number of true primary vertices;', 40, 0, 80)".format(region))
+        exec("self.hMM{0}_dPhi = r.TH1F('hMM{0}_dPhi' + self.sufix, ';Dimuon collinearity |#Delta#Phi|;', 30, 0, 3.14)".format(region))
+        exec("self.hMM{0}_mass = r.TH1F('hMM{0}_mass' + self.sufix, ';Dimuon invariant mass m_{{#mu#mu}} (GeV);', 80, 0, 400)".format(region))
+        exec("self.hMM{0}_cosAlpha = r.TH1F('hMM{0}_cosAlpha' + self.sufix, ';Dimuon cos(#alpha_{{#mu#mu}});', 22, -1.1, 1.1)".format(region))
+        exec("self.hMM{0}_trackIxy = r.TH1F('hMM{0}_trackIxy' + self.sufix, ';Dimuon |d_{{0}}|/#sigma_{{d}};', 40, 0, 40)".format(region))
+        exec("self.hMM{0}_trackIxy_log = r.TH1F('hMM{0}_trackIxy_log' + self.sufix, ';Dimuon |d_{{0}}|/#sigma_{{d}};', len(binlog_Ixy)-1, binlog_Ixy)".format(region))
+        exec("self.hMM{0}_trackDxy = r.TH1F('hMM{0}_trackDxy' + self.sufix, ';Dimuon |d_{{0}}| (cm);', 30, 0, 0.5)".format(region))
+        exec("self.hMM{0}_Lxy = r.TH1F('hMM{0}_Lxy' + self.sufix, ';Dimuon vertex |L_{{xy}}| (cm);', 20, 0, 10)".format(region))
+        exec("self.hMM{0}_Ixy = r.TH1F('hMM{0}_Ixy' + self.sufix, ';Dimuon vertex |L_{{xy}}|/#sigma_{{L}};', 20, 0, 20)".format(region))
+        exec("self.hMM{0}_leadingPt = r.TH1F('hMM{0}_leadingPt' + self.sufix, ';Dimuon leading p_{{T}};', 30, 0, 300)".format(region))
+        exec("self.hMM{0}_subleadingPt = r.TH1F('hMM{0}_subleadingPt' + self.sufix, ';Dimuon subleading p_{{T}};', 30, 0, 300)".format(region))
+        exec("self.hMM{0}_normalizedChi2 = r.TH1F('hMM{0}_normalizedChi2' + self.sufix, ';Dimuon vertex fit #chi^{{2}}/ndof;', 20, 0, 10)".format(region))
+        exec("self.hMM{0}_cosAlpha_dPhi = r.TH2F('hMM{0}_cosAlpha_dPhi' + self.sufix, ';Dimuon cos(#alpha_{{#mu#mu}}) ; Dimuon collinearity |#Delta#Phi|', 20, -1.0, 1.0, 20, 0, 3.14)".format(region))
+        exec("self.hMM{0}_DeltaPhi_dPhi = r.TH2F('hMM{0}_DeltaPhi_dPhi' + self.sufix, ';Dimuon #Delta#Phi(ll) ; Dimuon collinearity |#Delta#Phi|', 20, 0.0, 3.14, 20, 0, 3.14)".format(region))
+
+
+    def declareDielectronHistograms(self, region):
+
+        binlog_Ixy = np.logspace(-2, 2, 50)
+
+        #### ---------------
+        #### ---- EE plots
+        #### ---------------
+
+        exec("self.hEE{0}_nBSEE = r.TH1F('hEE{0}_nBSEE' + self.sufix, ';Number of EE candidates;', 4, 0, 4)".format(region))
+        exec("self.hEE{0}_nPU = r.TH1F('hEE{0}_nPU' + self.sufix, ';Number of true primary vertices;', 40, 0, 80)".format(region))
+        exec("self.hEE{0}_dPhi = r.TH1F('hEE{0}_dPhi' + self.sufix, ';Dielectron collinearity |#Delta#Phi|;', 30, 0, 3.14)".format(region))
+        exec("self.hEE{0}_mass = r.TH1F('hEE{0}_mass' + self.sufix, ';Dielectron invariant mass m_{{ee}} (GeV);', 80, 0, 400)".format(region))
+        exec("self.hEE{0}_cosAlpha = r.TH1F('hEE{0}_cosAlpha' + self.sufix, ';Dielectron cos(#alpha_{{ee}});', 22, -1.1, 1.1)".format(region))
+        exec("self.hEE{0}_trackIxy = r.TH1F('hEE{0}_trackIxy' + self.sufix, ';Dielectron |d_{{0}}|/#sigma_{{d}};', 40, 0, 40)".format(region))
+        exec("self.hEE{0}_trackIxy_log = r.TH1F('hEE{0}_trackIxy_log' + self.sufix, ';Dielectron |d_{{0}}|/#sigma_{{d}};', len(binlog_Ixy)-1, binlog_Ixy)".format(region))
+        exec("self.hEE{0}_trackDxy = r.TH1F('hEE{0}_trackDxy' + self.sufix, ';Dielectron |d_{{0}}| (cm);', 30, 0, 0.5)".format(region))
+        exec("self.hEE{0}_Lxy = r.TH1F('hEE{0}_Lxy' + self.sufix, ';Dielectron vertex |L_{{xy}}| (cm);', 20, 0, 10)".format(region))
+        exec("self.hEE{0}_Ixy = r.TH1F('hEE{0}_Ixy' + self.sufix, ';Dielectron vertex |L_{{xy}}|/#sigma_{{L}};', 20, 0, 20)".format(region))
+        exec("self.hEE{0}_leadingPt = r.TH1F('hEE{0}_leadingPt' + self.sufix, ';Dielectron leading p_{{T}};', 30, 0, 300)".format(region))
+        exec("self.hEE{0}_subleadingPt = r.TH1F('hEE{0}_subleadingPt' + self.sufix, ';Dielectron subleading p_{{T}};', 30, 0, 300)".format(region))
+        exec("self.hEE{0}_leadingEt = r.TH1F('hEE{0}_leadingEt' + self.sufix, ';Dielectron leading E_{{T}};', 30, 0, 300)".format(region))
+        exec("self.hEE{0}_subleadingEt = r.TH1F('hEE{0}_subleadingEt' + self.sufix, ';Dielectron subleading E_{{T}};', 30, 0, 300)".format(region))
+        exec("self.hEE{0}_normalizedChi2 = r.TH1F('hEE{0}_normalizedChi2' + self.sufix, ';Dielectron vertex fit #chi^{{2}}/ndof;', 20, 0, 10)".format(region))
+        exec("self.hEE{0}_cosAlpha_dPhi = r.TH2F('hEE{0}_cosAlpha_dPhi' + self.sufix, ';Dielectron cos(#alpha_{{ee}}) ; Dielectron collinearity |#Delta#Phi|', 20, -1.0, 1.0, 20, 0, 3.14)".format(region))
+        exec("self.hEE{0}_Lxy_dPhi = r.TH2F('hEE{0}_Lxy_dPhi' + self.sufix, ';Dielectron |L_{{xy}}| (cm) ; Dielectron collinearity |#Delta#Phi|', 20, 0.0, 1.0, 20, 0, 3.14)".format(region))
+        exec("self.hEE{0}_DeltaPhi_dPhi = r.TH2F('hEE{0}_DeltaPhi_dPhi' + self.sufix, ';Dielectron #Delta#Phi(ll) ; Dielectron collinearity |#Delta#Phi|', 20, 0.0, 3.14, 20, 0, 3.14)".format(region))
+
+
+
+
+    #### ------------------------
+    #### --
+    #### ---- declareRegions
+    #### --
+    #### ------------------------
+
+    def declareDielectronRegions(self):
+
+        #### ---------------------------
+        #### ---- EE Region definition
+        #### ---------------------------
+
+        EE_OSSRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_dPhiforward])
+        EE_OSCRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_dPhibackward])
+        EE_offZCRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_OffZ, self.cm.EE_dPhibackward])
+        EE_offZSRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_OffZ, self.cm.EE_dPhiforward])
+        EE_onZCRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_OnZ, self.cm.EE_dPhibackward])
+        EE_onZSRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_OnZ, self.cm.EE_dPhiforward])
+        EE_promptSRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_Ixy6prompt, self.cm.EE_dPhiforward])
+        EE_promptCRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_Ixy6prompt, self.cm.EE_dPhibackward])
+
+
+        self.dielectronRegions.append(['CROS', EE_OSCRcut])
+        self.dielectronRegions.append(['SROS', EE_OSSRcut])
+        self.dielectronRegions.append(['promptCR', EE_promptCRcut])
+        self.dielectronRegions.append(['promptSR', EE_promptSRcut])
+        self.dielectronRegions.append(['onZCR', EE_onZCRcut])
+        self.dielectronRegions.append(['onZSR', EE_onZSRcut])
+        self.dielectronRegions.append(['offZCR', EE_offZCRcut])
+        self.dielectronRegions.append(['offZSR', EE_offZSRcut])
+
+
+    def declareDimuonRegions(self):
+
+
+        #### ---------------------------
+        #### ---- MM Region definition
+        #### ---------------------------
+
+        MM_OSSRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_dPhiforward])
+        MM_OSCRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_dPhibackward])
+        MM_offZCRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_OffZ, self.cm.MM_dPhibackward])
+        MM_offZSRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_OffZ, self.cm.MM_dPhiforward])
+        MM_onZCRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_OnZ, self.cm.MM_dPhibackward])
+        MM_onZSRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_OnZ, self.cm.MM_dPhiforward])
+        MM_promptSRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_Ixy6prompt, self.cm.MM_dPhiforward])
+        MM_promptCRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_Ixy6prompt, self.cm.MM_dPhibackward])
+
+
+        self.dimuonRegions.append(['CROS', MM_OSCRcut])
+        self.dimuonRegions.append(['SROS', MM_OSSRcut])
+        self.dimuonRegions.append(['promptCR', MM_promptCRcut])
+        self.dimuonRegions.append(['promptSR', MM_promptSRcut])
+        self.dimuonRegions.append(['onZCR', MM_onZCRcut])
+        self.dimuonRegions.append(['onZSR', MM_onZSRcut])
+        self.dimuonRegions.append(['offZCR', MM_offZCRcut])
+        self.dimuonRegions.append(['offZSR', MM_offZSRcut])
+
 
 
 
@@ -462,63 +544,6 @@ class processHandler:
 
 
 
-    #### ------------------------
-    #### --
-    #### ---- declareHistograms
-    #### --
-    #### ------------------------
-
-    def declareDimuonHistograms(self, region):
-
-        binlog_Ixy = np.logspace(-2, 2, 50)
-
-        #### ---------------
-        #### ---- MM plots
-        #### ---------------
-
-        exec("self.hMM{0}_nBSMM = r.TH1F('hMM{0}_nBSMM' + self.sufix, ';Number of MM candidates;', 4, 0, 4)".format(region))
-        exec("self.hMM{0}_nPU = r.TH1F('hMM{0}_nPU' + self.sufix, ';Number of true primary vertices;', 40, 0, 80)".format(region))
-        exec("self.hMM{0}_dPhi = r.TH1F('hMM{0}_dPhi' + self.sufix, ';Dimuon collinearity |#Delta#Phi|;', 30, 0, 3.14)".format(region))
-        exec("self.hMM{0}_mass = r.TH1F('hMM{0}_mass' + self.sufix, ';Dimuon invariant mass m_{{#mu#mu}} (GeV);', 80, 0, 400)".format(region))
-        exec("self.hMM{0}_cosAlpha = r.TH1F('hMM{0}_cosAlpha' + self.sufix, ';Dimuon cos(#alpha_{{#mu#mu}});', 22, -1.1, 1.1)".format(region))
-        exec("self.hMM{0}_trackIxy = r.TH1F('hMM{0}_trackIxy' + self.sufix, ';Dimuon |d_{{0}}|/#sigma_{{d}};', 40, 0, 40)".format(region))
-        exec("self.hMM{0}_trackIxy_log = r.TH1F('hMM{0}_trackIxy_log' + self.sufix, ';Dimuon |d_{{0}}|/#sigma_{{d}};', len(binlog_Ixy)-1, binlog_Ixy)".format(region))
-        exec("self.hMM{0}_trackDxy = r.TH1F('hMM{0}_trackDxy' + self.sufix, ';Dimuon |d_{{0}}| (cm);', 30, 0, 0.5)".format(region))
-        exec("self.hMM{0}_Lxy = r.TH1F('hMM{0}_Lxy' + self.sufix, ';Dimuon vertex |L_{{xy}}| (cm);', 20, 0, 10)".format(region))
-        exec("self.hMM{0}_Ixy = r.TH1F('hMM{0}_Ixy' + self.sufix, ';Dimuon vertex |L_{{xy}}|/#sigma_{{L}};', 20, 0, 20)".format(region))
-        exec("self.hMM{0}_leadingPt = r.TH1F('hMM{0}_leadingPt' + self.sufix, ';Dimuon leading p_{{T}};', 30, 0, 300)".format(region))
-        exec("self.hMM{0}_subleadingPt = r.TH1F('hMM{0}_subleadingPt' + self.sufix, ';Dimuon subleading p_{{T}};', 30, 0, 300)".format(region))
-        exec("self.hMM{0}_normalizedChi2 = r.TH1F('hMM{0}_normalizedChi2' + self.sufix, ';Dimuon vertex fit #chi^{{2}}/ndof;', 20, 0, 10)".format(region))
-        exec("self.hMM{0}_cosAlpha_dPhi = r.TH2F('hMM{0}_cosAlpha_dPhi' + self.sufix, ';Dimuon cos(#alpha_{{#mu#mu}}) ; Dimuon collinearity |#Delta#Phi|', 20, -1.0, 1.0, 20, 0, 3.14)".format(region))
-        exec("self.hMM{0}_DeltaPhi_dPhi = r.TH2F('hMM{0}_DeltaPhi_dPhi' + self.sufix, ';Dimuon #Delta#Phi(ll) ; Dimuon collinearity |#Delta#Phi|', 20, 0.0, 3.14, 20, 0, 3.14)".format(region))
-
-
-    def declareDielectronHistograms(self, region):
-
-        binlog_Ixy = np.logspace(-2, 2, 50)
-
-        #### ---------------
-        #### ---- EE plots
-        #### ---------------
-
-        exec("self.hEE{0}_nBSEE = r.TH1F('hEE{0}_nBSEE' + self.sufix, ';Number of EE candidates;', 4, 0, 4)".format(region))
-        exec("self.hEE{0}_nPU = r.TH1F('hEE{0}_nPU' + self.sufix, ';Number of true primary vertices;', 40, 0, 80)".format(region))
-        exec("self.hEE{0}_dPhi = r.TH1F('hEE{0}_dPhi' + self.sufix, ';Dielectron collinearity |#Delta#Phi|;', 30, 0, 3.14)".format(region))
-        exec("self.hEE{0}_mass = r.TH1F('hEE{0}_mass' + self.sufix, ';Dielectron invariant mass m_{{ee}} (GeV);', 80, 0, 400)".format(region))
-        exec("self.hEE{0}_cosAlpha = r.TH1F('hEE{0}_cosAlpha' + self.sufix, ';Dielectron cos(#alpha_{{ee}});', 22, -1.1, 1.1)".format(region))
-        exec("self.hEE{0}_trackIxy = r.TH1F('hEE{0}_trackIxy' + self.sufix, ';Dielectron |d_{{0}}|/#sigma_{{d}};', 40, 0, 40)".format(region))
-        exec("self.hEE{0}_trackIxy_log = r.TH1F('hEE{0}_trackIxy_log' + self.sufix, ';Dielectron |d_{{0}}|/#sigma_{{d}};', len(binlog_Ixy)-1, binlog_Ixy)".format(region))
-        exec("self.hEE{0}_trackDxy = r.TH1F('hEE{0}_trackDxy' + self.sufix, ';Dielectron |d_{{0}}| (cm);', 30, 0, 0.5)".format(region))
-        exec("self.hEE{0}_Lxy = r.TH1F('hEE{0}_Lxy' + self.sufix, ';Dielectron vertex |L_{{xy}}| (cm);', 20, 0, 10)".format(region))
-        exec("self.hEE{0}_Ixy = r.TH1F('hEE{0}_Ixy' + self.sufix, ';Dielectron vertex |L_{{xy}}|/#sigma_{{L}};', 20, 0, 20)".format(region))
-        exec("self.hEE{0}_leadingPt = r.TH1F('hEE{0}_leadingPt' + self.sufix, ';Dielectron leading p_{{T}};', 30, 0, 300)".format(region))
-        exec("self.hEE{0}_subleadingPt = r.TH1F('hEE{0}_subleadingPt' + self.sufix, ';Dielectron subleading p_{{T}};', 30, 0, 300)".format(region))
-        exec("self.hEE{0}_leadingEt = r.TH1F('hEE{0}_leadingEt' + self.sufix, ';Dielectron leading E_{{T}};', 30, 0, 300)".format(region))
-        exec("self.hEE{0}_subleadingEt = r.TH1F('hEE{0}_subleadingEt' + self.sufix, ';Dielectron subleading E_{{T}};', 30, 0, 300)".format(region))
-        exec("self.hEE{0}_normalizedChi2 = r.TH1F('hEE{0}_normalizedChi2' + self.sufix, ';Dielectron vertex fit #chi^{{2}}/ndof;', 20, 0, 10)".format(region))
-        exec("self.hEE{0}_cosAlpha_dPhi = r.TH2F('hEE{0}_cosAlpha_dPhi' + self.sufix, ';Dielectron cos(#alpha_{{ee}}) ; Dielectron collinearity |#Delta#Phi|', 20, -1.0, 1.0, 20, 0, 3.14)".format(region))
-        exec("self.hEE{0}_Lxy_dPhi = r.TH2F('hEE{0}_Lxy_dPhi' + self.sufix, ';Dielectron |L_{{xy}}| (cm) ; Dielectron collinearity |#Delta#Phi|', 20, 0.0, 1.0, 20, 0, 3.14)".format(region))
-        exec("self.hEE{0}_DeltaPhi_dPhi = r.TH2F('hEE{0}_DeltaPhi_dPhi' + self.sufix, ';Dielectron #Delta#Phi(ll) ; Dielectron collinearity |#Delta#Phi|', 20, 0.0, 3.14, 20, 0, 3.14)".format(region))
 
 
 
@@ -529,7 +554,7 @@ class processHandler:
             try:
                 if not os.path.exists(d): os.makedirs(d)
                 break
-            except OSError, e:
+            except OSError as e:
                 if e.errno != os.errno.EEXIST:
                     raise
                 print("Sleeping...")
@@ -542,10 +567,9 @@ class processHandler:
             self.hEE_cutEfficiency.Write()
             self.hMM_cutEfficiency.Write()
         else:
-            for attr, value in self.__dict__.iteritems():
+            for attr, value in self.__dict__.items():
                 if attr[0] == 'h': value.Write()
 
         
         output.Close()
-
 
