@@ -35,7 +35,40 @@ The starting point are the NTuples. The NTuples that are used for making the plo
   <li> The <strong>harvesting step</strong> works with instances of both the Sample.py and Canvas.py classes. It accesses the histograms stored in the previously created .root files and make the plots. For this step to succeed the .root files must exist, so the previous step needs to be run at least once time before.</li>
 </ul>
 
-### Starting point: The samples and the .dat file
+
+## Quick start
+
+To run the <strong>filling step</strong> with the default configuration just run the following command:
+```
+python fillPlots.py -o dir_name 
+```
+this will fill the set of predefined histograms declared in ```include/processHandler.py``` and store them in several ```.root``` files (one output ```.root``` file per ```.root``` sample file given as an input). By default this command runs on CONDOR, so one job will be launched per ```.root``` file. The output files will be saved in ```dir_name/``` that will be automatically created.
+
+Once finished, the harvesting step can be run by running whatever ```harvesting_*.py``` file available, giving the previous output directory as the input directory e.g.:
+```
+python harvesting_BackgroundValidation.py -i dir_name 
+```
+that will create several png/pdf files with the harvested plots.
+
+
+### Galapago notebooks
+
+To get a deeper undestanding of Galapago and learn how to tune both steps, a set of Python Notebooks are provided in the ```notebooks/``` folder:
+<ul>
+  <li> Nb0_Quick-start.ipynb: It explains how to fill and harvest one simple histogram from the begining to the end.</li>
+  <li> Nb1_Filling-with-processes.ipynb: It explains how to tune the ```include/processHandler.py``` file to modify the filling step.</li>
+  <li> Nb2_Cuts-with-CutManager.ipynb: It explains how to apply cuts by using the ```include/CutManager.py``` Galapago module.</li>
+</ul>
+
+To run the notebooks, just init session in https://swan002.cern.ch/ (no additional configuration is required) and open a terminal. To load the framework just clone the repository from the last branch updated:
+```
+git clone https://github.com/longlivedpeople/Galapago-Framework.git -b winterImplementations
+```
+and every notebook should run correctly.
+
+## Reading the Ntuples: The .dat file structure
+
+<p> Galapago works with Ntuples created with the IFCALongLived analyzer, that can be accesed here: https://github.com/longlivedpeople/IFCALongLivedAnalysis.</p>
 
 <p> In this framework the samples are managed through the dat files, where all the details needed to create the plots are specified. Usually, each sample will be composed by several .root files (NTuples) that are located in the same directory. The information in the .dat file include: </p>
 <ul>
@@ -48,13 +81,10 @@ The starting point are the NTuples. The NTuples that are used for making the plo
   <li> <strong>IsData</strong>: 1 if the sample is a data sample or 0 if it is Monte Carlo.</li>
 </ul>
 
-### The structure of the samples: reading from the .dat file
+### Using the .dat file to read samples
 
 This framework structures the samples by using 3 python classes: ```Sample```, ```Block``` and ```Tree```. They are defined in ```include/Sample.py```. They are used both in filling and harvesting steps.
 
-
-
-### How to read all (or some) datasets of the samples.dat file
 
 To read the ```samples.dat``` file the user has to define an instance of the class ```Tree``` (defined in ```include/Samples.py```). The command to do so is:
 
@@ -73,10 +103,4 @@ listOfDatasets.append('Dataset2')
 tree = Sample.Tree(helper.selectSamples('samples.dat', listOfDatasets, sType), 'Name of tree instance', isData, loopFile)
 ```
 
-
-### How to read the trees of the datasets and create the histograms 
-
-### Plotting
-
-## Instructions to run 
 

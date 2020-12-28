@@ -69,6 +69,7 @@ class CutManager:
       self.MM_mass15 = self.brackets('ev.DMDM_mass[imm] > 15')
       self.MM_normChi2_10 = self.brackets('ev.DMDM_normalizedChi2[imm] < 10')
       self.MM_cosAlpha0p8 = self.brackets('ev.DMDM_cosAlpha[imm] > -0.80')
+      self.MM_dR0p2 = self.brackets('ev.DMDM_dR[imm] > 0.2')
       self.MM_ID = self.brackets('abs(ev.DGM_eta[ev.DMDM_idxA[imm]]) < 2.0 and abs(ev.DGM_eta[ev.DMDM_idxB[imm]]) < 2.0 and ev.DGM_pt[ev.DMDM_idxA[imm]] > 31 and ev.DGM_pt[ev.DMDM_idxB[imm]] > 31 and ev.DGM_ptError[ev.DMDM_idxB[imm]]/ev.DGM_pt[ev.DMDM_idxB[imm]] < 0.3 and ev.DGM_ptError[ev.DMDM_idxA[imm]]/ev.DGM_pt[ev.DMDM_idxA[imm]] < 0.3 and ev.DGM_ndof[ev.DMDM_idxA[imm]] > 0.00001 and ev.DGM_ndof[ev.DMDM_idxB[imm]] > 0.00001 and ev.DGM_chi2[ev.DMDM_idxA[imm]]/ev.DGM_ndof[ev.DMDM_idxA[imm]] < 10 and ev.DGM_chi2[ev.DMDM_idxB[imm]]/ev.DGM_ndof[ev.DMDM_idxB[imm]] < 10 and ev.DGM_numberOfValidHits[ev.DMDM_idxA[imm]] > 22 and ev.DGM_numberOfValidHits[ev.DMDM_idxB[imm]] > 22')
       
 
