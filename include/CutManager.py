@@ -17,10 +17,12 @@ class CutManager:
 
    def initEventCuts(self):
 
-      self.highPU = self.brackets('nPV > 22')
-      self.medPU = self.brackets('nPV > 14 and nPV < 23')
-      self.lowPU = self.brackets('nPV < 15')
-      self.goodPV = self.brackets('PV_passAcceptance')
+      self.haveEE = self.brackets('ev.nEE > 0')
+      self.haveMM = self.brackets('ev.nDMDM > 0')
+      self.highPU = self.brackets('ev.nPV > 22')
+      self.medPU = self.brackets('ev.nPV > 14 and ev.nPV < 23')
+      self.lowPU = self.brackets('ev.nPV < 15')
+      self.goodPV = self.brackets('ev.PV_passAcceptance')
 
 
    ####################################
