@@ -50,6 +50,10 @@ python harvesting_BackgroundValidation.py -i dir_name
 ```
 that will create several png/pdf files with the harvested plots.
 
+Before executing the harvesting step, we can <strong>check that all files run correctly in the filling step</strong> just by using the ```checkCompleted.py``` script:
+```
+python checkCompleted.py -d dir_name
+```
 
 ### Galapago notebooks
 

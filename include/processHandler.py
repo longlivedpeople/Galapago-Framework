@@ -275,7 +275,7 @@ class processHandler:
             if not eval(self.cm.MM_cosAlpha0p8): continue
             if not eval(self.cm.MM_mass15): continue
             if not eval(self.cm.MM_normChi2_10): continue
-            if not eval(self.cm.MM_dR0p2): continue
+            #if not eval(self.cm.MM_dR0p2): continue # deactivated because DATA Ntuples do not have this
 
             if eval(self.cm.MM_iso2l) and eval(self.cm.MM_OS): nBSMM+=1
 
