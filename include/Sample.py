@@ -106,6 +106,7 @@ class Sample:
       self.count = 0.0
 
       for _file in os.listdir(self.location):
+        if '.root' not in _file: continue
         ftfile = TFile(location + _file)
         ttree = ftfile.Get('Events')
         self.ftpaths.append(location + _file)
@@ -118,7 +119,7 @@ class Sample:
           for j in ttree:
             gw = abs(j.genWeight)
             if gw: break
-          self.count = self.count + self.ftfiles[i].Get('sum2Weights').GetBinContent(1)/abs(gw)
+          self.count = self.count + self.ftfiles[i].Get('sum2Weights').GetBinContent(1)/(abs(gw)*abs(gw))
       else:
         for ttree in self.ttrees:
           self.count = self.count + ttree.GetEntries()
@@ -126,6 +127,10 @@ class Sample:
       if not self.isData:
         self.lumWeight = self.xSection / self.count
 
+      print('Name: ', self.name, self.label)
+      #print('Cross-section: ', self.xSection)
+      #print('Count: ', self.count)
+      #print('lumWeight: ', self.lumWeight)
 
 
    def printSample(self):
@@ -475,7 +480,7 @@ class Tree:
      return h   
 
 
-   def Loop(self, lumi, outdir):
+   def Loop(self, lumi, outdir, doEffs = False):
 
      #
      # Runs a loop over all the events of the trees, of the samples, of the blocks 
@@ -493,11 +498,14 @@ class Tree:
            else:
                process = processHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False)
            for n,ev in enumerate(ttree):
-               process.processEvent(ev)
+               if not doEffs:
+                   process.processEvent(ev)
+               else:
+                   process.countLLs(ev)
            process.Write()
 
 
-   def launchLoop(self, lumi, outdir, queue = 'espresso'):
+   def launchLoop(self, lumi, outdir, queue = 'espresso', doEffs = False):
 
      #
      # Launches Loop function in CONDOR
@@ -515,6 +523,8 @@ class Tree:
 
      # Get command to launch:
      command = 'python {0}runLoop.py -f {1} -o {2} -n {3} -b {4} -s {5} -t {6} -l {7} '
+     if doEffs: command += '--doEffs '
+
 
      # Get cmssw release:
      cmssw = ''

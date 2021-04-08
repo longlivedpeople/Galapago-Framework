@@ -130,7 +130,7 @@ def makeEffPlotStack(lumi, name, hname, ylog, tree, inputdir, labels, outtag = '
 
 
 
-def makeEffPlotJoint(lumi, name, hname, ylog, tree, inputdir, labels, outtag = '', LLlabel = '', era = 2016):
+def makeEffPlotJoint(lumi, name, hname, ylog, tree, inputdir, labels, outtag = '', LLlabel = '', era = 2016, isSignal = True):
 
     luminosity = lumi
 
@@ -192,8 +192,11 @@ def makeEffPlotJoint(lumi, name, hname, ylog, tree, inputdir, labels, outtag = '
         else:
             histos[-1].Draw("hist, same")
 
-        masses = eval(_hist.GetTitle()[3:])
-        legendtxt = 'm_{H} = '+str(masses[0])+' GeV, m_{X} = '+str(masses[1])+' GeV, c#tau = '+str(masses[2])+' mm'
+        if isSignal:
+            masses = eval(_hist.GetTitle()[3:])
+            legendtxt = 'm_{H} = '+str(masses[0])+' GeV, m_{X} = '+str(masses[1])+' GeV, c#tau = '+str(masses[2])+' mm'
+        else: 
+            legendtxt = _hist.GetTitle()
 
         legend.AddEntry(histos[-1], legendtxt, 'l')
 
@@ -259,8 +262,7 @@ for level in runningfile.split('/')[:-1]:
 if __name__ == "__main__":
 
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
-    parser.add_option('-e', '--EGinput', action='store', type=str, dest='EGinput', default='', help='Target directory')
-    parser.add_option('-m', '--Muoninput', action='store', type=str, dest='Muoninput', default='', help='Target directory')
+    parser.add_option('-i', '--input', action='store', type=str, dest='input', default='', help='Target directory')
     (opts, args) = parser.parse_args()
 
     ############# Set the TDR plot style
@@ -278,16 +280,12 @@ if __name__ == "__main__":
     Backgrounds.append('TT') 
 
     ############# Signal definition
-    Signals = []
-    #Signals.append('DisplacedSUSY_350_148_173')
-    Signals.append('HXX_1000_350_350mm')
-    Signals.append('HXX_1000_350_35mm')
-    Signals.append('HXX_1000_150_100mm')
-    Signals.append('HXX_1000_150_10mm')
-    Signals.append('HXX_400_150_400mm')
-    Signals.append('HXX_400_50_400mm')
-    Signals.append('HXX_400_50_40mm')
-    Signals.append('HXX_400_50_4mm')
+    Signals_400_50 = []
+    Signals_400_50.append('HXX_400_50_1mm')
+    Signals_400_50.append('HXX_400_50_10mm')
+    Signals_400_50.append('HXX_400_50_100mm')
+    Signals_400_50.append('HXX_400_50_1000mm')
+
 
     ############# Luminosity definition
     lumiB = 5.79
@@ -304,43 +302,45 @@ if __name__ == "__main__":
 
 
 
-    filename = 'dat/Samples_cern_fillingv2.dat'
+    filename = 'dat/Samples_cern_Legacy.dat'
     treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )
-    treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Signals, 'MC'), name = 'SI', isdata = 0 )
+    treeSI_400_50 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Signals_400_50, 'MC'), name = 'SI', isdata = 0 )
 
     MMlabels = []
     MMlabels.append('Muon trigger')
     MMlabels.append('Good PV')
-    MMlabels.append('Have MM candidate')
+    MMlabels.append('Have MM passing ID')
     MMlabels.append('p_{T} > 31 GeV')
     MMlabels.append('|#eta| < 2')
-    MMlabels.append('#Delta R > 0.2')
-    MMlabels.append('m_{#mu#mu} > 15 GeV')
-    MMlabels.append('RelIso < 0.2')
-    MMlabels.append('Cosmic muon rejection')
     MMlabels.append('Vertex #chi^{2}/ndof < 10')
+    MMlabels.append('#Delta R > 0.2')
+    MMlabels.append('Rel. PFIso < 0.2')
+    MMlabels.append('Cosmic muon rejection')
+    MMlabels.append('m_{#mu#mu} > 15 GeV')
     MMlabels.append('Opposite charge')
     MMlabels.append('SR: |#Delta#Phi| < #pi/2')
+    MMlabels.append('Off-Z: |m_Z - m_{#mu#mu}| > 10 GeV')
     MMlabels.append('Displaced: |d_{0}|/#sigma_{d} > 6')
 
-    makeEffPlotStack(lumi_Muon, 'BKG_MMefficiency_2016', 'hMM_cutEfficiency', False, treeMC, WORKPATH + opts.Muoninput, MMlabels, outtag = 'LLefficiencies', LLlabel = 'MM')
-    makeEffPlotJoint(lumi_Muon, 'SI_MMefficiency_2016', 'hMM_cutEfficiency', False, treeSI, WORKPATH + opts.Muoninput, MMlabels, outtag = 'LLefficiencies', LLlabel = 'MM')
+    #makeEffPlotJoint(lumi_Muon, 'BKG_MMefficiency_2016', 'hMM_cutEfficiency', False, treeMC, WORKPATH + opts.input, MMlabels, outtag = 'LLefficiencies', LLlabel = 'MM', isSignal = False)
+    makeEffPlotJoint(lumi_Muon, 'SI_MMefficiency_2016_400_50', 'hMM_cutEfficiency', False, treeSI_400_50, WORKPATH + opts.input, MMlabels, outtag = 'LLefficiencies', LLlabel = 'MM')
 
 
     EElabels = []
     EElabels.append('Photon trigger')
     EElabels.append('Good PV')
-    EElabels.append('Have EE candidate')
+    EElabels.append('Have EE passing ID')
     EElabels.append('p_{T} > 45,28 GeV')
     EElabels.append('E_{T} > 45,28 GeV')
-    EElabels.append('|#eta| < 2')
-    EElabels.append('m_{ee} > 15 GeV')
-    EElabels.append('RelIso < 0.2')
+    EElabels.append('|#eta| #in [0, 1.4442]U[1.566, 2]')
     EElabels.append('Vertex #chi^{2}/ndof < 10')
+    EElabels.append('Rel. TrkIso < 0.1')
+    EElabels.append('m_{ee} > 15 GeV')
     EElabels.append('Opposite charge')
+    EElabels.append('Off-Z: |m_Z - m_{ee}| > 10 GeV')
     EElabels.append('SR: |#Delta#Phi| < #pi/2')
     EElabels.append('Displaced: |d_{0}|/#sigma_{d} > 6')
 
-    makeEffPlotStack(lumi_EG, 'BKG_EEefficiency_2016', 'hEE_cutEfficiency', False, treeMC, WORKPATH + opts.Muoninput, EElabels, outtag = 'LLefficiencies', LLlabel = 'EE')
-    makeEffPlotJoint(lumi_EG, 'SI_EEefficiency_2016', 'hEE_cutEfficiency', False, treeSI, WORKPATH + opts.Muoninput, EElabels, outtag = 'LLefficiencies', LLlabel = 'EE')
+    #makeEffPlotJoint(lumi_EG, 'BKG_EEefficiency_2016', 'hEE_cutEfficiency', False, treeMC, WORKPATH + opts.input, EElabels, outtag = 'LLefficiencies', LLlabel = 'EE', isSignal = False)
+    makeEffPlotJoint(lumi_EG, 'SI_EEefficiency_2016_400_50', 'hEE_cutEfficiency', False, treeSI_400_50, WORKPATH + opts.input, EElabels, outtag = 'LLefficiencies', LLlabel = 'EE')
 

@@ -39,6 +39,8 @@ if __name__ == "__main__":
     parser.add_option('-t', '--tag', action='store', type=str, dest='tag', default='', help='Output tag')
     parser.add_option('-f', '--filename', action='store', type=str, dest='filename', default='', help='Path to file')
     parser.add_option('-n', '--nmax', action='store', type=int, dest='nmax', default=0, help='Path to file')
+    parser.add_option('--skipEff', action='store_true', dest='skipEff', help='Output tag')
+    parser.add_option('--skipFakes', action='store_true', dest='skipFakes', help='Output tag')
     (opts, args) = parser.parse_args()
 
 
@@ -115,7 +117,7 @@ if __name__ == "__main__":
         #### ----
         #### -----------------------
 
-        if _tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15 == 1:
+        if _tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15 == 1 and not opts.skipEff:
 
             #### -----------------------------------
             #### ---- Efficiencies and resolutions
@@ -185,7 +187,7 @@ if __name__ == "__main__":
                 # -- Resolutions
                 # 
                 if deltaR < MAX_DELTAR:
-                    ptRes = -(pt - _tree.ElectronCandidate_pt[index])/pt
+                    ptRes = -(pt - _tree.PhotonSel_et[_tree.ElectronCandidate_photonIdx[index]])/pt
                     dxyRes = -(dxy - abs(_tree.ElectronCandidate_dxy[index]))/abs(dxy)
 
                     hist_IFCA_ptRes.Fill(ptRes)
@@ -246,6 +248,8 @@ if __name__ == "__main__":
             #### ---- Fake rates
             #### -----------------
 
+        if _tree.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15 == 1 and not opts.skipFakes:
+
             for j in range(0, _tree.nElectronCandidate):
 
                 pt = _tree.ElectronCandidate_pt[j]
@@ -263,7 +267,7 @@ if __name__ == "__main__":
                 deltaR = 9999.0
                 index = -9
                 for k in range(0, _tree.nGenLepton):
-                    if not _tree.GenLeptonSel_isPromptFinalState[k]: continue
+                    #if not _tree.GenLeptonSel_isPromptFinalState[k]: continue
                     if abs(_tree.GenLeptonSel_pdgId[k]) != 11: continue
                     re = TVector3()
                     re.SetPtEtaPhi(_tree.GenLeptonSel_pt[k], _tree.GenLeptonSel_eta[k], _tree.GenLeptonSel_phi[k])

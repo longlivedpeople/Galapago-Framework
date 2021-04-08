@@ -3,3 +3,5 @@ toCONDOR espresso python $PWD/doElectronPlots.py -f /eos/user/f/fernance/LLP_Ana
 toCONDOR espresso python $PWD/doElectronPlots.py -f /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/HXX_400_50_400mm/ -t HXX_400_50_400mm
 toCONDOR espresso python $PWD/doElectronPlots.py -f /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/HXX_400_150_400mm/ -t HXX_400_150_400mm
 toCONDOR longlunch python $PWD/doElectronPlots.py -f /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DYJetsToLL_M-50/ -t Drell_Yan -n 5000000
+toCONDOR longlunch python $PWD/doElectronPlots.py -f /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/TT/ -t TTbar -n 5000000 --skipEff
+

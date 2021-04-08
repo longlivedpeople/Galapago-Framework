@@ -96,7 +96,7 @@ if __name__ == "__main__":
     EFF_pt.addRate(SI_40mm_IFCAeff_pt_, 'AP,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 40 mm', 'p', r.kBlue-4, True, 1, marker = 24)
     EFF_pt.addRate(SI_400mm_IFCAeff_pt_, 'AP,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 400 mm', 'p', r.kBlue-6, True, 2, marker = 24)
     EFF_pt.addRate(BKG_IFCAeff_pt_, 'AP,SAME', 'Z/#gamma* #rightarrow ee', 'p', r.kBlack, True, 3, marker = 24)
-    EFF_pt.addLatex(0.9, 0.93, 'Matched electrons', size = 0.032, align = 31)
+    EFF_pt.addLatex(0.9, 0.93, 'Displaced electrons', size = 0.032, align = 31)
     EFF_pt.save(1, 0, 0, '', '', outputDir = WORKPATH + 'harvested_'+opts.tag+'/', inProgress = False)
     
     ### Pt (CMS)
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     EFF_eta.addRate(SI_40mm_IFCAeff_eta, 'AP,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 40 mm', 'p', r.kBlue-4, True, 1, marker = 24)
     EFF_eta.addRate(SI_400mm_IFCAeff_eta, 'AP,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 400 mm', 'p', r.kBlue-6, True, 2, marker = 24)
     EFF_eta.addRate(BKG_IFCAeff_eta, 'AP,SAME', 'Z/#gamma* #rightarrow ee', 'p', r.kBlack, True, 3, marker = 24)
-    EFF_eta.addLatex(0.9, 0.93, 'Matched electrons', size = 0.032, align = 31)
+    EFF_eta.addLatex(0.9, 0.93, 'Displaced electrons', size = 0.032, align = 31)
     EFF_eta.save(1, 0, 0, '', '', outputDir = WORKPATH + 'harvested_'+opts.tag+'/', inProgress = False)
 
 
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     SI_50_400mm_CMSeff_dxy = rebinAxis(SI_50_400mm_CMSeff_dxy, logrebin_dxy)
 
     EFF_dxy = Canvas.Canvas("EFF_Combined_log_dxy", 'png', 0.15, 0.70, 0.45, 0.78, 1) 
-    EFF_dxy.addRate(SI_50_400mm_IFCAeff_dxy, 'AP', 'Matched electrons', 'p', r.kBlue+2, True, 0, marker = 24)
+    EFF_dxy.addRate(SI_50_400mm_IFCAeff_dxy, 'AP', 'Displaced electrons', 'p', r.kBlue+2, True, 0, marker = 24)
     EFF_dxy.addRate(SI_50_400mm_CMSeff_dxy, 'AP,SAME', 'PAT Loose electrons', 'p', r.kRed+2, True, 1, marker = 24)
     EFF_dxy.addLatex(0.15, 0.86, 'm_{H} = 400 GeV, m_{X} = 150 GeV, c#tau = 400 mm', size = 0.032, align = 11)
     EFF_dxy.save(1, 0, 0, '', '', outputDir = WORKPATH + 'harvested_'+opts.tag+'/', inProgress = False, xlog = True)
@@ -195,7 +195,7 @@ if __name__ == "__main__":
     SI_50_400mm_CMSeff_dxy = getObject('Results/th1fHXX_400_150_400mm.root', 'eff_CMS_dxy')
 
     EFF_dxy = Canvas.Canvas("EFF_Combined_lin_dxy", 'png', 0.15, 0.70, 0.45, 0.78, 1) 
-    EFF_dxy.addRate(SI_50_400mm_IFCAeff_dxy, 'AP', 'Matched electrons', 'p', r.kBlue+2, True, 0, marker = 24)
+    EFF_dxy.addRate(SI_50_400mm_IFCAeff_dxy, 'AP', 'Displaced electrons', 'p', r.kBlue+2, True, 0, marker = 24)
     EFF_dxy.addRate(SI_50_400mm_CMSeff_dxy, 'AP,SAME', 'PAT Loose electrons', 'p', r.kRed+2, True, 1, marker = 24)
     EFF_dxy.addLatex(0.15, 0.86, 'm_{H} = 400 GeV, m_{X} = 150 GeV, c#tau = 400 mm', size = 0.032, align = 11)
     EFF_dxy.save(1, 0, 0, '', '', outputDir = WORKPATH + 'harvested_'+opts.tag+'/', inProgress = False)
@@ -214,7 +214,7 @@ if __name__ == "__main__":
     SI_50_400mm_CMSeff_Lxy = rebinAxis(SI_50_400mm_CMSeff_Lxy, logrebin_Lxy)
 
     EFF_Lxy = Canvas.Canvas("EFF_Combined_log_Lxy", 'png', 0.15, 0.70, 0.45, 0.78, 1) 
-    EFF_Lxy.addRate(SI_50_400mm_IFCAeff_Lxy, 'AP', 'Matched electrons', 'p', r.kBlue+2, True, 0, marker = 24)
+    EFF_Lxy.addRate(SI_50_400mm_IFCAeff_Lxy, 'AP', 'Displaced electrons', 'p', r.kBlue+2, True, 0, marker = 24)
     EFF_Lxy.addRate(SI_50_400mm_CMSeff_Lxy, 'AP,SAME', 'PAT Loose electrons', 'p', r.kRed+2, True, 1, marker = 24)
     EFF_Lxy.addLatex(0.15, 0.86, 'm_{H} = 400 GeV, m_{X} = 150 GeV, c#tau = 400 mm', size = 0.032, align = 11)
     EFF_Lxy.save(1, 0, 0, '', '', outputDir = WORKPATH + 'harvested_'+opts.tag+'/', inProgress = False, xlog = True)
@@ -225,7 +225,7 @@ if __name__ == "__main__":
     SI_50_400mm_CMSeff_Lxy = getObject('Results/th1fHXX_400_150_400mm.root', 'eff_CMS_Lxy')
 
     EFF_Lxy = Canvas.Canvas("EFF_Combined_lin_Lxy", 'png', 0.15, 0.7, 0.45, 0.78, 1) 
-    EFF_Lxy.addRate(SI_50_400mm_IFCAeff_Lxy, 'AP', 'Matched electrons', 'p', r.kBlue+2, True, 0, marker = 24)
+    EFF_Lxy.addRate(SI_50_400mm_IFCAeff_Lxy, 'AP', 'Displaced electrons', 'p', r.kBlue+2, True, 0, marker = 24)
     EFF_Lxy.addRate(SI_50_400mm_CMSeff_Lxy, 'AP,SAME', 'PAT Loose electrons', 'p', r.kRed+2, True, 1, marker = 24)
     EFF_Lxy.addLatex(0.15, 0.86, 'm_{H} = 400 GeV, m_{X} = 150 GeV, c#tau = 400 mm', size = 0.032, align = 11)
     EFF_Lxy.save(1, 0, 0, '', '', outputDir = WORKPATH + 'harvested_'+opts.tag+'/', inProgress = False)
@@ -276,6 +276,52 @@ if __name__ == "__main__":
     FAKE_dxy.addRate(SI_150_400mm_IFCAfake_dxy, 'AP,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 150 GeV, c#tau = 400 mm', 'p', r.kRed+2, True, 1, marker = 24)
     FAKE_dxy.save(1, 0, 0, '', '', outputDir = WORKPATH + 'harvested_'+opts.tag+'/', inProgress = False)
 
+
+    ### Pt (TTbar)
+
+    BKG_IFCAfake_pt = getObject('Results/th1fTTbar.root', 'fake_IFCA_pt')
+    SI_4mm_IFCAfake_pt = getObject('Results/th1fHXX_400_50_4mm.root', 'fake_IFCA_pt')
+    SI_40mm_IFCAfake_pt = getObject('Results/th1fHXX_400_50_40mm.root', 'fake_IFCA_pt')
+    SI_400mm_IFCAfake_pt = getObject('Results/th1fHXX_400_50_400mm.root', 'fake_IFCA_pt')
+
+    FAKE_pt = Canvas.Canvas("FAKE_TTbar_pt", 'png', 0.15, 0.77, 0.45, 0.9, 1) 
+    FAKE_pt.addRate(SI_4mm_IFCAfake_pt, 'AP', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 4 mm', 'p', r.kBlue+2, True, 0, marker = 24)
+    FAKE_pt.addRate(SI_40mm_IFCAfake_pt, 'AP,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 40 mm', 'p', r.kBlue-4, True, 1, marker = 24)
+    FAKE_pt.addRate(SI_400mm_IFCAfake_pt, 'AP,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 400 mm', 'p', r.kBlue-6, True, 2, marker = 24)
+    FAKE_pt.addRate(BKG_IFCAfake_pt, 'AP,SAME', 'TTbar', 'p', r.kBlack, True, 3, marker = 24)
+    FAKE_pt.save(1, 0, 0, '', '', outputDir = WORKPATH + 'harvested_'+opts.tag+'/', inProgress = False)
+    
+    ### Eta (TTbar)
+
+    BKG_IFCAfake_eta = getObject('Results/th1fTTbar.root', 'fake_IFCA_eta')
+    SI_4mm_IFCAfake_eta = getObject('Results/th1fHXX_400_50_4mm.root', 'fake_IFCA_eta')
+    SI_40mm_IFCAfake_eta = getObject('Results/th1fHXX_400_50_40mm.root', 'fake_IFCA_eta')
+    SI_400mm_IFCAfake_eta = getObject('Results/th1fHXX_400_50_400mm.root', 'fake_IFCA_eta')
+
+    FAKE_eta = Canvas.Canvas("FAKE_TTbar_eta", 'png', 0.15, 0.77, 0.45, 0.9, 1) 
+    FAKE_eta.addRate(SI_4mm_IFCAfake_eta, 'AP', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 4 mm', 'p', r.kBlue+2, True, 0, marker = 24)
+    FAKE_eta.addRate(SI_40mm_IFCAfake_eta, 'AP,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 40 mm', 'p', r.kBlue-4, True, 1, marker = 24)
+    FAKE_eta.addRate(SI_400mm_IFCAfake_eta, 'AP,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 400 mm', 'p', r.kBlue-6, True, 2, marker = 24)
+    FAKE_eta.addRate(BKG_IFCAfake_eta, 'AP,SAME', 'TTbar', 'p', r.kBlack, True, 3, marker = 24)
+    FAKE_eta.save(1, 0, 0, '', '', outputDir = WORKPATH + 'harvested_'+opts.tag+'/', inProgress = False)
+
+
+
+    ### dxy (TTbar)
+        
+    BKG_IFCAfake_dxy = getObject('Results/th1fTTbar.root', 'fake_IFCA_dxy')
+    SI_50_400mm_IFCAfake_dxy = getObject('Results/th1fHXX_400_50_400mm.root', 'fake_IFCA_dxy')
+    SI_150_400mm_IFCAfake_dxy = getObject('Results/th1fHXX_400_150_400mm.root', 'fake_IFCA_dxy')
+
+    FAKE_dxy = Canvas.Canvas("FAKE_TTbar_dxy", 'png', 0.15, 0.77, 0.45, 0.9, 1) 
+    FAKE_dxy.addRate(SI_50_400mm_IFCAfake_dxy, 'AP', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 400 mm', 'p', r.kBlue+2, True, 0, marker = 24)
+    FAKE_dxy.addRate(SI_150_400mm_IFCAfake_dxy, 'AP,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 150 GeV, c#tau = 400 mm', 'p', r.kRed+2, True, 1, marker = 24)
+    FAKE_dxy.addRate(BKG_IFCAfake_dxy, 'AP,SAME', 'TTbar', 'p', r.kBlack, True, 1, marker = 24)
+    FAKE_dxy.save(1, 0, 0, '', '', outputDir = WORKPATH + 'harvested_'+opts.tag+'/', inProgress = False)
+
+
+
+
     ########################
     ####   Histograms   ####
     ########################
@@ -294,12 +340,12 @@ if __name__ == "__main__":
 
     SI_4mm_IFCAhist_ptRes.SetMaximum(1.4*max(BKG_IFCAhist_ptRes.GetMaximum(), SI_4mm_IFCAhist_ptRes.GetMaximum(), SI_40mm_IFCAhist_ptRes.GetMaximum(), SI_400mm_IFCAhist_ptRes.GetMaximum()))
 
-    HIST_ptRes = Canvas.Canvas("HIST_IFCA_ptRes", 'png', 0.15, 0.77, 0.45, 0.9, 1) 
+    HIST_ptRes = Canvas.Canvas("HIST_IFCA_photon_ptRes", 'png', 0.15, 0.77, 0.45, 0.9, 1) 
     HIST_ptRes.addRate(SI_4mm_IFCAhist_ptRes, 'HIST', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 4 mm', 'f', r.kBlue+2, True, 0, marker = 24)
     HIST_ptRes.addRate(SI_40mm_IFCAhist_ptRes, 'HIST,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 40 mm', 'f', r.kBlue-4, True, 1, marker = 24)
     HIST_ptRes.addRate(SI_400mm_IFCAhist_ptRes, 'HIST,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 400 mm', 'f', r.kBlue-6, True, 2, marker = 24)
     HIST_ptRes.addRate(BKG_IFCAhist_ptRes, 'HIST,SAME', 'Z/#gamma* #rightarrow ee', 'f', r.kBlack, True, 3, marker = 24)
-    HIST_ptRes.addLatex(0.9, 0.93, 'Matched electrons', size = 0.032, align = 31)
+    HIST_ptRes.addLatex(0.9, 0.93, 'Displaced electrons', size = 0.032, align = 31)
     HIST_ptRes.save(1, 0, 0, '', '', outputDir = WORKPATH + 'harvested_'+opts.tag+'/', inProgress = False)
 
 
@@ -371,7 +417,7 @@ if __name__ == "__main__":
     EFF_pt.addRate(SI_40mm_IFCAeff_pt_, 'AP,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 40 mm', 'p', r.kBlue-4, True, 1, marker = 24)
     EFF_pt.addRate(SI_400mm_IFCAeff_pt_, 'AP,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 400 mm', 'p', r.kBlue-6, True, 2, marker = 24)
     EFF_pt.addRate(BKG_IFCAeff_pt_, 'AP,SAME', 'Z/#gamma* #rightarrow ee', 'p', r.kBlack, True, 3, marker = 24)
-    EFF_pt.addLatex(0.9, 0.93, 'Matched electrons', size = 0.032, align = 31)
+    EFF_pt.addLatex(0.9, 0.93, 'Displaced electrons', size = 0.032, align = 31)
     EFF_pt.save(1, 0, 0, '', '', outputDir = WORKPATH + 'harvested_'+opts.tag+'/', inProgress = False)
 
 
@@ -390,6 +436,6 @@ if __name__ == "__main__":
     EFF_Lxy = Canvas.Canvas("QEFF_IFCA_Lxy", 'png', 0.15, 0.20, 0.45, 0.28, 1) 
     EFF_Lxy.addRate(SI_150mm_IFCAeff_Lxy, 'AP', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 150 GeV, c#tau = 400 mm', 'p', r.kMagenta+2, True, 0, marker = 24)
     EFF_Lxy.addRate(SI_50mm_IFCAeff_Lxy, 'AP,SAME', 'H#rightarrowXX: m_{H} = 400 GeV, m_{X} = 50 GeV, c#tau = 400 mm', 'p', r.kBlue-6, True, 1, marker = 24)
-    EFF_Lxy.addLatex(0.9, 0.93, 'Matched electrons', size = 0.032, align = 31)
+    EFF_Lxy.addLatex(0.9, 0.93, 'Displaced electrons', size = 0.032, align = 31)
     EFF_Lxy.save(1, 0, 0, '', '', outputDir = WORKPATH + 'harvested_'+opts.tag+'/', inProgress = False)
 

@@ -15,6 +15,7 @@ parser.add_option('-s', '--sample', action='store', type=str, dest='sample', def
 parser.add_option('-t', '--tree', action='store', type=str, dest='tree', default='', help='TFile/TTree number')
 parser.add_option('-l', '--lumiweight', action='store', type=float, dest='lumiweight', help='lumiweight')
 parser.add_option('-d', '--data', action='store_true', dest='data', help='True if DATA')
+parser.add_option('--doEffs', action='store_true', dest='doEffs', help='True if doing only efficiencies')
 (opts, args) = parser.parse_args()
 
 ##
@@ -35,7 +36,10 @@ else:
 
 for n,ev in enumerate(ttree):
 
-    process.processEvent(ev)
+    if not opts.doEffs:
+        process.processEvent(ev)
+    else:
+        process.countLLs(ev)
 
 
 process.Write()
