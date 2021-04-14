@@ -231,7 +231,6 @@ if __name__ == "__main__":
     ############# Tree creation
     treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )
     treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Signals, 'SI'), name = 'SI', isdata = 0 )
-    treeSIOld = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/Samples_cern_fillinglow.dat', SignalsOld, 'SI'), name = 'SI', isdata = 0 )
     treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleData, 'DATA'), name = 'DATA', isdata = 1 )
 
     start_time = time.time()

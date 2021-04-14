@@ -1,0 +1,15 @@
+#######################################################################################################################################
+#
+# NAME ;      CHANNEL NAME ;      TYPE ;      HISTOGRAM ;                LIMITS (min,max);         DIRECTORY ; 
+#
+#######################################################################################################################################
+2016Muon      nMMe1_I             bkg         hMMoffZCRne1_trackIxy      6.0,10.0                  histograms_Legacy
+2016Muon      nMMe1_I             sig         hMMoffZSRne1_trackIxy      6.0,10.0                  histograms_Legacy
+2016Muon      nMMe1_II            bkg         hMMoffZCRne1_trackIxy      11.0,15.0                 histograms_Legacy
+2016Muon      nMMe1_II            sig         hMMoffZSRne1_trackIxy      11.0,15.0                 histograms_Legacy
+2016Muon      nMMe1_III           bkg         hMMoffZCRne1_trackIxy      16.0,24.0                 histograms_Legacy
+2016Muon      nMMe1_III           sig         hMMoffZSRne1_trackIxy      16.0,24.0                 histograms_Legacy
+2016Muon      nMMe1_IV            bkg         hMMoffZCRne1_trackIxy      25.0,inf                  histograms_Legacy
+2016Muon      nMMe1_IV            sig         hMMoffZSRne1_trackIxy      25.0,inf                  histograms_Legacy
+2016Muon      nMMg1               bkg         hMMfullZCRng1_trackIxy     1.0,inf                   histograms_Legacy
+2016Muon      nMMg1               sig         hMMfullZSRng1_trackIxy     1.0,inf                   histograms_Legacy
