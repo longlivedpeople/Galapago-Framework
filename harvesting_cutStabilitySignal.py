@@ -192,8 +192,7 @@ for level in runningfile.split('/')[:-1]:
 if __name__ == "__main__":
 
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
-    parser.add_option('-e', '--EGinput', action='store', type=str, dest='EGinput', default='', help='Target directory')
-    parser.add_option('-m', '--Muoninput', action='store', type=str, dest='Muoninput', default='', help='Target directory')
+    parser.add_option('-i', '--input', action='store', type=str, dest='input', default='', help='Target directory')
     (opts, args) = parser.parse_args()
 
     ############# Set the TDR plot style
@@ -215,22 +214,11 @@ if __name__ == "__main__":
     Signals.append('HXX_400_50_4mm')
 
     ############# Luminosity definition
-    lumiB = 5.79
-    lumiC = 2.57
-    lumiD = 4.25
-    lumiE = 4.01
-    lumiF = 3.10
-    lumiG = 7.54
-    lumiH = 8.61
-
-    lumi_EG = lumiB + lumiC + lumiD + lumiE + lumiF + lumiG + lumiH
-    lumi_Muon = lumiB + lumiC + lumiD + lumiE + lumiF + lumiG + lumiH
-
 
     filename = 'dat/Samples_cern_fillingv2.dat'
     treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Signals, 'MC'), name = 'SI', isdata = 0 )
 
-    makeCutStability('SI_MMdPhiStability_2016', 'hMM_cutEfficiency', 12, False, treeSI, WORKPATH + opts.Muoninput, outtag = 'LLefficiencies', LLlabel = 'MM')
-    makeCutStability('SI_EEdPhiStability_2016', 'hEE_cutEfficiency', 11, False, treeSI, WORKPATH + opts.Muoninput, outtag = 'LLefficiencies', LLlabel = 'EE')
+    makeCutStability('SI_MMdPhiStability_2016', 'hMM_cutEfficiency', 12, False, treeSI, WORKPATH + opts.input, outtag = 'LLefficiencies', LLlabel = 'MM')
+    makeCutStability('SI_EEdPhiStability_2016', 'hEE_cutEfficiency', 11, False, treeSI, WORKPATH + opts.input, outtag = 'LLefficiencies', LLlabel = 'EE')
 
 

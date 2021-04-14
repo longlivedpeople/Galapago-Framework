@@ -145,7 +145,7 @@ if __name__ == "__main__":
     print '########################################################################' + bcolors.ENDC
 
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
-    parser.add_option('-i', '--input', action='store', type=str, dest='inputFile', default='launchWithGridui/Aachen.root', help='the input file. default \'merged.root\'')
+    parser.add_option('-i', '--input', action='store', type=str, dest='inputdir', default='', help='the input dir')
 
     (opts, args) = parser.parse_args()
 
@@ -154,77 +154,115 @@ if __name__ == "__main__":
     gROOT.SetBatch(1)
     r.setTDRStyle()
 
-    ############# Background definition
-    Backgrounds = []
-    Backgrounds.append('WJetsToLNu')
-    Backgrounds.append('WW')
-    Backgrounds.append('WZ')
-    Backgrounds.append('ZZ')
-    Backgrounds.append('TTJets_DiLept')
-    Backgrounds.append('DYJetsToLL_M-50')
-    Backgrounds.append('DYJetsToLL_M-10to50')
-    Backgrounds.append('QCD_Pt-30to40')
-    Backgrounds.append('QCD_Pt-40toInf')
 
-    EEchannel = DatacardManager.Channel('EE', 'SR_EEsel_minIxy', 5.0, 20.0)
-    MMchannel = DatacardManager.Channel('MM', 'SR_MMsel_minIxy', 3.5, 20.0)
+    ###########################################
+    ########## Tree initialization
+    #####
+
+    ############# Signal definition
+    Signals = []
+    Signals.append('HXX_400_50_4mm')
+    Signals.append('HXX_400_50_40mm')
+    Signals.append('HXX_400_50_400mm')
+    Signals.append('HXX_400_150_400mm')
+    Signals.append('HXX_1000_150_10mm')
+    Signals.append('HXX_1000_150_100mm')
+    Signals.append('HXX_1000_350_35mm')
+    Signals.append('HXX_1000_350_350mm')
+
+    ############# EG data definition
+    DoubleEGB = 'DoubleEG_Run2016B'
+    DoubleEGC = 'DoubleEG_Run2016C'
+    DoubleEGD = 'DoubleEG_Run2016D'
+    DoubleEGE = 'DoubleEG_Run2016E'
+    DoubleEGF = 'DoubleEG_Run2016F'
+    DoubleEGG = 'DoubleEG_Run2016G'
+    DoubleEGH = 'DoubleEG_Run2016H'
+
+    DoubleEG_list = []
+    DoubleEG_list.append(DoubleEGB)
+    DoubleEG_list.append(DoubleEGC)
+    DoubleEG_list.append(DoubleEGD)
+    DoubleEG_list.append(DoubleEGE)
+    DoubleEG_list.append(DoubleEGF)
+    DoubleEG_list.append(DoubleEGG)
+    DoubleEG_list.append(DoubleEGH)
+
+    ############# Muon data definition
+    DoubleMuonB = 'DoubleMuon_Run2016B'
+    DoubleMuonC = 'DoubleMuon_Run2016C'
+    DoubleMuonD = 'DoubleMuon_Run2016D'
+    DoubleMuonE = 'DoubleMuon_Run2016E'
+    DoubleMuonF = 'DoubleMuon_Run2016F'
+    DoubleMuonG = 'DoubleMuon_Run2016G'
+    DoubleMuonH = 'DoubleMuon_Run2016H'
+
+    DoubleMuon_list = []
+    DoubleMuon_list.append(DoubleMuonB)
+    DoubleMuon_list.append(DoubleMuonC)
+    DoubleMuon_list.append(DoubleMuonD)
+    DoubleMuon_list.append(DoubleMuonE)
+    DoubleMuon_list.append(DoubleMuonF)
+    DoubleMuon_list.append(DoubleMuonG)
+    DoubleMuon_list.append(DoubleMuonH)
+
+
+    ########### .dat definition
+    filename = 'dat/Samples_cern_fillingv2.dat'
+
+
+    ########### Data Tree's declaration
+    treeEGDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_list, 'DATA'), name = 'DATA', isdata = 1 )
+    treeMuonDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_list, 'DATA'), name = 'DATA', isdata = 1 )
+
+
+    ###########################################
+    ########## Muon channel datacards
+    #####
+
+    #MMchannel_nMMe1 = DatacardManager.Channel('MMe1', 'trackIxy', 6.0, -99)
+    MMchannel_nMMe1_I = DatacardManager.Channel('MMe1_I', 'trackIxy', 6.0, 10.0)
+    MMchannel_nMMe1_II = DatacardManager.Channel('MMe1_II', 'trackIxy', 11.0, 15.0)
+    MMchannel_nMMe1_III = DatacardManager.Channel('MMe1_III', 'trackIxy', 16.0, 24.0)
+    MMchannel_nMMe1_IV = DatacardManager.Channel('MMe1_IV', 'trackIxy', 25.0, -99)
+    MMchannel_nMMg1 = DatacardManager.Channel('MMg1', 'trackIxy', 1.0, -99)
 
 
     # Fill the two channels with the background information (just one time because the yields are the same for every signal datacard) 
-    for sample in Backgrounds:
 
-        tree = Sample.Tree(helper.selectSamples('dat/MC.dat', [sample], 'MC'), 'MC', 0, opts.inputFile)
+    hMMoffZCR_ne1_trackIxy = treeMuonDATA.getLoopTH1F(opts.inputdir, 'hMMoffZCR_ne1_trackIxy')
+    #MMchannel_nMMe1.addBackground('bkg', hMMoffZCR_ne1_trackIxy)
+    MMchannel_nMMe1_I.addBackground('bkg', hMMoffZCR_ne1_trackIxy)
+    MMchannel_nMMe1_II.addBackground('bkg', hMMoffZCR_ne1_trackIxy)
+    MMchannel_nMMe1_III.addBackground('bkg', hMMoffZCR_ne1_trackIxy)
+    MMchannel_nMMe1_IV.addBackground('bkg', hMMoffZCR_ne1_trackIxy)
 
-        hEE = tree.getLoopTH1F('haux', EEchannel.variable, 'aux')
-        EEchannel.addBackground(sample, hEE)
-
-        hMM = tree.getLoopTH1F('haux', MMchannel.variable, 'aux')
-        MMchannel.addBackground(sample, hMM)
-
-
-
-    ############## Data definition
-    MuonData = []
-    MuonData.append('DoubleMuon-Run2016B')
-    ElectronData = []
-    ElectronData.append('DoubleEG-Run2016B')
-
-
-    MMtree = Sample.Tree(helper.selectSamples('dat/DATA.dat', MuonData, 'DATA'), 'DATA', 0, opts.inputFile)
-    hMM = MMtree.getLoopTH1F('haux', MMchannel.variable, 'aux')
-    MMchannel.addData(hMM)
-    
-    EEtree = Sample.Tree(helper.selectSamples('dat/DATA.dat', ElectronData, 'DATA'), 'DATA', 0, opts.inputFile)
-    hEE = EEtree.getLoopTH1F('haux', EEchannel.variable, 'aux')
-    EEchannel.addData(hEE)
-
-
-    ############# Signal definition
-    Signal = []
-    Signal.append('DisplacedSUSY_1500_494_160')
-    Signal.append('DisplacedSUSY_1000_148_60')
-    Signal.append('DisplacedSUSY_350_148_173')
-    Signal.append('HXX_1000_350_350')
-    Signal.append('HXX_1000_350_35')
-    Signal.append('HXX_1000_150_100')
-    Signal.append('HXX_1000_150_10')
-    Signal.append('HXX_400_150_400')
-    Signal.append('HXX_400_150_40')
-#    Signal.append('DisplacedSUSY_120_48_165')
+    hMMfullZCR_ng1_trackIxy = treeMuonDATA.getLoopTH1F(opts.inputdir, 'hMMfullZCR_ng1_trackIxy')
+    MMchannel_nMMg1.addBackground('bkg', hMMfullZCR_ng1_trackIxy)
 
 
     # Loop over the signals to make the datacards
-    for sample in Signal:
+    for sample in Signals:
 
-        SItree = Sample.Tree(helper.selectSamples('dat/SI.dat', [sample], 'SI'), 'SI', 0, opts.inputFile)
-        hsEE = SItree.getLoopTH1F('haux', EEchannel.variable, 'aux')
-        hsMM = SItree.getLoopTH1F('haux', MMchannel.variable, 'aux')
-        EEchannel.setSignal(sample, hsEE)
-        MMchannel.setSignal(sample, hsMM)
+        treeSI = Sample.Tree(fileName = helper.selectSamples(WORKPATH + filename, [sample], 'SI'), name = 'SI', isdata = 0)
 
-        datacard = DatacardManager.Datacard()
-        datacard.addChannel(EEchannel)
-        datacard.addChannel(MMchannel)
+        hMMoffZSR_ne1_trackIxy = treeSI.getLoopTH1F(opts.inputdir, 'hMMoffZSR_ne1_trackIxy')
+        hMMfullZSR_ng1_trackIxy = treeSI.getLoopTH1F(opts.inputdir, 'hMMfullZSR_ng1_trackIxy')
+
+        #MMchannel_nMMe1.setSignal('sig', hMMoffZSR_ne1_trackIxy)
+        MMchannel_nMMe1_I.setSignal('sig', hMMoffZSR_ne1_trackIxy)
+        MMchannel_nMMe1_II.setSignal('sig', hMMoffZSR_ne1_trackIxy)
+        MMchannel_nMMe1_III.setSignal('sig', hMMoffZSR_ne1_trackIxy)
+        MMchannel_nMMe1_IV.setSignal('sig', hMMoffZSR_ne1_trackIxy)
+        MMchannel_nMMg1.setSignal('sig', hMMfullZSR_ng1_trackIxy)
+
+        datacard = DatacardManager.Datacard('Datacard_' + sample + '.txt')
+        #datacard.addChannel(MMchannel_nMMe1)
+        datacard.addChannel(MMchannel_nMMe1_I)
+        datacard.addChannel(MMchannel_nMMe1_II)
+        datacard.addChannel(MMchannel_nMMe1_III)
+        datacard.addChannel(MMchannel_nMMe1_IV)
+        datacard.addChannel(MMchannel_nMMg1)
         datacard.saveDatacard(outputDir = 'Datacards/')
 
 

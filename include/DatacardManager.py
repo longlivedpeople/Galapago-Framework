@@ -3,11 +3,60 @@ import os
 
 
 
+
+class Recipe:
+
+    """ Class Recipe """
+
+    def __init__(self, recipe):
+
+        self.dcs = {}
+
+        _file = open(recipe, 'r')
+        _lines = _file.readlines()
+
+        for _l in _lines:
+
+            if _l[0] == '#': continue
+            elems = _l.split(' ')
+            elems = [x for x in elems if x!= '']
+
+            name      = elems[0]
+            channel   = elems[1]
+            ctype     = elems[2]
+            histo     = elems[3]
+            limits    = elems[4]
+            directory = elems[5] if '\n' not in elems[5] else elems[5][:-1]
+
+            if name not in self.dcs.keys():
+                self.dcs[name] = {}
+
+            if channel not in self.dcs[name].keys():
+                self.dcs[name][channel] = self.initChannel()
+
+            self.dcs[name][channel][ctype]['histogram'] = histo
+            self.dcs[name][channel][ctype]['limits'][0] = limits.split(',')[0]
+            self.dcs[name][channel][ctype]['limits'][1] = limits.split(',')[1]
+            self.dcs[name][channel][ctype]['dir'] = directory
+                    
+
+
+
+    def initChannel(self):
+
+        channel = {}
+
+        channel['bkg'] = {'histogram' : '', 'limits' : [0,0], 'dir' : ''}
+        channel['sig'] = {'histogram' : '', 'limits' : [0,0], 'dir' : ''}
+
+        return channel
+
+
 class Datacard:
 
     """ Class Datacard """
 
-    def __init__(self):
+    def __init__(self, name):
 
         self.channels = []
         self.channelCounter = 0
@@ -20,7 +69,7 @@ class Datacard:
         self.observation = ''
         self.expected = ''
         self.separator = self.hwidth*'-'
-
+        self.name = name
 
     def addChannel(self, channel):
 
@@ -123,7 +172,7 @@ class Datacard:
 
         outputPath = outputDir if outputDir else ''
 
-        _f = open(outputDir + 'datacard_' + self.signalName + '.txt', 'w')
+        _f = open(outputDir + self.name, 'w')
         _f.write(self.heading)
         _f.write(self.separator)
         _f.write(self.observation)
@@ -138,14 +187,13 @@ class Channel:
 
     """ Class Channel """
 
-    def __init__(self, name, variable, xmin, xmax):
+    def __init__(self, name, xmin, xmax):
 
         self.name = name # ee o mm
         self.backgrounds = []
         self.backgroundCounter = 0
         self.signal = 0
         self.data = 0
-        self.variable = variable
         self.xmin = xmin
         self.xmax = xmax
 
@@ -153,18 +201,14 @@ class Channel:
     def addBackground(self, sample, h):
 
         self.backgroundCounter += 1 
-        name = sample.replace('_', '')
-        name = name.replace('-', '')
-        name = name.replace('DYJetsToLL', 'dy')
-        name = name.replace('TTJetsDiLept', 'ttbar')
-        name = name.replace('QCDPt', 'qcd')
+  
+        name = sample
 
-
-        # get the histogram
-#        tree = Sample.Tree(helper.selectSamples(dat, [sample], 'MC'), 'MC', 0, inputFile) 
-#        h = tree.getLoopTH1F(sample + '_yield', self.variable, 'aux')
-        nbinmin = h.FindBin(self.xmin) 
-        nbinmax = h.FindBin(self.xmax) 
+        nbinmin = h.FindBin(float(self.xmin)) 
+        if self.xmax == 'inf':
+            nbinmax = h.GetNbinsX()
+        else:
+            nbinmax = h.FindBin(float(self.xmax))
         value = h.Integral(nbinmin, nbinmax)
 
         # add the background
@@ -174,18 +218,14 @@ class Channel:
 
     def setSignal(self, sample, h):
 
-        #name = sample.replace('_', '')
-        #name = name.replace('-', '')
         name = sample
 
-#        tree = Sample.Tree(helper.selectSamples(dat, [sample], 'SI'), 'SI', 0, inputFile) 
-#        h = tree.getLoopTH1F(sample + '_yield', self.variable, 'aux')
-        nbinmin = h.FindBin(self.xmin)
-        nbinmax = h.FindBin(self.xmax)
+        nbinmin = h.FindBin(float(self.xmin))
+        if self.xmax == 'inf':
+            nbinmax = h.GetNbinsX()
+        else:
+            nbinmax = h.FindBin(float(self.xmax))
         value = h.Integral(nbinmin, nbinmax)
-        print(">> Signal", sample)
-        print(h.GetBinCenter(nbinmax))
-        print(self.xmin, nbinmin, self.xmax, nbinmax, value)
 
         signal = EventSet(name = name, number = '0', rate = value)
         self.signal = signal
@@ -194,8 +234,6 @@ class Channel:
 
     def addData(self, h):
 
-#        tree = Sample.Tree(helper.selectSamples(dat, [sample], 'DATA'), 'DATA', 0, inputFile)
-#        h = tree.getLoopTH1F(sample + '_yield', self.variable, 'aux')
         nbinmin = h.FindBin(self.xmin)
         nbinmax = h.FindBin(self.xmax)
         value = h.Integral(nbinmin, nbinmax)

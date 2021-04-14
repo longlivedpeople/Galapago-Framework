@@ -148,16 +148,17 @@ if __name__ == "__main__":
 
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
     parser.add_option('-o', '--out', action='store', type=str, dest='out', default='', help='Output tag')
-    parser.add_option('-q', '--qenv', action='store', type=str, dest='qenv', default='', help='Select if you want to send the job a condor queue')
+    parser.add_option('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_Legacy.dat', help='dat file')
+    parser.add_option('-q', '--condor', action='store_true', dest='condor', default='', help='Select if you want to send the job a condor queue')
     parser.add_option('-t', '--test', action='store_true', dest='test', default='', help='Test tag')
+    parser.add_option('--doEffs', action='store_true', dest='doEffs', help='True if doing only efficiencies')
     (opts, args) = parser.parse_args()
 
-    if opts.qenv == '': opts.qenv = False
 
     ############# Set the TDR plot style
-    r.gROOT.LoadMacro(WORKPATH + 'include/tdrstyle.C+')
+    #r.gROOT.LoadMacro(WORKPATH + 'include/tdrstyle.C+')
     r.gROOT.SetBatch(1)
-    r.setTDRStyle()
+    #r.setTDRStyle()
 
 
     ############# Muon data definition
@@ -189,16 +190,29 @@ if __name__ == "__main__":
     Backgrounds.append('TT') 
 
     ############# Signal definition
+    SignalsOld = []
+    SignalsOld.append('HXX_400_50_4mm')
+    SignalsOld.append('HXX_400_50_40mm')
+    SignalsOld.append('HXX_400_50_400mm')
     Signals = []
-    #Signals.append('DisplacedSUSY_350_148_173')
-    Signals.append('HXX_400_50_4mm')
-    Signals.append('HXX_400_50_40mm')
-    Signals.append('HXX_400_50_400mm')
-    Signals.append('HXX_400_150_400mm')
-    Signals.append('HXX_1000_150_10mm')
-    Signals.append('HXX_1000_150_100mm')
-    Signals.append('HXX_1000_350_35mm')
-    Signals.append('HXX_1000_350_350mm')
+    Signals.append('HXX_400_50_1mm')
+    Signals.append('HXX_400_50_10mm')
+    Signals.append('HXX_400_50_100mm')
+    Signals.append('HXX_400_50_1000mm')
+    Signals.append('HXX_300_20_1mm')
+    Signals.append('HXX_300_20_100mm')
+    Signals.append('HXX_300_20_1000mm')
+    Signals.append('HXX_300_20_10000mm')
+    Signals.append('HXX_300_50_1mm')
+    Signals.append('HXX_300_50_10mm')
+    Signals.append('HXX_300_50_100mm')
+    Signals.append('HXX_300_50_1000mm')
+    Signals.append('HXX_300_50_10000mm')
+    Signals.append('HXX_300_150_1mm')
+    Signals.append('HXX_300_150_10mm')
+    Signals.append('HXX_300_150_100mm')
+    Signals.append('HXX_300_150_1000mm')
+    Signals.append('HXX_300_150_10000mm')
 
     ############# Parameter definition
     lumiB = 5.79
@@ -210,37 +224,35 @@ if __name__ == "__main__":
     lumiH = 8.61
     lumi =  lumiB + lumiC + lumiD + lumiE + lumiF + lumiG + lumiH# luminosity
 
-   # filename = 'dat/Samples_cern_fillEG.dat' if opts.test else 'dat/Samples_cern_filling.dat'
-    filename = 'dat/Samples_cern_filling_test.dat' if opts.test else 'dat/Samples_cern_fillingv2.dat'
-    #filename = 'dat/Samples_cern_fillEG.dat' if opts.test else 'dat/Samples_cern_fillEG.dat'
+    filename = opts.dat
 
     DoubleData = DoubleMuon + DoubleEG
-    #DoubleData = DoubleEG
+
     ############# Tree creation
     treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )
     treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Signals, 'SI'), name = 'SI', isdata = 0 )
     treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleData, 'DATA'), name = 'DATA', isdata = 1 )
 
-    ############# Cut definition
-
-
-    ############# Plotting
     start_time = time.time()
 
     ############# Make output dir
     if not os.path.exists(WORKPATH +  opts.out + '/'): os.makedirs(WORKPATH +  opts.out + '/')
 
-    ###################
-    ####  Dimuons  ####
-    ###################
-
-#    treeMC.Loop(lumi, WORKPATH + opts.out + '/')
-    #treeSI.Loop(lumi, WORKPATH + opts.out + '/')
-    #treeDATA.Loop(lumi, WORKPATH + opts.out + '/')
-    #treeMC.launchLoop(lumi, WORKPATH +  opts.out + '/', queue = 'longlunch')
-    treeSI.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch')
-    treeDATA.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch')
-
+    ##################
+    ####  Launch  ####
+    ##################
+    
+    if opts.condor:
+        #treeMC.launchLoop(lumi, WORKPATH +  opts.out + '/', queue = 'longlunch', doEffs = opts.doEffs)
+        treeSI.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch', doEffs = opts.doEffs)
+        treeSIOld.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch', doEffs = opts.doEffs)
+        treeDATA.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch', doEffs = opts.doEffs)
+    else:
+        #treeMC.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
+        treeSI.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
+        treeSIOld.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
+        treeDATA.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
+    
 
     print("--- %s seconds ---" % (time.time() - start_time))
 

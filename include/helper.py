@@ -19,7 +19,7 @@ def selectSamples(inputfile, selList, sType = 'DATA'):
 
     checkedList = []
     typeList    = []
-    print "selectSamples for ", sType, ": List Of Samples:" , selList
+    print("selectSamples for ", sType, ": List Of Samples:" , selList)
 
 
     for line in f.readlines():
@@ -30,7 +30,7 @@ def selectSamples(inputfile, selList, sType = 'DATA'):
             cond_std = _sample == line.split()[2]
             cond_re = re.search(_sample, line.split()[2]) != 0
             if _sample == line.split()[2] or re.search(_sample, line.split()[2]):
-                print "---> Found a match for", _sample, ":",  line.split()[2], " ", line.split()[3], line.split()[4], line.split()[5], ", matchesName_=", cond_std, ", matchesRegExp", cond_re 
+                print("---> Found a match for", _sample, ":",  line.split()[2], " ", line.split()[3], line.split()[4], line.split()[5], ", matchesName_=", cond_std, ", matchesRegExp", cond_re) 
                 if not sType == 'SYNCH':
                     tmp_file.write(line)
                 else:
@@ -42,13 +42,13 @@ def selectSamples(inputfile, selList, sType = 'DATA'):
     for _selSample in selList:
         if not '*' in _selSample:
             if _selSample not in checkedList:
-                print 'ERROR: some samples weren\'t selected, check all sample names!'
-                print 'check this sample:', _selSample
+                print('ERROR: some samples weren\'t selected, check all sample names!')
+                print('check this sample:', _selSample)
                 sys.exit('exiting...')
         else:
-            print 'you used some wildcards in selecting the samples. be careful with that!'
+            print('you used some wildcards in selecting the samples. be careful with that!')
     if not len(set(typeList)) == 1:
-            print 'ERROR: you\'re mixing DATA and MC!'
+            print('ERROR: you\'re mixing DATA and MC!')
             sys.exit('exiting...')
             
     return tmp_file.name
