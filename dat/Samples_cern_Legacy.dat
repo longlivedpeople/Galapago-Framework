@@ -1,0 +1,57 @@
+#-----------------------------------------------------------
+#-----------------------------------------------------------
+#----- all samples that are currently available ------------
+#-----------------------------------------------------------
+#
+#-----------------------------------------------------------
+#----------------- data samples ----------------------------
+# BLOCK        COLOR                         NAME                 LABEL                                     LOCATION OF FRIENDS                                                     XSEC     ISDATA
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#
+#----------------- monte carlo -----------------------------
+#-----------------------------------------------------------
+# BLOCK     COLOR         NAME                       LABEL                       LOCATION OF FRIENDS                                                                   XSEC    ISDATA
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Diboson         r.kBlue-3       WJetsToLNu                                ZZ,WZ,WW                       /eos/user/f/fernance/LLPNTuples/2016/MC/WJetsToLNu_0000.root                61526700   0 
+Diboson         r.kBlue-3       WW                                        ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/WW/                             118700      0 
+Diboson         r.kBlue-3       WZ                                        ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/WZ/                             47130      0 
+Diboson         r.kBlue-3       ZZ                                        ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/ZZ/                             16523      0 
+TTJets          r.kAzure-4      TT                                        t#bar{t}                       /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/TT/                           831760     0 
+DYJets          r.kAzure+10     DYJetsToLL_M-50                           Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DYJetsToLL_M-50/                6077220    0 
+DYJets          r.kAzure+10     DYJetsToLL_M-10to50                       Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DYJetsToLL_M-10to50/            18610000   0 
+###########################################################################
+HXX_400_50_1mm      r.kGreen+2      HXX_400_50_1mm                    HXX(400,50,1)                      /eos/user/f/fernance/ggH_HToSSTo4l_MH-400_MS-50_ctauS-1_TuneCUEP8M1_13TeV-powheg-pythia8/NTuples-Galapago/210215_135904/0000/                1    0
+HXX_400_50_10mm     r.kSpring       HXX_400_50_10mm                   HXX(400,50,10)                     /eos/user/f/fernance/ggH_HToSSTo4l_MH-400_MS-50_ctauS-10_TuneCUEP8M1_13TeV-powheg-pythia8/NTuples-Galapago/210215_135911/0000/               1    0
+HXX_400_50_100mm    r.kAzure        HXX_400_50_100mm                  HXX(400,50,100)                    /eos/user/f/fernance/ggH_HToSSTo4l_MH-400_MS-50_ctauS-100_TuneCUEP8M1_13TeV-powheg-pythia8/NTuples-Galapago/210215_135918/0000/              1    0
+HXX_400_50_1000mm   r.kBlue+2       HXX_400_50_1000mm                 HXX(400,50,1000)                   /eos/user/f/fernance/ggH_HToSSTo4l_MH-400_MS-50_ctauS-1000_TuneCUEP8M1_13TeV-powheg-pythia8/NTuples-Galapago/210215_135924/0000/             1    0
+HXX_300_150_1mm      r.kGreen+2      HXX_300_150_1mm                    HXX(300,150,1)                   /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-150_ctauS-1_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144811/0000/                1    0
+HXX_300_150_10mm     r.kSpring       HXX_300_150_10mm                   HXX(300,150,10)                  /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-150_ctauS-10_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144803/0000/                1    0
+HXX_300_150_100mm    r.kAzure        HXX_300_150_100mm                  HXX(300,150,100)                 /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-150_ctauS-100_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144756/0000/                1    0
+HXX_300_150_1000mm   r.kBlue+2       HXX_300_150_1000mm                 HXX(300,150,1000)                /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-150_ctauS-1000_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144750/0000/                1    0
+HXX_300_150_10000mm  r.kMagenta+2    HXX_300_150_10000mm                HXX(300,150,10000)               /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-150_ctauS-10000_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144744/0000/                1    0
+HXX_300_50_1mm       r.kGreen+2      HXX_300_50_1mm                     HXX(300,50,1)                    /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-50_ctauS-1_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144846/0000/                1    0
+HXX_300_50_10mm      r.kSpring       HXX_300_50_10mm                    HXX(300,50,10)                   /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-50_ctauS-10_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144841/0000/                1    0
+HXX_300_50_100mm     r.kAzure        HXX_300_50_100mm                   HXX(300,50,100)                  /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-50_ctauS-100_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144835/0000/                1    0
+HXX_300_50_1000mm    r.kBlue+2       HXX_300_50_1000mm                  HXX(300,50,1000)                 /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-50_ctauS-1000_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144829/0000/                1    0
+HXX_300_50_10000mm   r.kMagenta+2    HXX_300_50_10000mm                 HXX(300,50,10000)                /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-50_ctauS-10000_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144823/0000/                1    0
+HXX_300_20_1mm       r.kGreen+2      HXX_300_20_1mm                     HXX(300,20,1)                    /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-20_ctauS-1_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144910/0000/                1    0
+#HXX_300_20_10mm      r.kSpring       HXX_300_20_10mm                    HXX(300,20,10)                                   1    0
+HXX_300_20_100mm     r.kAzure        HXX_300_20_100mm                   HXX(300,20,100)                  /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-20_ctauS-100_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144904/0000/                1    0
+HXX_300_20_1000mm    r.kBlue+2       HXX_300_20_1000mm                  HXX(300,20,1000)                 /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-20_ctauS-1000_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144858/0000/                1    0
+HXX_300_20_10000mm   r.kMagenta+2    HXX_300_20_10000mm                 HXX(300,20,10000)                /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-50_ctauS-10000_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144823/0000/                1    0
+###   DoubleEG Data   ########################################################################
+Data          r.kBlack       DoubleEG_Run2016B                          Data                              /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DoubleEG_Run2016B/    1    1
+Data          r.kBlack       DoubleEG_Run2016C                          Data                              /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DoubleEG_Run2016C/    1    1
+Data          r.kBlack       DoubleEG_Run2016D                          Data                              /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DoubleEG_Run2016D/    1    1
+Data          r.kBlack       DoubleEG_Run2016E                          Data                              /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DoubleEG_Run2016E/    1    1
+Data          r.kBlack       DoubleEG_Run2016F                          Data                              /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DoubleEG_Run2016F/    1    1
+Data          r.kBlack       DoubleEG_Run2016G                          Data                              /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DoubleEG_Run2016G/    1    1
+Data          r.kBlack       DoubleEG_Run2016H                          Data                              /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DoubleEG_Run2016H/    1    1
+###   DoubleMuon Data   ########################################################################
+Data          r.kBlack       DoubleMuon_Run2016B                        Data                              /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DoubleMuon_Run2016B/   1    1
+Data          r.kBlack       DoubleMuon_Run2016C                        Data                              /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DoubleMuon_Run2016C/     1    1
+Data          r.kBlack       DoubleMuon_Run2016D                        Data                              /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DoubleMuon_Run2016D/   1    1
+Data          r.kBlack       DoubleMuon_Run2016E                        Data                              /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DoubleMuon_Run2016E/    1    1
+Data          r.kBlack       DoubleMuon_Run2016F                        Data                              /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DoubleMuon_Run2016F/           1    1
+Data          r.kBlack       DoubleMuon_Run2016G                        Data                              /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DoubleMuon_Run2016G/   1    1
+Data          r.kBlack       DoubleMuon_Run2016H                        Data                              /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/DoubleMuon_Run2016H/   1    1
