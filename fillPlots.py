@@ -148,7 +148,7 @@ if __name__ == "__main__":
 
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
     parser.add_option('-o', '--out', action='store', type=str, dest='out', default='', help='Output tag')
-    parser.add_option('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_Legacy.dat', help='dat file')
+    parser.add_option('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_UltraLegacy.dat', help='dat file')
     parser.add_option('-q', '--condor', action='store_true', dest='condor', default='', help='Select if you want to send the job a condor queue')
     parser.add_option('-t', '--test', action='store_true', dest='test', default='', help='Test tag')
     parser.add_option('--doEffs', action='store_true', dest='doEffs', help='True if doing only efficiencies')
@@ -163,31 +163,41 @@ if __name__ == "__main__":
 
     ############# Muon data definition
     DoubleMuon = []
-    DoubleMuon.append('DoubleMuon_Run2016B')
-    DoubleMuon.append('DoubleMuon_Run2016C')
-    DoubleMuon.append('DoubleMuon_Run2016D')
-    DoubleMuon.append('DoubleMuon_Run2016E')
-    DoubleMuon.append('DoubleMuon_Run2016F')
-    DoubleMuon.append('DoubleMuon_Run2016G')
-    DoubleMuon.append('DoubleMuon_Run2016H')
+    #DoubleMuon.append('DoubleMuon_Run2016B_HIPM')
+    #DoubleMuon.append('DoubleMuon_Run2016C_HIPM')
+    #DoubleMuon.append('DoubleMuon_Run2016D_HIPM')
+    #DoubleMuon.append('DoubleMuon_Run2016E_HIPM')
+    #DoubleMuon.append('DoubleMuon_Run2016F_HIPM')
+    #DoubleMuon.append('DoubleMuon_Run2016F_noHIPM')
+    #DoubleMuon.append('DoubleMuon_Run2016G_noHIPM')
+    #DoubleMuon.append('DoubleMuon_Run2016H_noHIPM')
+    DoubleMuon.append('DoubleMuon_Run2018A')
+    DoubleMuon.append('DoubleMuon_Run2018B')
+    DoubleMuon.append('DoubleMuon_Run2018C')
+    DoubleMuon.append('DoubleMuon_Run2018D')
 
     DoubleEG = []
-    DoubleEG.append('DoubleEG_Run2016B')
-    DoubleEG.append('DoubleEG_Run2016C')
-    DoubleEG.append('DoubleEG_Run2016D')
-    DoubleEG.append('DoubleEG_Run2016E')
-    DoubleEG.append('DoubleEG_Run2016F')
-    DoubleEG.append('DoubleEG_Run2016G')
-    DoubleEG.append('DoubleEG_Run2016H')
+    DoubleEG.append('DoubleEG_Run2016B_HIPM')
+    DoubleEG.append('DoubleEG_Run2016C_HIPM')
+    DoubleEG.append('DoubleEG_Run2016D_HIPM')
+    DoubleEG.append('DoubleEG_Run2016E_HIPM')
+    DoubleEG.append('DoubleEG_Run2016F_HIPM')
+    DoubleEG.append('DoubleEG_Run2016F_noHIPM')
+    DoubleEG.append('DoubleEG_Run2016G_noHIPM')
+    DoubleEG.append('DoubleEG_Run2016H_noHIPM')
 
     ############# Background definition
     Backgrounds = []
-    Backgrounds.append('DYJetsToLL_M-50') 
-    Backgrounds.append('DYJetsToLL_M-10to50') 
-    Backgrounds.append('WW') 
-    Backgrounds.append('WZ') 
-    Backgrounds.append('ZZ') 
-    Backgrounds.append('TT') 
+    Backgrounds.append('DYJetsToLL_M-50_preVFP') 
+    Backgrounds.append('DYJetsToLL_M-50_postVFP') 
+    Backgrounds.append('TTTo2L2Nu_preVFP') 
+    Backgrounds.append('TTTo2L2Nu_postVFP') 
+    #Backgrounds.append('DYJetsToLL_M-10to50') 
+    #Backgrounds.append('WW') 
+    #Backgrounds.append('WZ') 
+    #Backgrounds.append('ZZ') 
+    #Backgrounds.append('TT') 
+
 
     ############# Signal definition
     SignalsOld = []
@@ -230,8 +240,8 @@ if __name__ == "__main__":
 
     ############# Tree creation
     treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )
-    treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Signals, 'SI'), name = 'SI', isdata = 0 )
-    treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleData, 'DATA'), name = 'DATA', isdata = 1 )
+    #treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Signals, 'SI'), name = 'SI', isdata = 0 )
+    treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon, 'DATA'), name = 'DATA', isdata = 1 )
 
     start_time = time.time()
 
@@ -243,14 +253,12 @@ if __name__ == "__main__":
     ##################
     
     if opts.condor:
-        #treeMC.launchLoop(lumi, WORKPATH +  opts.out + '/', queue = 'longlunch', doEffs = opts.doEffs)
-        treeSI.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch', doEffs = opts.doEffs)
-        treeSIOld.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch', doEffs = opts.doEffs)
-        treeDATA.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch', doEffs = opts.doEffs)
+        #treeMC.launchLoop(lumi, WORKPATH +  opts.out + '/', queue = 'workday', doEffs = opts.doEffs)
+        #treeSI.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch', doEffs = opts.doEffs)
+        treeDATA.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'workday', doEffs = opts.doEffs)
     else:
         #treeMC.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
-        treeSI.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
-        treeSIOld.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
+        #treeSI.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
         treeDATA.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
     
 

@@ -85,6 +85,7 @@ class processHandler:
         exec("self.hMM{0}_nBSMM = r.TH1F('hMM{0}_nBSMM' + self.sufix, ';Number of MM candidates;', 4, 0, 4)".format(region))
         exec("self.hMM{0}_nPU = r.TH1F('hMM{0}_nPU' + self.sufix, ';Number of true primary vertices;', 40, 0, 80)".format(region))
         exec("self.hMM{0}_dPhi = r.TH1F('hMM{0}_dPhi' + self.sufix, ';Dimuon collinearity |#Delta#Phi|;', 30, 0, 3.14)".format(region))
+        exec("self.hMM{0}_dPhi_inv = r.TH1F('hMM{0}_dPhi_inv' + self.sufix, ';Dimuon inverted collinearity #pi - |#Delta#Phi|;', 30, 0, 3.14)".format(region))
         exec("self.hMM{0}_mass = r.TH1F('hMM{0}_mass' + self.sufix, ';Dimuon invariant mass m_{{#mu#mu}} (GeV);', 80, 0, 400)".format(region))
         exec("self.hMM{0}_cosAlpha = r.TH1F('hMM{0}_cosAlpha' + self.sufix, ';Dimuon cos(#alpha_{{#mu#mu}});', 22, -1.1, 1.1)".format(region))
         exec("self.hMM{0}_trackIxy = r.TH1F('hMM{0}_trackIxy' + self.sufix, ';Dimuon |d_{{0}}|/#sigma_{{d}};', 40, 0, 40)".format(region))
@@ -96,6 +97,7 @@ class processHandler:
         exec("self.hMM{0}_subleadingPt = r.TH1F('hMM{0}_subleadingPt' + self.sufix, ';Dimuon subleading p_{{T}};', 30, 0, 300)".format(region))
         exec("self.hMM{0}_normalizedChi2 = r.TH1F('hMM{0}_normalizedChi2' + self.sufix, ';Dimuon vertex fit #chi^{{2}}/ndof;', 50, 0, 50)".format(region))
         exec("self.hMM{0}_cosAlpha_dPhi = r.TH2F('hMM{0}_cosAlpha_dPhi' + self.sufix, ';Dimuon cos(#alpha_{{#mu#mu}}) ; Dimuon collinearity |#Delta#Phi|', 20, -1.0, 1.0, 20, 0, 3.14)".format(region))
+        exec("self.hMM{0}_vx_vy = r.TH2F('hMM{0}_vx_vy' + self.sufix, ';Dimuon vertex v_{{x}} (cm) ; Dimuon vertex v_{{y}} (cm)', 200, -4.0, 4.0, 200, -4.0, 4.0)".format(region))
         exec("self.hMM{0}_DeltaPhi_dPhi = r.TH2F('hMM{0}_DeltaPhi_dPhi' + self.sufix, ';Dimuon #Delta#Phi(ll) ; Dimuon collinearity |#Delta#Phi|', 20, 0.0, 3.14, 20, 0, 3.14)".format(region))
 
 
@@ -110,6 +112,7 @@ class processHandler:
         exec("self.hEE{0}_nBSEE = r.TH1F('hEE{0}_nBSEE' + self.sufix, ';Number of EE candidates;', 4, 0, 4)".format(region))
         exec("self.hEE{0}_nPU = r.TH1F('hEE{0}_nPU' + self.sufix, ';Number of true primary vertices;', 40, 0, 80)".format(region))
         exec("self.hEE{0}_dPhi = r.TH1F('hEE{0}_dPhi' + self.sufix, ';Dielectron collinearity |#Delta#Phi|;', 30, 0, 3.14)".format(region))
+        exec("self.hEE{0}_dPhi_inv = r.TH1F('hEE{0}_dPhi_inv' + self.sufix, ';Dielectron inverted collinearity #pi - |#Delta#Phi|;', 30, 0, 3.14)".format(region))
         exec("self.hEE{0}_mass = r.TH1F('hEE{0}_mass' + self.sufix, ';Dielectron invariant mass m_{{ee}} (GeV);', 80, 0, 400)".format(region))
         exec("self.hEE{0}_cosAlpha = r.TH1F('hEE{0}_cosAlpha' + self.sufix, ';Dielectron cos(#alpha_{{ee}});', 22, -1.1, 1.1)".format(region))
         exec("self.hEE{0}_trackIxy = r.TH1F('hEE{0}_trackIxy' + self.sufix, ';Dielectron |d_{{0}}|/#sigma_{{d}};', 40, 0, 40)".format(region))
@@ -123,6 +126,7 @@ class processHandler:
         exec("self.hEE{0}_subleadingEt = r.TH1F('hEE{0}_subleadingEt' + self.sufix, ';Dielectron subleading E_{{T}};', 30, 0, 300)".format(region))
         exec("self.hEE{0}_normalizedChi2 = r.TH1F('hEE{0}_normalizedChi2' + self.sufix, ';Dielectron vertex fit #chi^{{2}}/ndof;', 50, 0, 50)".format(region))
         exec("self.hEE{0}_cosAlpha_dPhi = r.TH2F('hEE{0}_cosAlpha_dPhi' + self.sufix, ';Dielectron cos(#alpha_{{ee}}) ; Dielectron collinearity |#Delta#Phi|', 20, -1.0, 1.0, 20, 0, 3.14)".format(region))
+        exec("self.hEE{0}_vx_vy = r.TH2F('hEE{0}_vx_vy' + self.sufix, ';Dielectron vertex v_{{x}} (cm) ; Dielectron vertex v_{{y}} (cm)', 200, -4.0, 4.0, 200, -4.0, 4.0)".format(region))
         exec("self.hEE{0}_Lxy_dPhi = r.TH2F('hEE{0}_Lxy_dPhi' + self.sufix, ';Dielectron |L_{{xy}}| (cm) ; Dielectron collinearity |#Delta#Phi|', 20, 0.0, 1.0, 20, 0, 3.14)".format(region))
         exec("self.hEE{0}_DeltaPhi_dPhi = r.TH2F('hEE{0}_DeltaPhi_dPhi' + self.sufix, ';Dielectron #Delta#Phi(ll) ; Dielectron collinearity |#Delta#Phi|', 20, 0.0, 3.14, 20, 0, 3.14)".format(region))
 
@@ -141,6 +145,7 @@ class processHandler:
         #### ---- EE Region definition
         #### ---------------------------
 
+        EE_BScut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l])
         EE_OSSRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_dPhiforward])
         EE_OSCRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_dPhibackward])
         EE_offZCRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_OffZ, self.cm.EE_dPhibackward])
@@ -159,6 +164,7 @@ class processHandler:
         EE_fullZSR_ng1_cut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_dPhiforward, self.cm.EE_nBSEEg1])
 
 
+        self.dielectronRegions.append(['BS', EE_BScut])
         self.dielectronRegions.append(['CROS', EE_OSCRcut])
         self.dielectronRegions.append(['SROS', EE_OSSRcut])
         self.dielectronRegions.append(['promptCR', EE_promptCRcut])
@@ -169,12 +175,12 @@ class processHandler:
         self.dielectronRegions.append(['onZSR', EE_onZSRcut])
         self.dielectronRegions.append(['offZCR', EE_offZCRcut])
         self.dielectronRegions.append(['offZSR', EE_offZSRcut])
-        self.dielectronRegions.append(['offZCRne1', EE_offZCR_ne1_cut])
-        self.dielectronRegions.append(['offZSRne1', EE_offZSR_ne1_cut])
-        self.dielectronRegions.append(['offZCRng1', EE_offZCR_ng1_cut])
-        self.dielectronRegions.append(['offZSRng1', EE_offZSR_ng1_cut])
-        self.dielectronRegions.append(['fullZCRng1', EE_fullZCR_ng1_cut])
-        self.dielectronRegions.append(['fullZSRng1', EE_fullZSR_ng1_cut])
+        #self.dielectronRegions.append(['offZCRne1', EE_offZCR_ne1_cut])
+        #self.dielectronRegions.append(['offZSRne1', EE_offZSR_ne1_cut])
+        #self.dielectronRegions.append(['offZCRng1', EE_offZCR_ng1_cut])
+        #self.dielectronRegions.append(['offZSRng1', EE_offZSR_ng1_cut])
+        #self.dielectronRegions.append(['fullZCRng1', EE_fullZCR_ng1_cut])
+        #self.dielectronRegions.append(['fullZSRng1', EE_fullZSR_ng1_cut])
 
 
     def declareDimuonRegions(self):
@@ -184,6 +190,7 @@ class processHandler:
         #### ---- MM Region definition
         #### ---------------------------
 
+        MM_BScut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l])
         MM_OSSRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_dPhiforward])
         MM_OSCRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_dPhibackward])
         MM_offZCRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_OffZ, self.cm.MM_dPhibackward])
@@ -202,6 +209,7 @@ class processHandler:
         MM_fullZSR_ng1_cut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_dPhiforward, self.cm.MM_nBSMMg1])
 
 
+        self.dimuonRegions.append(['BS', MM_BScut])
         self.dimuonRegions.append(['CROS', MM_OSCRcut])
         self.dimuonRegions.append(['SROS', MM_OSSRcut])
         self.dimuonRegions.append(['promptCR', MM_promptCRcut])
@@ -212,12 +220,12 @@ class processHandler:
         self.dimuonRegions.append(['onZSR', MM_onZSRcut])
         self.dimuonRegions.append(['offZCR', MM_offZCRcut])
         self.dimuonRegions.append(['offZSR', MM_offZSRcut])
-        self.dimuonRegions.append(['offZCRne1', MM_offZCR_ne1_cut])
-        self.dimuonRegions.append(['offZSRne1', MM_offZSR_ne1_cut])
-        self.dimuonRegions.append(['offZCRng1', MM_offZCR_ng1_cut])
-        self.dimuonRegions.append(['offZSRng1', MM_offZSR_ng1_cut])
-        self.dimuonRegions.append(['fullZCRng1', MM_fullZCR_ng1_cut])
-        self.dimuonRegions.append(['fullZSRng1', MM_fullZSR_ng1_cut])
+        #self.dimuonRegions.append(['offZCRne1', MM_offZCR_ne1_cut])
+        #self.dimuonRegions.append(['offZSRne1', MM_offZSR_ne1_cut])
+        #self.dimuonRegions.append(['offZCRng1', MM_offZCR_ng1_cut])
+        #self.dimuonRegions.append(['offZSRng1', MM_offZSR_ng1_cut])
+        #self.dimuonRegions.append(['fullZCRng1', MM_fullZCR_ng1_cut])
+        #self.dimuonRegions.append(['fullZSRng1', MM_fullZSR_ng1_cut])
 
 
 
@@ -316,7 +324,7 @@ class processHandler:
             if not eval(self.cm.MM_eta2): continue
             if not eval(self.cm.MM_cosAlpha0p8): continue
             if not eval(self.cm.MM_mass15): continue
-            if not eval(self.cm.MM_normChi2_10): continue
+            if not eval(self.cm.MM_normChi2_5): continue
             if not eval(self.cm.MM_dR0p2): continue 
 
             if eval(self.cm.MM_iso2l) and eval(self.cm.MM_OS): nBSMM+=1
@@ -341,6 +349,7 @@ class processHandler:
         exec("self.hMM{0}_nPU.Fill(ev.nPV, weight)".format(region))
         exec("self.hMM{0}_nBSMM.Fill(nBSMM, weight)".format(region))
         exec("self.hMM{0}_dPhi.Fill(abs(ev.DMDM_dPhi[mm_maxIxy]), weight)".format(region))
+        exec("self.hMM{0}_dPhi_inv.Fill(3.14 - abs(ev.DMDM_dPhi[mm_maxIxy]), weight)".format(region))
         exec("self.hMM{0}_mass.Fill(ev.DMDM_mass[mm_maxIxy], weight)".format(region))
         exec("self.hMM{0}_trackIxy.Fill(ev.DMDM_trackIxy_PV[mm_maxIxy], weight)".format(region))
         exec("self.hMM{0}_trackIxy_log.Fill(ev.DMDM_trackIxy_PV[mm_maxIxy], weight)".format(region))
@@ -351,6 +360,7 @@ class processHandler:
         exec("self.hMM{0}_cosAlpha.Fill(ev.DMDM_cosAlpha[mm_maxIxy], weight)".format(region))
         exec("self.hMM{0}_leadingPt.Fill(ev.DMDM_leadingPt[mm_maxIxy], weight)".format(region))
         exec("self.hMM{0}_cosAlpha_dPhi.Fill(ev.DMDM_cosAlpha[mm_maxIxy], abs(ev.DMDM_dPhi[mm_maxIxy]), weight)".format(region))
+        exec("self.hMM{0}_vx_vy.Fill(ev.DMDM_vx[mm_maxIxy], ev.DMDM_vy[mm_maxIxy], weight)".format(region))
         exec("self.hMM{0}_DeltaPhi_dPhi.Fill(ev.DMDM_lldPhi[mm_maxIxy], abs(ev.DMDM_dPhi[mm_maxIxy]), weight)".format(region))
 
 
@@ -377,7 +387,7 @@ class processHandler:
             if not eval(self.cm.EE_subleadingPt28): continue
             if not eval(self.cm.EE_leadingEt45): continue
             if not eval(self.cm.EE_subleadingEt28): continue
-            if not eval(self.cm.EE_normChi2_10): continue
+            if not eval(self.cm.EE_normChi2_7): continue
             if not eval(self.cm.EE_mass15): continue
            
             if eval(self.cm.EE_iso2l) and eval(self.cm.EE_OS): nBSEE+=1
@@ -401,6 +411,7 @@ class processHandler:
         exec("self.hEE{0}_nPU.Fill(ev.nPV, weight)".format(region))
         exec("self.hEE{0}_nBSEE.Fill(nBSEE, weight)".format(region))
         exec("self.hEE{0}_dPhi.Fill(abs(ev.EE_dPhi[ee_maxIxy]), weight)".format(region))
+        exec("self.hEE{0}_dPhi_inv.Fill(3.14 - abs(ev.EE_dPhi[ee_maxIxy]), weight)".format(region))
         exec("self.hEE{0}_mass.Fill(ev.EE_mass[ee_maxIxy], weight)".format(region))
         exec("self.hEE{0}_trackDxy.Fill(ev.EE_trackDxy_PV[ee_maxIxy], weight)".format(region))
         exec("self.hEE{0}_trackIxy.Fill(ev.EE_trackIxy_PV[ee_maxIxy], weight)".format(region))
@@ -413,6 +424,7 @@ class processHandler:
         exec("self.hEE{0}_subleadingEt.Fill(ev.EE_subleadingEt[ee_maxIxy], weight)".format(region))
         exec("self.hEE{0}_normalizedChi2.Fill(ev.EE_normalizedChi2[ee_maxIxy], weight)".format(region))
         exec("self.hEE{0}_cosAlpha_dPhi.Fill(ev.EE_cosAlpha[ee_maxIxy], abs(ev.EE_dPhi[ee_maxIxy]), weight)".format(region))
+        exec("self.hEE{0}_vx_vy.Fill(ev.EE_vx[ee_maxIxy], ev.EE_vy[ee_maxIxy], weight)".format(region))
         exec("self.hEE{0}_Lxy_dPhi.Fill(abs(ev.EE_Lxy_PV[ee_maxIxy]), abs(ev.EE_dPhi[ee_maxIxy]), weight)".format(region))
         exec("self.hEE{0}_DeltaPhi_dPhi.Fill(ev.EE_lldPhi[ee_maxIxy], abs(ev.EE_dPhi[ee_maxIxy]), weight)".format(region))
 

@@ -16,7 +16,7 @@ import include.CutManager as CutManager
 
 
 
-def makePromptBKGPlot(lumi, hname_SR, hname_CR, ylog, treeDATA, inputdir, rebin = False, limit = 0.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = '', DATAlabel = '', extralabel = '', xlog = False):
+def makePromptBKGPlot(name, lumi, hname_SR, hname_CR, ylog, treeDATA, inputdir, rebin = False, limit = 0.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = '', DATAlabel = '', extralabel = '', xlog = False):
 
 
     ### Get histograms
@@ -67,16 +67,16 @@ def makePromptBKGPlot(lumi, hname_SR, hname_CR, ylog, treeDATA, inputdir, rebin 
  
 
     ### Canvas object
-    plot = Canvas.Canvas('BKGVal_'+hname_SR, 'png', 0.53, 0.79, 0.7, 0.87, 1)
+    plot = Canvas.Canvas('BKGVal_'+name, 'png', 0.51, 0.75, 0.7, 0.83, 1)
     plot.addHisto(hCR, 'HIST', 'Background (Data-driven)', 'f', '', 1, 0)
     plot.addHisto(hSR, 'P, SAME', 'Data', 'p', '', 1, 1)
-    plot.addLatex(0.17, 0.85, extralabel, font = 62)
+    plot.addLatex(0.17, 0.8, extralabel, font = 62)
 
     ### Channel banner:
     if LLlabel == 'EE':
-        plot.addLatex(0.17, 0.81, 'e^{+}e^{-} channel', font = 42)
+        plot.addLatex(0.17, 0.74, 'e^{+}e^{-} channel', font = 42)
     if LLlabel == 'MM':
-        plot.addLatex(0.17, 0.81, '#mu^{+}#mu^{-} channel', font = 42)
+        plot.addLatex(0.17, 0.74, '#mu^{+}#mu^{-} channel', font = 42)
 
 
     ### Save it
@@ -106,40 +106,46 @@ if __name__ == "__main__":
 
 
     ############# EG data definition
-    DoubleEGB = 'DoubleEG_Run2016B'
-    DoubleEGC = 'DoubleEG_Run2016C'
-    DoubleEGD = 'DoubleEG_Run2016D'
-    DoubleEGE = 'DoubleEG_Run2016E'
-    DoubleEGF = 'DoubleEG_Run2016F'
-    DoubleEGG = 'DoubleEG_Run2016G'
-    DoubleEGH = 'DoubleEG_Run2016H'
+    DoubleEGB = 'DoubleEG_Run2016B_HIPM'
+    DoubleEGC = 'DoubleEG_Run2016C_HIPM'
+    DoubleEGD = 'DoubleEG_Run2016D_HIPM'
+    DoubleEGE = 'DoubleEG_Run2016E_HIPM'
+    DoubleEGF1 = 'DoubleEG_Run2016F_HIPM'
+    DoubleEGF2 = 'DoubleEG_Run2016F_noHIPM'
+    DoubleEGG = 'DoubleEG_Run2016G_noHIPM'
+    DoubleEGH = 'DoubleEG_Run2016H_noHIPM'
 
-    DoubleEG_list = []
-    DoubleEG_list.append(DoubleEGB)
-    DoubleEG_list.append(DoubleEGC)
-    DoubleEG_list.append(DoubleEGD)
-    DoubleEG_list.append(DoubleEGE)
-    DoubleEG_list.append(DoubleEGF)
-    DoubleEG_list.append(DoubleEGG)
-    DoubleEG_list.append(DoubleEGH)
+    DoubleEG_HIPM = []
+    DoubleEG_noHIPM = []
+    DoubleEG_HIPM.append(DoubleEGB)
+    DoubleEG_HIPM.append(DoubleEGC)
+    DoubleEG_HIPM.append(DoubleEGD)
+    DoubleEG_HIPM.append(DoubleEGE)
+    DoubleEG_HIPM.append(DoubleEGF1)
+    DoubleEG_noHIPM.append(DoubleEGF2)
+    DoubleEG_noHIPM.append(DoubleEGG)
+    DoubleEG_noHIPM.append(DoubleEGH)
 
     ############# Muon data definition
-    DoubleMuonB = 'DoubleMuon_Run2016B'
-    DoubleMuonC = 'DoubleMuon_Run2016C'
-    DoubleMuonD = 'DoubleMuon_Run2016D'
-    DoubleMuonE = 'DoubleMuon_Run2016E'
-    DoubleMuonF = 'DoubleMuon_Run2016F'
-    DoubleMuonG = 'DoubleMuon_Run2016G'
-    DoubleMuonH = 'DoubleMuon_Run2016H'
+    DoubleMuonB = 'DoubleMuon_Run2016B_HIPM'
+    DoubleMuonC = 'DoubleMuon_Run2016C_HIPM'
+    DoubleMuonD = 'DoubleMuon_Run2016D_HIPM'
+    DoubleMuonE = 'DoubleMuon_Run2016E_HIPM'
+    DoubleMuonF1 = 'DoubleMuon_Run2016F_HIPM'
+    DoubleMuonF2 = 'DoubleMuon_Run2016F_noHIPM'
+    DoubleMuonG = 'DoubleMuon_Run2016G_noHIPM'
+    DoubleMuonH = 'DoubleMuon_Run2016H_noHIPM'
 
-    DoubleMuon_list = []
-    DoubleMuon_list.append(DoubleMuonB)
-    DoubleMuon_list.append(DoubleMuonC)
-    DoubleMuon_list.append(DoubleMuonD)
-    DoubleMuon_list.append(DoubleMuonE)
-    DoubleMuon_list.append(DoubleMuonF)
-    DoubleMuon_list.append(DoubleMuonG)
-    DoubleMuon_list.append(DoubleMuonH)
+    DoubleMuon_HIPM = []
+    DoubleMuon_noHIPM = []
+    DoubleMuon_HIPM.append(DoubleMuonB)
+    DoubleMuon_HIPM.append(DoubleMuonC)
+    DoubleMuon_HIPM.append(DoubleMuonD)
+    DoubleMuon_HIPM.append(DoubleMuonE)
+    DoubleMuon_HIPM.append(DoubleMuonF1)
+    DoubleMuon_noHIPM.append(DoubleMuonF2)
+    DoubleMuon_noHIPM.append(DoubleMuonG)
+    DoubleMuon_noHIPM.append(DoubleMuonH)
 
 
     ############# Background definition
@@ -181,7 +187,7 @@ if __name__ == "__main__":
     lumiEG['DoubleEG_Run2016H'] = lumiH
 
     lumi_EG = 0.0
-    for dataset in DoubleEG_list: lumi_EG += lumiEG[dataset]
+    #for dataset in DoubleEG_list: lumi_EG += lumiEG[dataset]
 
 
     lumiMuon = {}
@@ -194,12 +200,12 @@ if __name__ == "__main__":
     lumiMuon['DoubleMuon_Run2016H'] = lumiH
 
     lumi_Muon = 0.0
-    for dataset in DoubleMuon_list: lumi_Muon += lumiMuon[dataset]
+    #for dataset in DoubleMuon_list: lumi_Muon += lumiMuon[dataset]
+    
 
 
 
-
-    filename = 'dat/Samples_cern_fillingv2.dat'
+    filename = 'dat/Samples_cern_UltraLegacy.dat'
 
     ######################################
     ######## Some bin definitions ########
@@ -214,40 +220,57 @@ if __name__ == "__main__":
 #                                  np.arange(100, 400, 15, float)))
 
 
+    Ixy_reb = [0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 10.0, 14.0, 20.0, 30.0, 40.0]
+    Ixy_rebin = np.array(Ixy_reb)
 
     ################################
     ######## DoubleEG Plots ########
     ################################
-       
-    treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_list, 'DATA'), name = 'DATA', isdata = 1 )
+    treeDATA_HIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_HIPM, 'DATA'), name = 'DATA', isdata = 1 )
+    treeDATA_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_noHIPM, 'DATA'), name = 'DATA', isdata = 1 )
 
     #### Prompt validation
 
-    #makePromptBKGPlot(lumi = lumi_EG, hname_SR = 'hEEpromptSR_trackIxy_log', hname_CR = 'hEECROS_trackIxy_log', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '', xlog = True) 
-    makePromptBKGPlot(lumi = lumi_EG, hname_SR = 'hEEpromptSR_mass', hname_CR = 'hEEpromptCR_mass', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '', xlog = False) 
+    makePromptBKGPlot(name = 'EEprompt_mass_HIPM', lumi = 19.7, hname_SR = 'hEEpromptSR_mass', hname_CR = 'hEEpromptCR_mass', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '', xlog = False) 
+    makePromptBKGPlot(name = 'EEprompt_mass_noHIPM', lumi = 16.15, hname_SR = 'hEEpromptSR_mass', hname_CR = 'hEEpromptCR_mass', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '', xlog = False) 
 
     #### On-Z validation
 
-    #makePromptBKGPlot(lumi = lumi_EG, hname_SR = 'hEEonZSR_mass', hname_CR = 'hEECROS_mass', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '', xlog = False) 
-    makePromptBKGPlot(lumi = lumi_EG, hname_SR = 'hEEonZSR_trackIxy_log', hname_CR = 'hEEonZCR_trackIxy_log', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'On-Z control region', xlog = True) 
-    makePromptBKGPlot(lumi = lumi_EG, hname_SR = 'hEEoffZSR_trackIxy_log', hname_CR = 'hEEoffZCR_trackIxy_log', ylog = True, treeDATA = treeDATA, inputdir = opts.input, limit = 6.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '', xlog = True) 
+    makePromptBKGPlot(name = 'EEOnZ_trackIxy_log_HIPM', lumi = 19.7, hname_SR = 'hEEonZSR_trackIxy_log', hname_CR = 'hEEonZCR_trackIxy_log', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'On-Z control region', xlog = True) 
+    makePromptBKGPlot(name = 'EEOnZ_trackIxy_HIPM', lumi = 19.7, hname_SR = 'hEEonZSR_trackIxy', hname_CR = 'hEEonZCR_trackIxy', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, rebin = Ixy_rebin, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'On-Z control region', xlog = False) 
+    makePromptBKGPlot(name = 'EEOffZ_trackIxy_log_HIPM', lumi = 19.7, hname_SR = 'hEEoffZSR_trackIxy_log', hname_CR = 'hEEoffZCR_trackIxy_log', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, limit = 6.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '', xlog = True) 
+    makePromptBKGPlot(name = 'EEOffZ_trackIxy_HIPM', lumi = 19.7, hname_SR = 'hEEoffZSR_trackIxy', hname_CR = 'hEEoffZCR_trackIxy', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, limit = 6.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '', xlog = False) 
     
+    makePromptBKGPlot(name = 'EEOnZ_trackIxy_log_noHIPM', lumi = 16.2, hname_SR = 'hEEonZSR_trackIxy_log', hname_CR = 'hEEonZCR_trackIxy_log', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'On-Z control region', xlog = True) 
+    makePromptBKGPlot(name = 'EEOnZ_trackIxy_noHIPM', lumi = 16.2, hname_SR = 'hEEonZSR_trackIxy', hname_CR = 'hEEonZCR_trackIxy', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, rebin = Ixy_rebin, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'On-Z control region', xlog = False) 
+    makePromptBKGPlot(name = 'EEOffZ_trackIxy_log_noHIPM', lumi = 16.2, hname_SR = 'hEEoffZSR_trackIxy_log', hname_CR = 'hEEoffZCR_trackIxy_log', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, limit = 6.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '', xlog = True) 
+    makePromptBKGPlot(name = 'EEOffZ_trackIxy_noHIPM', lumi = 16.2, hname_SR = 'hEEoffZSR_trackIxy', hname_CR = 'hEEoffZCR_trackIxy', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, limit = 6.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '', xlog = False) 
 
     ##################################
     ######## DoubleMuon Plots ########
     ##################################
     
-    treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_list, 'DATA'), name = 'DATA', isdata = 1 )
+    treeDATA_HIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_HIPM, 'DATA'), name = 'DATA', isdata = 1 )
+    treeDATA_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_noHIPM, 'DATA'), name = 'DATA', isdata = 1 )
 
     #### Prompt validation
 
-    #makePromptBKGPlot(lumi = lumi_Muon, hname_SR = 'hMMpromptSR_trackIxy_log', hname_CR = 'hMMCROS_trackIxy_log', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'Prompt control region', xlog = True) 
-    makePromptBKGPlot(lumi = lumi_Muon, hname_SR = 'hMMpromptSR_mass', hname_CR = 'hMMpromptCR_mass', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'Prompt control region', xlog = False) 
+    makePromptBKGPlot(name = 'MMPrompt_mass_HIPM', lumi = 19.7, hname_SR = 'hMMpromptSR_mass', hname_CR = 'hMMpromptCR_mass', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'Prompt control region', xlog = False) 
+    makePromptBKGPlot(name = 'MMPrompt_mass_noHIPM', lumi = 16.2, hname_SR = 'hMMpromptSR_mass', hname_CR = 'hMMpromptCR_mass', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'Prompt control region', xlog = False) 
 
     
     #### On-Z validation
 
-    #makePromptBKGPlot(lumi = lumi_Muon, hname_SR = 'hMMonZSR_mass', hname_CR = 'hMMCROS_mass', ylog = True, treeDATA = treeDATA, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '', xlog = False) 
-    makePromptBKGPlot(lumi = lumi_Muon, hname_SR = 'hMMonZSR_trackIxy_log', hname_CR = 'hMMonZCR_trackIxy_log', ylog = True, treeDATA = treeDATA, inputdir = opts.input,  xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'On-Z control region', xlog = True) 
-    makePromptBKGPlot(lumi = lumi_Muon, hname_SR = 'hMMoffZSR_trackIxy_log', hname_CR = 'hMMoffZCR_trackIxy_log', ylog = True, treeDATA = treeDATA, inputdir = opts.input, limit = 6.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'Off-Z (prompt) control region', extralabel = '', xlog = True) 
-    makePromptBKGPlot(lumi = lumi_Muon, hname_SR = 'hMMoffZSR_dPhi', hname_CR = 'hMMoffZCR_dPhi', ylog = True, treeDATA = treeDATA, inputdir = opts.input, limit = 6.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'Off-Z (prompt) control region', extralabel = '', xlog = False) 
+    makePromptBKGPlot(name = 'MMOnZ_trackIxy_log_HIPM', lumi = 19.7, hname_SR = 'hMMonZSR_trackIxy_log', hname_CR = 'hMMonZCR_trackIxy_log', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input,  xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'On-Z control region', xlog = True) 
+    makePromptBKGPlot(name = 'MMOnZ_trackIxy_HIPM', lumi = 19.7, hname_SR = 'hMMonZSR_trackIxy', hname_CR = 'hMMonZCR_trackIxy', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input,  rebin = Ixy_rebin, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'On-Z control region', xlog = False) 
+    makePromptBKGPlot(name = 'MMOnZ_Lxy_HIPM', lumi = 19.7, hname_SR = 'hMMonZSR_Lxy', hname_CR = 'hMMonZCR_Lxy', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'On-Z control region', xlog = False) 
+    makePromptBKGPlot(name = 'MMOnZ_Ixy_HIPM', lumi = 19.7, hname_SR = 'hMMonZSR_Ixy', hname_CR = 'hMMonZCR_Ixy', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'On-Z control region', xlog = False) 
+    makePromptBKGPlot(name = 'MMOffZ_trackIxy_log_HIPM', lumi = 19.7, hname_SR = 'hMMoffZSR_trackIxy_log', hname_CR = 'hMMoffZCR_trackIxy_log', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, limit = 6.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'Off-Z (prompt) control region', extralabel = '', xlog = True) 
+    makePromptBKGPlot(name = 'MMOffZ_trackIxy_HIPM', lumi = 19.7, hname_SR = 'hMMoffZSR_trackIxy', hname_CR = 'hMMoffZCR_trackIxy', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, limit = 6.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'Off-Z (prompt) control region', extralabel = '', xlog = False) 
+
+    makePromptBKGPlot(name = 'MMOnZ_trackIxy_log_noHIPM', lumi = 16.2, hname_SR = 'hMMonZSR_trackIxy_log', hname_CR = 'hMMonZCR_trackIxy_log', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input,  xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'On-Z control region', xlog = True) 
+    makePromptBKGPlot(name = 'MMOnZ_trackIxy_noHIPM', lumi = 16.2, hname_SR = 'hMMonZSR_trackIxy', hname_CR = 'hMMonZCR_trackIxy', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input,  rebin = Ixy_rebin, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'On-Z control region', xlog = False) 
+    makePromptBKGPlot(name = 'MMOnZ_Lxy_noHIPM', lumi = 16.2, hname_SR = 'hMMonZSR_Lxy', hname_CR = 'hMMonZCR_Lxy', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'On-Z control region', xlog = False) 
+    makePromptBKGPlot(name = 'MMOnZ_Ixy_noHIPM', lumi = 16.2, hname_SR = 'hMMonZSR_Ixy', hname_CR = 'hMMonZCR_Ixy', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'On-Z control region', xlog = False) 
+    makePromptBKGPlot(name = 'MMOffZ_trackIxy_log_noHIPM', lumi = 16.2, hname_SR = 'hMMoffZSR_trackIxy_log', hname_CR = 'hMMoffZCR_trackIxy_log', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, limit = 6.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'Off-Z (prompt) control region', extralabel = '', xlog = True) 
+    makePromptBKGPlot(name = 'MMOffZ_trackIxy_noHIPM', lumi = 16.2, hname_SR = 'hMMoffZSR_trackIxy', hname_CR = 'hMMoffZCR_trackIxy', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, limit = 6.0, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'Off-Z (prompt) control region', extralabel = '', xlog = False) 

@@ -267,11 +267,11 @@ if __name__ == "__main__":
     make2DPlot(hmm, 'MM_DY_DeltaPhi_dPhi', '2DPlots')
     make2DPlot(hee, 'EE_DY_DeltaPhi_dPhi', '2DPlots')
 
-
+   
     #
     # -- ttbar Correlation
     #
-
+    
     treeTT = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TT'], 'MC'), name = 'MC', isdata = 0 )
     makeSymmetryTest(lumi_total, 'hEEOS0_dPhi', 0, treeTT, WORKPATH + opts.input, 'Monte Carlo: TT (OS0 Region)', 'TT_hEE_dPhi_corr', 0)
     EE_TTstat = makeSymmetryTest2(lumi_total, 'hEEOS0_dPhi', 0, treeTT, WORKPATH + opts.input, 'Monte Carlo: TT (OS0 Region)', 'TT_hEE_dPhi_test', 0)
@@ -294,12 +294,12 @@ if __name__ == "__main__":
     hmm = treeVV.getLoopTH2F(WORKPATH + opts.input, 'hMMOS0_DeltaPhi_dPhi') 
     hee = treeVV.getLoopTH2F(WORKPATH + opts.input, 'hEEOS0_DeltaPhi_dPhi') 
     make2DPlot(hmm, 'MM_VV_DeltaPhi_dPhi', '2DPlots')
-    make2DPlot(hee, 'EE_VV_DeltaPhi_dPhi', '2DPlots')
-    
+    make2DPlot(hee, 'EE_VV_DeltaPhi_dPhi', '2DPlots')    
+
     #
     # -- Plot with N(SR)/N(CR) for different background sources
     #    
-
+    """
     leftMargin = 0.13
     rightMargin = 0.10
     topMargin = 0.08
@@ -310,8 +310,7 @@ if __name__ == "__main__":
     binWidth = xWidth/5
 
 
-    ###### -> Electron channel summary
-
+    ###### -> Electron and muon channel summary
     EE_summary = r.TH1F('EE_Summary', '', 5, 0, 5) 
     EE_summary.GetXaxis().SetLabelSize(0)
     EE_summary.GetYaxis().SetTitle("r_{SR/CR} factor")
@@ -385,6 +384,7 @@ if __name__ == "__main__":
     sumplot.addLine(0, 1.0, 5, 1.0, r.kRed)
     sumplot.save(1, 0, 0, '', '', outputDir = 'SymmetryResults/')
 
+    """
 
 
     #
