@@ -200,10 +200,6 @@ if __name__ == "__main__":
 
 
     ############# Signal definition
-    SignalsOld = []
-    SignalsOld.append('HXX_400_50_4mm')
-    SignalsOld.append('HXX_400_50_40mm')
-    SignalsOld.append('HXX_400_50_400mm')
     Signals = []
     Signals.append('HXX_400_50_1mm')
     Signals.append('HXX_400_50_10mm')
@@ -253,13 +249,13 @@ if __name__ == "__main__":
     ##################
     
     if opts.condor:
-        #treeMC.launchLoop(lumi, WORKPATH +  opts.out + '/', queue = 'workday', doEffs = opts.doEffs)
+        treeMC.launchLoop(lumi, WORKPATH +  opts.out + '/', queue = 'workday', doEffs = opts.doEffs)
         #treeSI.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch', doEffs = opts.doEffs)
-        treeDATA.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'workday', doEffs = opts.doEffs)
+        #treeDATA.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'workday', doEffs = opts.doEffs)
     else:
-        #treeMC.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
+        treeMC.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
         #treeSI.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
-        treeDATA.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
+        #treeDATA.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
     
 
     print("--- %s seconds ---" % (time.time() - start_time))

@@ -248,7 +248,11 @@ class Canvas:
       newhisto.SetMarkerSize (histo.GetMarkerSize ())
       newhisto.SetLineColor(histo.GetLineColor())
       newhisto.SetLineStyle(histo.GetLineStyle())
+      newhisto.SetLineWidth(histo.GetLineWidth())
       newhisto.SetMaximum(histo.GetMaximum())
+      newhisto.SetMinimum(histo.GetMinimum())
+      newhisto.GetXaxis().SetTitle(histo.GetXaxis().GetTitle())
+      newhisto.GetYaxis().SetTitle(histo.GetYaxis().GetTitle())
       for i in range(1,nbinsx+2):
          newhisto.SetBinContent(i,histo.GetBinContent(i))
          newhisto.SetBinError  (i,histo.GetBinError  (i))

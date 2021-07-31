@@ -8,7 +8,7 @@ import numpy as np
 
 class processHandler:
 
-    def __init__(self, outdir, treename, blockname, samplename, samplenumber, lumiweight, isdata):
+    def __init__(self, outdir, treename, blockname, samplename, samplenumber, lumiweight, isdata, year = '2016'):
 
         ### outdir: Path where the root file will be stored
         ### treename: Name of the (Galapago) Tree (MC; DATA; SI)
@@ -32,6 +32,27 @@ class processHandler:
 
         ## Init histogram efficiencies
         self.declareEfficiencies()
+
+        #### ------------------------------
+        #### ---- Set year configuration
+        #### ------------------------------
+        self.mumu_path      = 'False'
+        self.mumu_selection = 'False'
+        self.ee_path        = 'False'
+        self.ee_selection   = 'False'
+        if year=='2016':
+            self.mumu_path      = self.cm.mupath2016
+            self.ee_path        = self.cm.epath2016
+            self.mumu_selection = self.cm.MM_BS2016
+            self.ee_selection   = self.cm.EE_BS2016
+        elif year=='2017':
+            self.ee_path        = self.cm.epath2017
+            self.ee_selection   = self.cm.EE_BS2017
+        elif year=='2018':
+            self.mumu_path      = self.cm.mupath2018
+            self.ee_path        = self.cm.epath2018
+            self.mumu_selection = self.cm.MM_BS2018
+            self.ee_selection   = self.cm.EE_BS2018
 
         #### ------------------------------
         #### ---- Regions initialization
@@ -251,9 +272,9 @@ class processHandler:
         if not ev.PV_passAcceptance: return
 
         # Count
-        if ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10:
+        if eval(self.mumu_path):
             self.hMM_yield.Fill(0, weight)
-        if not ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 and ev.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15:
+        if eval(self.ee_path) and not eval(self.mumu_path):
             self.hEE_yield.Fill(0, weight)
 
         # Dimuon processing
@@ -303,13 +324,14 @@ class processHandler:
 
     def processDimuons(self, ev):
 
+        if not eval(self.mumu_path):
+            return -99, -99
+        if ev.nDMDM < 1:
+            return -99, -99
 
         #### ----------------------------
         #### ---- Select a MM candidate
         #### ----------------------------
-
-        ### -> Events just passing the trigger and having a valid DG pair
-        if not ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 or ev.nDMDM == 0: return -99, -99
 
         ### -> Find the MM pair with maximum Ixy that passes the cuts
         mm_maxIxy = -99
@@ -319,13 +341,7 @@ class processHandler:
         for i in range(0, ev.nDMDM):
 
             imm = i
-            if not eval(self.cm.MM_ID): continue
-            if not eval(self.cm.MM_pt31): continue
-            if not eval(self.cm.MM_eta2): continue
-            if not eval(self.cm.MM_cosAlpha0p8): continue
-            if not eval(self.cm.MM_mass15): continue
-            if not eval(self.cm.MM_normChi2_5): continue
-            if not eval(self.cm.MM_dR0p2): continue 
+            if not eval(self.mumu_selection): continue
 
             if eval(self.cm.MM_iso2l) and eval(self.cm.MM_OS): nBSMM+=1
 
@@ -373,7 +389,11 @@ class processHandler:
 
     def processDielectrons(self, ev):
 
-        if ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 or not ev.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15 or ev.nEE == 0: return -99, -99
+
+        if not eval(self.ee_path) or eval(self.mumu_path):
+            return -99, -99
+        if ev.nEE < 1:
+            return -99, -99
 
         ### -> Find the EE pair with maximum Ixy that passes the cuts
         ee_maxIxy = -99
@@ -382,13 +402,7 @@ class processHandler:
         for i in range(0, ev.nEE):
          
             iee = i
-            if not eval(self.cm.EE_eta2): continue
-            if not eval(self.cm.EE_leadingPt45): continue
-            if not eval(self.cm.EE_subleadingPt28): continue
-            if not eval(self.cm.EE_leadingEt45): continue
-            if not eval(self.cm.EE_subleadingEt28): continue
-            if not eval(self.cm.EE_normChi2_7): continue
-            if not eval(self.cm.EE_mass15): continue
+            if not eval(self.ee_selection): continue
            
             if eval(self.cm.EE_iso2l) and eval(self.cm.EE_OS): nBSEE+=1
 
