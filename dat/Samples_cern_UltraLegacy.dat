@@ -1,0 +1,51 @@
+#-----------------------------------------------------------
+#-----------------------------------------------------------
+#----- all samples that are currently available ------------
+#-----------------------------------------------------------
+#
+#-----------------------------------------------------------
+#----------------- data samples ----------------------------
+# BLOCK        COLOR                         NAME                 LABEL                                     LOCATION OF FRIENDS                                                     XSEC     ISDATA
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#
+#----------------- monte carlo -----------------------------
+#-----------------------------------------------------------
+# BLOCK     COLOR         NAME                       LABEL                       LOCATION OF FRIENDS                                                                   XSEC    ISDATA
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Diboson         r.kBlue-3       WW                                        ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/WW/                             118700      0 
+#Diboson         r.kBlue-3       WZ                                        ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/WZ/                             47130      0 
+#Diboson         r.kBlue-3       ZZ                                        ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/ZZ/                             16523      0 
+TTJets          r.kAzure-4      TTTo2L2Nu_preVFP                                 t#bar{t}                       /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_preVFP/                           831760     0 
+TTJets          r.kAzure-4      TTTo2L2Nu_postVFP                                t#bar{t}                       /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/                          831760     0 
+DYJets          r.kAzure+10     DYJetsToLL_M-50_preVFP                           Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2016/DYJetsToLL_M-50_preVFP/                6077220    0 
+DYJets          r.kAzure+10     DYJetsToLL_M-50_postVFP                          Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2016/DYJetsToLL_M-50_postVFP/               6077220    0 
+#HXX_300_20_10000mm   r.kMagenta+2    HXX_300_20_10000mm                 HXX(300,20,10000)                /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-50_ctauS-10000_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144823/0000/                1    0
+###########################################################################
+###########################################################################
+###   DoubleEG Data   ########################################################################
+#
+#
+Data     r.kBlack     DoubleEG_Run2016B_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleEG_B_HIPM/      1    1
+Data     r.kBlack     DoubleEG_Run2016C_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleEG_C_HIPM/      1    1
+Data     r.kBlack     DoubleEG_Run2016D_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleEG_D_HIPM/      1    1
+Data     r.kBlack     DoubleEG_Run2016E_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleEG_E_HIPM/      1    1
+Data     r.kBlack     DoubleEG_Run2016F_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleEG_F_HIPM/      1    1
+Data     r.kBlack     DoubleEG_Run2016F_noHIPM     Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleEG_F_noHIPM/    1    1
+Data     r.kBlack     DoubleEG_Run2016G_noHIPM     Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleEG_G_noHIPM/    1    1
+Data     r.kBlack     DoubleEG_Run2016H_noHIPM     Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleEG_H_noHIPM/    1    1
+###########################################################################
+###########################################################################
+###   DoubleMuon Data   ########################################################################
+Data     r.kBlack     DoubleMuon_Run2016B_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleMuon_B_HIPM/      1    1
+Data     r.kBlack     DoubleMuon_Run2016C_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleMuon_C_HIPM/      1    1
+Data     r.kBlack     DoubleMuon_Run2016D_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleMuon_D_HIPM/      1    1
+Data     r.kBlack     DoubleMuon_Run2016E_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleMuon_E_HIPM/      1    1
+Data     r.kBlack     DoubleMuon_Run2016F_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleMuon_F_HIPM/      1    1
+Data     r.kBlack     DoubleMuon_Run2016F_noHIPM     Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleMuon_F_noHIPM/    1    1
+Data     r.kBlack     DoubleMuon_Run2016G_noHIPM     Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleMuon_G_noHIPM/    1    1
+Data     r.kBlack     DoubleMuon_Run2016H_noHIPM     Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleMuon_H_noHIPM/    1    1
+###########################################################################
+Data     r.kBlack     DoubleMuon_Run2018A            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/DoubleMuon_A/      1    1
+Data     r.kBlack     DoubleMuon_Run2018B            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/DoubleMuon_B/      1    1
+Data     r.kBlack     DoubleMuon_Run2018C            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/DoubleMuon_C/      1    1
+Data     r.kBlack     DoubleMuon_Run2018D            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/DoubleMuon_D/      1    1
