@@ -12,14 +12,26 @@
 #-----------------------------------------------------------
 # BLOCK     COLOR         NAME                       LABEL                       LOCATION OF FRIENDS                                                                   XSEC    ISDATA
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#Diboson         r.kBlue-3       WW                                        ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/WW/                             118700      0 
-#Diboson         r.kBlue-3       WZ                                        ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/WZ/                             47130      0 
-#Diboson         r.kBlue-3       ZZ                                        ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/NTuples/2016_v3/ZZ/                             16523      0 
-TTJets          r.kAzure-4      TTTo2L2Nu_preVFP                                 t#bar{t}                       /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_preVFP/                           831760     0 
-TTJets          r.kAzure-4      TTTo2L2Nu_postVFP                                t#bar{t}                       /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/                          831760     0 
-DYJets          r.kAzure+10     DYJetsToLL_M-50_preVFP                           Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2016/DYJetsToLL_M-50_preVFP/                6077220    0 
-DYJets          r.kAzure+10     DYJetsToLL_M-50_postVFP                          Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2016/DYJetsToLL_M-50_postVFP/               6077220    0 
-#HXX_300_20_10000mm   r.kMagenta+2    HXX_300_20_10000mm                 HXX(300,20,10000)                /eos/user/f/fernance/ggH_HToSSTo4l_MH-300_MS-50_ctauS-10000_TuneCUEP8M1_13TeV-powheg-pythia8-v2/NTuples-Galapago/210216_144823/0000/                1    0
+#Diboson         r.kBlue-3       ZZ_preVFP                                  ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2017/ZZ_preVFP/                      12170      0 
+#Diboson         r.kBlue-3       ZZ_postVFP                                 ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2017/ZZ_postVFP/                     12170      0 
+Diboson         r.kBlue-3       ZZ_2017                                    ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2017/ZZ/                             12170      0 
+Diboson         r.kBlue-3       ZZ_2018                                    ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2018/ZZ/                             12170      0 
+Diboson         r.kBlue-3       WZ_preVFP                                  ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2016/WZ_preVFP/                      27590      0 
+Diboson         r.kBlue-3       WZ_postVFP                                 ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2016/WZ_postVFP/                     27590      0 
+Diboson         r.kBlue-3       WZ_2017                                    ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2017/WZ/                             27590      0 
+Diboson         r.kBlue-3       WZ_2018                                    ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2018/WZ/                             27590      0 
+Diboson         r.kBlue-3       WW_preVFP                                  ZZ,WW,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2016/WW_preVFP/                      75950      0 
+Diboson         r.kBlue-3       WW_postVFP                                 ZZ,WW,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2016/WW_postVFP/                     75950      0 
+Diboson         r.kBlue-3       WW_2017                                    ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2017/WW/                             75950      0 
+Diboson         r.kBlue-3       WW_2018                                    ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2018/WW/                             75950      0 
+TTJets          r.kAzure-4      TTTo2L2Nu_2017                             t#bar{t}                       /eos/user/f/fernance/LLP_Analysis/UL/2017/TTTo2L2Nu/                      87315      0 
+TTJets          r.kAzure-4      TTTo2L2Nu_2018                             t#bar{t}                       /eos/user/f/fernance/LLP_Analysis/UL/2018/TTTo2L2Nu/                      87315      0 
+TTJets          r.kAzure-4      TTTo2L2Nu_preVFP                           t#bar{t}                       /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_preVFP/               87315      0 
+TTJets          r.kAzure-4      TTTo2L2Nu_postVFP                          t#bar{t}                       /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/              87315      0 
+DYJets          r.kAzure+10     DYJetsToLL_M-50_2017                       Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2017/DYJetsToLL_M-50/                5398000    0 
+DYJets          r.kAzure+10     DYJetsToLL_M-50_2018                       Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2018/DYJetsToLL_M-50/                5398000    0 
+DYJets          r.kAzure+10     DYJetsToLL_M-50_preVFP                     Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2016/DYJetsToLL_M-50_preVFP/         5398000    0 
+DYJets          r.kAzure+10     DYJetsToLL_M-50_postVFP                    Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2016/DYJetsToLL_M-50_postVFP/        5398000    0 
 ###########################################################################
 ###########################################################################
 ###   DoubleEG Data   ########################################################################
@@ -33,6 +45,17 @@ Data     r.kBlack     DoubleEG_Run2016F_HIPM       Data     /eos/user/f/fernance
 Data     r.kBlack     DoubleEG_Run2016F_noHIPM     Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleEG_F_noHIPM/    1    1
 Data     r.kBlack     DoubleEG_Run2016G_noHIPM     Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleEG_G_noHIPM/    1    1
 Data     r.kBlack     DoubleEG_Run2016H_noHIPM     Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/DoubleEG_H_noHIPM/    1    1
+###########################################################################
+Data     r.kBlack     DoubleEG_Run2017B            Data     /eos/user/f/fernance/LLP_Analysis/UL/2017/EG_Run2017B/      1    1
+Data     r.kBlack     DoubleEG_Run2017C            Data     /eos/user/f/fernance/LLP_Analysis/UL/2017/EG_Run2017C/      1    1
+Data     r.kBlack     DoubleEG_Run2017D            Data     /eos/user/f/fernance/LLP_Analysis/UL/2017/EG_Run2017D/      1    1
+Data     r.kBlack     DoubleEG_Run2017E            Data     /eos/user/f/fernance/LLP_Analysis/UL/2017/EG_Run2017E/      1    1
+Data     r.kBlack     DoubleEG_Run2017F            Data     /eos/user/f/fernance/LLP_Analysis/UL/2017/EG_Run2017F/      1    1
+###########################################################################
+Data     r.kBlack     EGamma_Run2018A            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/EGamma_A/      1    1
+Data     r.kBlack     EGamma_Run2018B            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/EGamma_B/      1    1
+Data     r.kBlack     EGamma_Run2018C            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/EGamma_C/      1    1
+Data     r.kBlack     EGamma_Run2018D            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/EGamma_D/      1    1
 ###########################################################################
 ###########################################################################
 ###   DoubleMuon Data   ########################################################################

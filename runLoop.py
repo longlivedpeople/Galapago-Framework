@@ -1,34 +1,35 @@
 import ROOT as r
-import optparse
+import argparse
 from include.processHandler import *
 
 ##
 ## -- Parser object
 ##
 
-parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
-parser.add_option('-f', '--file', action='store', type=str, dest='file', default='', help='Path to TFile')
-parser.add_option('-o', '--out', action='store', type=str, dest='out', default='', help='Path to outputdir')
-parser.add_option('-n', '--name', action='store', type=str, dest='name', default='', help='Name of the Tree: MC, SI or DATA')
-parser.add_option('-b', '--block', action='store', type=str, dest='block', default='', help='Block name')
-parser.add_option('-s', '--sample', action='store', type=str, dest='sample', default='', help='Sample name')
-parser.add_option('-t', '--tree', action='store', type=str, dest='tree', default='', help='TFile/TTree number')
-parser.add_option('-l', '--lumiweight', action='store', type=float, dest='lumiweight', help='lumiweight')
-parser.add_option('-d', '--data', action='store_true', dest='data', help='True if DATA')
-parser.add_option('--doEffs', action='store_true', dest='doEffs', help='True if doing only efficiencies')
-(opts, args) = parser.parse_args()
+parser = argparse.ArgumentParser(usage='usage: %prog [args] FilenameWithSamples', version='%prog 1.0')
+parser.add_argument('-f', '--file', action='store', type=str, dest='file', default='', help='Path to TFile')
+parser.add_argument('-o', '--out', action='store', type=str, dest='out', default='', help='Path to outputdir')
+parser.add_argument('-n', '--name', action='store', type=str, dest='name', default='', help='Name of the Tree: MC, SI or DATA')
+parser.add_argument('-b', '--block', action='store', type=str, dest='block', default='', help='Block name')
+parser.add_argument('-s', '--sample', action='store', type=str, dest='sample', default='', help='Sample name')
+parser.add_argument('-t', '--tree', action='store', type=str, dest='tree', default='', help='TFile/TTree number')
+parser.add_argument('-l', '--lumiweight', action='store', type=float, dest='lumiweight', help='lumiweight')
+parser.add_argument('-y', '--year', action='store', dest='year', help='year')
+parser.add_argument('-d', '--data', action='store_true', dest='data', help='True if DATA')
+parser.add_argument('--doEffs', action='store_true', dest='doEffs', help='True if doing only efficiencies')
+args = parser.parse_args()
 
 ##
 ## -- Load TFile and TTree
 ##
 
-tfile = r.TFile(opts.file)
+tfile = r.TFile(args.file)
 ttree = tfile.Get("Events")
 
-if opts.data:
-    process = processHandler(opts.out, opts.name, opts.block, opts.sample, opts.tree, 1, True)
+if args.data:
+    process = processHandler(args.out, args.name, args.block, args.sample, args.tree, 1, True, args.year)
 else:
-    process = processHandler(opts.out, opts.name, opts.block, opts.sample, opts.tree, opts.lumiweight, False)
+    process = processHandler(args.out, args.name, args.block, args.sample, args.tree, args.lumiweight, False, args.year)
 
 ##
 ## -- Loop over the events
@@ -36,7 +37,7 @@ else:
 
 for n,ev in enumerate(ttree):
 
-    if not opts.doEffs:
+    if not args.doEffs:
         process.processEvent(ev)
     else:
         process.countLLs(ev)

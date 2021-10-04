@@ -26,7 +26,7 @@ class CutManager:
 
       ### Trigger paths
       self.epath2016 = self.brackets('ev.HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15 or ev.HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55')
-      self.epath2017 = self.brackets('ev.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_PixelVeto_Mass55 or ev.HLT_DoublePhoton70')
+      self.epath2017 = self.brackets('ev.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_PixelVeto_Mass55 or ev.HLT_DoublePhoton70')
       self.epath2018 = self.brackets('ev.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_NoPixelVeto or ev.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_DoublePhoton70')
       self.mupath2016 = self.brackets('ev.HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10')
       self.mupath2018 = self.brackets('ev.HLT_DoubleL2Mu23NoVtx_2Cha or ev.HLT_DoubleL2Mu23NoVtx_2Cha_CosmicSeed')
@@ -47,11 +47,13 @@ class CutManager:
       self.EE_iso2l          = self.brackets('ev.EE_relisoA[iee] < 0.1 and ev.EE_relisoB[iee] < 0.1')
       self.EE_pt1_35         = self.brackets('ev.EE_leadingPt[iee] > 35')
       self.EE_pt2_25         = self.brackets('ev.EE_subleadingPt[iee] > 25')
-      self.EE_et1_35         = self.brackets('ev.EE_leadingEt[iee] > 35')
+      self.EE_et1_40         = self.brackets('ev.EE_leadingEt[iee] > 40')
       self.EE_et2_25         = self.brackets('ev.EE_subleadingEt[iee] > 25')
       self.EE_normChi2_10    = self.brackets('ev.EE_normalizedChi2[iee] < 10')
       self.EE_normChi2_7     = self.brackets('ev.EE_normalizedChi2[iee] < 7')
       self.EE_mass15         = self.brackets('ev.EE_mass[iee] > 15')
+      self.EE_Lxy_0p5        = self.brackets('ev.EE_Lxy_PV[iee] > 0.5')
+      self.EE_Lxy_0p8        = self.brackets('ev.EE_Lxy_PV[iee] > 0.8')
       self.EE_etanoBE        = self.brackets('(abs(ev.ElectronCandidate_eta[ev.EE_idxA[iee]]) < 1.4442 or abs(ev.ElectronCandidate_eta[ev.EE_idxA[iee]]) > 1.566) and (abs(ev.ElectronCandidate_eta[ev.EE_idxB[iee]]) < 1.4442 or abs(ev.ElectronCandidate_eta[ev.EE_idxB[iee]]) > 1.566)')
       self.EE_eta2           = self.brackets('abs(ev.ElectronCandidate_eta[ev.EE_idxA[iee]]) < 2.0 and abs(ev.ElectronCandidate_eta[ev.EE_idxB[iee]]) < 2.0')
       self.EE_dPhibackward   = self.brackets('abs(ev.EE_dPhi[iee]) > 3.14/2.0')
@@ -62,29 +64,54 @@ class CutManager:
       self.EE_nBSEEg1        = self.brackets('nBSEE > 1')
 
 
+      ## Region definition
+
       self.EE_BS2016        = self.AddList([self.EE_eta2,
-                                            self.EE_pt1_35,
-                                            self.EE_pt2_25,
-                                            self.EE_et1_35,
+                                            self.EE_et1_40,
                                             self.EE_et2_25,
                                             self.EE_mass15,
-                                            self.EE_normChi2_7])
+                                            self.EE_normChi2_10])
 
       self.EE_BS2017        = self.AddList([self.EE_eta2,
-                                            self.EE_pt1_35,
-                                            self.EE_pt2_25,
-                                            self.EE_et1_35,
+                                            self.EE_et1_40,
                                             self.EE_et2_25,
                                             self.EE_mass15,
-                                            self.EE_normChi2_7])
+                                            self.EE_normChi2_10])
 
       self.EE_BS2018        = self.AddList([self.EE_eta2,
-                                            self.EE_pt1_35,
-                                            self.EE_pt2_25,
-                                            self.EE_et1_35,
+                                            self.EE_et1_40,
                                             self.EE_et2_25,
                                             self.EE_mass15,
-                                            self.EE_normChi2_7])
+                                            self.EE_normChi2_10])
+
+      self.EE_sel           = self.AddList([self.EE_iso2l,
+                                            self.EE_OS])
+
+      self.EE_Wjets         = self.AddList([self.EE_iso1l])
+
+      self.EE_QCD           = self.AddList([self.EE_iso0l])
+
+      self.EE_SR            = self.AddList([self.EE_sel,
+                                            self.EE_dPhiforward])
+
+      self.EE_BCR           = self.AddList([self.EE_sel,
+                                            self.EE_dPhibackward])
+
+      self.EE_SRI           = self.AddList([self.EE_SR,
+                                            self.EE_OffZ,
+      #                                      self.EE_Lxy_0p8,
+                                            self.EE_nBSEEe1])
+
+      self.EE_SRII          = self.AddList([self.EE_SR,
+                                            self.EE_nBSEEg1])
+
+      self.EE_BCRI          = self.AddList([self.EE_BCR,
+                                            self.EE_OffZ,
+      #                                      self.EE_Lxy_0p8,
+                                            self.EE_nBSEEe1])
+
+      self.EE_BCRII         = self.AddList([self.EE_BCR,
+                                            self.EE_nBSEEg1])
 
    ####################################
    #######  MM cut definition   #######
@@ -103,12 +130,14 @@ class CutManager:
       self.MM_dPhiforward   = self.brackets('abs(ev.DMDM_dPhi[imm]) < 3.14/2.0')
       self.MM_Ixy6high      = self.brackets('ev.DMDM_trackIxy_PV[imm] > 6')
       self.MM_Ixy6prompt    = self.brackets('ev.DMDM_trackIxy_PV[imm] < 6')
+      self.MM_Lxy_0p2       = self.brackets('ev.DMDM_Lxy_PV[imm] > 0.2')
       self.MM_mass15        = self.brackets('ev.DMDM_mass[imm] > 15')
       self.MM_normChi2_10   = self.brackets('ev.DMDM_normalizedChi2[imm] < 10')
       self.MM_normChi2_5    = self.brackets('ev.DMDM_normalizedChi2[imm] < 5')
       self.MM_cosAlpha0p8   = self.brackets('ev.DMDM_cosAlpha[imm] > -0.80')
+      self.MM_cosAlpha0p9   = self.brackets('ev.DMDM_cosAlpha[imm] > -0.90')
       self.MM_dR0p2         = self.brackets('ev.DMDM_dR[imm] > 0.2')
-      self.MM_pt31          = self.brackets('ev.DGM_pt[ev.DMDM_idxA[imm]] > 31 and ev.DGM_pt[ev.DMDM_idxB[imm]] > 31')
+      self.MM_pt30          = self.brackets('ev.DGM_pt[ev.DMDM_idxA[imm]] > 30 and ev.DGM_pt[ev.DMDM_idxB[imm]] > 30')
       self.MM_pt25          = self.brackets('ev.DGM_pt[ev.DMDM_idxA[imm]] > 25 and ev.DGM_pt[ev.DMDM_idxB[imm]] > 25')
       self.MM_eta2          = self.brackets('abs(ev.DGM_eta[ev.DMDM_idxA[imm]]) < 2.0 and abs(ev.DGM_eta[ev.DMDM_idxB[imm]]) < 2.0')
       self.MM_ID            = self.brackets('abs(ev.DGM_eta[ev.DMDM_idxA[imm]]) < 2.4 and abs(ev.DGM_eta[ev.DMDM_idxB[imm]]) < 2.4 and ev.DGM_pt[ev.DMDM_idxA[imm]] > 10 and ev.DGM_pt[ev.DMDM_idxB[imm]] > 10 and ev.DGM_ptError[ev.DMDM_idxB[imm]]/ev.DGM_pt[ev.DMDM_idxB[imm]] < 0.3 and ev.DGM_ptError[ev.DMDM_idxA[imm]]/ev.DGM_pt[ev.DMDM_idxA[imm]] < 0.3 and ev.DGM_normChi2[ev.DMDM_idxA[imm]] < 10 and ev.DGM_normChi2[ev.DMDM_idxB[imm]] < 10 and ev.DGM_numberOfValidHits[ev.DMDM_idxA[imm]] > 22 and ev.DGM_numberOfValidHits[ev.DMDM_idxB[imm]] > 22')
@@ -116,21 +145,51 @@ class CutManager:
       self.MM_nBSMMg1       = self.brackets('nBSMM > 1')
       
 
-      self.MM_BS2016        = self.AddList([self.MM_pt31,
+      self.MM_BS2016        = self.AddList([self.MM_pt30,
                                            self.MM_ID,
                                            self.MM_eta2,
                                            self.MM_cosAlpha0p8,
                                            self.MM_mass15,
-                                           self.MM_normChi2_5,
+                                           self.MM_normChi2_10,
                                            self.MM_dR0p2])
 
       self.MM_BS2018        = self.AddList([self.MM_pt25,
                                            self.MM_ID,
                                            self.MM_eta2,
-                                           self.MM_cosAlpha0p8,
+                                           self.MM_cosAlpha0p9,
                                            self.MM_mass15,
-                                           self.MM_normChi2_5,
+                                           self.MM_normChi2_10,
                                            self.MM_dR0p2])
+
+      self.MM_sel           = self.AddList([self.MM_iso2l,
+                                            self.MM_OS])
+
+      self.MM_Wjets         = self.AddList([self.MM_iso1l])
+
+      self.MM_QCD           = self.AddList([self.MM_iso0l])
+
+      self.MM_SR            = self.AddList([self.MM_sel,
+                                            self.MM_dPhiforward])
+
+      self.MM_BCR           = self.AddList([self.MM_sel,
+                                            self.MM_dPhibackward])
+
+      self.MM_SRI           = self.AddList([self.MM_SR,
+                                            self.MM_OffZ,
+      #                                      self.MM_Lxy_0p2,
+                                            self.MM_nBSMMe1])
+
+      self.MM_SRII          = self.AddList([self.MM_SR,
+                                            self.MM_nBSMMg1])
+
+      self.MM_BCRI          = self.AddList([self.MM_BCR,
+                                            self.MM_OffZ,
+      #                                      self.MM_Lxy_0p2,
+                                            self.MM_nBSMMe1])
+
+      self.MM_BCRII         = self.AddList([self.MM_BCR,
+                                            self.MM_nBSMMg1])
+
 
    ###########################################
    #######  Logical cut combinations   #######

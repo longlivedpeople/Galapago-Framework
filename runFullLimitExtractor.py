@@ -43,14 +43,14 @@ WORKPATH = os.path.abspath('./') + '/'
 
 ##################################### FUNCTION DEFINITION ########################################
 
-def createDatacards(datacards, Backgrounds, Signals, flavor): 
+def createDatacards(datacards, Backgrounds, Signals, flavor, year): 
 
     treeBKG = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'DATA'), name = 'DATA', isdata = 1 )
     datacard_list = []
 
-    for datacard_name in datacards.keys():
+    for datacard_key in datacards.keys():
 
-        datacard = datacards[datacard_name]
+        datacard = datacards[datacard_key]
         channels = {}
 
         ### Initialize channels with background information
@@ -61,19 +61,32 @@ def createDatacards(datacards, Backgrounds, Signals, flavor):
             directory = datacard[channel_name]['bkg']['dir']
             histogram = datacard[channel_name]['bkg']['histogram']
 
+            print('>>>>> Info channel', channel_name, xmin, xmax, directory, histogram)
+
             channels[channel_name] = DatacardManager.Channel(channel_name, xmin, xmax)
 
             ## Get histogram
             _histo = treeBKG.getLoopTH1F(directory, histogram)
+            print(directory, histogram)
+            c1 = r.TCanvas("", "", 500, 500)
+            c1.SetLogy(1)
+            _histo.Draw('HIST')
+            c1.Print('Pruebafondochannel.png')
             channels[channel_name].addBackground('bkg', _histo)
-
+            print(channels[channel_name].backgrounds[0].rate)
          
         for sample in Signals:
 
-            treeSI = Sample.Tree(fileName = helper.selectSamples(WORKPATH + filename, [sample], 'SI'), name = 'SI', isdata = 0)
+            treeSI = Sample.Tree(fileName = helper.selectSamples(WORKPATH + 'signals_2016.dat', [sample], 'SI'), name = 'SI', isdata = 0)
+
+            sample_split = sample.split('_')
+            mH = sample_split[1]
+            mS = sample_split[2]
+            ctau = sample_split[3]
+            sample_label = 'mH' + mH + '__' + 'mS' + mS + '__' + 'ctau' + ctau + 'mm'
 
             ## Create datacard:
-            datacard_name = 'Datacard' + flavor + '_' + sample + '.txt'
+            datacard_name = 'Datacard__' + flavor + '__' + sample_label + '__' + year  + '.txt'
             output_datacard = DatacardManager.Datacard(datacard_name)
 
             for channel_name in datacard.keys():
@@ -89,16 +102,12 @@ def createDatacards(datacards, Backgrounds, Signals, flavor):
     return datacard_list
 
 
-def executeCombine(_d):
+def executeCombine(_d, year):
 
-    name = _d.replace('Datacard', '')
+    name = _d.replace('Datacard__', '')
     name = name.replace('.txt', '')
-    name = name.replace(name.split('_')[-1], '')
-    if name[-1] == '_': name = name[:-1]
-    #print(name)
-
-    ctau = (_d.split('mm')[0]).split('_')[-1]
-    #print(ctau)
+    name = '__' + name.split('__ctau')[0] + '__era' + year
+    ctau = (_d.split('__ctau')[1]).split('mm')[0]
     
     ### Move to the working dir:
     command = 'combine -M AsymptoticLimits -n {0} -m {1} {2}'.format(name, ctau, _d)
@@ -138,61 +147,52 @@ if __name__ == "__main__":
 
     ############# Signal definition
     Signals = []
-    Signals.append('HXX_400_50_1mm')
-    Signals.append('HXX_400_50_10mm')
-    Signals.append('HXX_400_50_100mm')
-    Signals.append('HXX_400_50_1000mm')
-    Signals.append('HXX_300_20_1mm')
-    Signals.append('HXX_300_20_100mm')
-    Signals.append('HXX_300_20_1000mm')
-    Signals.append('HXX_300_20_10000mm')
-    Signals.append('HXX_300_50_1mm')
-    Signals.append('HXX_300_50_10mm')
-    Signals.append('HXX_300_50_100mm')
-    Signals.append('HXX_300_50_1000mm')
-    Signals.append('HXX_300_50_10000mm')
-    Signals.append('HXX_300_150_1mm')
-    Signals.append('HXX_300_150_10mm')
-    Signals.append('HXX_300_150_100mm')
-    Signals.append('HXX_300_150_1000mm')
-    Signals.append('HXX_300_150_10000mm')
+    Signals.append('HSS_400_50_1_2016')
+    Signals.append('HSS_400_50_10_2016')
+    Signals.append('HSS_400_50_100_2016')
+    Signals.append('HSS_400_50_1000_2016')
+    Signals.append('HSS_400_50_10000_2016')
 
     ############# Muon data definition
-    DoubleMuonB = 'DoubleMuon_Run2016B'
-    DoubleMuonC = 'DoubleMuon_Run2016C'
-    DoubleMuonD = 'DoubleMuon_Run2016D'
-    DoubleMuonE = 'DoubleMuon_Run2016E'
-    DoubleMuonF = 'DoubleMuon_Run2016F'
-    DoubleMuonG = 'DoubleMuon_Run2016G'
-    DoubleMuonH = 'DoubleMuon_Run2016H'
+    DoubleMuon2016 = []
+    DoubleMuon2016.append('DoubleMuon_Run2016B_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016C_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016D_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016E_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016F_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016F_noHIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016G_noHIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016H_noHIPM')
 
-    DoubleMuon_list = []
-    DoubleMuon_list.append(DoubleMuonB)
-    DoubleMuon_list.append(DoubleMuonC)
-    DoubleMuon_list.append(DoubleMuonD)
-    DoubleMuon_list.append(DoubleMuonE)
-    DoubleMuon_list.append(DoubleMuonF)
-    DoubleMuon_list.append(DoubleMuonG)
-    DoubleMuon_list.append(DoubleMuonH)
+    DoubleMuon2018 = []
+    DoubleMuon2018.append('DoubleMuon_Run2018A')
+    DoubleMuon2018.append('DoubleMuon_Run2018B')
+    DoubleMuon2018.append('DoubleMuon_Run2018C')
+    DoubleMuon2018.append('DoubleMuon_Run2018D')
 
+    ############# Electron data definition
+    DoubleEG2016 = []
+    DoubleEG2016.append('DoubleEG_Run2016B_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016C_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016D_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016E_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016F_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016F_noHIPM')
+    DoubleEG2016.append('DoubleEG_Run2016G_noHIPM')
+    DoubleEG2016.append('DoubleEG_Run2016H_noHIPM')
 
-    ############# EG data definition
-    DoubleEGB = 'DoubleEG_Run2016B'
-    DoubleEGC = 'DoubleEG_Run2016C'
-    DoubleEGD = 'DoubleEG_Run2016D'
-    DoubleEGE = 'DoubleEG_Run2016E'
-    DoubleEGF = 'DoubleEG_Run2016F'
-    DoubleEGG = 'DoubleEG_Run2016G'
-    DoubleEGH = 'DoubleEG_Run2016H'
+    DoubleEG2017 = []
+    DoubleEG2017.append('DoubleEG_Run2017B')
+    DoubleEG2017.append('DoubleEG_Run2017C')
+    DoubleEG2017.append('DoubleEG_Run2017D')
+    DoubleEG2017.append('DoubleEG_Run2017E')
+    DoubleEG2017.append('DoubleEG_Run2017F')
 
-    DoubleEG_list = []
-    DoubleEG_list.append(DoubleEGB)
-    DoubleEG_list.append(DoubleEGC)
-    DoubleEG_list.append(DoubleEGD)
-    DoubleEG_list.append(DoubleEGE)
-    DoubleEG_list.append(DoubleEGF)
-    DoubleEG_list.append(DoubleEGG)
-    DoubleEG_list.append(DoubleEGH)
+    EGamma2018 = []
+    EGamma2018.append('EGamma_Run2018A')
+    EGamma2018.append('EGamma_Run2018B')
+    EGamma2018.append('EGamma_Run2018C')
+    EGamma2018.append('EGamma_Run2018D')
 
 
     ########### .dat definition
@@ -200,8 +200,8 @@ if __name__ == "__main__":
 
 
     ########### Data Tree's declaration
-    treeMuonDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_list, 'DATA'), name = 'DATA', isdata = 1 )
-    treeEGDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_list, 'DATA'), name = 'DATA', isdata = 1 )
+    #treeMuonDATA_2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016, 'DATA'), name = 'DATA', isdata = 1 )
+    #treeEGDATA_2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016, 'DATA'), name = 'DATA', isdata = 1 )
 
 
     ###########################################
@@ -224,30 +224,97 @@ if __name__ == "__main__":
     ###########################################
     ########## Loop over datacards
     #####
+    owd = os.getcwd()
 
-    muon_datacard_names = []
-    electron_datacard_names = []
+    muon_datacard_names_2016 = []
+    muon_datacard_names_2018 = []
+    electron_datacard_names_2016 = []
+    electron_datacard_names_2017 = []
+    electron_datacard_names_2018 = []
 
     if doMuons:
-        muon_datacard_names = createDatacards(datacards = muon_datacards, Backgrounds = DoubleMuon_list, Signals = Signals, flavor = 'Muon')
+        muon_datacard_names_2016 = createDatacards(datacards = muon_datacards, Backgrounds = DoubleMuon2016, Signals = Signals, flavor = 'Muon', year = '2016')
+        muon_datacard_names_2018 = createDatacards(datacards = muon_datacards, Backgrounds = DoubleMuon2018, Signals = Signals, flavor = 'Muon', year = '2018')
     if doElectrons:
-        electron_datacard_names = createDatacards(datacards = electron_datacards, Backgrounds = DoubleEG_list, Signals = Signals, flavor = 'Electron')
+        electron_datacard_names_2016 = createDatacards(datacards = electron_datacards, Backgrounds = DoubleEG2016, Signals = Signals, flavor = 'Electron', year = '2016')
+        electron_datacard_names_2017 = createDatacards(datacards = electron_datacards, Backgrounds = DoubleEG2017, Signals = Signals, flavor = 'Electron', year = '2017')
+        electron_datacard_names_2018 = createDatacards(datacards = electron_datacards, Backgrounds = EGamma2018, Signals = Signals, flavor = 'Electron', year = '2018')
+
+
+    # Create combined Muon + Electron datacard
+    joint_datacard_names_2016 = []
+    joint_datacard_names_2018 = []
+    os.chdir(_outdir) 
+    if len(muon_datacard_names_2016) == len(electron_datacard_names_2016):
+        muon_datacard_names_2016.sort()
+        electron_datacard_names_2016.sort()
+        for i in range(0, len(muon_datacard_names_2016)):
+            sufix = muon_datacard_names_2016[i].replace('Datacard__Muon__', '')
+            command = 'combineCards.py ' + muon_datacard_names_2016[i] + ' ' + electron_datacard_names_2016[i] + ' > Datacard__Joint__' + sufix
+            os.system(command)
+            joint_datacard_names_2016.append('Datacard__Joint__' + sufix)
+    if len(muon_datacard_names_2018) == len(electron_datacard_names_2018):
+        muon_datacard_names_2018.sort()
+        electron_datacard_names_2018.sort()
+        for i in range(0, len(muon_datacard_names_2018)):
+            sufix = muon_datacard_names_2018[i].replace('Datacard__Muon__', '')
+            command = 'combineCards.py ' + muon_datacard_names_2018[i] + ' ' + electron_datacard_names_2018[i] + ' > Datacard__Joint__' + sufix
+            os.system(command)
+            joint_datacard_names_2018.append('Datacard__Joint__' + sufix)
+    os.chdir(owd)
+
+
+
+
+    # create single combined years datacard
+    muon_datacard_names_full = []
+    os.chdir(_outdir)
+    if len(muon_datacard_names_2016) == len(muon_datacard_names_2018):
+        muon_datacard_names_2016.sort()
+        muon_datacard_names_2018.sort()
+        for i in range(0, len(muon_datacard_names_2016)):
+            out_name = muon_datacard_names_2016[i].replace('2016', 'Full')
+            command = 'combineCards.py ' + muon_datacard_names_2016[i] + ' ' + muon_datacard_names_2018[i] + ' > ' + out_name
+            os.system(command)
+            muon_datacard_names_full.append(out_name)
+    os.chdir(owd)
+
 
 
     ###########################################
     ########## Extract limits using combine
     #####
-    """
     owd = os.getcwd()
     os.chdir(_outdir) 
     print("> Muon datacards to process: ")
-    for _d in muon_datacard_names:
-        print('  ' +  _d + ' limits:' )
-
-        executeCombine(_d)
-
+    if doMuons:
+        for _d in muon_datacard_names_2016:
+            print('  ' +  _d + ' limits:' )
+            executeCombine(_d, '2016')
+        for _d in muon_datacard_names_2018:
+            print('  ' +  _d + ' limits:' )
+            executeCombine(_d, '2018')
+    print("> Electrons datacards to process: ")
+    if doElectrons:
+        for _d in electron_datacard_names_2016:
+            print('  ' +  _d + ' limits:' )
+            executeCombine(_d, '2016')
+        for _d in electron_datacard_names_2018:
+            print('  ' +  _d + ' limits:' )
+            executeCombine(_d, '2018')
+    print("> Joint datacards to process: ")
+    if doElectrons and doMuons and len(joint_datacard_names_2016) > 0:
+        for _d in joint_datacard_names_2016:
+            print('  ' +  _d + ' limits:' )
+            executeCombine(_d, '2016')
+        for _d in joint_datacard_names_2018:
+            print('  ' +  _d + ' limits:' )
+            executeCombine(_d, '2018')
+    if len(muon_datacard_names_full):
+        for _d in muon_datacard_names_full:
+            print('  ' +  _d + ' limits:' )
+            executeCombine(_d, 'Full')
     os.chdir(owd)
-    """
 
     ###########################################
     ########## Make json
@@ -265,6 +332,8 @@ if __name__ == "__main__":
             grouped[point_id]['json'] = ''
 
         grouped[point_id]['combine'].append(_outdir + _f)
+
+    print(grouped)
 
     # Make json for each group:
     for point_id in grouped.keys():
@@ -286,29 +355,49 @@ if __name__ == "__main__":
     ########## Plot Limits
     #####
 
+    print("----->>>> grouped.keys():")
+    print(grouped.keys())
+
     sets = {}
     for point_id in grouped.keys():
-        mH = point_id.split('_')[2]
-       
+        mH     = point_id.split('mH')[1].split('__')[0]
+        mS     = point_id.split('mS')[1].split('__')[0]
+        year   = point_id.split('era')[1]
+        flavor = point_id.split('__')[1]
         if mH not in sets.keys():
             sets[mH] = {}
-            sets[mH]['jsons'] = []
-            sets[mH]['flavor'] = ''
-            if 'Muon' in point_id:
-                sets[mH]['flavor'] = 'Muon'
-            if 'Electron' in point_id:
-                sets[mH]['flavor'] = 'Electron'
+            sets[mH] = {}
+            sets[mH]['2016'] = {}
+            sets[mH]['2017'] = {}
+            sets[mH]['2018'] = {}
+            sets[mH]['Full'] = {}
+            sets[mH]['2016']['Electron'] = []
+            sets[mH]['2016']['Muon']     = []
+            sets[mH]['2016']['Joint']    = []
+            sets[mH]['2017']['Electron'] = []
+            sets[mH]['2018']['Electron'] = []
+            sets[mH]['2018']['Muon']     = []
+            sets[mH]['2018']['Joint']    = []
+            sets[mH]['Full']['Electron'] = []
+            sets[mH]['Full']['Muon']     = []
+            sets[mH]['Full']['Joint']    = []
 
-        sets[mH]['jsons'].append(grouped[point_id]['json'])
+        sets[mH][year][flavor].append(grouped[point_id]['json']) 
 
     for mH in sets.keys():
-        plot_input = ''
-        for json in sets[mH]['jsons']:
-            plot_input = plot_input + json + ','
-        plot_input = plot_input[:-1]
+        for year in sets[mH].keys():
+            for flavor in sets[mH][year].keys():
 
-        command = 'python include/plotLimits.py -j {0} -m {1} -f {2} -o {3}'.format(plot_input, mH, sets[mH]['flavor'], _outdir)
-        os.system(command)
+                if len(sets[mH][year][flavor]) < 1: continue
+
+                plot_input = ''
+                for json in sets[mH][year][flavor]:
+                    plot_input = plot_input + json + ','
+                    plot_input = plot_input[:-1]
+
+                command = 'python include/plotLimits.py -j {0} -m {1} -f {2} -o {3} -y {4}'.format(plot_input, mH, flavor, _outdir, year)
+                print(command)
+                os.system(command)
 
 
 

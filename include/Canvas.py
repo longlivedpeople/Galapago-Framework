@@ -137,7 +137,11 @@ class Canvas:
       latex.SetTextFont(42);
       latex.SetTextAlign(31);
       latex.SetTextSize(0.068);
-      latex.DrawLatex(0.23, 0.88, "#bf{CMS}")
+
+      if not scy:
+          latex.DrawLatex(0.23, 0.88, "#bf{CMS}")
+      else:
+          latex.DrawLatex(0.30, 0.88, "#bf{CMS}")
 
       latexb = TLatex()
       latexb.SetNDC();
@@ -147,10 +151,24 @@ class Canvas:
       latexb.SetTextAlign(31);
       latexb.SetTextSize(0.045);            
 
-      #if(isData):
-      latexb.DrawLatex(0.39, 0.88, "#it{Preliminary}")
-      #else:
-      #  latexb.DrawLatex(0.38, 0.93, "#it{Simulation}")
+      if(isData):
+         if not scy:
+             latexb.DrawLatex(0.37, 0.88, "#it{Preliminary}")
+         else:
+             latexb.DrawLatex(0.44, 0.88, "#it{Preliminary}")
+      else:
+         if not inProgress:
+             if not scy:
+                 latexb.DrawLatex(0.37, 0.88, "#it{Simulation}")
+             else:
+                 latexb.DrawLatex(0.44, 0.88, "#it{Simulation}")
+         else:
+             if not scy:
+                 latexb.DrawLatex(0.37, 0.88, "#it{Work in progress}")
+             else:
+                 latexb.DrawLatex(0.44, 0.88, "#it{Work in progress}")
+
+
 
       text_lumi =str(lumi)+" fb^{-1} (13 TeV)"
       latexc = TLatex()
@@ -160,7 +178,7 @@ class Canvas:
       latexc.SetTextFont(42);
       latexc.SetTextAlign(31);
       latexc.SetTextSize(0.05);
-      if lumi != '': latexc.DrawLatex(0.88, 0.93, text_lumi)
+      if lumi != '': latexc.DrawLatex(0.88, 0.88, text_lumi)
 
 
    def banner3(self, isData, lumi):
@@ -530,7 +548,6 @@ class Canvas:
       line.Draw('');
 
       pad1.cd()
-      #self.banner2(isData, lumi)
 
       if maxYnumbers:
           r.TGaxis().SetMaxDigits(maxYnumbers)
@@ -550,6 +567,9 @@ class Canvas:
           self.ensurePath(path)
           self.myCanvas.SaveAs(path)
           if not '.root' in pathlog:
+              if self.histos[0].GetMinimum() == 0:
+                  self.histos[0].SetMinimum(0.1) ### log y axis consistency
+              self.histos[0].SetMaximum(100.0*self.histos[0].GetMaximum()) ### log y axis consistency
               pad1.cd()
               pad1.SetLogy()
               self.myCanvas.SaveAs(pathlog)
