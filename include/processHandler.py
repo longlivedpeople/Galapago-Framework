@@ -25,6 +25,7 @@ class processHandler:
         self.samplenumber = samplenumber
         self.lumiweight = lumiweight
         self.isdata = isdata
+        self.year = year
         self.cm = CutManager.CutManager()
         self.sufix = '__{0}__{1}__{2}__{3}'.format(treename, blockname, samplename, str(samplenumber))
 
@@ -78,6 +79,7 @@ class processHandler:
         self.hEE_trackIxy       = {}
         self.hEE_trackIxy_log   = {}
         self.hEE_trackDxy       = {}
+        self.hEE_sigmaD         = {}
         self.hEE_Lxy            = {}
         self.hEE_Ixy            = {}
         self.hEE_leadingEt      = {}
@@ -98,6 +100,7 @@ class processHandler:
         self.hMM_trackIxy       = {}
         self.hMM_trackIxy_log   = {}
         self.hMM_trackDxy       = {}
+        self.hMM_sigmaD         = {}
         self.hMM_Lxy            = {}
         self.hMM_Ixy            = {}
         self.hMM_leadingPt      = {}
@@ -142,18 +145,18 @@ class processHandler:
         self.hMM_nPU[region]            = r.TH1F('hMM{0}_nPU'.format(region) + self.sufix, ';Number of true primary vertices;', 40, 0, 80)
         self.hMM_dPhi[region]           = r.TH1F('hMM{0}_dPhi'.format(region) + self.sufix, ';Dimuon collinearity |#Delta#Phi|;', 30, 0, 3.14)
         self.hMM_dPhi_inv[region]       = r.TH1F('hMM{0}_dPhi_inv'.format(region) + self.sufix, ';Dimuon inverted collinearity #pi - |#Delta#Phi|;', 30, 0, 3.14)
-        self.hMM_mass[region]           = r.TH1F('hMM{0}_mass'.format(region) + self.sufix, ';Dimuon invariant mass m_{{#mu#mu}} (GeV);', 80, 0, 400)
-        self.hMM_cosAlpha[region]       = r.TH1F('hMM{0}_cosAlpha'.format(region) + self.sufix, ';Dimuon cos(#alpha_{{#mu#mu}});', 22, -1.1, 1.1)
-        self.hMM_trackIxy[region]       = r.TH1F('hMM{0}_trackIxy'.format(region) + self.sufix, ';Dimuon |d_{{0}}|/#sigma_{{d}};', 40, 0, 40)
-        self.hMM_trackIxy_log[region]   = r.TH1F('hMM{0}_trackIxy_log'.format(region) + self.sufix, ';Dimuon |d_{{0}}|/#sigma_{{d}};', len(binlog_Ixy)-1, binlog_Ixy)
-        self.hMM_trackDxy[region]       = r.TH1F('hMM{0}_trackDxy'.format(region) + self.sufix, ';Dimuon |d_{{0}}| (cm);', 30, 0, 0.5)
-        self.hMM_Lxy[region]            = r.TH1F('hMM{0}_Lxy'.format(region) + self.sufix, ';Dimuon vertex |L_{{xy}}| (cm);', 40, 0, 10) 
-        self.hMM_Ixy[region]            = r.TH1F('hMM{0}_Ixy'.format(region) + self.sufix, ';Dimuon vertex |L_{{xy}}|/#sigma_{{L}};', 40, 0, 40)
-        self.hMM_leadingPt[region]      = r.TH1F('hMM{0}_leadingPt'.format(region) + self.sufix, ';Dimuon leading p_{{T}};', 30, 0, 300)
-        self.hMM_subleadingPt[region]   = r.TH1F('hMM{0}_subleadingPt'.format(region) + self.sufix, ';Dimuon subleading p_{{T}};', 30, 0, 300)
-        self.hMM_normalizedChi2[region] = r.TH1F('hMM{0}_normalizedChi2'.format(region) + self.sufix, ';Dimuon vertex fit #chi^{{2}}/ndof;', 50, 0, 50)      
-        self.hMM_vx_vy[region]          = r.TH2F('hMM{0}_vx_vy'.format(region) + self.sufix, ';Dimuon vertex v_{{x}} (cm) ; Dimuon vertex v_{{y}} (cm)', 200, -4.0, 4.0, 200, -4.0, 4.0)
-
+        self.hMM_mass[region]           = r.TH1F('hMM{0}_mass'.format(region) + self.sufix, ';Dimuon invariant mass m_{#mu#mu} (GeV);', 80, 0, 400)
+        self.hMM_cosAlpha[region]       = r.TH1F('hMM{0}_cosAlpha'.format(region) + self.sufix, ';Dimuon cos(#alpha_{#mu#mu});', 22, -1.1, 1.1)
+        self.hMM_trackIxy[region]       = r.TH1F('hMM{0}_trackIxy'.format(region) + self.sufix, ';Dimuon |d_{0}|/#sigma_{d};', 40, 0, 40)
+        self.hMM_trackIxy_log[region]   = r.TH1F('hMM{0}_trackIxy_log'.format(region) + self.sufix, ';Dimuon |d_{0}|/#sigma_{d};', len(binlog_Ixy)-1, binlog_Ixy)
+        self.hMM_trackDxy[region]       = r.TH1F('hMM{0}_trackDxy'.format(region) + self.sufix, ';Dimuon |d_{0}| (cm);', 30, 0, 0.5)
+        self.hMM_sigmaD[region]         = r.TH1F('hMM{0}_sigmaD'.format(region) + self.sufix, ';Dimuon #sigma_{d} (cm);', 100, 0, 0.01)
+        self.hMM_Lxy[region]            = r.TH1F('hMM{0}_Lxy'.format(region) + self.sufix, ';Dimuon vertex |L_{xy}| (cm);', 40, 0, 10) 
+        self.hMM_Ixy[region]            = r.TH1F('hMM{0}_Ixy'.format(region) + self.sufix, ';Dimuon vertex |L_{xy}|/#sigma_{L};', 40, 0, 40)
+        self.hMM_leadingPt[region]      = r.TH1F('hMM{0}_leadingPt'.format(region) + self.sufix, ';Dimuon leading p_{T};', 60, 0, 300)
+        self.hMM_subleadingPt[region]   = r.TH1F('hMM{0}_subleadingPt'.format(region) + self.sufix, ';Dimuon subleading p_{T};', 60, 0, 300)
+        self.hMM_normalizedChi2[region] = r.TH1F('hMM{0}_normalizedChi2'.format(region) + self.sufix, ';Dimuon vertex fit #chi^{2}/ndof;', 50, 0, 50)      
+        self.hMM_vx_vy[region]          = r.TH2F('hMM{0}_vx_vy'.format(region) + self.sufix, ';Dimuon vertex v_{x} (cm) ; Dimuon vertex v_{y} (cm)', 200, -4.0, 4.0, 200, -4.0, 4.0)
 
 
     def declareDielectronHistograms(self, region):
@@ -168,17 +171,18 @@ class processHandler:
         self.hEE_nPU[region]            = r.TH1F('hEE{0}_nPU'.format(region) + self.sufix, ';Number of true primary vertices;', 40, 0, 80)
         self.hEE_dPhi[region]           = r.TH1F('hEE{0}_dPhi'.format(region) + self.sufix, ';Dielectron collinearity |#Delta#Phi|;', 30, 0, 3.14)
         self.hEE_dPhi_inv[region]       = r.TH1F('hEE{0}_dPhi_inv'.format(region) + self.sufix, ';Dielectron inverted collinearity #pi - |#Delta#Phi|;', 30, 0, 3.14)
-        self.hEE_mass[region]           = r.TH1F('hEE{0}_mass'.format(region) + self.sufix, ';Dielectron invariant mass m_{{ee}} (GeV);', 80, 0, 400) 
-        self.hEE_cosAlpha[region]       = r.TH1F('hEE{0}_cosAlpha'.format(region) + self.sufix, ';Dielectron cos(#alpha_{{ee}});', 22, -1.1, 1.1)
-        self.hEE_trackIxy[region]       = r.TH1F('hEE{0}_trackIxy'.format(region) + self.sufix, ';Dielectron |d_{{0}}|/#sigma_{{d}};', 40, 0, 40)
-        self.hEE_trackIxy_log[region]   = r.TH1F('hEE{0}_trackIxy_log'.format(region) + self.sufix, ';Dielectron |d_{{0}}|/#sigma_{{d}};', len(binlog_Ixy)-1, binlog_Ixy)
-        self.hEE_trackDxy[region]       = r.TH1F('hEE{0}_trackDxy'.format(region) + self.sufix, ';Dielectron |d_{{0}}| (cm);', 30, 0, 0.5)
-        self.hEE_Lxy[region]            = r.TH1F('hEE{0}_Lxy'.format(region) + self.sufix, ';Dielectron vertex |L_{{xy}}| (cm);', 40, 0, 10)
-        self.hEE_Ixy[region]            = r.TH1F('hEE{0}_Ixy'.format(region) + self.sufix, ';Dielectron vertex |L_{{xy}}|/#sigma_{{L}};', 40, 0, 40) 
-        self.hEE_leadingEt[region]      = r.TH1F('hEE{0}_leadingEt'.format(region) + self.sufix, ';Dielectron leading E_{{T}};', 30, 0, 300)
-        self.hEE_subleadingEt[region]   = r.TH1F('hEE{0}_subleadingEt'.format(region) + self.sufix, ';Dielectron subleading E_{{T}};', 30, 0, 300)
-        self.hEE_normalizedChi2[region] = r.TH1F('hEE{0}_normalizedChi2'.format(region) + self.sufix, ';Dielectron vertex fit #chi^{{2}}/ndof;', 50, 0, 50)
-        self.hEE_vx_vy[region]          = r.TH2F('hEE{0}_vx_vy'.format(region) + self.sufix, ';Dielectron vertex v_{{x}} (cm) ; Dielectron vertex v_{{y}} (cm)', 200, -4.0, 4.0, 200, -4.0, 4.0)
+        self.hEE_mass[region]           = r.TH1F('hEE{0}_mass'.format(region) + self.sufix, ';Dielectron invariant mass m_{ee} (GeV);', 80, 0, 400) 
+        self.hEE_cosAlpha[region]       = r.TH1F('hEE{0}_cosAlpha'.format(region) + self.sufix, ';Dielectron cos(#alpha_{ee});', 22, -1.1, 1.1)
+        self.hEE_trackIxy[region]       = r.TH1F('hEE{0}_trackIxy'.format(region) + self.sufix, ';Dielectron |d_{0}|/#sigma_{d};', 40, 0, 40)
+        self.hEE_trackIxy_log[region]   = r.TH1F('hEE{0}_trackIxy_log'.format(region) + self.sufix, ';Dielectron |d_{0}|/#sigma_{d};', len(binlog_Ixy)-1, binlog_Ixy)
+        self.hEE_trackDxy[region]       = r.TH1F('hEE{0}_trackDxy'.format(region) + self.sufix, ';Dielectron |d_{0}| (cm);', 30, 0, 0.5)
+        self.hEE_sigmaD[region]         = r.TH1F('hEE{0}_sigmaD'.format(region) + self.sufix, ';Dielectron #sigma_{d} (cm);', 100, 0, 0.01)
+        self.hEE_Lxy[region]            = r.TH1F('hEE{0}_Lxy'.format(region) + self.sufix, ';Dielectron vertex |L_{xy}| (cm);', 40, 0, 10)
+        self.hEE_Ixy[region]            = r.TH1F('hEE{0}_Ixy'.format(region) + self.sufix, ';Dielectron vertex |L_{xy}|/#sigma_{L};', 40, 0, 40) 
+        self.hEE_leadingEt[region]      = r.TH1F('hEE{0}_leadingEt'.format(region) + self.sufix, ';Dielectron leading E_{T};', 60, 0, 300)
+        self.hEE_subleadingEt[region]   = r.TH1F('hEE{0}_subleadingEt'.format(region) + self.sufix, ';Dielectron subleading E_{T};', 60, 0, 300)
+        self.hEE_normalizedChi2[region] = r.TH1F('hEE{0}_normalizedChi2'.format(region) + self.sufix, ';Dielectron vertex fit #chi^{2}/ndof;', 50, 0, 50)
+        self.hEE_vx_vy[region]          = r.TH2F('hEE{0}_vx_vy'.format(region) + self.sufix, ';Dielectron vertex v_{x} (cm) ; Dielectron vertex v_{y} (cm)', 200, -4.0, 4.0, 200, -4.0, 4.0)
 
 
 
@@ -195,23 +199,27 @@ class processHandler:
         #### ---- EE Region definition
         #### ---------------------------
 
-        EE_onZCRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_OnZ, self.cm.EE_dPhibackward])
-        EE_onZSRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_OnZ, self.cm.EE_dPhiforward])
-        EE_promptSRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_Ixy6prompt, self.cm.EE_dPhiforward])
-        EE_promptCRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_Ixy6prompt, self.cm.EE_dPhibackward])
+        EE_onZCRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_OnZ, self.cm.EE_dPhibackward, self.cm.EE_nBSEEe1])
+        EE_onZSRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_OnZ, self.cm.EE_dPhiforward, self.cm.EE_nBSEEe1])
+        EE_promptSRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_Ixy6prompt, self.cm.EE_dPhiforward, self.cm.EE_nBSEEe1])
+        EE_promptCRcut = self.cm.AddList([self.cm.EE_OS, self.cm.EE_iso2l, self.cm.EE_Ixy6prompt, self.cm.EE_dPhibackward, self.cm.EE_nBSEEe1])
 
 
         #self.dielectronRegions.append(['sel', self.cm.EE_sel])
         #self.dielectronRegions.append(['Wjets', self.cm.EE_Wjets])
+        #self.dielectronRegions.append(['WjetsSR', self.cm.EE_Wjets_SR])
+        #self.dielectronRegions.append(['WjetsBCR', self.cm.EE_Wjets_BCR])
         #self.dielectronRegions.append(['QCD', self.cm.EE_QCD])
+        #self.dielectronRegions.append(['QCDSR', self.cm.EE_QCD_SR])
+        #self.dielectronRegions.append(['QCDBCR', self.cm.EE_QCD_BCR])
         #self.dielectronRegions.append(['promptCR', EE_promptCRcut])
         #self.dielectronRegions.append(['promptSR', EE_promptSRcut])
         #self.dielectronRegions.append(['onZCR', EE_onZCRcut])
         #self.dielectronRegions.append(['onZSR', EE_onZSRcut])
-        #self.dielectronRegions.append(['SR', self.cm.EE_SR])
+        self.dielectronRegions.append(['SR', self.cm.EE_SR])
         self.dielectronRegions.append(['SRI', self.cm.EE_SRI])
         self.dielectronRegions.append(['SRII', self.cm.EE_SRII])
-        #self.dielectronRegions.append(['BCR', self.cm.EE_BCR])
+        self.dielectronRegions.append(['BCR', self.cm.EE_BCR])
         self.dielectronRegions.append(['BCRI', self.cm.EE_BCRI])
         self.dielectronRegions.append(['BCRII', self.cm.EE_BCRII])
 
@@ -223,22 +231,26 @@ class processHandler:
         #### ---- MM Region definition
         #### ---------------------------
 
-        MM_onZCRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_OnZ, self.cm.MM_dPhibackward])
-        MM_onZSRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_OnZ, self.cm.MM_dPhiforward])
-        MM_promptSRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_Ixy6prompt, self.cm.MM_dPhiforward])
-        MM_promptCRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_Ixy6prompt, self.cm.MM_dPhibackward])
+        MM_onZCRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_OnZ, self.cm.MM_dPhibackward, self.cm.MM_nBSMMe1])
+        MM_onZSRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_OnZ, self.cm.MM_dPhiforward, self.cm.MM_nBSMMe1])
+        MM_promptSRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_Ixy6prompt, self.cm.MM_dPhiforward, self.cm.MM_nBSMMe1])
+        MM_promptCRcut = self.cm.AddList([self.cm.MM_OS, self.cm.MM_iso2l, self.cm.MM_Ixy6prompt, self.cm.MM_dPhibackward, self.cm.MM_nBSMMe1])
 
         #self.dimuonRegions.append(['sel', self.cm.MM_sel])
         #self.dimuonRegions.append(['Wjets', self.cm.MM_Wjets])
+        #self.dimuonRegions.append(['WjetsSR', self.cm.MM_Wjets_SR])
+        #self.dimuonRegions.append(['WjetsBCR', self.cm.MM_Wjets_BCR])
         #self.dimuonRegions.append(['QCD', self.cm.MM_QCD])
+        #self.dimuonRegions.append(['QCDSR', self.cm.MM_QCD_SR])
+        #self.dimuonRegions.append(['QCDBCR', self.cm.MM_QCD_BCR])
         #self.dimuonRegions.append(['promptCR', MM_promptCRcut])
         #self.dimuonRegions.append(['promptSR', MM_promptSRcut])
         #self.dimuonRegions.append(['onZCR', MM_onZCRcut])
         #self.dimuonRegions.append(['onZSR', MM_onZSRcut])
-        #self.dimuonRegions.append(['SR', self.cm.MM_SR])
+        self.dimuonRegions.append(['SR', self.cm.MM_SR])
         self.dimuonRegions.append(['SRI', self.cm.MM_SRI])
         self.dimuonRegions.append(['SRII', self.cm.MM_SRII])
-        #self.dimuonRegions.append(['BCR', self.cm.MM_BCR])
+        self.dimuonRegions.append(['BCR', self.cm.MM_BCR])
         self.dimuonRegions.append(['BCRI', self.cm.MM_BCRI])
         self.dimuonRegions.append(['BCRII', self.cm.MM_BCRII])
 
@@ -362,12 +374,14 @@ class processHandler:
         self.hMM_mass[region].Fill(ev.DMDM_mass[mm_maxIxy], weight)
         self.hMM_trackIxy[region].Fill(ev.DMDM_trackIxy_PV[mm_maxIxy], weight)
         self.hMM_trackIxy_log[region].Fill(ev.DMDM_trackIxy_PV[mm_maxIxy], weight)
-        self.hMM_trackDxy[region].Fill(ev.DMDM_trackDxy_PV[mm_maxIxy], weight)
+        self.hMM_trackDxy[region].Fill(abs(ev.DMDM_trackDxy_PV[mm_maxIxy]), weight)
+        #self.hMM_sigmaD[region].Fill(ev.DMDM_trackIxy_PV[mm_maxIxy]/abs(ev.DMDM_trackDxy_PV[mm_maxIxy]), weight)
         self.hMM_Lxy[region].Fill(abs(ev.DMDM_Lxy_PV[mm_maxIxy]), weight)
         self.hMM_Ixy[region].Fill(abs(ev.DMDM_Ixy_PV[mm_maxIxy]), weight)
         self.hMM_normalizedChi2[region].Fill(ev.DMDM_normalizedChi2[mm_maxIxy], weight)
         self.hMM_cosAlpha[region].Fill(ev.DMDM_cosAlpha[mm_maxIxy], weight)
         self.hMM_leadingPt[region].Fill(ev.DMDM_leadingPt[mm_maxIxy], weight) 
+        self.hMM_subleadingPt[region].Fill(ev.DMDM_subleadingPt[mm_maxIxy], weight) 
         self.hMM_vx_vy[region].Fill(ev.DMDM_vx[mm_maxIxy], ev.DMDM_vy[mm_maxIxy], weight)
 
 
@@ -382,7 +396,8 @@ class processHandler:
     def processDielectrons(self, ev):
 
 
-        if not eval(self.ee_path) or eval(self.mumu_path):
+        #if not eval(self.ee_path) or eval(self.mumu_path):
+        if not eval(self.ee_path):
             return -99, -99
         if ev.nEE < 1:
             return -99, -99
@@ -419,7 +434,8 @@ class processHandler:
         self.hEE_dPhi[region].Fill(abs(ev.EE_dPhi[ee_maxIxy]), weight)
         self.hEE_dPhi_inv[region].Fill(3.14 - abs(ev.EE_dPhi[ee_maxIxy]), weight)
         self.hEE_mass[region].Fill(ev.EE_mass[ee_maxIxy], weight) 
-        self.hEE_trackDxy[region].Fill(ev.EE_trackDxy_PV[ee_maxIxy], weight)
+        self.hEE_trackDxy[region].Fill(abs(ev.EE_trackDxy_PV[ee_maxIxy]), weight)
+        #self.hEE_sigmaD[region].Fill(ev.EE_trackIxy_PV[ee_maxIxy]/abs(ev.EE_trackDxy_PV[ee_maxIxy]), weight)
         self.hEE_trackIxy[region].Fill(ev.EE_trackIxy_PV[ee_maxIxy], weight)
         self.hEE_trackIxy_log[region].Fill(ev.EE_trackIxy_PV[ee_maxIxy], weight)
         self.hEE_Lxy[region].Fill(abs(ev.EE_Lxy_PV[ee_maxIxy]), weight) 
@@ -446,7 +462,7 @@ class processHandler:
 
 
         ### EE Channel
-        if not ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10 and ev.Flag_HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15:
+        if eval(self.ee_path) and not eval(self.mumu_path):
 
             self.hEE_cutEfficiency.Fill(0, weight) 
 
@@ -456,7 +472,6 @@ class processHandler:
             if ev.nEE < 1: return
             self.hEE_cutEfficiency.Fill(2, weight)
 
-            pass_ptmin = False
             pass_etmin = False
             pass_etamax = False
             pass_normChi2max = False
@@ -471,26 +486,22 @@ class processHandler:
 
                 iee = i
 
-                if not eval(self.cm.EE_leadingPt45): continue
-                if not eval(self.cm.EE_subleadingPt28): continue
-                pass_ptmin = True
-
-                if not eval(self.cm.EE_leadingEt45): continue
-                if not eval(self.cm.EE_subleadingEt28): continue
+                if not eval(self.cm.EE_et1_40): continue
+                if not eval(self.cm.EE_et2_25): continue
                 pass_etmin = True
 
                 if not eval(self.cm.EE_eta2): continue
                 if not eval(self.cm.EE_etanoBE): continue
                 pass_etamax = True
 
-                if not eval(self.cm.EE_normChi2_10): continue
-                pass_normChi2max = True 
+                if not eval(self.cm.EE_mass15): continue
+                pass_massmin = True
 
                 if not eval(self.cm.EE_iso2l): continue
                 pass_relisomax = True
 
-                if not eval(self.cm.EE_mass15): continue
-                pass_massmin = True
+                if not eval(self.cm.EE_normChi2_10): continue
+                pass_normChi2max = True 
 
                 if not eval(self.cm.EE_OS): continue
                 pass_oscharge = True
@@ -504,20 +515,19 @@ class processHandler:
                 if not eval(self.cm.EE_Ixy6high): continue
                 pass_Ixymin = True
 
-            if pass_ptmin: self.hEE_cutEfficiency.Fill(3, weight)
-            if pass_etmin: self.hEE_cutEfficiency.Fill(4, weight)
-            if pass_etamax: self.hEE_cutEfficiency.Fill(5, weight)
-            if pass_normChi2max: self.hEE_cutEfficiency.Fill(6, weight)
-            if pass_relisomax: self.hEE_cutEfficiency.Fill(7, weight)
-            if pass_massmin: self.hEE_cutEfficiency.Fill(8, weight)
-            if pass_oscharge: self.hEE_cutEfficiency.Fill(9, weight)
-            if pass_dPhiSR: self.hEE_cutEfficiency.Fill(10, weight)
-            if pass_offZ: self.hEE_cutEfficiency.Fill(11, weight)
-            if pass_Ixymin: self.hEE_cutEfficiency.Fill(12, weight)
+            if pass_etmin: self.hEE_cutEfficiency.Fill(3, weight)
+            if pass_etamax: self.hEE_cutEfficiency.Fill(4, weight)
+            if pass_massmin: self.hEE_cutEfficiency.Fill(5, weight)
+            if pass_relisomax: self.hEE_cutEfficiency.Fill(6, weight)
+            if pass_normChi2max: self.hEE_cutEfficiency.Fill(7, weight)
+            if pass_oscharge: self.hEE_cutEfficiency.Fill(8, weight)
+            if pass_dPhiSR: self.hEE_cutEfficiency.Fill(9, weight)
+            if pass_offZ: self.hEE_cutEfficiency.Fill(10, weight)
+            if pass_Ixymin: self.hEE_cutEfficiency.Fill(11, weight)
 
 
         ### MM Channel
-        if ev.Flag_HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10:
+        if eval(self.mumu_path):
 
             self.hMM_cutEfficiency.Fill(0, weight) 
 
@@ -547,26 +557,28 @@ class processHandler:
                 if not eval(self.cm.MM_ID): continue
                 pass_ID = True
 
-                if not eval(self.cm.MM_pt31): continue
+                if self.year == '2016' and not eval(self.cm.MM_pt30): continue
+                if self.year == '2018' and not eval(self.cm.MM_pt25): continue
                 pass_ptmin = True
 
                 if not eval(self.cm.MM_eta2): continue
                 pass_etamax = True
 
-                if not eval(self.cm.MM_normChi2_10): continue
-                pass_normChi2max = True 
-
                 if not eval(self.cm.MM_dR0p2): continue
                 pass_dRmin = True
+
+                if not eval(self.cm.MM_mass15): continue
+                pass_massmin = True
 
                 if not eval(self.cm.MM_iso2l): continue
                 pass_relisomax = True
 
-                if not eval(self.cm.MM_cosAlpha0p8): continue
-                pass_cosAlphamin = True
+                if not eval(self.cm.MM_normChi2_10): continue
+                pass_normChi2max = True 
 
-                if not eval(self.cm.MM_mass15): continue
-                pass_massmin = True
+                if self.year == '2016' and not eval(self.cm.MM_cosAlpha0p8): continue
+                if self.year == '2018' and not eval(self.cm.MM_cosAlpha0p9): continue
+                pass_cosAlphamin = True
 
                 if not eval(self.cm.MM_OS): continue
                 pass_oscharge = True
@@ -583,11 +595,11 @@ class processHandler:
             if pass_ID: self.hMM_cutEfficiency.Fill(2, weight)
             if pass_ptmin: self.hMM_cutEfficiency.Fill(3, weight)
             if pass_etamax: self.hMM_cutEfficiency.Fill(4, weight)
-            if pass_normChi2max: self.hMM_cutEfficiency.Fill(5, weight)
-            if pass_dRmin: self.hMM_cutEfficiency.Fill(6, weight)
+            if pass_dRmin: self.hMM_cutEfficiency.Fill(5, weight)
+            if pass_massmin: self.hMM_cutEfficiency.Fill(6, weight)
             if pass_relisomax: self.hMM_cutEfficiency.Fill(7, weight)
-            if pass_cosAlphamin: self.hMM_cutEfficiency.Fill(8, weight)
-            if pass_massmin: self.hMM_cutEfficiency.Fill(9, weight)
+            if pass_normChi2max: self.hMM_cutEfficiency.Fill(8, weight)
+            if pass_cosAlphamin: self.hMM_cutEfficiency.Fill(9, weight)
             if pass_oscharge: self.hMM_cutEfficiency.Fill(10, weight)
             if pass_dPhiSR: self.hMM_cutEfficiency.Fill(11, weight)
             if pass_offZ: self.hMM_cutEfficiency.Fill(12, weight)
@@ -603,7 +615,7 @@ class processHandler:
 
     def declareEfficiencies(self):
 
-        self.hEE_cutEfficiency = r.TH1F('hEE_cutEfficiency' + self.sufix, ';; Events with EE / Category', 13, 0, 13)
+        self.hEE_cutEfficiency = r.TH1F('hEE_cutEfficiency' + self.sufix, ';; Events with EE / Category', 12, 0, 12)
         self.hMM_cutEfficiency = r.TH1F('hMM_cutEfficiency' + self.sufix, ';; Events with MM / Category', 14, 0, 14)
 
 

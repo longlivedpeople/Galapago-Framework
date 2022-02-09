@@ -7,7 +7,7 @@ import time
 class Canvas:
    'Common base class for all Samples'
 
-   def __init__(self, name, _format, x1, y1, x2, y2, c, ww=0, hh=0):
+   def __init__(self, name, _format, x1, y1, x2, y2, c, ww=0, hh=0, lsize=0):
       self.name = name
       self.format = _format
       self.plotNames    = [name + "." + i for i in _format.split(',')]
@@ -27,7 +27,10 @@ class Canvas:
       self.myLegend = TLegend(x1, y1, x2, y2)
       self.myLegend.SetFillStyle(0)
       self.myLegend.SetTextFont(42)
-      self.myLegend.SetTextSize(0.03)
+      if lsize:
+         self.myLegend.SetTextSize(lsize)
+      else:
+         self.myLegend.SetTextSize(0.03)
       self.myLegend.SetLineWidth(0)
       self.myLegend.SetBorderSize(0)
       self.myLegend.SetNColumns(c)              
@@ -153,9 +156,9 @@ class Canvas:
 
       if(isData):
          if not scy:
-             latexb.DrawLatex(0.37, 0.88, "#it{Preliminary}")
+             latexb.DrawLatex(0.39, 0.88, "#it{Preliminary}")
          else:
-             latexb.DrawLatex(0.44, 0.88, "#it{Preliminary}")
+             latexb.DrawLatex(0.46, 0.88, "#it{Preliminary}")
       else:
          if not inProgress:
              if not scy:
@@ -178,7 +181,7 @@ class Canvas:
       latexc.SetTextFont(42);
       latexc.SetTextAlign(31);
       latexc.SetTextSize(0.05);
-      if lumi != '': latexc.DrawLatex(0.88, 0.88, text_lumi)
+      if lumi != '': latexc.DrawLatex(0.90, 0.88, text_lumi)
 
 
    def banner3(self, isData, lumi):
@@ -462,7 +465,7 @@ class Canvas:
                   self.makeRate(self.histos[i], self.options[i])
               else:
                   self.histos[i].GetYaxis().SetTitleSize(0.045)
-                  self.histos[i].GetYaxis().SetTitleOffset(1.5);
+                  self.histos[i].GetYaxis().SetTitleOffset(1.25);
                   self.histos[i].GetXaxis().SetLabelSize(0)
                   self.histos[i].GetYaxis().SetLabelSize(0.04)
                   self.histos[i].Draw(self.options[i])
@@ -523,7 +526,7 @@ class Canvas:
           tmp_ratio.GetYaxis().SetNdivisions(4);
           tmp_ratio.GetYaxis().SetTitleOffset(0.5);
           tmp_ratio.GetXaxis().SetLabelSize(0.10);
-          tmp_ratio.GetYaxis().SetTitleSize(0.12);
+          tmp_ratio.GetYaxis().SetTitleSize(0.11);
           tmp_ratio.GetXaxis().SetTitleSize(0.12);
           tmp_ratio.GetXaxis().SetLabelOffset(0.02);
           tmp_ratio.GetXaxis().SetTitle(self.histos[0].GetXaxis().GetTitle());
@@ -541,7 +544,7 @@ class Canvas:
 
       pad2.cd();  
       for rat in ratios:
-          rat.Draw('PE1,same');
+          rat.Draw('P E0 E1,same');
 
       line = TLine(xmin, 1, xmax, 1)
       line.SetLineColor(r.kGray+2);
@@ -569,7 +572,7 @@ class Canvas:
           if not '.root' in pathlog:
               if self.histos[0].GetMinimum() == 0:
                   self.histos[0].SetMinimum(0.1) ### log y axis consistency
-              self.histos[0].SetMaximum(100.0*self.histos[0].GetMaximum()) ### log y axis consistency
+              #self.histos[0].SetMaximum(100.0*self.histos[0].GetMaximum()) ### log y axis consistency
               pad1.cd()
               pad1.SetLogy()
               self.myCanvas.SaveAs(pathlog)

@@ -52,9 +52,11 @@ class CutManager:
       self.EE_normChi2_10    = self.brackets('ev.EE_normalizedChi2[iee] < 10')
       self.EE_normChi2_7     = self.brackets('ev.EE_normalizedChi2[iee] < 7')
       self.EE_mass15         = self.brackets('ev.EE_mass[iee] > 15')
+      self.EE_Lxy_0p2        = self.brackets('ev.EE_Lxy_PV[iee] > 0.2')
       self.EE_Lxy_0p5        = self.brackets('ev.EE_Lxy_PV[iee] > 0.5')
       self.EE_Lxy_0p8        = self.brackets('ev.EE_Lxy_PV[iee] > 0.8')
-      self.EE_etanoBE        = self.brackets('(abs(ev.ElectronCandidate_eta[ev.EE_idxA[iee]]) < 1.4442 or abs(ev.ElectronCandidate_eta[ev.EE_idxA[iee]]) > 1.566) and (abs(ev.ElectronCandidate_eta[ev.EE_idxB[iee]]) < 1.4442 or abs(ev.ElectronCandidate_eta[ev.EE_idxB[iee]]) > 1.566)')
+      self.EE_dxy_0p03       = self.brackets('abs(ev.EE_trackDxy_PV[iee]) > 0.03')
+      self.EE_etanoBE        = self.brackets('(abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxA[iee]]]) < 1.4442 or abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxA[iee]]]) > 1.566) and (abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxB[iee]]]) < 1.4442 or abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxB[iee]]]) > 1.566)')
       self.EE_eta2           = self.brackets('abs(ev.ElectronCandidate_eta[ev.EE_idxA[iee]]) < 2.0 and abs(ev.ElectronCandidate_eta[ev.EE_idxB[iee]]) < 2.0')
       self.EE_dPhibackward   = self.brackets('abs(ev.EE_dPhi[iee]) > 3.14/2.0')
       self.EE_dPhiforward    = self.brackets('abs(ev.EE_dPhi[iee]) < 3.14/2.0')
@@ -70,26 +72,33 @@ class CutManager:
                                             self.EE_et1_40,
                                             self.EE_et2_25,
                                             self.EE_mass15,
+                                            self.EE_etanoBE,
                                             self.EE_normChi2_10])
 
       self.EE_BS2017        = self.AddList([self.EE_eta2,
                                             self.EE_et1_40,
                                             self.EE_et2_25,
                                             self.EE_mass15,
+                                            self.EE_etanoBE,
                                             self.EE_normChi2_10])
 
       self.EE_BS2018        = self.AddList([self.EE_eta2,
                                             self.EE_et1_40,
                                             self.EE_et2_25,
                                             self.EE_mass15,
+                                            self.EE_etanoBE,
                                             self.EE_normChi2_10])
 
       self.EE_sel           = self.AddList([self.EE_iso2l,
                                             self.EE_OS])
 
       self.EE_Wjets         = self.AddList([self.EE_iso1l])
+      self.EE_Wjets_SR      = self.AddList([self.EE_iso1l, self.EE_dPhiforward])
+      self.EE_Wjets_BCR     = self.AddList([self.EE_iso1l, self.EE_dPhibackward])
 
       self.EE_QCD           = self.AddList([self.EE_iso0l])
+      self.EE_QCD_SR        = self.AddList([self.EE_iso0l, self.EE_dPhiforward])
+      self.EE_QCD_BCR       = self.AddList([self.EE_iso0l, self.EE_dPhibackward])
 
       self.EE_SR            = self.AddList([self.EE_sel,
                                             self.EE_dPhiforward])
@@ -99,7 +108,8 @@ class CutManager:
 
       self.EE_SRI           = self.AddList([self.EE_SR,
                                             self.EE_OffZ,
-      #                                      self.EE_Lxy_0p8,
+                                            self.EE_Lxy_0p2,
+                                            self.EE_dxy_0p03,
                                             self.EE_nBSEEe1])
 
       self.EE_SRII          = self.AddList([self.EE_SR,
@@ -107,7 +117,8 @@ class CutManager:
 
       self.EE_BCRI          = self.AddList([self.EE_BCR,
                                             self.EE_OffZ,
-      #                                      self.EE_Lxy_0p8,
+                                            self.EE_Lxy_0p2,
+                                            self.EE_dxy_0p03,
                                             self.EE_nBSEEe1])
 
       self.EE_BCRII         = self.AddList([self.EE_BCR,
@@ -130,6 +141,7 @@ class CutManager:
       self.MM_dPhiforward   = self.brackets('abs(ev.DMDM_dPhi[imm]) < 3.14/2.0')
       self.MM_Ixy6high      = self.brackets('ev.DMDM_trackIxy_PV[imm] > 6')
       self.MM_Ixy6prompt    = self.brackets('ev.DMDM_trackIxy_PV[imm] < 6')
+      self.MM_dxy_0p02      = self.brackets('abs(ev.DMDM_trackDxy_PV[imm]) > 0.02')
       self.MM_Lxy_0p2       = self.brackets('ev.DMDM_Lxy_PV[imm] > 0.2')
       self.MM_mass15        = self.brackets('ev.DMDM_mass[imm] > 15')
       self.MM_normChi2_10   = self.brackets('ev.DMDM_normalizedChi2[imm] < 10')
@@ -140,7 +152,7 @@ class CutManager:
       self.MM_pt30          = self.brackets('ev.DGM_pt[ev.DMDM_idxA[imm]] > 30 and ev.DGM_pt[ev.DMDM_idxB[imm]] > 30')
       self.MM_pt25          = self.brackets('ev.DGM_pt[ev.DMDM_idxA[imm]] > 25 and ev.DGM_pt[ev.DMDM_idxB[imm]] > 25')
       self.MM_eta2          = self.brackets('abs(ev.DGM_eta[ev.DMDM_idxA[imm]]) < 2.0 and abs(ev.DGM_eta[ev.DMDM_idxB[imm]]) < 2.0')
-      self.MM_ID            = self.brackets('abs(ev.DGM_eta[ev.DMDM_idxA[imm]]) < 2.4 and abs(ev.DGM_eta[ev.DMDM_idxB[imm]]) < 2.4 and ev.DGM_pt[ev.DMDM_idxA[imm]] > 10 and ev.DGM_pt[ev.DMDM_idxB[imm]] > 10 and ev.DGM_ptError[ev.DMDM_idxB[imm]]/ev.DGM_pt[ev.DMDM_idxB[imm]] < 0.3 and ev.DGM_ptError[ev.DMDM_idxA[imm]]/ev.DGM_pt[ev.DMDM_idxA[imm]] < 0.3 and ev.DGM_normChi2[ev.DMDM_idxA[imm]] < 10 and ev.DGM_normChi2[ev.DMDM_idxB[imm]] < 10 and ev.DGM_numberOfValidHits[ev.DMDM_idxA[imm]] > 22 and ev.DGM_numberOfValidHits[ev.DMDM_idxB[imm]] > 22')
+      self.MM_ID            = self.brackets('abs(ev.DGM_eta[ev.DMDM_idxA[imm]]) < 2.4 and abs(ev.DGM_eta[ev.DMDM_idxB[imm]]) < 2.4 and ev.DGM_pt[ev.DMDM_idxA[imm]] > 10 and ev.DGM_pt[ev.DMDM_idxB[imm]] > 10 and ev.DGM_ptError[ev.DMDM_idxB[imm]]/ev.DGM_pt[ev.DMDM_idxB[imm]] < 0.3 and ev.DGM_ptError[ev.DMDM_idxA[imm]]/ev.DGM_pt[ev.DMDM_idxA[imm]] < 0.3 and ev.DGM_muonHits[ev.DMDM_idxA[imm]] > 11 and ev.DGM_muonHits[ev.DMDM_idxB[imm]] > 11 and ev.DGM_outerTrackerHits[ev.DMDM_idxA[imm]] > 5 and ev.DGM_outerTrackerHits[ev.DMDM_idxB[imm]] > 5')
       self.MM_nBSMMe1       = self.brackets('nBSMM == 1')
       self.MM_nBSMMg1       = self.brackets('nBSMM > 1')
       
@@ -165,8 +177,16 @@ class CutManager:
                                             self.MM_OS])
 
       self.MM_Wjets         = self.AddList([self.MM_iso1l])
+      self.MM_Wjets_SR      = self.AddList([self.MM_iso1l,
+                                            self.MM_dPhiforward])
+      self.MM_Wjets_BCR     = self.AddList([self.MM_iso1l,
+                                            self.MM_dPhibackward])
 
       self.MM_QCD           = self.AddList([self.MM_iso0l])
+      self.MM_QCD_SR        = self.AddList([self.MM_iso0l,
+                                            self.MM_dPhiforward])
+      self.MM_QCD_BCR       = self.AddList([self.MM_iso0l,
+                                            self.MM_dPhibackward])
 
       self.MM_SR            = self.AddList([self.MM_sel,
                                             self.MM_dPhiforward])
@@ -176,7 +196,8 @@ class CutManager:
 
       self.MM_SRI           = self.AddList([self.MM_SR,
                                             self.MM_OffZ,
-      #                                      self.MM_Lxy_0p2,
+                                            self.MM_Lxy_0p2,
+      #                                      self.MM_dxy_0p02,
                                             self.MM_nBSMMe1])
 
       self.MM_SRII          = self.AddList([self.MM_SR,
@@ -184,7 +205,8 @@ class CutManager:
 
       self.MM_BCRI          = self.AddList([self.MM_BCR,
                                             self.MM_OffZ,
-      #                                      self.MM_Lxy_0p2,
+                                            self.MM_Lxy_0p2,
+      #                                      self.MM_dxy_0p02,
                                             self.MM_nBSMMe1])
 
       self.MM_BCRII         = self.AddList([self.MM_BCR,
