@@ -79,7 +79,7 @@
 
 import ROOT as r
 from   ROOT import gROOT, TCanvas, TFile, TGraphErrors, SetOwnership
-import math, sys, optparse, array, copy, os
+import math, sys, argparse, array, copy, os
 import gc, inspect, __main__
 import numpy as np
 import time
@@ -146,14 +146,16 @@ if __name__ == "__main__":
     print '                  Starting IFCA-LLP analysis...                         '
     print '########################################################################' + bcolors.ENDC
 
-    parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
-    parser.add_option('-o', '--out', action='store', type=str, dest='out', default='', help='Output tag')
-    parser.add_option('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_Legacy.dat', help='dat file')
-    parser.add_option('-q', '--condor', action='store_true', dest='condor', default='', help='Select if you want to send the job a condor queue')
-    parser.add_option('-t', '--test', action='store_true', dest='test', default='', help='Test tag')
-    parser.add_option('--doEffs', action='store_true', dest='doEffs', help='True if doing only efficiencies')
-    (opts, args) = parser.parse_args()
+    parser = argparse.ArgumentParser(usage='usage: %prog [args] FilenameWithSamples', version='%prog 1.0')
+    parser.add_argument('-o', '--out', action='store', type=str, dest='out', default='', help='Output tag')
+    parser.add_argument('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_UltraLegacy.dat', help='dat file')
+    parser.add_argument('-q', '--condor', action='store_true', dest='condor', help='Select if you want to send the job a condor queue')
+    parser.add_argument('-t', '--test', action='store_true', dest='test', default='', help='Test tag')
+    parser.add_argument('--doEffs', action='store_true', dest='doEffs', help='True if doing only efficiencies')
+    args = parser.parse_args()
 
+    doDATA = True
+    doMC = False
 
     ############# Set the TDR plot style
     #r.gROOT.LoadMacro(WORKPATH + 'include/tdrstyle.C+')
@@ -162,96 +164,196 @@ if __name__ == "__main__":
 
 
     ############# Muon data definition
-    DoubleMuon = []
-    DoubleMuon.append('DoubleMuon_Run2016B')
-    DoubleMuon.append('DoubleMuon_Run2016C')
-    DoubleMuon.append('DoubleMuon_Run2016D')
-    DoubleMuon.append('DoubleMuon_Run2016E')
-    DoubleMuon.append('DoubleMuon_Run2016F')
-    DoubleMuon.append('DoubleMuon_Run2016G')
-    DoubleMuon.append('DoubleMuon_Run2016H')
+    DoubleMuon2016 = []
+    DoubleMuon2018 = []
+    DoubleMuon2016.append('DoubleMuon_Run2016B_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016C_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016D_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016E_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016F_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016F_noHIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016G_noHIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016H_noHIPM')
+    DoubleMuon2018.append('DoubleMuon_Run2018A')
+    DoubleMuon2018.append('DoubleMuon_Run2018B')
+    DoubleMuon2018.append('DoubleMuon_Run2018C')
+    DoubleMuon2018.append('DoubleMuon_Run2018D')
 
-    DoubleEG = []
-    DoubleEG.append('DoubleEG_Run2016B')
-    DoubleEG.append('DoubleEG_Run2016C')
-    DoubleEG.append('DoubleEG_Run2016D')
-    DoubleEG.append('DoubleEG_Run2016E')
-    DoubleEG.append('DoubleEG_Run2016F')
-    DoubleEG.append('DoubleEG_Run2016G')
-    DoubleEG.append('DoubleEG_Run2016H')
+    DoubleEG2016 = []
+    DoubleEG2017 = []
+    DoubleEG2018 = []
+    DoubleEG2016.append('DoubleEG_Run2016B_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016C_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016D_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016E_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016F_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016F_noHIPM')
+    DoubleEG2016.append('DoubleEG_Run2016G_noHIPM')
+    DoubleEG2016.append('DoubleEG_Run2016H_noHIPM')
+    DoubleEG2017.append('DoubleEG_Run2017B')
+    DoubleEG2017.append('DoubleEG_Run2017C')
+    DoubleEG2017.append('DoubleEG_Run2017D')
+    DoubleEG2017.append('DoubleEG_Run2017E')
+    DoubleEG2017.append('DoubleEG_Run2017F')
+    DoubleEG2018.append('EGamma_Run2018A')
+    DoubleEG2018.append('EGamma_Run2018B')
+    DoubleEG2018.append('EGamma_Run2018C')
+    DoubleEG2018.append('EGamma_Run2018D')
 
     ############# Background definition
-    Backgrounds = []
-    Backgrounds.append('DYJetsToLL_M-50') 
-    Backgrounds.append('DYJetsToLL_M-10to50') 
-    Backgrounds.append('WW') 
-    Backgrounds.append('WZ') 
-    Backgrounds.append('ZZ') 
-    Backgrounds.append('TT') 
+    Backgrounds_preVFP = []
+    Backgrounds_preVFP.append('DYJetsToLL_M-50_preVFP') 
+    Backgrounds_preVFP.append('TTTo2L2Nu_preVFP') 
+    Backgrounds_preVFP.append('WW_preVFP') 
+    Backgrounds_preVFP.append('WZ_preVFP') 
+    Backgrounds_postVFP = []
+    Backgrounds_postVFP.append('DYJetsToLL_M-50_postVFP') 
+    Backgrounds_postVFP.append('TTTo2L2Nu_postVFP') 
+    Backgrounds_postVFP.append('WW_postVFP') 
+    Backgrounds_postVFP.append('WZ_postVFP') 
+    Backgrounds_2017 = []
+    Backgrounds_2017.append('DYJetsToLL_M-50_2017') 
+    Backgrounds_2017.append('TTTo2L2Nu_2017') 
+    Backgrounds_2017.append('WW_2017') 
+    Backgrounds_2017.append('WZ_2017') 
+    Backgrounds_2017.append('ZZ_2017') 
+    Backgrounds_2018 = []
+    Backgrounds_2018.append('DYJetsToLL_M-50_2018') 
+    Backgrounds_2018.append('TTTo2L2Nu_2018') 
+    Backgrounds_2018.append('WW_2018') 
+    Backgrounds_2018.append('WZ_2018') 
+    Backgrounds_2018.append('ZZ_2018') 
+
+
 
     ############# Signal definition
-    SignalsOld = []
-    SignalsOld.append('HXX_400_50_4mm')
-    SignalsOld.append('HXX_400_50_40mm')
-    SignalsOld.append('HXX_400_50_400mm')
-    Signals = []
-    Signals.append('HXX_400_50_1mm')
-    Signals.append('HXX_400_50_10mm')
-    Signals.append('HXX_400_50_100mm')
-    Signals.append('HXX_400_50_1000mm')
-    Signals.append('HXX_300_20_1mm')
-    Signals.append('HXX_300_20_100mm')
-    Signals.append('HXX_300_20_1000mm')
-    Signals.append('HXX_300_20_10000mm')
-    Signals.append('HXX_300_50_1mm')
-    Signals.append('HXX_300_50_10mm')
-    Signals.append('HXX_300_50_100mm')
-    Signals.append('HXX_300_50_1000mm')
-    Signals.append('HXX_300_50_10000mm')
-    Signals.append('HXX_300_150_1mm')
-    Signals.append('HXX_300_150_10mm')
-    Signals.append('HXX_300_150_100mm')
-    Signals.append('HXX_300_150_1000mm')
-    Signals.append('HXX_300_150_10000mm')
+    Signals_2016 = []
+    Signals_2016.append('HSS_125_50_1_2016')
+    Signals_2016.append('HSS_125_50_10_2016')
+    Signals_2016.append('HSS_125_50_100_2016')
+    Signals_2016.append('HSS_125_50_1000_2016')
+    Signals_2016.append('HSS_125_50_10000_2016')
+    #Signals_2016.append('HSS_125_30_1_2016')
+    #Signals_2016.append('HSS_125_30_10_2016')
+    #Signals_2016.append('HSS_125_30_100_2016')
+    #Signals_2016.append('HSS_125_30_1000_2016')
+    #Signals_2016.append('HSS_125_30_10000_2016')
+    Signals_2016.append('HSS_400_50_1_2016')
+    Signals_2016.append('HSS_400_50_10_2016')
+    Signals_2016.append('HSS_400_50_100_2016')
+    Signals_2016.append('HSS_400_50_1000_2016')
+    Signals_2016.append('HSS_400_50_10000_2016')
+    Signals_2016.append('HSS_1000_350_1_2016')
+    Signals_2016.append('HSS_1000_350_10_2016')
+    Signals_2016.append('HSS_1000_350_100_2016')
+    Signals_2016.append('HSS_1000_350_1000_2016')
+    Signals_2016.append('HSS_1000_350_10000_2016')
+    Signals_2017 = []
+    Signals_2017.append('HSS_125_50_1_2017')
+    Signals_2017.append('HSS_125_50_10_2017')
+    Signals_2017.append('HSS_125_50_100_2017')
+    Signals_2017.append('HSS_125_50_1000_2017')
+    Signals_2017.append('HSS_125_50_10000_2017')
+    """
+    Signals_2017.append('HSS_125_30_1_2017')
+    Signals_2017.append('HSS_125_30_10_2017')
+    Signals_2017.append('HSS_125_30_100_2017')
+    Signals_2017.append('HSS_125_30_1000_2017')
+    Signals_2017.append('HSS_125_30_10000_2017')
+    """
+    Signals_2017.append('HSS_400_50_1_2017')
+    Signals_2017.append('HSS_400_50_10_2017')
+    Signals_2017.append('HSS_400_50_100_2017')
+    Signals_2017.append('HSS_400_50_1000_2017')
+    Signals_2017.append('HSS_400_50_10000_2017')
+    Signals_2017.append('HSS_1000_350_1_2017')
+    Signals_2017.append('HSS_1000_350_10_2017')
+    Signals_2017.append('HSS_1000_350_100_2017')
+    Signals_2017.append('HSS_1000_350_1000_2017')
+    Signals_2017.append('HSS_1000_350_10000_2017')
+    Signals_2018 = []
+    Signals_2018.append('HSS_125_50_1_2018')
+    Signals_2018.append('HSS_125_50_10_2018')
+    Signals_2018.append('HSS_125_50_100_2018')
+    Signals_2018.append('HSS_125_50_1000_2018')
+    Signals_2018.append('HSS_125_50_10000_2018')
+    """
+    Signals_2018.append('HSS_125_30_1_2018')
+    Signals_2018.append('HSS_125_30_10_2018')
+    Signals_2018.append('HSS_125_30_100_2018')
+    Signals_2018.append('HSS_125_30_1000_2018')
+    Signals_2018.append('HSS_125_30_10000_2018')
+    """
+    Signals_2018.append('HSS_400_50_1_2018')
+    Signals_2018.append('HSS_400_50_10_2018')
+    Signals_2018.append('HSS_400_50_100_2018')
+    Signals_2018.append('HSS_400_50_1000_2018')
+    Signals_2018.append('HSS_400_50_10000_2018')
+    Signals_2018.append('HSS_1000_350_1_2018')
+    Signals_2018.append('HSS_1000_350_10_2018')
+    Signals_2018.append('HSS_1000_350_100_2018')
+    Signals_2018.append('HSS_1000_350_1000_2018')
+    Signals_2018.append('HSS_1000_350_10000_2018')
 
-    ############# Parameter definition
+    ############# Luminosity definition
     lumiB = 5.79
     lumiC = 2.57
     lumiD = 4.25
     lumiE = 4.01
-    lumiF = 3.10
+    lumiF = 2.53 # total 3.10
+    lumiF_noHIMP = 0.57
     lumiG = 7.54
     lumiH = 8.61
     lumi =  lumiB + lumiC + lumiD + lumiE + lumiF + lumiG + lumiH# luminosity
 
-    filename = opts.dat
+    lumi_preVFP = 5.79 + 2.57 + 4.25 + 4.01 + 2.53
+    lumi_postVFP = 0.57 + 7.54 + 8.61
+    lumi_2017 = 41.48
+    lumi_2018 = 59.83
 
-    DoubleData = DoubleMuon + DoubleEG
+    filename = args.dat
+
 
     ############# Tree creation
-    treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )
-    treeSI = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Signals, 'SI'), name = 'SI', isdata = 0 )
-    treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleData, 'DATA'), name = 'DATA', isdata = 1 )
+    if not args.condor:
+        treeSI_2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'signals_2016.dat', Signals_2016, 'SI'), name = 'SI', isdata = 0 )
+        treeSI_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'signals_2017.dat', Signals_2017, 'SI'), name = 'SI', isdata = 0 )
+        treeSI_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'signals_2018.dat', Signals_2018, 'SI'), name = 'SI', isdata = 0 )
+    if doDATA:
+        treeDATA2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016 + DoubleEG2016, 'DATA'), name = 'DATA', isdata = 1 )
+        treeDATA2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2017, 'DATA'), name = 'DATA', isdata = 1 )
+        treeDATA2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2018 + DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1 )
+    if doMC:
+        treeMCpreVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds_preVFP, 'DATA'), name = 'MC', isdata = 1 )
+        treeMCpostVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds_postVFP, 'DATA'), name = 'MC', isdata = 1 )
+        treeMC2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds_2017, 'DATA'), name = 'MC', isdata = 1 )
+        treeMC2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds_2018, 'DATA'), name = 'MC', isdata = 1 )
 
     start_time = time.time()
 
     ############# Make output dir
-    if not os.path.exists(WORKPATH +  opts.out + '/'): os.makedirs(WORKPATH +  opts.out + '/')
+    if not os.path.exists(WORKPATH +  args.out + '/'): os.makedirs(WORKPATH +  args.out + '/')
 
     ##################
     ####  Launch  ####
     ##################
     
-    if opts.condor:
-        #treeMC.launchLoop(lumi, WORKPATH +  opts.out + '/', queue = 'longlunch', doEffs = opts.doEffs)
-        treeSI.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch', doEffs = opts.doEffs)
-        treeSIOld.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch', doEffs = opts.doEffs)
-        treeDATA.launchLoop(lumi, WORKPATH + opts.out + '/', queue = 'longlunch', doEffs = opts.doEffs)
+    if args.condor:
+        if doMC:
+            treeMCpreVFP.launchLoop(lumi_preVFP, WORKPATH + args.out + '/', queue = 'workday', doEffs = args.doEffs, year = '2016')
+            treeMCpostVFP.launchLoop(lumi_postVFP, WORKPATH + args.out + '/', queue = 'workday', doEffs = args.doEffs, year = '2016')
+            treeMC2017.launchLoop(lumi_2017, WORKPATH + args.out + '/', queue = 'workday', doEffs = args.doEffs, year = '2017')
+            treeMC2018.launchLoop(lumi_2018, WORKPATH + args.out + '/', queue = 'workday', doEffs = args.doEffs, year = '2018')
+        if doDATA:
+            print('Launching Data...')
+            treeDATA2016.launchLoop(lumi, WORKPATH + args.out + '/', queue = 'workday', doEffs = args.doEffs, year = '2016')
+            treeDATA2017.launchLoop(lumi, WORKPATH + args.out + '/', queue = 'workday', doEffs = args.doEffs, year = '2017')
+            treeDATA2018.launchLoop(lumi, WORKPATH + args.out + '/', queue = 'workday', doEffs = args.doEffs, year = '2018')
+        #treeSI.launchLoop(lumi, WORKPATH + args.out + '/', queue = 'espresso', doEffs = args.doEffs, year = '2016')
     else:
-        #treeMC.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
-        treeSI.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
-        treeSIOld.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
-        treeDATA.Loop(lumi, WORKPATH + opts.out + '/', doEffs = opts.doEffs)
+        treeSI_2016.Loop(lumi_preVFP + lumi_postVFP, WORKPATH + args.out + '/', doEffs = args.doEffs, year = '2016')
+        treeSI_2017.Loop(lumi_2017, WORKPATH + args.out + '/', doEffs = args.doEffs, year = '2017')
+        treeSI_2018.Loop(lumi_2018, WORKPATH + args.out + '/', doEffs = args.doEffs, year = '2018')
     
 
     print("--- %s seconds ---" % (time.time() - start_time))

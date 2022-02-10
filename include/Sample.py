@@ -480,7 +480,7 @@ class Tree:
      return h   
 
 
-   def Loop(self, lumi, outdir, doEffs = False):
+   def Loop(self, lumi, outdir, doEffs = False, year = '2016'):
 
      #
      # Runs a loop over all the events of the trees, of the samples, of the blocks 
@@ -494,9 +494,9 @@ class Tree:
          print("Reading samples: " + s.name)
          for t,ttree in enumerate(s.ttrees):
            if s.isData:
-               process = processHandler(outdir, self.name, b.name, s.name, t, 1, True)
+               process = processHandler(outdir, self.name, b.name, s.name, t, 1, True, year)
            else:
-               process = processHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False)
+               process = processHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, year)
            for n,ev in enumerate(ttree):
                if not doEffs:
                    process.processEvent(ev)
@@ -505,12 +505,13 @@ class Tree:
            process.Write()
 
 
-   def launchLoop(self, lumi, outdir, queue = 'espresso', doEffs = False):
+   def launchLoop(self, lumi, outdir, queue = 'espresso', doEffs = False, year = '2016'):
 
      #
-     # Launches Loop function in CONDOR
-     # TTree <------> Job
-     #
+     # Launches Loop function in CONDOR:
+     # TTree  <----> Job
+     # Sample <----> Cluster with x jobs (x = number of TTrees per sample)
+     # 
 
 
      outdir = outdir + '/' if outdir[-1] != '/' else outdir # outdir correction
@@ -522,7 +523,7 @@ class Tree:
        absdir += path + '/'
 
      # Get command to launch:
-     command = 'python {0}runLoop.py -f {1} -o {2} -n {3} -b {4} -s {5} -t {6} -l {7} '
+     command = 'python {0}runLoop.py -f {1} -o {2} -n {3} -b {4} -s {5} -t {6} -l {7} -y {8} '
      if doEffs: command += '--doEffs '
 
 
@@ -544,24 +545,25 @@ pushd
      # Get condor submission file template:
      subfile = """
 universe                = vanilla
-executable              = $(filename)
-output                  = {1}.out
-error                   = {1}.err
-log                     = {1}.log
+executable              = {1}
+arguments               = $(ProcId)
+output                  = {2}.out
+error                   = {2}.err
+log                     = {2}.log
 Notify_user             = fernance@cern.ch
 +JobFlavour = "{0}" 
-queue filename matching {2}
-""".format(queue, '{0}', '{1}')
+queue {3}
+""".format(queue, '{0}', '{1}', '{2}')
 
      for b in self.blocks:
        for s in b.samples:
          for t,ttree in enumerate(s.ttrees):
 
            if s.isData:
-               scommand = command.format(absdir, s.ftpaths[t], outdir, self.name, b.name, s.name, str(t), str(1.0))
+               scommand = command.format(absdir, s.ftpaths[t], outdir, self.name, b.name, s.name, str(t), str(1.0), year)
                scommand += '-d'
            else:
-               scommand = command.format(absdir, s.ftpaths[t], outdir, self.name, b.name, s.name, str(t), str(lumi*s.lumWeight))
+               scommand = command.format(absdir, s.ftpaths[t], outdir, self.name, b.name, s.name, str(t), str(lumi*s.lumWeight), year)
 
            #print(scommand)
 
@@ -572,19 +574,20 @@ queue filename matching {2}
            _bashfile.write(bashfile.format(scommand))
            _bashfile.close()
 
-           ## Submission file
-           if not os.path.exists(absdir + 'sub/'): os.makedirs(absdir + 'sub/')
-           _subname = absdir + 'sub/' +'sub_{0}_{1}_{2}_{3}.sh'.format(self.name, b.name, s.name, str(t))
-           _subfile = open(_subname, 'w')
-           _subtext = subfile.format(outdir + '{0}_{1}_{2}_{3}'.format(self.name, b.name, s.name, str(t)), _bashname)
-           _subfile.write(_subtext)
-           _subfile.close()
+         ## Submission file
+         if not os.path.exists(absdir + 'sub/'): os.makedirs(absdir + 'sub/')
+         _subname = absdir + 'sub/' +'sub_{0}_{1}_{2}.sh'.format(self.name, b.name, s.name)
+         _bashtemplate = absdir + 'bash/' + 'bash_{0}_{1}_{2}_$(ProcId).sh'.format(self.name, b.name, s.name)
+         _subfile = open(_subname, 'w')
+         _subtext = subfile.format(_bashtemplate, outdir + '{0}_{1}_{2}_$(ProcId)'.format(self.name, b.name, s.name, str(t)), str(len(s.ttrees)))
+         _subfile.write(_subtext)
+         _subfile.close()
 
-           ## Launch and clear
-           os.system('chmod +x ' + _bashname)
-           os.system('chmod +x ' + _subname)
-           os.system('condor_submit ' + _subname)
-           #os.system('rm ' + _subname)
+         ## Launch and clear
+         os.system('chmod +x ' + _bashname)
+         os.system('chmod +x ' + _subname)
+         os.system('condor_submit ' + _subname + ' -batch-name ' + s.name)
+         #os.system('rm ' + _subname)
 
 
    def getTH1FsFromDir(self, inputdir):

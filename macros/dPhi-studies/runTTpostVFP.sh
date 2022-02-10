@@ -1,0 +1,15 @@
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 0
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 1
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 2
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 3
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 4
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 5
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 6
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 7
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 8
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 9
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 10
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 11
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 12
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 13
+toCONDOR python $PWD/plotVertexPattern.py -f /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/TTpostVFP_chunk0.root -t 14

@@ -79,7 +79,7 @@ if __name__ == "__main__":
     print '########################################################################' + bcolors.ENDC
 
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
-    parser.add_option('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_Legacy.dat', help='dat file')
+    parser.add_option('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_UltraLegacy.dat', help='dat file')
     parser.add_option('-r', '--recipe', action='store', type=str, dest='recipe', default='', help='the input dir')
 
     (opts, args) = parser.parse_args()
@@ -96,42 +96,22 @@ if __name__ == "__main__":
 
     ############# Signal definition
     Signals = []
-    Signals.append('HXX_400_50_1mm')
-    Signals.append('HXX_400_50_10mm')
-    Signals.append('HXX_400_50_100mm')
-    Signals.append('HXX_400_50_1000mm')
-    Signals.append('HXX_300_20_1mm')
-    Signals.append('HXX_300_20_100mm')
-    Signals.append('HXX_300_20_1000mm')
-    Signals.append('HXX_300_20_10000mm')
-    Signals.append('HXX_300_50_1mm')
-    Signals.append('HXX_300_50_10mm')
-    Signals.append('HXX_300_50_100mm')
-    Signals.append('HXX_300_50_1000mm')
-    Signals.append('HXX_300_50_10000mm')
-    Signals.append('HXX_300_150_1mm')
-    Signals.append('HXX_300_150_10mm')
-    Signals.append('HXX_300_150_100mm')
-    Signals.append('HXX_300_150_1000mm')
-    Signals.append('HXX_300_150_10000mm')
+    Signals.append('HSS_400_50_1_2016')
+    Signals.append('HSS_400_50_10_2016')
+    Signals.append('HSS_400_50_100_2016')
+    Signals.append('HSS_400_50_1000_2016')
+    Signals.append('HSS_400_50_10000_2016')
 
     ############# Muon data definition
-    DoubleMuonB = 'DoubleMuon_Run2016B'
-    DoubleMuonC = 'DoubleMuon_Run2016C'
-    DoubleMuonD = 'DoubleMuon_Run2016D'
-    DoubleMuonE = 'DoubleMuon_Run2016E'
-    DoubleMuonF = 'DoubleMuon_Run2016F'
-    DoubleMuonG = 'DoubleMuon_Run2016G'
-    DoubleMuonH = 'DoubleMuon_Run2016H'
-
-    DoubleMuon_list = []
-    DoubleMuon_list.append(DoubleMuonB)
-    DoubleMuon_list.append(DoubleMuonC)
-    DoubleMuon_list.append(DoubleMuonD)
-    DoubleMuon_list.append(DoubleMuonE)
-    DoubleMuon_list.append(DoubleMuonF)
-    DoubleMuon_list.append(DoubleMuonG)
-    DoubleMuon_list.append(DoubleMuonH)
+    DoubleMuon2016 = []
+    DoubleMuon2016.append('DoubleMuon_Run2016B_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016C_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016D_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016E_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016F_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016F_noHIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016G_noHIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016H_noHIPM')
 
 
     ########### .dat definition
@@ -139,7 +119,7 @@ if __name__ == "__main__":
 
 
     ########### Data Tree's declaration
-    treeMuonDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_list, 'DATA'), name = 'DATA', isdata = 1 )
+    treeMuonDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016, 'DATA'), name = 'DATA', isdata = 1 )
 
 
 
@@ -178,7 +158,7 @@ if __name__ == "__main__":
          
         for sample in Signals:
 
-            treeSI = Sample.Tree(fileName = helper.selectSamples(WORKPATH + filename, [sample], 'SI'), name = 'SI', isdata = 0)
+            treeSI = Sample.Tree(fileName = helper.selectSamples(WORKPATH + 'signals_2016.dat', [sample], 'SI'), name = 'SI', isdata = 0)
 
             ## Create datacard:
             output_datacard = DatacardManager.Datacard('Datacard_' + sample + '.txt')

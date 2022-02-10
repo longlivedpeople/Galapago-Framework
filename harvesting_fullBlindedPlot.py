@@ -13,8 +13,16 @@ import include.Canvas as Canvas
 import include.CutManager as CutManager
 #from include.Utils import *
 
-
-
+#####################
+#####
+###
+###   Function to plot histograms with signal simulation and estimated background
+###   (could accept either data-driven or Monte Carlo)
+###
+###     - Plots are drawn without ratio nor data in signal region (by the moment)
+###
+#####
+#####################
 
 def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI, rebin = False, lines = [], xlabel = '', outtag = '', ymax = 0.0, LLlabel = '', DATAlabel = '', extralabel = ''):
 
@@ -22,6 +30,7 @@ def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI,
     ### Get histograms
     luminosity = lumi
 
+    print(inputdir, hname_bkg)
     hbkg_ = treeDATA.getLoopTH1F(inputdir, hname_bkg)
     
     ### rebinins:
@@ -34,7 +43,7 @@ def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI,
         hbkg = hbkg_.Clone()
 
     hbkg.SetFillColorAlpha(r.kCyan-6, 0.8) 
-    hbkg.SetLineColor(r.kCyan-6) 
+    hbkg.SetLineColor(r.kCyan-2) 
     hbkg.GetXaxis().SetTitleSize(0.045)
     hbkg.GetYaxis().SetTitleSize(0.045)
 
@@ -44,7 +53,7 @@ def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI,
     hSIS = treeSI.getLoopStack(inputdir, hname_SI)
 
     for _i, _h in enumerate(hSIS.GetHists()):
-        _h.Scale(lumi/35.87)
+        #_h.Scale(lumi/35.87)
         s_histos.append(copy.deepcopy(_h))
 
 
@@ -57,7 +66,7 @@ def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI,
     if not ylog:
         hbkg.SetMaximum(1.3*maxVal)
     else:
-        hbkg.SetMaximum(100000.0*maxVal)
+        hbkg.SetMaximum(100.0*maxVal)
         hbkg.SetMinimum(0.0001)
 
     if ymax: hbkg.SetMaximum(ymax) 
@@ -65,41 +74,32 @@ def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI,
     ### Count background events
     backtotal = 0.0
     for n in range(1, hbkg.GetNbinsX() + 1):
-        if hbkg.GetBinLowEdge(n) > 6.0:
+        if hbkg.GetBinLowEdge(n) > 20.0:
             backtotal += hbkg.GetBinContent(n)
 
-    print(backtotal)
-
-
+    print("background total", backtotal)
 
     ### Canvas object
-    plot = Canvas.Canvas('Blinded_'+hname_bkg, 'png', 0.15, 0.6, 0.6, 0.89, 1)
+    plot = Canvas.Canvas('Blinded_'+hname_bkg, 'png,pdf', 0.15, 0.65, 0.6, 0.89, 1)
     plot.addHisto(hbkg, 'HIST', 'Background (Data-driven)', 'f', '', 1, 0)
     
     ### Add signals:
     for i,_h in enumerate(s_histos):
-        stotal_6 = 0.0
-        stotal_2 = 0.0
-        for n in range(1, _h.GetNbinsX() + 1):
-            if _h.GetBinLowEdge(n) > 6.0:
-                stotal_6 += _h.GetBinContent(n)
-            if _h.GetBinLowEdge(n) > 2.0:
-                stotal_2 += _h.GetBinContent(n)
-                #print('bin', _h.GetBinContent(n))
 
         _h.SetLineWidth(2) # provisional
         masses = eval(_h.GetTitle()[3:])
-        print(masses, stotal_6, stotal_2)
         legend = 'm_{H} = '+str(masses[0])+' GeV, m_{X} = '+str(masses[1])+' GeV, c#tau = '+str(masses[2])+' mm'
         plot.addHisto(_h, 'HIST, SAME', legend, 'l', _h.GetFillColor(), 1, i+1) # Signal
 
     for line in lines:
-        plot.addLine(line, hbkg.GetMinimum(), line, hbkg.GetMaximum(), r.kBlack)
+        plot.addLine(line, hbkg.GetMinimum(), line, hbkg.GetMaximum(), r.kBlack, 2)
 
+    ### Extralabel
+    #plot.addLatex(0.17, 0.8, extralabel, font = 62)
 
     ### Save it
     outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/SRPlots_' + outtag + '/'
-    plot.save(1, 0, ylog, luminosity, '', outputDir = outdir, xlog = False)
+    plot.save(1, 1, ylog, luminosity, '', outputDir = outdir, xlog = False)
 
     
 
@@ -122,143 +122,190 @@ if __name__ == "__main__":
     r.gROOT.SetBatch(1)
     r.setTDRStyle()
 
+    ############# Dat file
+    filename = 'dat/Samples_cern_UltraLegacy.dat'
 
     ############# EG data definition
-    DoubleEGB = 'DoubleEG_Run2016B'
-    DoubleEGC = 'DoubleEG_Run2016C'
-    DoubleEGD = 'DoubleEG_Run2016D'
-    DoubleEGE = 'DoubleEG_Run2016E'
-    DoubleEGF = 'DoubleEG_Run2016F'
-    DoubleEGG = 'DoubleEG_Run2016G'
-    DoubleEGH = 'DoubleEG_Run2016H'
+    DoubleEG2016 = []
+    DoubleEG2016.append('DoubleEG_Run2016B_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016C_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016D_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016E_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016F_HIPM')
+    DoubleEG2016.append('DoubleEG_Run2016F_noHIPM')
+    DoubleEG2016.append('DoubleEG_Run2016G_noHIPM')
+    DoubleEG2016.append('DoubleEG_Run2016H_noHIPM')
+    DoubleEG2017 = []
+    DoubleEG2017.append('DoubleEG_Run2017B')
+    DoubleEG2017.append('DoubleEG_Run2017C')
+    DoubleEG2017.append('DoubleEG_Run2017D')
+    DoubleEG2017.append('DoubleEG_Run2017E')
+    DoubleEG2017.append('DoubleEG_Run2017F')
+    EGamma2018 = []
+    EGamma2018.append('EGamma_Run2018A')
+    EGamma2018.append('EGamma_Run2018B')
+    EGamma2018.append('EGamma_Run2018C')
+    EGamma2018.append('EGamma_Run2018D')
 
-    DoubleEG_list = []
-    DoubleEG_list.append(DoubleEGB)
-    DoubleEG_list.append(DoubleEGC)
-    DoubleEG_list.append(DoubleEGD)
-    DoubleEG_list.append(DoubleEGE)
-    DoubleEG_list.append(DoubleEGF)
-    DoubleEG_list.append(DoubleEGG)
-    DoubleEG_list.append(DoubleEGH)
 
     ############# Muon data definition
-    DoubleMuonB = 'DoubleMuon_Run2016B'
-    DoubleMuonC = 'DoubleMuon_Run2016C'
-    DoubleMuonD = 'DoubleMuon_Run2016D'
-    DoubleMuonE = 'DoubleMuon_Run2016E'
-    DoubleMuonF = 'DoubleMuon_Run2016F'
-    DoubleMuonG = 'DoubleMuon_Run2016G'
-    DoubleMuonH = 'DoubleMuon_Run2016H'
+    DoubleMuon2016 = []
+    DoubleMuon2016.append('DoubleMuon_Run2016B_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016C_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016D_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016E_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016F_HIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016F_noHIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016G_noHIPM')
+    DoubleMuon2016.append('DoubleMuon_Run2016H_noHIPM')
+    DoubleMuon2018 = []
+    DoubleMuon2018.append('DoubleMuon_Run2018A')
+    DoubleMuon2018.append('DoubleMuon_Run2018B')
+    DoubleMuon2018.append('DoubleMuon_Run2018C')
+    DoubleMuon2018.append('DoubleMuon_Run2018D')
 
-    DoubleMuon_list = []
-    DoubleMuon_list.append(DoubleMuonB)
-    DoubleMuon_list.append(DoubleMuonC)
-    DoubleMuon_list.append(DoubleMuonD)
-    DoubleMuon_list.append(DoubleMuonE)
-    DoubleMuon_list.append(DoubleMuonF)
-    DoubleMuon_list.append(DoubleMuonG)
-    DoubleMuon_list.append(DoubleMuonH)
-
-
-    ############# Background definition
-    Backgrounds = []
-    Backgrounds.append('DYJetsToLL_M-50') 
-    Backgrounds.append('DYJetsToLL_M-10to50') 
-    Backgrounds.append('WW') 
-    Backgrounds.append('WZ') 
-    Backgrounds.append('ZZ') 
-    Backgrounds.append('TT') 
 
     ############# Signal definition
-    Signals = []
-    Signals.append('HXX_400_50_4mm')
-    Signals.append('HXX_400_50_40mm')
-    Signals.append('HXX_400_50_400mm')
-    Signals.append('HXX_400_150_400mm')
-    Signals.append('HXX_1000_150_100mm')
-    Signals.append('HXX_1000_150_10mm')
-    Signals.append('HXX_1000_350_350mm')
-    Signals.append('HXX_1000_350_35mm')
-
-    Signals_400_50 = []
-    Signals_400_50.append('HXX_400_50_1mm')
-    Signals_400_50.append('HXX_400_50_10mm')
-    Signals_400_50.append('HXX_400_50_100mm')
-    Signals_400_50.append('HXX_400_50_1000mm')
+    Signals2016 = []
+    Signals2016.append('HSS_400_50_1_2016')
+    Signals2016.append('HSS_400_50_10_2016')
+    Signals2016.append('HSS_400_50_100_2016')
+    Signals2016.append('HSS_400_50_1000_2016')
+    Signals2016.append('HSS_400_50_10000_2016')
+    Signals2017 = []
+    Signals2017.append('HSS_400_50_1_2017')
+    Signals2017.append('HSS_400_50_10_2017')
+    Signals2017.append('HSS_400_50_100_2017')
+    Signals2017.append('HSS_400_50_1000_2017')
+    Signals2017.append('HSS_400_50_10000_2017')
+    Signals2018 = []
+    Signals2018.append('HSS_400_50_1_2018')
+    Signals2018.append('HSS_400_50_10_2018')
+    Signals2018.append('HSS_400_50_100_2018')
+    Signals2018.append('HSS_400_50_1000_2018')
+    Signals2018.append('HSS_400_50_10000_2018')
 
 
     ############# Luminosity definition
-    lumiB = 5.79
-    lumiC = 2.57
-    lumiD = 4.25
-    lumiE = 4.01
-    lumiF = 3.10
-    lumiG = 7.54
-    lumiH = 8.61
-
-    lumiEG = {}
-    lumiEG['DoubleEG_Run2016B'] = lumiB
-    lumiEG['DoubleEG_Run2016C'] = lumiC
-    lumiEG['DoubleEG_Run2016D'] = lumiD
-    lumiEG['DoubleEG_Run2016E'] = lumiE
-    lumiEG['DoubleEG_Run2016F'] = lumiF
-    lumiEG['DoubleEG_Run2016G'] = lumiG
-    lumiEG['DoubleEG_Run2016H'] = lumiH
-
-    lumi_EG = 0.0
-    for dataset in DoubleEG_list: lumi_EG += lumiEG[dataset]
+    lumi2016 = 35.9 # fb-1
+    lumi2017 = 41.5 # fb-1
+    lumi2018 = 59.7 # fb-1
 
 
-    lumiMuon = {}
-    lumiMuon['DoubleMuon_Run2016B'] = lumiB
-    lumiMuon['DoubleMuon_Run2016C'] = lumiC
-    lumiMuon['DoubleMuon_Run2016D'] = lumiD
-    lumiMuon['DoubleMuon_Run2016E'] = lumiE
-    lumiMuon['DoubleMuon_Run2016F'] = lumiF
-    lumiMuon['DoubleMuon_Run2016G'] = lumiG
-    lumiMuon['DoubleMuon_Run2016H'] = lumiH
+    ############# Galapago Tree definitions
+    treeSI_2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'signals_2016.dat', Signals2016, 'SI'), name = 'SI', isdata = 0 )
+    treeSI_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'signals_2017.dat', Signals2017, 'SI'), name = 'SI', isdata = 0 )
+    treeSI_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'signals_2018.dat', Signals2018, 'SI'), name = 'SI', isdata = 0 )
 
-    lumi_Muon = 0.0
-    for dataset in DoubleMuon_list: lumi_Muon += lumiMuon[dataset]
+    treeDATA_EG2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016, 'DATA'), name = 'DATA', isdata = 1 )
+    treeDATA_EG2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2017, 'DATA'), name = 'DATA', isdata = 1 )
+    treeDATA_EG2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, EGamma2018, 'DATA'), name = 'DATA', isdata = 1 )
 
-
-
-
-    #filename = 'dat/Samples_cern_Legacy.dat'
-    filename = 'dat/Samples_cern_fillingv2.dat'
-
-
-    ### Tree SI Tree
-    treeSI_400_50_Legacy = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/Samples_cern_Legacy.dat', Signals_400_50, 'SI'), name = 'SI', isdata = 0 )
-    treeSI_400_50_Old = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/Samples_cern_fillinglow.dat', Signals, 'SI'), name = 'SI', isdata = 0 )
+    treeDATA_Mu2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016, 'DATA'), name = 'DATA', isdata = 1 )
+    treeDATA_Mu2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1 )
 
     ################################
     ######## DoubleEG Plots ########
     ################################
        
-    treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_list, 'DATA'), name = 'DATA', isdata = 1 )
+    #### -> 2016 plots
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hEESRI_mass', hname_bkg = 'hEEBCRI_mass', ylog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hEESRI_trackIxy', hname_bkg = 'hEEBCRI_trackIxy', ylog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hEESRII_trackIxy', hname_bkg = 'hEEBCRII_trackIxy', ylog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hEESRI_trackDxy', hname_bkg = 'hEEBCRI_trackDxy', ylog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, treeSI = treeSI_2016, lines = [0.03], xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hEESRII_trackDxy', hname_bkg = 'hEEBCRII_trackDxy', ylog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hEESRI_Lxy', hname_bkg = 'hEEBCRI_Lxy', ylog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hEESRII_Lxy', hname_bkg = 'hEEBCRII_Lxy', ylog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hEESRI_Ixy', hname_bkg = 'hEEBCRI_Ixy', ylog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hEESRII_Ixy', hname_bkg = 'hEEBCRII_Ixy', ylog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
 
-    #makeBlindedPlot(lumi = lumi_EG, hname_SI = 'hEEoffZSR_nBSEE', hname_bkg = 'hEEoffZCR_nBSEE', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_first', treeSI = treeSI, xlabel = '', outtag = 'nLL-splitting', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
-    #makeBlindedPlot(lumi = lumi_EG, hname_SI = 'hEEoffZSR_ne1_nBSEE', hname_bkg = 'hEEoffZCR_ne1_nBSEE', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_nLL', treeSI = treeSI, xlabel = '', outtag = 'nLL-splitting', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
-    #makeBlindedPlot(lumi = lumi_EG, hname_SI = 'hEEoffZSR_ng1_nBSEE', hname_bkg = 'hEEoffZCR_ng1_nBSEE', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_nLL', treeSI = treeSI, xlabel = '', outtag = 'nLL-splitting', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
-    makeBlindedPlot(lumi = lumi_EG, hname_SI = 'hEEoffZSRne1_trackIxy', hname_bkg = 'hEEoffZCRne1_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = opts.input, treeSI = treeSI_400_50_Legacy, xlabel = '', outtag = 'nLL-splitting_400_50_Legacy', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
-    makeBlindedPlot(lumi = lumi_EG, hname_SI = 'hEEfullZSRng1_trackIxy', hname_bkg = 'hEEfullZCRng1_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = opts.input, treeSI = treeSI_400_50_Legacy, xlabel = '', outtag = 'nLL-splitting_400_50_Legacy', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
-    #makeBlindedPlot(lumi = lumi_EG, hname_SI = 'hEEoffZSRne1_trackIxy', hname_bkg = 'hEEoffZCRne1_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = opts.input, treeSI = treeSI_400_50_Old, xlabel = '', outtag = 'nLL-splitting_400_50_Old', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
-    #makeBlindedPlot(lumi = lumi_EG, hname_SI = 'hEEfullZSRng1_trackIxy', hname_bkg = 'hEEfullZCRng1_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = opts.input, treeSI = treeSI_400_50_Old, xlabel = '', outtag = 'nLL-splitting_400_50_Old', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    ### Cut variables in Signal Region
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hEESR_nBSEE', hname_bkg = 'hEEBCR_nBSEE', ylog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hEESR_mass', hname_bkg = 'hEEBCR_mass', ylog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, treeSI = treeSI_2016, lines = [15.], xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hEESR_leadingEt', hname_bkg = 'hEEBCR_leadingEt', ylog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, treeSI = treeSI_2016, lines = [40.], xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hEESR_subleadingEt', hname_bkg = 'hEEBCR_subleadingEt', ylog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, treeSI = treeSI_2016, lines = [25.], xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hEESR_normalizedChi2', hname_bkg = 'hEEBCR_normalizedChi2', ylog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, treeSI = treeSI_2016, rebin = np.linspace(0.0, 12.0, 13), lines = [10.], xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
 
+    #### -> 2017 plots
+    makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESRI_mass', hname_bkg = 'hEEBCRI_mass', ylog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESRI_trackIxy', hname_bkg = 'hEEBCRI_trackIxy', ylog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESRII_trackIxy', hname_bkg = 'hEEBCRII_trackIxy', ylog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESRI_trackDxy', hname_bkg = 'hEEBCRI_trackDxy', ylog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, treeSI = treeSI_2017, lines = [0.03], xlabel = '', outtag = '2017', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESRII_trackDxy', hname_bkg = 'hEEBCRII_trackDxy', ylog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESRI_Ixy', hname_bkg = 'hEEBCRI_Ixy', ylog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESRII_Ixy', hname_bkg = 'hEEBCRII_Ixy', ylog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESRI_Lxy', hname_bkg = 'hEEBCRI_Lxy', ylog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESRII_Lxy', hname_bkg = 'hEEBCRII_Lxy', ylog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+
+    ### Cut variables in Signal Region
+    makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESR_nBSEE', hname_bkg = 'hEEBCR_nBSEE', ylog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESR_mass', hname_bkg = 'hEEBCR_mass', ylog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, treeSI = treeSI_2017, lines = [15.], xlabel = '', outtag = '2017', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESR_leadingEt', hname_bkg = 'hEEBCR_leadingEt', ylog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, treeSI = treeSI_2017, lines = [40.], xlabel = '', outtag = '2017', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESR_subleadingEt', hname_bkg = 'hEEBCR_subleadingEt', ylog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, treeSI = treeSI_2017, lines = [25.], xlabel = '', outtag = '2017', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESR_normalizedChi2', hname_bkg = 'hEEBCR_normalizedChi2', ylog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, treeSI = treeSI_2017, rebin = np.linspace(0.0, 12.0, 13), lines = [10.], xlabel = '', outtag = '2017', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+
+    #### -> 2018 plots
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hEESRI_mass', hname_bkg = 'hEEBCRI_mass', ylog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hEESRI_trackIxy', hname_bkg = 'hEEBCRI_trackIxy', ylog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hEESRII_trackIxy', hname_bkg = 'hEEBCRII_trackIxy', ylog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hEESRI_trackDxy', hname_bkg = 'hEEBCRI_trackDxy', ylog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, treeSI = treeSI_2018, lines = [0.03], xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hEESRII_trackDxy', hname_bkg = 'hEEBCRII_trackDxy', ylog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hEESRI_Lxy', hname_bkg = 'hEEBCRI_Lxy', ylog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hEESRII_Lxy', hname_bkg = 'hEEBCRII_Lxy', ylog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hEESRI_Ixy', hname_bkg = 'hEEBCRI_Ixy', ylog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hEESRII_Ixy', hname_bkg = 'hEEBCRII_Ixy', ylog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hEESR_nBSEE', hname_bkg = 'hEEBCR_nBSEE', ylog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hEESR_mass', hname_bkg = 'hEEBCR_mass', ylog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, treeSI = treeSI_2018, lines = [15.], xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hEESR_leadingEt', hname_bkg = 'hEEBCR_leadingEt', ylog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, treeSI = treeSI_2018, lines = [40.], xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hEESR_subleadingEt', hname_bkg = 'hEEBCR_subleadingEt', ylog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, treeSI = treeSI_2018, lines = [25.], xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hEESR_normalizedChi2', hname_bkg = 'hEEBCR_normalizedChi2', ylog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, treeSI = treeSI_2018, rebin = np.linspace(0.0, 12.0, 13), lines = [10.], xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = '') 
 
     ##################################
     ######## DoubleMuon Plots ########
     ##################################
     
-    treeDATA = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_list, 'DATA'), name = 'DATA', isdata = 1 )
+    #### -> 2016 plots
 
-    #makeBlindedPlot(lumi = lumi_Muon, hname_SI = 'hMMoffZSR_nBSMM', hname_bkg = 'hMMoffZCR_nBSMM', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_first', treeSI = treeSI, xlabel = '', outtag = 'nLL-splitting', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
-    #makeBlindedPlot(lumi = lumi_Muon, hname_SI = 'hMMoffZSR_ne1_nBSMM', hname_bkg = 'hMMoffZCR_ne1_nBSMM', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_nLL', treeSI = treeSI, xlabel = '', outtag = 'nLL-splitting', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
-    #makeBlindedPlot(lumi = lumi_Muon, hname_SI = 'hMMoffZSR_ng1_nBSMM', hname_bkg = 'hMMoffZCR_ng1_nBSMM', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_nLL', treeSI = treeSI, xlabel = '', outtag = 'nLL-splitting', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
-    #makeBlindedPlot(lumi = lumi_Muon, hname_SI = 'hMMoffZSR_ne1_trackIxy_log', hname_bkg = 'hMMoffZCR_ne1_trackIxy_log', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_nLLnewlog', treeSI = treeSI, xlabel = '', outtag = 'nLL-splitting', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
-    #makeBlindedPlot(lumi = lumi_Muon, hname_SI = 'hMMfullZSR_ng1_trackIxy_log', hname_bkg = 'hMMfullZCR_ng1_trackIxy_log', ylog = True, treeDATA = treeDATA, inputdir = 'histograms_nLLnewlog', treeSI = treeSI, xlabel = '', outtag = 'nLL-splitting', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
-    makeBlindedPlot(lumi = lumi_Muon, hname_SI = 'hMMoffZSRne1_trackIxy', hname_bkg = 'hMMoffZCRne1_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = opts.input, treeSI = treeSI_400_50_Legacy, xlabel = '', outtag = 'nLL-splitting_400_50_Legacy', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
-    makeBlindedPlot(lumi = lumi_Muon, hname_SI = 'hMMfullZSRng1_trackIxy', hname_bkg = 'hMMfullZCRng1_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = opts.input, treeSI = treeSI_400_50_Legacy, xlabel = '', outtag = 'nLL-splitting_400_50_Legacy', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
-    #makeBlindedPlot(lumi = lumi_Muon, hname_SI = 'hMMoffZSRne1_trackIxy', hname_bkg = 'hMMoffZCRne1_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = opts.input, treeSI = treeSI_400_50_Old, xlabel = '', outtag = 'nLL-splitting_400_50_Old', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
-    #makeBlindedPlot(lumi = lumi_Muon, hname_SI = 'hMMfullZSRng1_trackIxy', hname_bkg = 'hMMfullZCRng1_trackIxy', ylog = True, treeDATA = treeDATA, inputdir = opts.input, treeSI = treeSI_400_50_Old, xlabel = '', outtag = 'nLL-splitting_400_50_Old', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSRI_mass', hname_bkg = 'hMMBCRI_mass', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSRI_trackIxy', hname_bkg = 'hMMBCRI_trackIxy', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSRII_trackIxy', hname_bkg = 'hMMBCRII_trackIxy', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSRI_trackDxy', hname_bkg = 'hMMBCRI_trackDxy', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, lines = [0.02], xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSRII_trackDxy', hname_bkg = 'hMMBCRII_trackDxy', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSRI_Lxy', hname_bkg = 'hMMBCRI_Lxy', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSRII_Lxy', hname_bkg = 'hMMBCRII_Lxy', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSRI_Ixy', hname_bkg = 'hMMBCRI_Ixy', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSRII_Ixy', hname_bkg = 'hMMBCRII_Ixy', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+
+
+    ### Cut variables in Signal Region
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSR_nBSMM', hname_bkg = 'hMMBCR_nBSMM', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSR_mass', hname_bkg = 'hMMBCR_mass', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, lines = [15.], xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSR_leadingPt', hname_bkg = 'hMMBCR_leadingPt', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, lines = [30.], xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSR_subleadingPt', hname_bkg = 'hMMBCR_subleadingPt', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, lines = [30.0], xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSR_normalizedChi2', hname_bkg = 'hMMBCR_normalizedChi2', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, rebin = np.linspace(0.0, 12.0, 13), lines = [10.0], xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2016, hname_SI = 'hMMSR_cosAlpha', hname_bkg = 'hMMBCR_cosAlpha', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, treeSI = treeSI_2016, lines = [-0.8], xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+
+
+    #### -> 2018 plots
+
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSRI_mass', hname_bkg = 'hMMBCRI_mass', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSRI_trackIxy', hname_bkg = 'hMMBCRI_trackIxy', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSRII_trackIxy', hname_bkg = 'hMMBCRII_trackIxy', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSRI_trackDxy', hname_bkg = 'hMMBCRI_trackDxy', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, lines = [0.02], xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSRII_trackDxy', hname_bkg = 'hMMBCRII_trackDxy', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSRI_Lxy', hname_bkg = 'hMMBCRI_Lxy', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSRII_Lxy', hname_bkg = 'hMMBCRII_Lxy', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSRI_Ixy', hname_bkg = 'hMMBCRI_Ixy', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSRII_Ixy', hname_bkg = 'hMMBCRII_Ixy', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+
+
+    ### Cut variables in Signal Region
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSR_nBSMM', hname_bkg = 'hMMBCR_nBSMM', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSR_mass', hname_bkg = 'hMMBCR_mass', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, lines = [15.], xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSR_leadingPt', hname_bkg = 'hMMBCR_leadingPt', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, lines = [25.], xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSR_subleadingPt', hname_bkg = 'hMMBCR_subleadingPt', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, lines = [25.0], xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSR_normalizedChi2', hname_bkg = 'hMMBCR_normalizedChi2', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, rebin = np.linspace(0.0, 12.0, 13), lines = [10.0], xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+    makeBlindedPlot(lumi = lumi2018, hname_SI = 'hMMSR_cosAlpha', hname_bkg = 'hMMBCR_cosAlpha', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, treeSI = treeSI_2018, lines = [-0.9], xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = '') 
+
+

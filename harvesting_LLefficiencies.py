@@ -280,67 +280,78 @@ if __name__ == "__main__":
     Backgrounds.append('TT') 
 
     ############# Signal definition
-    Signals_400_50 = []
-    Signals_400_50.append('HXX_400_50_1mm')
-    Signals_400_50.append('HXX_400_50_10mm')
-    Signals_400_50.append('HXX_400_50_100mm')
-    Signals_400_50.append('HXX_400_50_1000mm')
+    Signals_400_50_2016 = []
+    Signals_400_50_2016.append('HSS_400_50_1_2016')
+    Signals_400_50_2016.append('HSS_400_50_10_2016')
+    Signals_400_50_2016.append('HSS_400_50_100_2016')
+    Signals_400_50_2016.append('HSS_400_50_1000_2016')
+    Signals_400_50_2016.append('HSS_400_50_10000_2016')
+    Signals_400_50_2017 = []
+    Signals_400_50_2017.append('HSS_400_50_1_2017')
+    Signals_400_50_2017.append('HSS_400_50_10_2017')
+    Signals_400_50_2017.append('HSS_400_50_100_2017')
+    Signals_400_50_2017.append('HSS_400_50_1000_2017')
+    Signals_400_50_2017.append('HSS_400_50_10000_2017')
+    Signals_400_50_2018 = []
+    Signals_400_50_2018.append('HSS_400_50_1_2018')
+    Signals_400_50_2018.append('HSS_400_50_10_2018')
+    Signals_400_50_2018.append('HSS_400_50_100_2018')
+    Signals_400_50_2018.append('HSS_400_50_1000_2018')
+    Signals_400_50_2018.append('HSS_400_50_10000_2018')
 
+    Signals_1000_350_2018 = []
+    Signals_1000_350_2018.append('HSS_1000_350_1_2018')
+    Signals_1000_350_2018.append('HSS_1000_350_10_2018')
+    Signals_1000_350_2018.append('HSS_1000_350_100_2018')
+    Signals_1000_350_2018.append('HSS_1000_350_1000_2018')
+    Signals_1000_350_2018.append('HSS_1000_350_10000_2018')
 
-    ############# Luminosity definition
-    lumiB = 5.79
-    lumiC = 2.57
-    lumiD = 4.25
-    lumiE = 4.01
-    lumiF = 3.10
-    lumiG = 7.54
-    lumiH = 8.61
-
-    lumi_EG = lumiB + lumiC + lumiD + lumiE + lumiF + lumiG + lumiH
-    lumi_Muon = lumiB + lumiC + lumiD + lumiE + lumiF + lumiG + lumiH
-
-
-
-
-    filename = 'dat/Samples_cern_Legacy.dat'
-    treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )
-    treeSI_400_50 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Signals_400_50, 'MC'), name = 'SI', isdata = 0 )
+    filename = 'dat/Samples_cern_UltraLegacy.dat'
+    #treeMC = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'MC'), name = 'MC', isdata = 0 )
+    treeSI_400_50_2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'signals_2016.dat', Signals_400_50_2016, 'MC'), name = 'SI', isdata = 0 )
+    treeSI_400_50_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'signals_2017.dat', Signals_400_50_2017, 'MC'), name = 'SI', isdata = 0 )
+    treeSI_400_50_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'signals_2018.dat', Signals_400_50_2018, 'MC'), name = 'SI', isdata = 0 )
+    treeSI_1000_350_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'signals_2018.dat', Signals_1000_350_2018, 'MC'), name = 'SI', isdata = 0 )
 
     MMlabels = []
     MMlabels.append('Muon trigger')
     MMlabels.append('Good PV')
     MMlabels.append('Have MM passing ID')
-    MMlabels.append('p_{T} > 31 GeV')
+    MMlabels.append('p_{T} > 25 GeV')
     MMlabels.append('|#eta| < 2')
-    MMlabels.append('Vertex #chi^{2}/ndof < 10')
     MMlabels.append('#Delta R > 0.2')
-    MMlabels.append('Rel. PFIso < 0.2')
-    MMlabels.append('Cosmic muon rejection')
     MMlabels.append('m_{#mu#mu} > 15 GeV')
+    MMlabels.append('Rel. PFIso < 0.2')
+    MMlabels.append('Vertex #chi^{2}/ndof < 10')
+    MMlabels.append('Cosmic muon rejection')
     MMlabels.append('Opposite charge')
-    MMlabels.append('SR: |#Delta#Phi| < #pi/2')
+    MMlabels.append('|#Delta#Phi| < #pi/2')
     MMlabels.append('Off-Z: |m_Z - m_{#mu#mu}| > 10 GeV')
     MMlabels.append('Displaced: |d_{0}|/#sigma_{d} > 6')
 
     #makeEffPlotJoint(lumi_Muon, 'BKG_MMefficiency_2016', 'hMM_cutEfficiency', False, treeMC, WORKPATH + opts.input, MMlabels, outtag = 'LLefficiencies', LLlabel = 'MM', isSignal = False)
-    makeEffPlotJoint(lumi_Muon, 'SI_MMefficiency_2016_400_50', 'hMM_cutEfficiency', False, treeSI_400_50, WORKPATH + opts.input, MMlabels, outtag = 'LLefficiencies', LLlabel = 'MM')
+    makeEffPlotJoint(59.8, 'SI_MMefficiency_2016_400_50', 'hMM_cutEfficiency', False, treeSI_400_50_2016, WORKPATH + opts.input, MMlabels, outtag = 'LLefficiencies', LLlabel = 'MM', era = 2018)
+    makeEffPlotJoint(59.8, 'SI_MMefficiency_2018_400_50', 'hMM_cutEfficiency', False, treeSI_400_50_2018, WORKPATH + opts.input, MMlabels, outtag = 'LLefficiencies', LLlabel = 'MM', era = 2018)
+    makeEffPlotJoint(59.8, 'SI_MMefficiency_2018_1000_350', 'hMM_cutEfficiency', False, treeSI_1000_350_2018, WORKPATH + opts.input, MMlabels, outtag = 'LLefficiencies', LLlabel = 'MM', era = 2018)
 
 
     EElabels = []
     EElabels.append('Photon trigger')
     EElabels.append('Good PV')
     EElabels.append('Have EE passing ID')
-    EElabels.append('p_{T} > 45,28 GeV')
-    EElabels.append('E_{T} > 45,28 GeV')
-    EElabels.append('|#eta| #in [0, 1.4442]U[1.566, 2]')
-    EElabels.append('Vertex #chi^{2}/ndof < 10')
-    EElabels.append('Rel. TrkIso < 0.1')
+    EElabels.append('E_{T} > 40,25 GeV')
+    EElabels.append('|#eta| < 2')
     EElabels.append('m_{ee} > 15 GeV')
+    EElabels.append('Rel. TrkIso < 0.1')
+    EElabels.append('Vertex #chi^{2}/ndof < 10')
     EElabels.append('Opposite charge')
+    EElabels.append('|#Delta#Phi| < #pi/2')
     EElabels.append('Off-Z: |m_Z - m_{ee}| > 10 GeV')
-    EElabels.append('SR: |#Delta#Phi| < #pi/2')
     EElabels.append('Displaced: |d_{0}|/#sigma_{d} > 6')
 
     #makeEffPlotJoint(lumi_EG, 'BKG_EEefficiency_2016', 'hEE_cutEfficiency', False, treeMC, WORKPATH + opts.input, EElabels, outtag = 'LLefficiencies', LLlabel = 'EE', isSignal = False)
-    makeEffPlotJoint(lumi_EG, 'SI_EEefficiency_2016_400_50', 'hEE_cutEfficiency', False, treeSI_400_50, WORKPATH + opts.input, EElabels, outtag = 'LLefficiencies', LLlabel = 'EE')
+    makeEffPlotJoint(59.8, 'SI_EEefficiency_2016_400_50', 'hEE_cutEfficiency', False, treeSI_400_50_2016, WORKPATH + opts.input, EElabels, outtag = 'LLefficiencies', LLlabel = 'EE', era = 2018)
+    makeEffPlotJoint(59.8, 'SI_EEefficiency_2017_400_50', 'hEE_cutEfficiency', False, treeSI_400_50_2017, WORKPATH + opts.input, EElabels, outtag = 'LLefficiencies', LLlabel = 'EE', era = 2018)
+    makeEffPlotJoint(59.8, 'SI_EEefficiency_2018_400_50', 'hEE_cutEfficiency', False, treeSI_400_50_2018, WORKPATH + opts.input, EElabels, outtag = 'LLefficiencies', LLlabel = 'EE', era = 2018)
+    makeEffPlotJoint(59.8, 'SI_EEefficiency_2018_1000_350', 'hEE_cutEfficiency', False, treeSI_1000_350_2018, WORKPATH + opts.input, EElabels, outtag = 'LLefficiencies', LLlabel = 'EE', era = 2018)
 
