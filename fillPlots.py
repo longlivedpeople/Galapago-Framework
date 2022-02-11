@@ -228,27 +228,33 @@ if __name__ == "__main__":
 
     ############# Signal definition
     Signals_2016 = []
-    Signals_2016.append('HSS_125_50_1_2016')
-    Signals_2016.append('HSS_125_50_10_2016')
-    Signals_2016.append('HSS_125_50_100_2016')
-    Signals_2016.append('HSS_125_50_1000_2016')
-    Signals_2016.append('HSS_125_50_10000_2016')
-    #Signals_2016.append('HSS_125_30_1_2016')
-    #Signals_2016.append('HSS_125_30_10_2016')
-    #Signals_2016.append('HSS_125_30_100_2016')
-    #Signals_2016.append('HSS_125_30_1000_2016')
-    #Signals_2016.append('HSS_125_30_10000_2016')
+    #Signals_2016.append('HSS_125_50_1_2016')
+    #Signals_2016.append('HSS_125_50_10_2016')
+    #Signals_2016.append('HSS_125_50_100_2016')
+    #Signals_2016.append('HSS_125_50_1000_2016')
+    #Signals_2016.append('HSS_125_50_10000_2016')
+    Signals_2016.append('HSS_125_30_1_2016')
+    Signals_2016.append('HSS_125_30_10_2016')
+    Signals_2016.append('HSS_125_30_100_2016')
+    Signals_2016.append('HSS_125_30_1000_2016')
+    Signals_2016.append('HSS_125_30_10000_2016')
     Signals_2016.append('HSS_400_50_1_2016')
     Signals_2016.append('HSS_400_50_10_2016')
     Signals_2016.append('HSS_400_50_100_2016')
     Signals_2016.append('HSS_400_50_1000_2016')
     Signals_2016.append('HSS_400_50_10000_2016')
-    Signals_2016.append('HSS_1000_350_1_2016')
-    Signals_2016.append('HSS_1000_350_10_2016')
-    Signals_2016.append('HSS_1000_350_100_2016')
-    Signals_2016.append('HSS_1000_350_1000_2016')
-    Signals_2016.append('HSS_1000_350_10000_2016')
+    #Signals_2016.append('HSS_1000_350_1_2016')
+    #Signals_2016.append('HSS_1000_350_10_2016')
+    #Signals_2016.append('HSS_1000_350_100_2016')
+    #Signals_2016.append('HSS_1000_350_1000_2016')
+    #Signals_2016.append('HSS_1000_350_10000_2016')
+    Signals_2016.append('HSS_1000_150_1_2016')
+    Signals_2016.append('HSS_1000_150_10_2016')
+    Signals_2016.append('HSS_1000_150_100_2016')
+    Signals_2016.append('HSS_1000_150_1000_2016')
+    Signals_2016.append('HSS_1000_150_10000_2016')
     Signals_2017 = []
+    """
     Signals_2017.append('HSS_125_50_1_2017')
     Signals_2017.append('HSS_125_50_10_2017')
     Signals_2017.append('HSS_125_50_100_2017')
@@ -260,18 +266,24 @@ if __name__ == "__main__":
     Signals_2017.append('HSS_125_30_100_2017')
     Signals_2017.append('HSS_125_30_1000_2017')
     Signals_2017.append('HSS_125_30_10000_2017')
-    """
+
     Signals_2017.append('HSS_400_50_1_2017')
     Signals_2017.append('HSS_400_50_10_2017')
     Signals_2017.append('HSS_400_50_100_2017')
     Signals_2017.append('HSS_400_50_1000_2017')
     Signals_2017.append('HSS_400_50_10000_2017')
-    Signals_2017.append('HSS_1000_350_1_2017')
-    Signals_2017.append('HSS_1000_350_10_2017')
-    Signals_2017.append('HSS_1000_350_100_2017')
-    Signals_2017.append('HSS_1000_350_1000_2017')
-    Signals_2017.append('HSS_1000_350_10000_2017')
+    #Signals_2017.append('HSS_1000_350_1_2017')
+    #Signals_2017.append('HSS_1000_350_10_2017')
+    #Signals_2017.append('HSS_1000_350_100_2017')
+    #Signals_2017.append('HSS_1000_350_1000_2017')
+    #Signals_2017.append('HSS_1000_350_10000_2017')
+    Signals_2017.append('HSS_1000_150_1_2017')
+    Signals_2017.append('HSS_1000_150_10_2017')
+    Signals_2017.append('HSS_1000_150_100_2017')
+    Signals_2017.append('HSS_1000_150_1000_2017')
+    Signals_2017.append('HSS_1000_150_10000_2017')
     Signals_2018 = []
+    """
     Signals_2018.append('HSS_125_50_1_2018')
     Signals_2018.append('HSS_125_50_10_2018')
     Signals_2018.append('HSS_125_50_100_2018')
@@ -283,17 +295,24 @@ if __name__ == "__main__":
     Signals_2018.append('HSS_125_30_100_2018')
     Signals_2018.append('HSS_125_30_1000_2018')
     Signals_2018.append('HSS_125_30_10000_2018')
-    """
+
     Signals_2018.append('HSS_400_50_1_2018')
     Signals_2018.append('HSS_400_50_10_2018')
     Signals_2018.append('HSS_400_50_100_2018')
     Signals_2018.append('HSS_400_50_1000_2018')
     Signals_2018.append('HSS_400_50_10000_2018')
+    """
     Signals_2018.append('HSS_1000_350_1_2018')
     Signals_2018.append('HSS_1000_350_10_2018')
     Signals_2018.append('HSS_1000_350_100_2018')
     Signals_2018.append('HSS_1000_350_1000_2018')
     Signals_2018.append('HSS_1000_350_10000_2018')
+    """
+    Signals_2018.append('HSS_1000_150_1_2018')
+    Signals_2018.append('HSS_1000_150_10_2018')
+    Signals_2018.append('HSS_1000_150_100_2018')
+    Signals_2018.append('HSS_1000_150_1000_2018')
+    Signals_2018.append('HSS_1000_150_10000_2018')
 
     ############# Luminosity definition
     lumiB = 5.79
@@ -316,9 +335,9 @@ if __name__ == "__main__":
 
     ############# Tree creation
     if not args.condor:
-        treeSI_2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'signals_2016.dat', Signals_2016, 'SI'), name = 'SI', isdata = 0 )
-        treeSI_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'signals_2017.dat', Signals_2017, 'SI'), name = 'SI', isdata = 0 )
-        treeSI_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'signals_2018.dat', Signals_2018, 'SI'), name = 'SI', isdata = 0 )
+        treeSI_2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/signals_2016UL.dat', Signals_2016, 'SI'), name = 'SI', isdata = 0 )
+        treeSI_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/signals_2017UL.dat', Signals_2017, 'SI'), name = 'SI', isdata = 0 )
+        treeSI_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/signals_2018UL.dat', Signals_2018, 'SI'), name = 'SI', isdata = 0 )
     if doDATA:
         treeDATA2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016 + DoubleEG2016, 'DATA'), name = 'DATA', isdata = 1 )
         treeDATA2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2017, 'DATA'), name = 'DATA', isdata = 1 )
