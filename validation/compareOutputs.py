@@ -50,7 +50,7 @@ if files1 != files2:
     exit()
 
 checks = [] # fail: 0 ; success: 1; cannot compare: -1
-
+failed = []
 for filename in files1:
     print(">> Validating " + filename + '...')
     tfile1 = r.TFile(input1 + filename)
@@ -58,9 +58,14 @@ for filename in files1:
 
     histos1 = [th1f.GetName() for th1f in tfile1.GetListOfKeys()]
     histos2 = [th1f.GetName() for th1f in tfile2.GetListOfKeys()]
+    histos1.sort()
+    histos2.sort()
+
 
     if histos1 != histos2:
         print(" > The histograms are not the same")
+        print(" > Histograms not shared:")
+        print(set(histos1) - set(histos2))
         print(" > Exiting...")
         exit()
 
@@ -79,6 +84,7 @@ for filename in files1:
 
         if h1.GetEntries() != h2.GetEntries() or h1.GetMean() != h2.GetMean() or h1.GetRMS() != h2.GetRMS():
             checks.append(0)
+            failed.append([filename, histo])
         else:
             checks.append(1)
 
@@ -90,5 +96,6 @@ print(">>    - %d are indetermined" % checks.count(-1))
 print(">>    - %d successed" % checks.count(1))
 print(">>    - %d failed" % checks.count(0))
 
+print(failed)
 
 
