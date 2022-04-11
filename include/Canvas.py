@@ -96,40 +96,47 @@ class Canvas:
       latexc.SetTextSize(0.04);
       latexc.DrawLatex(0.90, 0.93, text_lumi)                
 
-   def banner2(self, isData, lumi, scy = False, inProgress = False):
-    
+   def bannerInFrame(self, isData, lumi, inProgress = False):
+     
       latex = TLatex()
-      latex.SetNDC();
-      latex.SetTextAngle(0);
-      latex.SetTextColor(r.kBlack);
-      latex.SetTextFont(42);
-      latex.SetTextAlign(31);
-      latex.SetTextSize(0.06);
-      latex.DrawLatex(0.23, 0.93, "#bf{CMS}")
+      latex.SetNDC();                         
+      latex.SetTextAngle(0);                  
+      latex.SetTextColor(r.kBlack);           
+      latex.SetTextFont(42);                  
+      latex.SetTextAlign(11);                 
+      latex.SetTextSize(0.05);                
+      latex.DrawLatex(0.17, 0.84, "#bf{CMS}") 
 
-      latexb = TLatex()
+         
+      latexb = TLatex()                      
       latexb.SetNDC();
       latexb.SetTextAngle(0);
       latexb.SetTextColor(r.kBlack);
       latexb.SetTextFont(42);
-      latexb.SetTextAlign(31);
-      latexb.SetTextSize(0.04);            
+      latexb.SetTextAlign(11);
+      latexb.SetTextSize(0.033);            
 
-      #if(isData):
-      latexb.DrawLatex(0.38, 0.93, "#it{Preliminary}")
-      #else:
-      #  latexb.DrawLatex(0.38, 0.93, "#it{Simulation}")
+      if(isData):
+             latexb.DrawLatex(0.17, 0.8, "#it{Preliminary}")
+      else:
+         if not inProgress:
+             latexb.DrawLatex(0.17, 0.8, "#it{Simulation}")
+         else:
+             latexb.DrawLatex(0.17, 0.8, "#it{Work in progress}")
 
-      text_lumi =str(lumi)+" fb^{-1} (13 TeV)"
+      text_lumi = ''
+      #if isData:
+      #    text_lumi = str(lumi)+" fb^{-1}  (13 TeV)"
+      if lumi: text_lumi = str(lumi)+" fb^{-1}  (13 TeV)"
+     
       latexc = TLatex()
       latexc.SetNDC();
       latexc.SetTextAngle(0);
       latexc.SetTextColor(r.kBlack);
       latexc.SetTextFont(42);
       latexc.SetTextAlign(31);
-      latexc.SetTextSize(0.05);
-      if lumi != '': latexc.DrawLatex(0.90, 0.93, text_lumi)
-
+      latexc.SetTextSize(0.04);
+      latexc.DrawLatex(0.90, 0.93, text_lumi)                
 
    def bannerRatio(self, isData, lumi, scy = False, inProgress = False):
     
@@ -262,7 +269,7 @@ class Canvas:
    def makeOFHisto(self, histo):
       nbinsx = histo.GetNbinsX()
       xmin = histo.GetXaxis().GetXmin(); xmax = histo.GetXaxis().GetXmax();
-      newhisto = r.TH1F(histo.GetName() +'_withOFBin', histo.GetTitle()+'_withOFBin', nbinsx+1, xmin, xmax+(xmax-xmin)/nbinsx)
+      newhisto = r.TH1F(histo.GetName() +'_withOFBin', 'withOFBin' + histo.GetTitle(), nbinsx+1, xmin, xmax+(xmax-xmin)/nbinsx)
       newhisto.Sumw2()
       newhisto.SetMarkerColor(histo.GetMarkerColor())
       newhisto.SetMarkerStyle(histo.GetMarkerStyle())
@@ -585,10 +592,10 @@ class Canvas:
       self.myCanvas.IsA().Destructor(self.myCanvas)                                                                                                                                            
 
 
-   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False, zlog = False, maxYnumbers = False, inProgress = False):
+   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False, zlog = False, maxYnumbers = False, inProgress = False, is2d = False):
 
       self.myCanvas.cd()
-      
+
       if(log):
           self.myCanvas.GetPad(0).SetLogy(1)
       if(xlog):
@@ -645,9 +652,9 @@ class Canvas:
 
       if maxYnumbers:
           r.TGaxis().SetMaxDigits(maxYnumbers) 
-          self.banner(isData, lumi, scy = True, inProgress = inProgress)
+          self.bannerInFrame(isData, lumi, inProgress = inProgress)
       else:
-          self.banner(isData, lumi, scy = False, inProgress = inProgress)
+          self.bannerInFrame(isData, lumi, inProgress = inProgress)
 
       if not outputDir[-1] == '/': dirName = outputDir + '/'
       else: dirName = outputDir

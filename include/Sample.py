@@ -81,6 +81,8 @@ import ROOT as r
 from array import array
 from ROOT import TTree, TFile, TCut, TH1F, TH2F, TH3F, THStack, TCanvas, SetOwnership
 from include.processHandler import processHandler
+from include.plotHandler import plotHandler
+from include.yieldHandler import yieldHandler
 import copy
 import os
 import __main__
@@ -480,13 +482,14 @@ class Tree:
      return h   
 
 
-   def Loop(self, lumi, outdir, doEffs = False, year = '2016'):
+   def Loop(self, lumi, outdir, mode, config, year = '2016'):
 
      #
      # Runs a loop over all the events of the trees, of the samples, of the blocks 
      # declared in the Tree, filling the histograms defined in include/processHandler.py
      # and saving them in a file
      #
+     # mode: ['plot', 'yield', 'efficiency']
 
         
      for b in self.blocks:
@@ -494,18 +497,25 @@ class Tree:
          print("Reading samples: " + s.name)
          for t,ttree in enumerate(s.ttrees):
            if s.isData:
-               process = processHandler(outdir, self.name, b.name, s.name, t, 1, True, year)
+             if mode == 'plot':
+               process = plotHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year)
+             elif mode == 'yield':
+               process = yieldHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year)
+             else:
+               process = processHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year)
            else:
-               process = processHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, year)
+             if mode == 'plot':
+               process = plotHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year)
+             elif mode == 'yield':
+               process = yieldHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year)
+             else:
+               process = processHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year)
            for n,ev in enumerate(ttree):
-               if not doEffs:
-                   process.processEvent(ev)
-               else:
-                   process.countLLs(ev)
+             process.processEvent(ev)
            process.Write()
 
 
-   def launchLoop(self, lumi, outdir, queue = 'espresso', doEffs = False, year = '2016'):
+   def launchLoop(self, lumi, outdir, mode, config, queue = 'espresso', year = '2016'):
 
      #
      # Launches Loop function in CONDOR:
@@ -523,8 +533,7 @@ class Tree:
        absdir += path + '/'
 
      # Get command to launch:
-     command = 'python {0}runLoop.py -f {1} -o {2} -n {3} -b {4} -s {5} -t {6} -l {7} -y {8} '
-     if doEffs: command += '--doEffs '
+     command = 'python {0}runLoop.py -f {1} -o {2} -n {3} -b {4} -s {5} -t {6} -l {7} -c {8} -y {9} -m {10} '
 
 
      # Get cmssw release:
@@ -560,10 +569,10 @@ queue {3}
          for t,ttree in enumerate(s.ttrees):
 
            if s.isData:
-               scommand = command.format(absdir, s.ftpaths[t], outdir, self.name, b.name, s.name, str(t), str(1.0), year)
+               scommand = command.format(absdir, s.ftpaths[t], outdir, self.name, b.name, s.name, str(t), str(1.0), config, year, mode)
                scommand += '-d'
            else:
-               scommand = command.format(absdir, s.ftpaths[t], outdir, self.name, b.name, s.name, str(t), str(lumi*s.lumWeight), year)
+               scommand = command.format(absdir, s.ftpaths[t], outdir, self.name, b.name, s.name, str(t), str(lumi*s.lumWeight), config, year, mode)
 
            #print(scommand)
 

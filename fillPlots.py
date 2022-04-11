@@ -149,13 +149,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(usage='usage: %prog [args] FilenameWithSamples', version='%prog 1.0')
     parser.add_argument('-o', '--out', action='store', type=str, dest='out', default='', help='Output tag')
     parser.add_argument('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_UltraLegacy.dat', help='dat file')
+    parser.add_argument('-m', '--mode', action='store', type=str, dest='mode', help='Select mode to process config file')
+    parser.add_argument('-c', '--config', action='store', type=str, dest='config', help='Select config file')
     parser.add_argument('-q', '--condor', action='store_true', dest='condor', help='Select if you want to send the job a condor queue')
     parser.add_argument('-t', '--test', action='store_true', dest='test', default='', help='Test tag')
-    parser.add_argument('--doEffs', action='store_true', dest='doEffs', help='True if doing only efficiencies')
     args = parser.parse_args()
 
     doDATA = True
     doMC = False
+    doSignals = True
 
     ############# Set the TDR plot style
     #r.gROOT.LoadMacro(WORKPATH + 'include/tdrstyle.C+')
@@ -228,11 +230,6 @@ if __name__ == "__main__":
 
     ############# Signal definition
     Signals_2016 = []
-    #Signals_2016.append('HSS_125_50_1_2016')
-    #Signals_2016.append('HSS_125_50_10_2016')
-    #Signals_2016.append('HSS_125_50_100_2016')
-    #Signals_2016.append('HSS_125_50_1000_2016')
-    #Signals_2016.append('HSS_125_50_10000_2016')
     Signals_2016.append('HSS_125_30_1_2016')
     Signals_2016.append('HSS_125_30_10_2016')
     Signals_2016.append('HSS_125_30_100_2016')
@@ -243,71 +240,38 @@ if __name__ == "__main__":
     Signals_2016.append('HSS_400_50_100_2016')
     Signals_2016.append('HSS_400_50_1000_2016')
     Signals_2016.append('HSS_400_50_10000_2016')
-    #Signals_2016.append('HSS_1000_350_1_2016')
-    #Signals_2016.append('HSS_1000_350_10_2016')
-    #Signals_2016.append('HSS_1000_350_100_2016')
-    #Signals_2016.append('HSS_1000_350_1000_2016')
-    #Signals_2016.append('HSS_1000_350_10000_2016')
     Signals_2016.append('HSS_1000_150_1_2016')
     Signals_2016.append('HSS_1000_150_10_2016')
     Signals_2016.append('HSS_1000_150_100_2016')
     Signals_2016.append('HSS_1000_150_1000_2016')
     Signals_2016.append('HSS_1000_150_10000_2016')
     Signals_2017 = []
-    """
-    Signals_2017.append('HSS_125_50_1_2017')
-    Signals_2017.append('HSS_125_50_10_2017')
-    Signals_2017.append('HSS_125_50_100_2017')
-    Signals_2017.append('HSS_125_50_1000_2017')
-    Signals_2017.append('HSS_125_50_10000_2017')
-    """
     Signals_2017.append('HSS_125_30_1_2017')
     Signals_2017.append('HSS_125_30_10_2017')
     Signals_2017.append('HSS_125_30_100_2017')
     Signals_2017.append('HSS_125_30_1000_2017')
     Signals_2017.append('HSS_125_30_10000_2017')
-
     Signals_2017.append('HSS_400_50_1_2017')
     Signals_2017.append('HSS_400_50_10_2017')
     Signals_2017.append('HSS_400_50_100_2017')
     Signals_2017.append('HSS_400_50_1000_2017')
     Signals_2017.append('HSS_400_50_10000_2017')
-    #Signals_2017.append('HSS_1000_350_1_2017')
-    #Signals_2017.append('HSS_1000_350_10_2017')
-    #Signals_2017.append('HSS_1000_350_100_2017')
-    #Signals_2017.append('HSS_1000_350_1000_2017')
-    #Signals_2017.append('HSS_1000_350_10000_2017')
     Signals_2017.append('HSS_1000_150_1_2017')
     Signals_2017.append('HSS_1000_150_10_2017')
     Signals_2017.append('HSS_1000_150_100_2017')
     Signals_2017.append('HSS_1000_150_1000_2017')
     Signals_2017.append('HSS_1000_150_10000_2017')
     Signals_2018 = []
-    """
-    Signals_2018.append('HSS_125_50_1_2018')
-    Signals_2018.append('HSS_125_50_10_2018')
-    Signals_2018.append('HSS_125_50_100_2018')
-    Signals_2018.append('HSS_125_50_1000_2018')
-    Signals_2018.append('HSS_125_50_10000_2018')
-    """
     Signals_2018.append('HSS_125_30_1_2018')
     Signals_2018.append('HSS_125_30_10_2018')
     Signals_2018.append('HSS_125_30_100_2018')
     Signals_2018.append('HSS_125_30_1000_2018')
     Signals_2018.append('HSS_125_30_10000_2018')
-
     Signals_2018.append('HSS_400_50_1_2018')
     Signals_2018.append('HSS_400_50_10_2018')
     Signals_2018.append('HSS_400_50_100_2018')
     Signals_2018.append('HSS_400_50_1000_2018')
     Signals_2018.append('HSS_400_50_10000_2018')
-    """
-    Signals_2018.append('HSS_1000_350_1_2018')
-    Signals_2018.append('HSS_1000_350_10_2018')
-    Signals_2018.append('HSS_1000_350_100_2018')
-    Signals_2018.append('HSS_1000_350_1000_2018')
-    Signals_2018.append('HSS_1000_350_10000_2018')
-    """
     Signals_2018.append('HSS_1000_150_1_2018')
     Signals_2018.append('HSS_1000_150_10_2018')
     Signals_2018.append('HSS_1000_150_100_2018')
@@ -348,6 +312,11 @@ if __name__ == "__main__":
         treeMC2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds_2017, 'DATA'), name = 'MC', isdata = 1 )
         treeMC2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds_2018, 'DATA'), name = 'MC', isdata = 1 )
 
+    if doSignals:
+        treeSI_2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/signals_2016UL.dat', Signals_2016, 'SI'), name = 'SI', isdata = 0 )
+        treeSI_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/signals_2017UL.dat', Signals_2017, 'SI'), name = 'SI', isdata = 0 )
+        treeSI_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/signals_2018UL.dat', Signals_2018, 'SI'), name = 'SI', isdata = 0 )
+
     start_time = time.time()
 
     ############# Make output dir
@@ -359,22 +328,23 @@ if __name__ == "__main__":
     
     if args.condor:
         if doMC:
-            treeMCpreVFP.launchLoop(lumi_preVFP, WORKPATH + args.out + '/', queue = 'workday', doEffs = args.doEffs, year = '2016')
-            treeMCpostVFP.launchLoop(lumi_postVFP, WORKPATH + args.out + '/', queue = 'workday', doEffs = args.doEffs, year = '2016')
-            treeMC2017.launchLoop(lumi_2017, WORKPATH + args.out + '/', queue = 'workday', doEffs = args.doEffs, year = '2017')
-            treeMC2018.launchLoop(lumi_2018, WORKPATH + args.out + '/', queue = 'workday', doEffs = args.doEffs, year = '2018')
+            treeMCpreVFP.launchLoop(lumi_preVFP, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2016')
+            treeMCpostVFP.launchLoop(lumi_postVFP, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2016')
+            treeMC2017.launchLoop(lumi_2017, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2017')
+            treeMC2018.launchLoop(lumi_2018, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2018')
         if doDATA:
             print('Launching Data...')
-            treeDATA2016.launchLoop(lumi, WORKPATH + args.out + '/', queue = 'workday', doEffs = args.doEffs, year = '2016')
-            treeDATA2017.launchLoop(lumi, WORKPATH + args.out + '/', queue = 'workday', doEffs = args.doEffs, year = '2017')
-            treeDATA2018.launchLoop(lumi, WORKPATH + args.out + '/', queue = 'workday', doEffs = args.doEffs, year = '2018')
-        #treeSI.launchLoop(lumi, WORKPATH + args.out + '/', queue = 'espresso', doEffs = args.doEffs, year = '2016')
+            treeDATA2016.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2016')
+            treeDATA2017.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2017')
+            treeDATA2018.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2018')
+        if doSignals:
+            treeSI_2016.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'espresso', year = '2016')
+            treeSI_2017.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'espresso', year = '2017')
+            treeSI_2018.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'espresso', year = '2018')
     else:
-        treeSI_2016.Loop(lumi_preVFP + lumi_postVFP, WORKPATH + args.out + '/', doEffs = args.doEffs, year = '2016')
-        treeSI_2017.Loop(lumi_2017, WORKPATH + args.out + '/', doEffs = args.doEffs, year = '2017')
-        treeSI_2018.Loop(lumi_2018, WORKPATH + args.out + '/', doEffs = args.doEffs, year = '2018')
-    
-
+        treeSI_2016.Loop(lumi_preVFP + lumi_postVFP, WORKPATH + args.out + '/', mode = args.mode, config = args.config, year = '2016')
+        treeSI_2017.Loop(lumi_2017, WORKPATH + args.out + '/', mode = args.mode, config = args.config, year = '2017')
+        treeSI_2018.Loop(lumi_2018, WORKPATH + args.out + '/', mode = args.mode, config = args.config, year = '2018')
     print("--- %s seconds ---" % (time.time() - start_time))
 
 

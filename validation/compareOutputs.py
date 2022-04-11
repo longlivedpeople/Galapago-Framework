@@ -43,6 +43,9 @@ for f in os.listdir(input2):
         continue
     files2.append(f)
 
+files1.sort()
+files2.sort()
+
 if files1 != files2:
     print("> The provided inputs do not contain the same ROOT files")
     print("> Exiting...")
@@ -75,14 +78,17 @@ for filename in files1:
         if h1.GetEntries() < 1 and h2.GetEntries() < 1:
             checks.append(-1)
             continue
+        """
         if h2.GetMean() < 1e-15:
             checks.append(-1)
             continue
         if h2.GetRMS() < 1e-15:
             checks.append(-1)
             continue
+        """
 
-        if h1.GetEntries() != h2.GetEntries() or h1.GetMean() != h2.GetMean() or h1.GetRMS() != h2.GetRMS():
+        #if h1.GetEntries() != h2.GetEntries() or h1.GetMean() != h2.GetMean() or h1.GetRMS() != h2.GetRMS():
+        if h1.GetEntries() != h2.GetEntries() or h1.Integral() != h2.Integral():
             checks.append(0)
             failed.append([filename, histo])
         else:

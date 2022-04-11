@@ -64,7 +64,7 @@ class Datacard:
         self.hwidth = 20 # First column width
         self.signalName = ''
         self.nBackground = 0
-        self.nNuisance = 2 # Provisional: TO BE UPDATED
+        self.nNuisance = 4 # Provisional: TO BE UPDATED
         self.heading = ''
         self.observation = ''
         self.expected = ''
@@ -156,14 +156,37 @@ class Datacard:
         self.nuisance += self.toCell('lumi', int(self.hwidth/2))
         self.nuisance += self.toCell('lnN', int(self.hwidth/2))
         for i in range(0, self.channelCounter*(self.nBackground + 1)):
-            self.nuisance += self.toCell('1.025')
+            if ((i%2) == 0):
+                self.nuisance += self.toCell('1.025')
+            else:
+                self.nuisance += self.toCell('-')
         self.nuisance += '\n'
 
         self.nuisance += self.toCell('PU', int(self.hwidth/2))
         self.nuisance += self.toCell('lnN', int(self.hwidth/2))
         for i in range(0, self.channelCounter*(self.nBackground + 1)):
-            self.nuisance += self.toCell('0.975/1.030')
+            if ((i%2) == 0):
+                self.nuisance += self.toCell('0.975/1.030')
+            else:
+                self.nuisance += self.toCell('-')
+        self.nuisance += '\n'
  
+        self.nuisance += self.toCell('recoID', int(self.hwidth/2))
+        self.nuisance += self.toCell('lnN', int(self.hwidth/2))
+        for i in range(0, self.channelCounter*(self.nBackground + 1)):
+            if ((i%2) == 0):
+                self.nuisance += self.toCell('1.10')
+            else:
+                self.nuisance += self.toCell('-')
+        self.nuisance += '\n'
+
+        self.nuisance += self.toCell('dphi', int(self.hwidth/2))
+        self.nuisance += self.toCell('lnN', int(self.hwidth/2))
+        for i in range(0, self.channelCounter*(self.nBackground + 1)):
+            if ((i%2) == 0):
+                self.nuisance += self.toCell('-')
+            else:
+                self.nuisance += self.toCell('1.10')
 
         ### Write file:
 
