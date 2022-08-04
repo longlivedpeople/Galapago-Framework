@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
                 for e,ev in enumerate(t):
 
-                    if e > 500000: break
+                    #if e > 500000: break
                     #if not eval(cm.epath2016): continue
 
                     # Count number of hard process leptons:
