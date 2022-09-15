@@ -1,0 +1,51 @@
+#-----------------------------------------------------------
+#-----------------------------------------------------------
+#----- all samples that are currently available ------------
+#-----------------------------------------------------------
+#
+#-----------------------------------------------------------
+#----------------- data samples ----------------------------
+# BLOCK        COLOR                         NAME                 LABEL                                     LOCATION OF FRIENDS                                                     XSEC     ISDATA
+#---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#
+#----------------- monte carlo -----------------------------
+#-----------------------------------------------------------
+# BLOCK     COLOR         NAME                       LABEL                       LOCATION OF FRIENDS                                                                   XSEC    ISDATA
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+###########################################################################
+###   DoubleEG Data   ########################################################################
+#
+#
+Data     r.kBlack     MET_EG_Run2016B_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_EG_B_HIPM/      1    1
+Data     r.kBlack     MET_EG_Run2016C_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_EG_C_HIPM/      1    1
+Data     r.kBlack     MET_EG_Run2016D_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_EG_D_HIPM/      1    1
+Data     r.kBlack     MET_EG_Run2016E_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_EG_E_HIPM/      1    1
+Data     r.kBlack     MET_EG_Run2016F_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_EG_F_HIPM/      1    1
+Data     r.kBlack     MET_EG_Run2016F_noHIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_EG_F_noHIPM/      1    1
+Data     r.kBlack     MET_EG_Run2016G_noHIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_EG_G_noHIPM/      1    1
+Data     r.kBlack     MET_EG_Run2016H_noHIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_EG_H_noHIPM/      1    1
+Data     r.kBlack     MET_EG_Run2017B       Data     /eos/user/f/fernance/LLP_Analysis/UL/2017/MET_EG_B/      1    1
+Data     r.kBlack     MET_EG_Run2017C       Data     /eos/user/f/fernance/LLP_Analysis/UL/2017/MET_EG_C/      1    1
+Data     r.kBlack     MET_EG_Run2017D       Data     /eos/user/f/fernance/LLP_Analysis/UL/2017/MET_EG_D/      1    1
+Data     r.kBlack     MET_EG_Run2017E       Data     /eos/user/f/fernance/LLP_Analysis/UL/2017/MET_EG_E/      1    1
+Data     r.kBlack     MET_EG_Run2017F       Data     /eos/user/f/fernance/LLP_Analysis/UL/2017/MET_EG_F/      1    1
+Data     r.kBlack     MET_EG_Run2018A       Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/MET_EG_A/      1    1
+Data     r.kBlack     MET_EG_Run2018B       Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/MET_EG_B/      1    1
+Data     r.kBlack     MET_EG_Run2018C       Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/MET_EG_C/      1    1
+Data     r.kBlack     MET_EG_Run2018D       Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/MET_EG_D/      1    1
+###########################################################################
+###   DoubleMuon Data   ########################################################################
+#
+#
+Data     r.kBlack     MET_Muon_Run2016B_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_Muon_B_HIPM/      1    1
+Data     r.kBlack     MET_Muon_Run2016C_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_Muon_C_HIPM/      1    1
+Data     r.kBlack     MET_Muon_Run2016D_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_Muon_D_HIPM/      1    1
+Data     r.kBlack     MET_Muon_Run2016E_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_Muon_E_HIPM/      1    1
+Data     r.kBlack     MET_Muon_Run2016F_HIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_Muon_F_HIPM/      1    1
+Data     r.kBlack     MET_Muon_Run2016F_noHIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_Muon_F_noHIPM/      1    1
+Data     r.kBlack     MET_Muon_Run2016G_noHIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_Muon_G_noHIPM/      1    1
+Data     r.kBlack     MET_Muon_Run2016H_noHIPM       Data     /eos/user/f/fernance/LLP_Analysis/UL/2016/MET_Muon_H_noHIPM/      1    1
+Data     r.kBlack     MET_Muon_Run2018A            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/MET_Muon_A/      1    1
+Data     r.kBlack     MET_Muon_Run2018B            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/MET_Muon_B/      1    1
+Data     r.kBlack     MET_Muon_Run2018C            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/MET_Muon_C/      1    1
+Data     r.kBlack     MET_Muon_Run2018D            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/MET_Muon_D/      1    1
