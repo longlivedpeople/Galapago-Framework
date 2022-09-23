@@ -362,12 +362,12 @@ if __name__ == "__main__":
     ### pt dependence
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_Data_full_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
-    canvas.addHisto(plot['Efficiency_HLT_Full_pt_2d_DATA'],'COLZ,TEXT', '', '', '', True, 0)
+    canvas.add2DRate(plot['Efficiency_HLT_Full_pt_2d_DATA'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_MC_full_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
-    canvas.addHisto(plot['Efficiency_HLT_Full_pt_2d_MC'],'COLZ,TEXT', '', '', '', True, 0)
+    canvas.add2DRate(plot['Efficiency_HLT_Full_pt_2d_MC'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
     canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
@@ -375,12 +375,12 @@ if __name__ == "__main__":
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SF_full_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SF,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SFErr_full_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SFErr,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
 
     SF.Write()
     SFErr.Write()
@@ -389,12 +389,12 @@ if __name__ == "__main__":
     ### eta dependence
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_Data_full_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
-    canvas.addHisto(plot['Efficiency_HLT_Full_eta_2d_DATA'],'COLZ,TEXT', '', '', '', True, 0)
+    canvas.add2DRate(plot['Efficiency_HLT_Full_eta_2d_DATA'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_MC_full_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
-    canvas.addHisto(plot['Efficiency_HLT_Full_eta_2d_MC'],'COLZ,TEXT', '', '', '', True, 0)
+    canvas.add2DRate(plot['Efficiency_HLT_Full_eta_2d_MC'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
     canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
@@ -402,12 +402,12 @@ if __name__ == "__main__":
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SF_full_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SF,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SFErr_full_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SFErr,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
 
     SF.Write()
     SFErr.Write()
@@ -415,12 +415,12 @@ if __name__ == "__main__":
     ### Full subleading muon dependence
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_Data_full_pt_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
-    canvas.addHisto(plot['Efficiency_HLT_Full_pt_eta_2d_DATA'],'COLZ,TEXT', '', '', '', True, 0)
+    canvas.add2DRate(plot['Efficiency_HLT_Full_pt_eta_2d_DATA'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_MC_full_pt_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
-    canvas.addHisto(plot['Efficiency_HLT_Full_pt_eta_2d_MC'],'COLZ,TEXT', '', '', '', True, 0)
+    canvas.add2DRate(plot['Efficiency_HLT_Full_pt_eta_2d_MC'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
     canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
@@ -428,12 +428,12 @@ if __name__ == "__main__":
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SF_full_pt_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SF,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SFErr_full_pt_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SFErr,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
 
     SF.Write()
     SFErr.Write()
