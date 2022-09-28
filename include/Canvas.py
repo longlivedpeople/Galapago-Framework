@@ -67,13 +67,13 @@ class Canvas:
 
       if(isData):
          if not scy:
-             latexb.DrawLatex(0.44, 0.93, "#it{Preliminary}")
+             latexb.DrawLatex(0.43, 0.93, "#it{Preliminary}")
          else:
              latexb.DrawLatex(0.53, 0.93, "#it{Preliminary}")
       else:
          if not inProgress:
              if not scy:
-                 latexb.DrawLatex(0.44, 0.93, "#it{Simulation}")
+                 latexb.DrawLatex(0.43, 0.93, "#it{Simulation}")
              else:
                  latexb.DrawLatex(0.53, 0.93, "#it{Simulation}")
          else:
@@ -83,8 +83,6 @@ class Canvas:
                  latexb.DrawLatex(0.63, 0.93, "#it{Work in progress}")
 
       text_lumi = ''
-      #if isData:
-      #    text_lumi = str(lumi)+" fb^{-1}  (13 TeV)"
       if lumi: text_lumi = str(lumi)+" fb^{-1}  (13 TeV)"
      
       latexc = TLatex()
@@ -125,8 +123,6 @@ class Canvas:
              latexb.DrawLatex(0.17, 0.8, "#it{Work in progress}")
 
       text_lumi = ''
-      #if isData:
-      #    text_lumi = str(lumi)+" fb^{-1}  (13 TeV)"
       if lumi: text_lumi = str(lumi)+" fb^{-1}  (13 TeV)"
      
       latexc = TLatex()
@@ -286,24 +282,26 @@ class Canvas:
          newhisto.SetBinError  (i,histo.GetBinError  (i))
       return newhisto
         
-   def makeRate(self, eff, option):
+   def makeRate(self, eff, option, is2d = False, ymin = 0.0, ymax = 1.2):
 
       eff.Draw(option)
       self.myCanvas.Update()
 
+      _g = eff.GetPaintedGraph()
+
+      _g.SetMinimum(ymin)
+      _g.SetMaximum(ymax)
       _h = eff.GetTotalHistogram()
       xmax = _h.GetXaxis().GetBinUpEdge(_h.GetNbinsX())
       xmin = _h.GetXaxis().GetBinLowEdge(1)
-
-      _g = eff.GetPaintedGraph()
-      _g.SetMinimum(0.0)
-      _g.SetMaximum(1.2)
       _g.GetXaxis().SetLimits(xmin,xmax)
 
       return eff
 
  
-   def addHisto(self, h, option, label, labelOption, color, ToDraw, orderForLegend, marker = False, doOF = False, normed = False):
+   def addHisto(self, h_, option, label, labelOption, color, ToDraw, orderForLegend, marker = False, doOF = False, normed = False):
+
+      h = copy.deepcopy(h_)
 
       if(color != ""):
           h.SetLineColor(color)
@@ -337,7 +335,7 @@ class Canvas:
       if color:
           _eff.SetMarkerColor(color)
 
-      _eff.SetLineWidth(2)
+      _eff.SetLineWidth(1)
       _eff.SetLineColor(color)
       _eff.SetMarkerSize(1.0)
 
@@ -348,10 +346,14 @@ class Canvas:
       self.ToDraw.append(ToDraw)
       self.orderForLegend.append(orderForLegend) 
 
-   def add2DRate(self, eff, option):
+   def add2DRate(self, eff, option, zmin, zmax):
 
       _eff = copy.deepcopy(eff)
-      self.histos.append(_eff)
+
+      _h = _eff.CreateHistogram()
+      if zmax:
+          _h.GetZaxis().SetRangeUser(zmin, zmax)
+      self.histos.append(_h)
       self.options.append(option)
       self.labels.append('')
       self.labelsOption.append('')
@@ -406,7 +408,8 @@ class Canvas:
           legendCounter = len(self.orderForLegend)
 
       self.addHisto(h, option, "", "", "", ToDraw, -1)  
-      for h_c in h.GetHists():
+      for h_c_ in h.GetHists():
+          h_c = copy.deepcopy(h_c_)
           self.addHisto(h_c, "H", h_c.GetTitle(), "F", "", 0, legendCounter)
           legendCounter = legendCounter + 1                                          
        
@@ -445,20 +448,22 @@ class Canvas:
               time.sleep(1.0)
               pass
 
-   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, label ="Data/Prediction", outputDir = 'plots/', xlog = False, maxYnumbers = False, inProgress = False):
+   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, label ="Data/Prediction", hsys = False, outputDir = 'plots/', xlog = False, maxYnumbers = False, inProgress = False):
 
       self.myCanvas.cd()
 
-      pad1 = TPad("pad1", "pad1", 0, 0.3, 1, 1.0)
+      ## Create tha pads
+      pad1 = TPad("pad1", "pad1", 0, 0.3, 1, 1.0) # for the plot
       pad1.SetBottomMargin(0.015)
       pad1.SetTopMargin(0.13)
       pad1.Draw()                                     
-      pad2 = TPad("pad2", "pad2", 0, 0.01, 1, 0.3)
+      pad2 = TPad("pad2", "pad2", 0, 0.01, 1, 0.3) # for the ratio
       pad2.SetTopMargin(0.05);
       pad2.SetBottomMargin(0.4);
-      pad2.SetGridy(1);
+      #pad2.SetGridy(1);
       pad2.Draw();                                      
 
+      ## Set log scale
       pad1.cd()
       if(log):
           pad1.SetLogy(1)
@@ -466,6 +471,7 @@ class Canvas:
           pad1.SetLogx(1)
           pad2.SetLogx(1)
 
+      ## Draw histograms
       for i in range(0, len(self.histos)):
           if(self.ToDraw[i] != 0):
               if str(type(self.histos[i])) == "<class 'ROOT.TEfficiency'>":
@@ -501,6 +507,7 @@ class Canvas:
           lat.DrawLatex(latex[0], latex[1], latex[2])
   
       
+      ## Ratios
       if type(hMC) != list:
           hMClist = [hMC]
       else: hMClist = hMC
@@ -536,7 +543,10 @@ class Canvas:
           tmp_ratio.GetYaxis().SetTitleSize(0.11);
           tmp_ratio.GetXaxis().SetTitleSize(0.12);
           tmp_ratio.GetXaxis().SetLabelOffset(0.02);
-          tmp_ratio.GetXaxis().SetTitle(self.histos[0].GetXaxis().GetTitle());
+          if 'TEfficiency' not in str(type(self.histos[0])): 
+              tmp_ratio.GetXaxis().SetTitle(self.histos[0].GetXaxis().GetTitle());
+          else:
+              tmp_ratio.GetXaxis().SetTitle(self.histos[0].GetTotalHistogram().GetXaxis().GetTitle());
           tmp_ratio.SetMarkerStyle(20);
           tmp_ratio.SetMarkerColor(r.kBlack);
           tmp_ratio.SetMarkerSize(0.8);
@@ -550,15 +560,35 @@ class Canvas:
           xmax = tmp_ratio.GetBinLowEdge(tmp_ratio.GetNbinsX()+1)
 
       pad2.cd();  
+      ## Draw systematics (if included)
+      if hsys:
+          hsys.GetYaxis().SetTitle(label);
+          hsys.GetYaxis().CenterTitle();
+          hsys.GetYaxis().SetLabelSize(0.10);
+          hsys.GetYaxis().SetNdivisions(4);
+          hsys.GetYaxis().SetTitleOffset(0.5);
+          hsys.GetXaxis().SetLabelSize(0.10);
+          hsys.GetYaxis().SetTitleSize(0.11);
+          hsys.GetXaxis().SetTitleSize(0.12);
+          hsys.GetXaxis().SetLabelOffset(0.02);
+          hsys.SetLineColor(r.kGray)
+          hsys.SetFillColor(r.kGray)
+          hsys.SetMarkerSize(0)
+          #hsys.SetFillStyle(3013)
+          hsys.GetYaxis().SetRangeUser(r_ymin, r_ymax);
+          hsys.Draw('E2,same')
+      ## Draw ratio
       for rat in ratios:
           rat.Draw('P E0 E1,same');
 
+      ## Lines
       line = TLine(xmin, 1, xmax, 1)
       line.SetLineColor(r.kGray+2);
       line.Draw('');
 
       pad1.cd()
 
+      ## Ratio
       if maxYnumbers:
           r.TGaxis().SetMaxDigits(maxYnumbers)
           self.bannerRatio(isData, lumi, scy = True, inProgress = inProgress)
@@ -577,7 +607,7 @@ class Canvas:
           self.ensurePath(path)
           self.myCanvas.SaveAs(path)
           if not '.root' in pathlog:
-              if self.histos[0].GetMinimum() == 0:
+              if 'TEfficiency' not in str(type(self.histos[0])) and self.histos[0].GetMinimum() == 0:
                   self.histos[0].SetMinimum(0.1) ### log y axis consistency
               #self.histos[0].SetMaximum(100.0*self.histos[0].GetMaximum()) ### log y axis consistency
               pad1.cd()
@@ -592,7 +622,7 @@ class Canvas:
       self.myCanvas.IsA().Destructor(self.myCanvas)                                                                                                                                            
 
 
-   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False, zlog = False, maxYnumbers = False, inProgress = False, is2d = False):
+   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False, zlog = False, maxYnumbers = False, inProgress = False, is2d = False, labelz = False):
 
       self.myCanvas.cd()
 
@@ -605,13 +635,14 @@ class Canvas:
      
       for i in range(0, len(self.histos)):
           if(self.ToDraw[i] != 0):        
-              if ymin and ymax:
-                  self.histos[i].GetYaxis().SetRangeUser(ymin, ymax)
-                  #self.histos[i].SetMaximum(ymax)
-
-              if 'TEfficiency' in str(type(self.histos[i])) and 'colz' not in self.options[i] and 'COLZ' not in self.options[i]:
-                  self.makeRate(self.histos[i], self.options[i])                   
+              if 'TEfficiency' in str(type(self.histos[i])) and not is2d:
+                  if ymax:
+                      self.makeRate(self.histos[i], self.options[i], is2d, ymin, ymax)                   
+                  else:
+                      self.makeRate(self.histos[i], self.options[i], is2d)                   
               else:
+                  if ymax:
+                      self.histos[i].GetYaxis().SetRangeUser(ymin, ymax)
                   self.histos[i].Draw(self.options[i])
 
       ## Draw axis:
@@ -638,6 +669,16 @@ class Canvas:
           lat.SetTextFont(latex[-4])
           lat.DrawLatex(latex[0], latex[1], latex[2])
   
+      if labelz:
+          lat = TLatex()
+          lat.SetNDC()
+          lat.SetTextColor(r.kBlack)
+          lat.SetTextAlign(31)
+          lat.SetTextSize(0.05)
+          lat.SetTextFont(42)
+          lat.SetTextAngle(90)
+          lat.DrawLatex(0.99, 0.92, labelz)
+
       if(legend):
           self.makeLegend()
           self.myLegend.Draw()
@@ -650,11 +691,14 @@ class Canvas:
       
       r.gPad.RedrawAxis()
 
-      if maxYnumbers:
-          r.TGaxis().SetMaxDigits(maxYnumbers) 
-          self.bannerInFrame(isData, lumi, inProgress = inProgress)
+      if not is2d:
+          if maxYnumbers:
+              r.TGaxis().SetMaxDigits(maxYnumbers) 
+              self.bannerInFrame(isData, lumi, inProgress = inProgress)
+          else:
+              self.bannerInFrame(isData, lumi, inProgress = inProgress)
       else:
-          self.bannerInFrame(isData, lumi, inProgress = inProgress)
+          self.banner(isData, lumi, scy = False, inProgress = inProgress)
 
       if not outputDir[-1] == '/': dirName = outputDir + '/'
       else: dirName = outputDir

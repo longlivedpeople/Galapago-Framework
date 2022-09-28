@@ -83,6 +83,7 @@ from ROOT import TTree, TFile, TCut, TH1F, TH2F, TH3F, THStack, TCanvas, SetOwne
 from include.processHandler import processHandler
 from include.plotHandler import plotHandler
 from include.yieldHandler import yieldHandler
+from include.effHandler import effHandler
 import copy
 import os
 import __main__
@@ -129,7 +130,7 @@ class Sample:
       if not self.isData:
         self.lumWeight = self.xSection / self.count
 
-      print('Name: ', self.name, self.label)
+      #print('Name: ', self.name, self.label)
       #print('Cross-section: ', self.xSection)
       #print('Count: ', self.count)
       #print('lumWeight: ', self.lumWeight)
@@ -143,6 +144,11 @@ class Sample:
       print("Sample IsData: ", self.isData)
       print("Sample LumWeight: ", self.lumWeight)
       print("#################################")
+
+
+   def closeFiles(self):
+       for _file in self.ftfiles:
+              _file.Close()
 
 
    def getTH1F(self, lumi, name, var, nbin, xmin, xmax, cut, options, xlabel):
@@ -317,14 +323,14 @@ class Block:
 class Tree:
    'Common base class for a physics meaningful tree'
 
-   def __init__(self, fileName, name, isdata):
+   def __init__(self, fileName, name, isdata, close = False):
       #print fileName
       self.name  = name
       self.isData = isdata
       self.blocks = []
-      self.parseFileName(fileName)
+      self.parseFileName(fileName, close)
 
-   def parseFileName(self, fileName):
+   def parseFileName(self, fileName, close = False):
       f = open(fileName)
 
       for l in f.readlines():
@@ -356,6 +362,10 @@ class Tree:
           self.addBlock(newBlock)
         else:
           coincidentBlock[0].addSample(sample)
+
+        if close:
+            sample.closeFiles()
+
 
 
    def printTree(self):
@@ -501,6 +511,8 @@ class Tree:
                process = plotHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year)
              elif mode == 'yield':
                process = yieldHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year)
+             elif mode == 'eff':
+               process = effHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year)
              else:
                process = processHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year)
            else:
@@ -508,6 +520,8 @@ class Tree:
                process = plotHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year)
              elif mode == 'yield':
                process = yieldHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year)
+             elif mode == 'eff':
+               process = effHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year)
              else:
                process = processHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year)
            for n,ev in enumerate(ttree):

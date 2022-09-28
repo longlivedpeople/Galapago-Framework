@@ -107,8 +107,8 @@ void setTDRStyle(bool fatline=true) {
   tdrStyle->SetTitleSize(0.045, "XYZ");
   // tdrStyle->SetTitleXSize(Float_t size = 0.02); // Another way to set the size?
   // tdrStyle->SetTitleYSize(Float_t size = 0.02);
-  tdrStyle->SetTitleXOffset(1.1);
-  tdrStyle->SetTitleYOffset(1.1);
+  tdrStyle->SetTitleXOffset(1.2);
+  tdrStyle->SetTitleYOffset(1.4);
   // tdrStyle->SetTitleOffset(1.1, "Y"); // Another way to set the Offset
 
   // For the axis labels:
@@ -160,6 +160,7 @@ void setTDRStyle(bool fatline=true) {
   //tdrStyle->SetPalette(kCool);
 
   // Galapago palettes
+  /*
   static Int_t bkgcolors[255];  
   Double_t stops2[2] = { 0.00, 1.00 };
   Double_t red2[2]   = { 1.00, 0.00};
@@ -167,6 +168,7 @@ void setTDRStyle(bool fatline=true) {
   Double_t blue2[2]  = { 1.00, 153./255.};
   Int_t F2 =  TColor::CreateGradientColorTable(2, stops2, red2, green2, blue2, 255);
   for (int i=0; i<255; i++){ bkgcolors[i] = F2+i;}
+  */ 
   //tdrStyle->SetPalette(255, bkgcolors);
 
 
