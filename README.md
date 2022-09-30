@@ -94,7 +94,11 @@ that will create several png/pdf files with the harvested plots.
 
 ### Examples
 
-(to be completed)
+Routine to do Data vs Monte Carlo comparisons in On-Z Control region:
+```
+python fillPlots -o histograms_DATAvsMC -d dat/Samples_cern_UltraLegacy.dat -m plot -c configs/config_Summer22_DataVSMC.json -q
+python harvesting_DATAvsMC.py -i histograms_DATAvsMC 
+```
 
 ## Galapago notebooks (deprecated)
 
