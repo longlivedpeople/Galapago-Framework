@@ -9,7 +9,7 @@ import numpy as np
 
 class processHandler:
 
-    def __init__(self, outdir, treename, blockname, samplename, samplenumber, lumiweight, isdata, configfile, year = '2016'):
+    def __init__(self, outdir, treename, blockname, samplename, samplenumber, lumiweight, isdata, configfile, year = '2016', raw = False):
 
         ### outdir: Path where the root file will be stored
         ### treename: Name of the (Galapago) Tree (MC; DATA; SI)
@@ -29,6 +29,7 @@ class processHandler:
         self.year = year
         self.cm = CutManager.CutManager()
         self.sufix = '__{0}__{1}__{2}__{3}'.format(treename, blockname, samplename, str(samplenumber))
+        self.raw = raw
 
         ## Init configuration
         self.config = {}
@@ -46,7 +47,7 @@ class processHandler:
         self.mumu_selection = 'False'
         self.ee_path        = 'False'
         self.ee_selection   = 'False'
-        if year=='2016':
+        if year=='2016' or year=='2016APV':
             self.mumu_path      = self.cm.ORList(self.config['triggerPaths']['muons']['2016'], 'ev.')
             self.ee_path        = self.cm.ORList(self.config['triggerPaths']['electrons']['2016'], 'ev.')
             self.mumu_selection = self.cm.AddList(self.config['selection']['muons']['2016'])
@@ -65,7 +66,6 @@ class processHandler:
         #### ------------------------------
     
         self.dielectronRegions = [] # region name : region cut
-        #self.declareDielectronRegions()
         for region in self.config["regions"]["electrons"].keys():
            self.dielectronRegions.append([region, self.cm.AddList(self.config["regions"]["electrons"][region])])
         
@@ -84,13 +84,27 @@ class processHandler:
         #### --------------------------------
         #### ---- Load SFs
         #### --------------------------------
-        self.file_sf_ee = r.TFile("/afs/cern.ch/work/f/fernance/private/Long_Lived_Analysis/UL-analysis/CMSSW_10_6_20/src/MyAnalysis/Galapago-Framework/calibration/Electron_ScaleFactors_2018.root")
-        self.sf_ee = self.file_sf_ee.Get("NUM_genTracksDown_DEN_tagsIntime_absdxy_2d_absdz_2d")
-        self.file_sf_mm = r.TFile("/afs/cern.ch/work/f/fernance/private/Long_Lived_Analysis/UL-analysis/CMSSW_10_6_20/src/MyAnalysis/Galapago-Framework/calibration/Muon_ScaleFactors_2018.root")
-        #self.sf_mm = self.file_sf_mm.Get("combined") # fixme: to be checked
-        self.sf_mm = self.file_sf_mm.Get("NUM_dGlobalsUp_DEN_dGlobalsDown_absdxy_2d_absdz_2d")
+
+        ### Reco + ID SFs
+        self.file_sf_ee_reco = r.TFile("/afs/cern.ch/work/f/fernance/private/Long_Lived_Analysis/UL-analysis/CMSSW_10_6_20/src/MyAnalysis/Galapago-Framework/calibration/Electron_ScaleFactors_2018.root")
+        self.sf_ee_reco = self.file_sf_ee_reco.Get("NUM_genTracksDown_DEN_tagsIntime_absdxy_2d_absdz_2d")
+        if year != '2017':
+            self.file_sf_mm_reco = r.TFile("/afs/cern.ch/work/f/fernance/private/Long_Lived_Analysis/UL-analysis/CMSSW_10_6_20/src/MyAnalysis/Galapago-Framework/calibration/Muon_ScaleFactors_2018.root")
+            self.sf_mm_reco = self.file_sf_mm_reco.Get("NUM_dGlobalsUp_DEN_dGlobalsDown_absdxy_2d_absdz_2d")
+
+        ### Trigger
+        self.file_sf_ee_trg = r.TFile("/afs/cern.ch/work/f/fernance/private/Long_Lived_Analysis/UL-analysis/CMSSW_10_6_20/src/MyAnalysis/Galapago-Framework/calibration/PhotonTrigger_ScaleFactors_"+year+".root")
+        self.sf_ee_trg = self.file_sf_ee_trg.Get("ScaleFactor_pt2_pt")
+        if year != '2017':
+            self.file_sf_mm_trg = r.TFile("/afs/cern.ch/work/f/fernance/private/Long_Lived_Analysis/UL-analysis/CMSSW_10_6_20/src/MyAnalysis/Galapago-Framework/calibration/MuonTrigger_ScaleFactors_"+year+".root")
+            self.sf_mm_trg = self.file_sf_mm_trg.Get("ScaleFactor_pt2_pt")
 
 
+    #### -------------------------------------------
+    #### --
+    #### ---- Get event weights and Scale Factors 
+    #### --   
+    #### -------------------------------------------
 
     def getWeight(self, ev, isData):
 
@@ -100,6 +114,50 @@ class processHandler:
             weight = 1.
 
         return weight
+
+
+    def getDimuonSF(self, ev, idx):
+
+        sf = 1.0 # default
+
+        if self.year == '2017' or self.raw:
+            return sf
+
+        ### Reco + ID
+        bx1 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxA[idx]]))
+        bx2 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxB[idx]]))
+        by1 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxA[idx]]))
+        by2 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxB[idx]]))
+        sf = sf * self.sf_mm_reco.GetBinContent(bx1, by1)*self.sf_mm_reco.GetBinContent(bx2, by2)
+
+        ### Trigger
+        bx = self.sf_mm_trg.GetXaxis().FindBin(ev.DMDM_subleadingPt[idx])
+        by = self.sf_mm_trg.GetYaxis().FindBin(ev.DMDM_leadingPt[idx])
+        sf = sf * self.sf_mm_trg.GetBinContent(bx, by)
+
+        return sf
+
+
+    def getDielectronSF(self, ev, idx):
+
+        sf = 1.0 # default
+
+        if self.raw:
+            return 1.0
+
+        ### Reco + ID
+        bx1 = self.sf_ee_reco.GetXaxis().FindBin(abs(ev.ElectronCandidate_dxy_PV[ev.EE_idxA[idx]]))
+        bx2 = self.sf_ee_reco.GetXaxis().FindBin(abs(ev.ElectronCandidate_dxy_PV[ev.EE_idxB[idx]]))
+        by1 = self.sf_ee_reco.GetYaxis().FindBin(abs(ev.IsoTrackSel_dz[ev.ElectronCandidate_isotrackIdx[ev.EE_idxA[idx]]]))
+        by2 = self.sf_ee_reco.GetYaxis().FindBin(abs(ev.IsoTrackSel_dz[ev.ElectronCandidate_isotrackIdx[ev.EE_idxB[idx]]]))
+        sf = sf * self.sf_ee_reco.GetBinContent(bx1, by1)*self.sf_ee_reco.GetBinContent(bx2, by2)
+
+        ### Trigger
+        bx = self.sf_ee_trg.GetXaxis().FindBin(ev.EE_subleadingEt[idx])
+        by = self.sf_ee_trg.GetYaxis().FindBin(ev.EE_leadingEt[idx])
+        sf = sf * self.sf_ee_trg.GetBinContent(bx, by)
+
+        return sf
 
     #### ----------------------------
     #### --

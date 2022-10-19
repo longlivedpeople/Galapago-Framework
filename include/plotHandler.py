@@ -10,9 +10,9 @@ import numpy as np
 
 class plotHandler(processHandler):
 
-    def __init__(self, outdir, treename, blockname, samplename, samplenumber, lumiweight, isdata, config, year):
+    def __init__(self, outdir, treename, blockname, samplename, samplenumber, lumiweight, isdata, config, year, raw):
 
-        processHandler.__init__(self, outdir, treename, blockname, samplename, samplenumber, lumiweight, isdata, config, year)
+        processHandler.__init__(self, outdir, treename, blockname, samplename, samplenumber, lumiweight, isdata, config, year, raw)
         self.initHistograms()
 
 
@@ -196,11 +196,7 @@ class plotHandler(processHandler):
         ## Compute SF
         sf = 1.0
         if not self.isdata:
-            bx1 = self.sf_mm.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxA[mm_maxIxy]]))
-            bx2 = self.sf_mm.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxB[mm_maxIxy]]))
-            by1 = self.sf_mm.GetXaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxA[mm_maxIxy]]))
-            by2 = self.sf_mm.GetXaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxB[mm_maxIxy]]))
-            sf = self.sf_mm.GetBinContent(bx1, by1)*self.sf_mm.GetBinContent(bx2, by2)
+            sf = self.getDimuonSF(ev, mm_maxIxy)
 
         self.hMM_nPU[region].Fill(ev.nPV, weight*sf)
         self.hMM_nBSMM[region].Fill(nBSMM, weight*sf)
@@ -236,11 +232,7 @@ class plotHandler(processHandler):
         ## Compute SF
         sf = 1.0
         if not self.isdata:
-            bx1 = self.sf_ee.GetXaxis().FindBin(abs(ev.ElectronCandidate_dxy_PV[ev.EE_idxA[ee_maxIxy]]))
-            bx2 = self.sf_ee.GetXaxis().FindBin(abs(ev.ElectronCandidate_dxy_PV[ev.EE_idxB[ee_maxIxy]]))
-            by1 = self.sf_ee.GetYaxis().FindBin(abs(ev.IsoTrackSel_dz[ev.ElectronCandidate_isotrackIdx[ev.EE_idxA[ee_maxIxy]]]))
-            by2 = self.sf_ee.GetYaxis().FindBin(abs(ev.IsoTrackSel_dz[ev.ElectronCandidate_isotrackIdx[ev.EE_idxB[ee_maxIxy]]]))
-            sf = self.sf_ee.GetBinContent(bx1, by1)*self.sf_ee.GetBinContent(bx2, by2)
+            sf = self.getDielectronSF(ev, ee_maxIxy)
 
         self.hEE_nPU[region].Fill(ev.nPV, weight*sf)
         self.hEE_nBSEE[region].Fill(nBSEE, weight*sf)

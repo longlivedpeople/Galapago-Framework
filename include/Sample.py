@@ -492,7 +492,7 @@ class Tree:
      return h   
 
 
-   def Loop(self, lumi, outdir, mode, config, year = '2016'):
+   def Loop(self, lumi, outdir, mode, config, year = '2016', raw = False):
 
      #
      # Runs a loop over all the events of the trees, of the samples, of the blocks 
@@ -508,28 +508,28 @@ class Tree:
          for t,ttree in enumerate(s.ttrees):
            if s.isData:
              if mode == 'plot':
-               process = plotHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year)
+               process = plotHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year, raw)
              elif mode == 'yield':
-               process = yieldHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year)
+               process = yieldHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year, raw)
              elif mode == 'eff':
-               process = effHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year)
+               process = effHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year, raw)
              else:
-               process = processHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year)
+               process = processHandler(outdir, self.name, b.name, s.name, t, 1, True, config, year, raw)
            else:
              if mode == 'plot':
-               process = plotHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year)
+               process = plotHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year, raw)
              elif mode == 'yield':
-               process = yieldHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year)
+               process = yieldHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year, raw)
              elif mode == 'eff':
-               process = effHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year)
+               process = effHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year, raw)
              else:
-               process = processHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year)
+               process = processHandler(outdir, self.name, b.name, s.name, t, lumi*s.lumWeight, False, config, year, raw)
            for n,ev in enumerate(ttree):
              process.processEvent(ev)
            process.Write()
 
 
-   def launchLoop(self, lumi, outdir, mode, config, queue = 'espresso', year = '2016'):
+   def launchLoop(self, lumi, outdir, mode, config, queue = 'espresso', year = '2016', raw = False):
 
      #
      # Launches Loop function in CONDOR:
@@ -548,6 +548,8 @@ class Tree:
 
      # Get command to launch:
      command = 'python {0}runLoop.py -f {1} -o {2} -n {3} -b {4} -s {5} -t {6} -l {7} -c {8} -y {9} -m {10} '
+     if raw:
+         command += '-r '
 
 
      # Get cmssw release:

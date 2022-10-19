@@ -19,6 +19,7 @@ parser.add_argument('-l', '--lumiweight', action='store', type=float, dest='lumi
 parser.add_argument('-m', '--mode', action='store', type=str, dest='mode', help='mode')
 parser.add_argument('-c', '--config', action='store', dest='config', help='Configuration file')
 parser.add_argument('-y', '--year', action='store', dest='year', help='year')
+parser.add_argument('-r', '--raw', action='store_true', dest='raw', help='apply scale factors or not')
 parser.add_argument('-d', '--data', action='store_true', dest='data', help='True if DATA')
 args = parser.parse_args()
 
@@ -33,18 +34,22 @@ print('data?', args.data)
 
 if args.data:
     if args.mode == 'plot':
-        process = plotHandler(args.out, args.name, args.block, args.sample, args.tree, 1, True, args.config, args.year)
+        process = plotHandler(args.out, args.name, args.block, args.sample, args.tree, 1, True, args.config, args.year, args.raw)
     elif args.mode == 'yield':
-        process = yieldHandler(args.out, args.name, args.block, args.sample, args.tree, 1, True, args.config, args.year)
+        process = yieldHandler(args.out, args.name, args.block, args.sample, args.tree, 1, True, args.config, args.year, args.raw)
+    elif args.mode == 'eff':
+        process = effHandler(args.out, args.name, args.block, args.sample, args.tree, 1, True, args.config, args.year, args.raw)
     else:
-        process = processHandler(args.out, args.name, args.block, args.sample, args.tree, 1, True, args.config, args.year)
+        process = processHandler(args.out, args.name, args.block, args.sample, args.tree, 1, True, args.config, args.year, args.raw)
 else:
     if args.mode == 'plot':
-        process = plotHandler(args.out, args.name, args.block, args.sample, args.tree, args.lumiweight, False, args.config, args.year)
+        process = plotHandler(args.out, args.name, args.block, args.sample, args.tree, args.lumiweight, False, args.config, args.year, args.raw)
     elif args.mode == 'yield':
-        process = yieldHandler(args.out, args.name, args.block, args.sample, args.tree, args.lumiweight, False, args.config, args.year)
+        process = yieldHandler(args.out, args.name, args.block, args.sample, args.tree, args.lumiweight, False, args.config, args.year, args.raw)
+    elif args.mode == 'eff':
+        process = effHandler(args.out, args.name, args.block, args.sample, args.tree, args.lumiweight, False, args.config, args.year, args.raw)
     else:
-        process = processHandler(args.out, args.name, args.block, args.sample, args.tree, args.lumiweight, False, args.config, args.year)
+        process = processHandler(args.out, args.name, args.block, args.sample, args.tree, args.lumiweight, False, args.config, args.year, args.raw)
 
 ##
 ## -- Loop over the events
