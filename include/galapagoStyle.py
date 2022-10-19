@@ -5,10 +5,13 @@ import numpy as np
 ### --- color arrays definition
 ###
 gcolors = {}
-gcolors['blue']   = r.TColor.GetColor('#4285f4');
-gcolors['red']    = r.TColor.GetColor('#ea4335');
-gcolors['yellow'] = r.TColor.GetColor('#fbbc04');
-gcolors['green']  = r.TColor.GetColor('#34a853');
+gcolors['red']       = r.TColor.GetColor('#ea4335');
+gcolors['orange']    = r.TColor.GetColor('#ff6d01');
+gcolors['yellow']    = r.TColor.GetColor('#fbbc04');
+gcolors['green']     = r.TColor.GetColor('#34a853');
+gcolors['blue']      = r.TColor.GetColor('#4285f4');
+gcolors['violet']    = r.TColor.GetColor('#8f00ff');
+gcolors['magenta']    = r.TColor.GetColor('#ff00ff');
 
 dcolors = {}
 dcolors['1mm'] = r.kAzure+10
