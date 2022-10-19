@@ -9,12 +9,12 @@ color_dict['10000'] = 'r.kMagenta+1'
 
 space = '      '
 
-eosdir = '/eos/user/f/fernance/Galapago/Sep2022/'
-prefix = 'ggH_HToSSTo4l'
-outdir = 'NTuples-Galapago_2017' # adapt year here!
+eosdir = '/eos/user/f/fernance/Galapago/RPV/'
+prefix = 'DisplacedSUSY'
+outdir = 'NTuples-Galapago_2018' # adapt year here!
 ndir   = '0000'
 
-outdat = 'CentralHSS_2017UL_Fall22.dat' # adapt year here!
+outdat = 'PrivRPV_2018UL_Fall22.dat' # adapt year here!
 outdat_ = open(outdat, 'w')
 
 ## loop over samples:
@@ -25,15 +25,15 @@ for _d in os.listdir(eosdir):
     sample_dir += _d + '/'
     sample_dir += outdir + '/'
 
-    mH   = (sample_dir.split('MH-')[-1]).split('_')[0]
-    mS   = (sample_dir.split('MS-')[-1]).split('_')[0]
-    ctau = (sample_dir.split('ctauS-')[-1]).split('_')[0]
-    sample_name = 'HSS_' + mH + '_' + mS + '_' + ctau + '_2017' # adapt year here!
-    sample_label = 'HSS({0},{1},{2})'.format(mH, mS, ctau)
+    mH   = (sample_dir.split('MSquark-')[-1]).split('_')[0]
+    mS   = (sample_dir.split('MChi-')[-1]).split('_')[0]
+    ctau = (sample_dir.split('ctau-')[-1]).split('mm')[0]
+    sample_name = 'RPV_' + mH + '_' + mS + '_' + ctau + '_2018' # adapt year here!
+    sample_label = 'RPV({0},{1},{2})'.format(mH, mS, ctau)
 
     if os.path.isdir(sample_dir):
-        #sample_dir += os.listdir(sample_dir)[-1] + '/0000/'
-        sample_dir += os.listdir(sample_dir)[-1] + '/'
+        sample_dir += os.listdir(sample_dir)[-1] + '/0000/'
+        #sample_dir += os.listdir(sample_dir)[-1] + '/'
         line = sample_name 
         line += space
         line += color_dict[ctau]
