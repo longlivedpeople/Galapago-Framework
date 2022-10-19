@@ -67,7 +67,7 @@ def makeBackgroundPlot2D(lumi, hname_bkg, zlog, treeDATA, inputdir, rebin = Fals
     r.gStyle.SetPalette(255, bkgpalette)
 
     ### Canvas object
-    plot = Canvas.Canvas('BkgOnly_'+hname_bkg, 'png,pdf', 0.35, 0.65, 0.7, 0.89, 1, ww = 610, hh = 600, lsize = 0.028)
+    plot = Canvas.Canvas(outtag+hname_bkg, 'png,pdf', 0.35, 0.65, 0.7, 0.89, 1, ww = 610, hh = 600, lsize = 0.028)
     plot.addHisto(hbkg, 'COLZ', '', '', '', 1, 0)
     
     for line in lines:
@@ -123,7 +123,7 @@ def makeSignalPlot2D(lumi, hname_sig, zlog, treeSI, inputdir, rebin = False, lin
     plot.save(1, 1, 0, luminosity, '', outputDir = outdir, zlog = zlog, is2d = True)
 
 
-def countYields2D(hname_bkg, hname_sig, treeDATA, treeSI, inputdir, xmins, ymins):
+def countJointYields2D(hname_bkg, hname_sig, treeDATA, treeSI, inputdir, xmins, ymins):
 
     histo_bkg = treeDATA.getLoopTH2F(inputdir, hname_bkg)
     histo_sig = treeSI.getLoopTH2F(inputdir, hname_sig)
@@ -143,7 +143,21 @@ def countYields2D(hname_bkg, hname_sig, treeDATA, treeSI, inputdir, xmins, ymins
             print(">> For (%f, %f):  " % (xmins[i], ymins[j]), "  Bkg: %f" % bkg_yield, "  Sig: %f" % sig_yield)
 
 
+def countYields2D(hname, tree, inputdir, xedges, yedges):
 
+    histo = tree.getLoopTH2F(inputdir, hname)
+
+    # edges to bins
+    xbinmax = histo.GetNbinsX() + 1 
+    ybinmax = histo.GetNbinsY() + 1
+    xbins = [histo.GetXaxis().FindBin(x) for x in xedges]
+    xbins.append(xbinmax)
+    ybins = [histo.GetYaxis().FindBin(y) for y in yedges]
+    ybins.append(ybinmax)
+    for i in range(0, len(xbins)-1):
+        for j in range(0, len(ybins)-1):
+            print('Bin in [{0},{1},{2},{3}] : '.format(xbins[i], xbins[i+1], ybins[j], ybins[j+1]), histo.Integral(xbins[i], xbins[i+1], ybins[j], ybins[j+1]))
+            
 
 ################################# GLOBAL VARIABLES DEFINITION ####################################
 
@@ -222,10 +236,10 @@ if __name__ == "__main__":
     treeDATA_Mu2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016, 'DATA'), name = 'DATA', isdata = 1 )
     treeDATA_Mu2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1 )
 
-    #########################################
-    ######## Background optimization ########
-    #########################################
-       
+    #####################################################
+    ######## Background optimization (mass bins) ########
+    #####################################################
+    """   
     #### -> Electron plots
 
     makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hEEBCRIM50_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'EE', extralabel = 'Mass range: [15, 76] GeV') 
@@ -261,6 +275,30 @@ if __name__ == "__main__":
     makeSignalPlot2D(lumi = lumi2018, hname_sig = 'hMMSRIM50_Lxy_trackIxy', zlog = True, treeSI = treeSI_2018, inputdir = opts.input, legend = 'H#rightarrowSS (400 GeV, 50 GeV, 100 mm)', xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = 'Mass range: [15, 76] GeV') 
     makeSignalPlot2D(lumi = lumi2018, hname_sig = 'hEESRIM50_Lxy_trackIxy', zlog = True, treeSI = treeSI_2018, inputdir = opts.input, legend = 'H#rightarrowSS (400 GeV, 50 GeV, 100 mm)', xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = 'Mass range: [15, 76] GeV') 
 
-    countYields2D(hname_bkg = 'hMMBCRIM50_Lxy_trackIxy', hname_sig = 'hMMSRIM50_Lxy_trackIxy', treeDATA = treeDATA_Mu2018, treeSI = treeSI_2018, inputdir = opts.input, xmins = [0.0, 0.1], ymins = [5.0, 10.0, 14.0]) 
-    countYields2D(hname_bkg = 'hEEBCRIM50_Lxy_trackIxy', hname_sig = 'hEESRIM50_Lxy_trackIxy', treeDATA = treeDATA_EG2018, treeSI = treeSI_2018, inputdir = opts.input, xmins = [0.0, 0.1], ymins = [5.0, 10.0, 14.0]) 
+    countJointYields2D(hname_bkg = 'hMMBCRIM50_Lxy_trackIxy', hname_sig = 'hMMSRIM50_Lxy_trackIxy', treeDATA = treeDATA_Mu2018, treeSI = treeSI_2018, inputdir = opts.input, xmins = [0.0, 0.1], ymins = [5.0, 10.0, 14.0]) 
+    countJointYields2D(hname_bkg = 'hEEBCRIM50_Lxy_trackIxy', hname_sig = 'hEESRIM50_Lxy_trackIxy', treeDATA = treeDATA_EG2018, treeSI = treeSI_2018, inputdir = opts.input, xmins = [0.0, 0.1], ymins = [5.0, 10.0, 14.0]) 
+    """
+
+
+    ########################################################
+    ######## Background optimization (Lxy/dxy bins) ########
+    ########################################################
+
+    www = '/eos/user/f/fernance/www/LLP/SignalRegion-optimization/2DPlots_nLL1'
+
+    #### -> Electron plots
+    makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hEEBCRI_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'EE', extralabel = 'Off-Z region, N_{DV} = 1', outdir = www) 
+    makeBackgroundPlot2D(lumi = lumi2017, hname_bkg = 'hEEBCRI_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, xlabel = '', outtag = '2017', LLlabel = 'EE', extralabel = 'Off-Z region, N_{DV} = 1', outdir = www) 
+    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hEEBCRI_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = 'Off-Z region, N_{DV} = 1', outdir = www) 
+
+    #### -> Muon plots
+    makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hMMBCRI_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'MM', extralabel = 'Off-Z region, N_{DV} = 1', outdir = www) 
+    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hMMBCRI_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = 'Off-Z region, N_{DV} = 1', outdir = www) 
+
+
+
+
+
+
+
 
