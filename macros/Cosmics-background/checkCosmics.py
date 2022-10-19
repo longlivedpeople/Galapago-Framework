@@ -51,7 +51,8 @@ if __name__ == "__main__":
     #### ---- Histograms
     #### -----------------
     hist_counts = r.TH1F("hist_counts", "", 4, 0, 4)
-    hist_cosAlpha = r.TH1F("hist_cosAlpha", "", 100, -1.0, 1.0)
+    hist_cosAlpha = r.TH1F("hist_cosAlpha", "", 100, -1.0, -0.75)
+    hist_cosAlpha_long = r.TH1F("hist_cosAlpha_long", "", 100, -1.0, 1.0)
     hist_alpha = r.TH1F("hist_Alpha", "", 100, 0.0, 3.15)
     hist_deltaPhi = r.TH1F("hist_deltaPhi", "", 100, 0.0, 3.15)
     hist_dPhi = r.TH1F("hist_dPhi", "", 100, 0.0, 3.15)
@@ -61,13 +62,6 @@ if __name__ == "__main__":
     #########################
     ####   Load sample   ####
     #########################
-    """
-    _dirName = opts.filename
-    _tree = r.TChain('Events')
-    for _file in os.listdir(_dirName):
-        if '.root' not in _file: continue
-        _tree.Add(_dirName + _file)
-    """
     _file = r.TFile(opts.filename)
     _tree = _file.Get('Events')
     print("TTree with " + str(_tree.GetEntries()) + " entries")
@@ -92,36 +86,24 @@ if __name__ == "__main__":
 
             imm = j # index to handle DMDM pair
             if not ev.DMDM_mass[imm] > 15: continue
-            if not ev.DMDM_normalizedChi2[imm] < 10: continue
-            if not ev.DMDM_dR[imm] > 0.2: continue
-            if not ev.DGM_pt[ev.DMDM_idxA[imm]] > 25 or not ev.DGM_pt[ev.DMDM_idxB[imm]] > 25: continue
-            if not abs(ev.DGM_eta[ev.DMDM_idxA[imm]]) < 2.0 or not abs(ev.DGM_eta[ev.DMDM_idxB[imm]]) < 2.0: continue
+            if not ev.DMDM_normalizedChi2[imm] < 20: continue
+            if not (ev.DGM_pt[ev.DMDM_idxA[imm]] > 25 and ev.DGM_pt[ev.DMDM_idxB[imm]] > 25): continue
+            if not (abs(ev.DGM_eta[ev.DMDM_idxA[imm]]) < 2.0 and abs(ev.DGM_eta[ev.DMDM_idxB[imm]]) < 2.0): continue
             if not ev.DGM_charge[ev.DMDM_idxA[imm]]*ev.DGM_charge[ev.DMDM_idxB[imm]] < 0: continue
             if not eval(cm.MM_iso2l): continue
             
-            #ID:
-            if not ev.DGM_ptError[ev.DMDM_idxB[imm]]/ev.DGM_pt[ev.DMDM_idxB[imm]] < 0.3: continue
-            if not ev.DGM_ptError[ev.DMDM_idxA[imm]]/ev.DGM_pt[ev.DMDM_idxA[imm]] < 0.3: continue
-            if not ev.DGM_normChi2[ev.DMDM_idxA[imm]] < 7.5: continue
-            if not ev.DGM_normChi2[ev.DMDM_idxB[imm]] < 7.5: continue
-            if not ev.DGM_muonHits[ev.DMDM_idxA[imm]] > 11: continue  
-            if not ev.DGM_muonHits[ev.DMDM_idxB[imm]] > 11: continue  
-            if not ev.DGM_outerTrackerHits[ev.DMDM_idxA[imm]] > 8: continue  
-            if not ev.DGM_outerTrackerHits[ev.DMDM_idxB[imm]] > 8: continue  
+            ## ID and dR cuts are assumed to be applied in ntuples, if this is not the case, we should apply it.
 
             qual = True
-
-            #if not eval(cm.MM_ID): continue
-            #if not eval(cm.MM_cosAlpha0p8): continue
 
             dgl1 = r.TVector3()
             dgl2 = r.TVector3()
             dgl1.SetPtEtaPhi(ev.DGM_pt[ev.DMDM_idxA[j]], ev.DGM_eta[ev.DMDM_idxA[j]], ev.DGM_phi[ev.DMDM_idxA[j]])
             dgl2.SetPtEtaPhi(ev.DGM_pt[ev.DMDM_idxB[j]], ev.DGM_eta[ev.DMDM_idxB[j]], ev.DGM_phi[ev.DMDM_idxB[j]])
 
-            #print("Eta: ", dgl1.Eta(), dgl2.Eta(), "Theta: " ,dgl1.Theta(), dgl2.Theta())
 
             hist_cosAlpha.Fill(ev.DMDM_cosAlpha[j])
+            hist_cosAlpha_long.Fill(ev.DMDM_cosAlpha[j])
             hist_alpha.Fill(abs(dgl1.Angle(dgl2)))
             hist_deltaPhi.Fill(abs(dgl1.DeltaPhi(dgl2)))
             hist_normChi2.Fill(ev.DMDM_normalizedChi2[j])
@@ -137,6 +119,7 @@ if __name__ == "__main__":
     #### Write everything to use later:
     hist_counts.Write()
     hist_cosAlpha.Write()
+    hist_cosAlpha_long.Write()
     hist_deltaPhi.Write()
     hist_alpha.Write()
     hist_normChi2.Write()

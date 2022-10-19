@@ -141,13 +141,15 @@ if __name__ == "__main__":
 
 
     hist_cosalpha = getObject('Results/th1f_all.root', 'hist_cosAlpha')
+    print(hist_cosalpha.GetEntries())
     hist_cosalpha.SetTitle(';Dimuon cos(#alpha); Dimuon vertex yield')
-    hist_cosalpha.SetMaximum(1e6)
+    hist_cosalpha.SetMaximum(1e7)
     hist_cosalpha.SetMinimum(0.1)
     hist_cosalpha.Sumw2()
     plot = Canvas.Canvas('hist_cosmics_cosalpha', 'png,pdf', 0.3, 0.75, 0.89, 0.8, 1)
     plot.addHisto(hist_cosalpha, 'P', '', 'p', r.kBlue, 1, 0)
-    plot.addLine(-0.8, 0.1, -0.8, 1e6,r.kRed)
+    plot.addLine(-0.8, 0.1, -0.8, 1e5,r.kRed)
+    plot.addLine(-0.99, 0.1, -0.99, 1e5,r.kRed)
     plot.addLatex(0.9, 0.93, 'Cosmic data 2018', size = 0.026, align = 31)
     plot.addLatex(0.85, 0.85, '/NoBPTX/Run2018B-12Nov2019_UL2018-v1/AOD', size = 0.026, align = 31)
     plot.addLatex(0.85, 0.8, 'HLT_L2Mu10_NoVertex_NoBPTX3BX', size = 0.026, align = 31)

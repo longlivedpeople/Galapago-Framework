@@ -129,6 +129,15 @@ python MuonTrigger-efficiency.py -e [2016, 2016APV, 2018]
 python PhotonTrigger-efficiency.py -e [2016, 2016APV, 2017, 2018]
 ```
 
+### Cosmic studies
+
+Scripts devoted to the study of the cosmic background that may appear in the signal regions of the search (muons 2016 and 2018). How to run (in `macros/Cosmics-background/` folder):
+
+
+```
+source run.sh
+python harvesting.py 
+```
 
 ## Galapago details
 
