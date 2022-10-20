@@ -102,6 +102,6 @@ print(">>    - %d are indetermined" % checks.count(-1))
 print(">>    - %d successed" % checks.count(1))
 print(">>    - %d failed" % checks.count(0))
 
-print(failed)
+#print(failed)
 
 
