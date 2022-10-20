@@ -3,9 +3,7 @@
 # NAME ;      CHANNEL NAME ;      TYPE ;      HISTOGRAM ;                LIMITS (min,max);         DIRECTORY ; 
 #
 #######################################################################################################################################
-Electron      nEE_IA             bkg         hEEBCRI_trackIxy            10.0,20.0                 histograms_FullRun2_Limits_081121_independent
-Electron      nEE_IA             sig         hEESRI_trackIxy             10.0,20.0                 histograms_FullRun2_Limits_081121_independent
-Electron      nEE_IB             bkg         hEEBCRI_trackIxy            20.0,inf                  histograms_FullRun2_Limits_081121_independent
-Electron      nEE_IB             sig         hEESRI_trackIxy             20.0,inf                  histograms_FullRun2_Limits_081121_independent
-Electron      nEE_II             bkg         hEEBCRII_trackIxy           1.0,inf                   histograms_FullRun2_Limits_081121_independent
-Electron      nEE_II             sig         hEESRII_trackIxy            1.0,inf                   histograms_FullRun2_Limits_081121_independent
+Electron      nEE_I              bkg         hEE_BCRI                    0.0,1.0                   yields_Summer22_February22Limits
+Electron      nEE_I              sig         hEE_SRI                     0.0,1.0                   yields_Summer22_February22Limits
+Electron      nEE_II             bkg         hEE_BCRII                   0.0,1.0                   yields_Summer22_February22Limits
+Electron      nEE_II             sig         hEE_SRII                    0.0,1.0                   yields_Summer22_February22Limits

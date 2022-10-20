@@ -28,10 +28,10 @@ TTJets          r.kAzure-4      TTTo2L2Nu_2017                             t#bar
 TTJets          r.kAzure-4      TTTo2L2Nu_2018                             t#bar{t}                       /eos/user/f/fernance/LLP_Analysis/UL/2018/TTTo2L2Nu/                      87315      0 
 TTJets          r.kAzure-4      TTTo2L2Nu_preVFP                           t#bar{t}                       /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_preVFP/               87315      0 
 TTJets          r.kAzure-4      TTTo2L2Nu_postVFP                          t#bar{t}                       /eos/user/f/fernance/LLP_Analysis/UL/2016/TTTo2L2Nu_postVFP/              87315      0 
-DYJets          r.kAzure+10     DYJetsToLL_M-50_2017                       Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2017/DYJetsToLL_M-50/                5398000    0 
-DYJets          r.kAzure+10     DYJetsToLL_M-50_2018                       Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2018/DYJetsToLL_M-50/                5398000    0 
-DYJets          r.kAzure+10     DYJetsToLL_M-50_preVFP                     Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2016/DYJetsToLL_M-50_preVFP/         5398000    0 
-DYJets          r.kAzure+10     DYJetsToLL_M-50_postVFP                    Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2016/DYJetsToLL_M-50_postVFP/        5398000    0 
+DYJets          r.kAzure+10     DYJetsToLL_M-50_2017                       Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2017/DYJetsToLL_M-50/                6077220    0 
+DYJets          r.kAzure+10     DYJetsToLL_M-50_2018                       Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2018/DYJetsToLL_M-50/                6077220    0 
+DYJets          r.kAzure+10     DYJetsToLL_M-50_preVFP                     Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2016/DYJetsToLL_M-50_preVFP/         6077220    0 
+DYJets          r.kAzure+10     DYJetsToLL_M-50_postVFP                    Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2016/DYJetsToLL_M-50_postVFP/        6077220    0 
 ###########################################################################
 ###########################################################################
 ###   DoubleEG Data   ########################################################################

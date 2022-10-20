@@ -77,7 +77,7 @@ def createDatacards(datacards, Backgrounds, Signals, flavor, year):
          
         for sample in Signals:
 
-            treeSI = Sample.Tree(fileName = helper.selectSamples(WORKPATH + 'signals_'+year+'.dat', [sample], 'SI'), name = 'SI', isdata = 0)
+            treeSI = Sample.Tree(fileName = helper.selectSamples(WORKPATH + 'dat/CombSignal_'+year+'UL_Fall22.dat', [sample], 'SI'), name = 'SI', isdata = 0)
 
             sample_split = sample.split('_')
             mH = sample_split[1]
@@ -146,6 +146,7 @@ if __name__ == "__main__":
     #####
 
     ############# Signal definition
+    """
     Signals2016 = []
     Signals2016.append('HSS_125_50_1_2016')
     Signals2016.append('HSS_125_50_10_2016')
@@ -196,6 +197,30 @@ if __name__ == "__main__":
     Signals2018.append('HSS_1000_350_100_2018')
     Signals2018.append('HSS_1000_350_1000_2018')
     Signals2018.append('HSS_1000_350_10000_2018')
+    """
+    Signals = []
+    Signals.append('HSS_300_50_1')
+    Signals.append('HSS_300_50_10')
+    Signals.append('HSS_300_50_100')
+    Signals.append('HSS_300_50_1000')
+    Signals.append('HSS_300_50_10000')
+    Signals.append('HSS_500_50_1')
+    Signals.append('HSS_500_50_10')
+    Signals.append('HSS_500_50_100')
+    Signals.append('HSS_500_50_1000')
+    Signals.append('HSS_500_50_10000')
+    Signals.append('HSS_1000_250_1')
+    Signals.append('HSS_1000_250_10')
+    Signals.append('HSS_1000_250_100')
+    Signals.append('HSS_1000_250_1000')
+    Signals.append('HSS_1000_250_10000')
+    Signals_2016preVFP = [i + '_2016APV' for i in Signals]
+    Signals_2016postVFP = [i + '_2016' for i in Signals]
+    Signals2016 = Signals_2016preVFP + Signals_2016postVFP
+    Signals2017 = [i + '_2017' for i in Signals]
+    Signals2018 = [i + '_2018' for i in Signals]
+
+
 
     ############# Muon data definition
     DoubleMuon2016 = []

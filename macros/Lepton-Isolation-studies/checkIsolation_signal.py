@@ -63,23 +63,23 @@ if __name__ == "__main__":
     ####   Load sample   ####
     #########################
     Signals2016 = []
-    Signals2016.append('HSS_125_50_1_2016')
-    Signals2016.append('HSS_125_50_10_2016')
-    Signals2016.append('HSS_125_50_100_2016')
-    Signals2016.append('HSS_125_50_1000_2016')
+    Signals2016.append('HSS_125_30_1_2016')
+    Signals2016.append('HSS_125_30_10_2016')
+    Signals2016.append('HSS_125_30_100_2016')
+    Signals2016.append('HSS_125_30_1000_2016')
     #Signals2016.append('HSS_125_50_10000_2016')
     Signals2016.append('HSS_400_50_1_2016')
     Signals2016.append('HSS_400_50_10_2016')
     Signals2016.append('HSS_400_50_100_2016')
     Signals2016.append('HSS_400_50_1000_2016')
     #Signals2016.append('HSS_400_50_10000_2016')
-    Signals2016.append('HSS_1000_350_1_2016')
-    Signals2016.append('HSS_1000_350_10_2016')
-    Signals2016.append('HSS_1000_350_100_2016')
-    Signals2016.append('HSS_1000_350_1000_2016')
+    Signals2016.append('HSS_1000_150_1_2016')
+    Signals2016.append('HSS_1000_150_10_2016')
+    Signals2016.append('HSS_1000_150_100_2016')
+    Signals2016.append('HSS_1000_150_1000_2016')
     #Signals2016.append('HSS_1000_350_10000_2016')
 
-    treeSI = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'signals_2016.dat', Signals2016, 'MC'), name = '2016', isdata = 0 )
+    treeSI = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'dat/signals_2016UL_Summer22.dat', Signals2016, 'MC'), name = '2016', isdata = 0 )
 
 
     ###################################

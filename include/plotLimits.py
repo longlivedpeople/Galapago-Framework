@@ -6,6 +6,13 @@ ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
 ##### Init style definitions
 
+CMSstyle = {
+               'obs' : { 'LineWidth' : 2},
+               'exp0' : { 'LineWidth' : 2, 'LineColor' : R.kBlue, 'LineStyle' : 4},
+               'exp1' : { 'FillColor' : R.kGreen+1},
+               'exp2' : { 'FillColor' : R.kOrange}
+               }
+
 magenta_exp0 = CreateTransparentColor(R.kMagenta+1, 0.9)
 magenta_exp1 = CreateTransparentColor(R.kMagenta-4, 0.3)
 magenta_exp2 = CreateTransparentColor(R.kMagenta-9, 0.3)
@@ -50,9 +57,9 @@ styles.append(style_green_dict)
 
 legend_dict = {
          'obs' : { 'Label' : 'Observed {0}', 'LegendStyle' : 'LP', 'DrawStyle' : 'PLSAME'},
-         'exp0' : { 'Label' : 'Expected (median) {0}', 'LegendStyle' : 'L', 'DrawStyle' : 'LSAME'},
-         'exp1' : { 'Label' : '#pm1#sigma Expected', 'LegendStyle' : 'F', 'DrawStyle' : '3SAME'},
-         'exp2' : { 'Label' : '#pm2#sigma Expected', 'LegendStyle' : 'F', 'DrawStyle' : '3SAME'}
+         'exp0' : { 'Label' : 'Median expected {0}', 'LegendStyle' : 'L', 'DrawStyle' : 'LSAME'},
+         'exp1' : { 'Label' : '68% expected', 'LegendStyle' : 'F', 'DrawStyle' : '3SAME'},
+         'exp2' : { 'Label' : '95% expected', 'LegendStyle' : 'F', 'DrawStyle' : '3SAME'}
          }
 
 def setLegendLabel(legend, label):
@@ -100,7 +107,7 @@ if __name__ == "__main__":
  
     # Set the standard green and yellow colors and draw
     if len(graphs) == 1:
-        StyleLimitBand(graphs[0])
+        StyleLimitBand(graphs[0], overwrite_style_dict=CMSstyle)
         setLegendLabel(legend_dict, ' ')
         DrawLimitBand(pads[0], graphs[0], draw=['exp2', 'exp1', 'exp0'], legend=legend, legend_overwrite=legend_dict)
     else:

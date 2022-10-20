@@ -3,7 +3,7 @@
 # NAME ;      CHANNEL NAME ;      TYPE ;      HISTOGRAM ;                LIMITS (min,max);         DIRECTORY ; 
 #
 #######################################################################################################################################
-Muon      nMM_IA             bkg         hMMBCRI_trackIxy            6.0,inf                 histograms_FullRun2_Limits_081121_independent
-Muon      nMM_IA             sig         hMMSRI_trackIxy             6.0,inf                 histograms_FullRun2_Limits_081121_independent
-Muon      nMM_II             bkg         hMMBCRII_trackIxy           1.0,inf                 histograms_FullRun2_Limits_081121_independent
-Muon      nMM_II             sig         hMMSRII_trackIxy            1.0,inf                 histograms_FullRun2_Limits_081121_independent
+Muon      nMM_I              bkg         hMM_BCRI                        0.0,1.0                 yields_Summer22_February22Limits
+Muon      nMM_I              sig         hMM_SRI                         0.0,1.0                 yields_Summer22_February22Limits
+Muon      nMM_II             bkg         hMM_BCRII                       0.0,1.0                 yields_Summer22_February22Limits
+Muon      nMM_II             sig         hMM_SRII                        0.0,1.0                 yields_Summer22_February22Limits

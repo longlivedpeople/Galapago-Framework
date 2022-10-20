@@ -1,5 +1,6 @@
 _aux*
 .tmp_sampleFile*
 *.pyc
+include/*.pyc
 *.png
 dat/*

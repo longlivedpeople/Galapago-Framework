@@ -251,9 +251,18 @@ class CutManager:
       returncut = ''
       for cut in cutlist:
           if cut != '':
-              returncut += cut
+              returncut += self.brackets(cut)
               if not cutlist.index(cut) == len(cutlist)-1:
                   returncut += ' and '
+      return self.brackets(returncut)
+
+   def ORList(self, cutlist, prefix = ''):
+      returncut = ''
+      for cut in cutlist:
+          if cut != '':
+              returncut += self.brackets(prefix + cut)
+              if not cutlist.index(cut) == len(cutlist)-1:
+                  returncut += ' or '
       return self.brackets(returncut)
   
    def Add(self, cut1, cut2):
@@ -282,82 +291,4 @@ class CutManager:
       passed = formula.EvalInstance()
 
       return passed 
-
-
-
-
-
-
-   ###########################################
-   #######  Logical cut combinations   #######
-   ###########################################
-
-   def donotB(self, cut):
-     return '(!' + self.brackets(cut) + ')'
-
-   def brackets(self, cut):
-      if cut != '':
-          return '('+cut+')'
-
-   def AddListB(self, cutlist):
-      returncut = ''
-      for cut in cutlist:
-          if cut != '':
-              returncut += cut
-              if not cutlist.index(cut) == len(cutlist)-1:
-                  returncut += ' && '
-      return self.brackets(returncut)
-  
-   def AddB(self, cut1, cut2):
-      if cut1 == '':
-          return cut2 
-      if cut2 == '':
-          return cut1
-      return self.brackets(cut1 + " && " + cut2 )
-  
-   def ORB(self, cut1, cut2):
-
-      return self.brackets(cut1 + " || " + cut2 )
-
-   def donot(self, cut):
-     return '(not ' + self.brackets(cut) + ')'
-
-   def AddList(self, cutlist):
-      returncut = ''
-      for cut in cutlist:
-          if cut != '':
-              returncut += cut
-              if not cutlist.index(cut) == len(cutlist)-1:
-                  returncut += ' and '
-      return self.brackets(returncut)
-  
-   def Add(self, cut1, cut2):
-      if cut1 == '':
-          return cut2 
-      if cut2 == '':
-          return cut1
-      return self.brackets(cut1 + " and " + cut2 )
-  
-   def OR(self, cut1, cut2):
-
-      return self.brackets(cut1 + " or " + cut2 )
-
-
-   #################################
-   #######  Cut evaluation   #######
-   #################################
-      
-   def passCut(self, event, cut, index = False):
-
-      if type(index) != bool:
-          cut = cut.format(str(index))
-
-      formula = r.TTreeFormula("_auxCut", cut, event)
-      formula.GetNdata()
-      passed = formula.EvalInstance()
-
-      return passed 
-
-
-
 
