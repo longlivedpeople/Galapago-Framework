@@ -86,17 +86,17 @@ class processHandler:
         #### --------------------------------
 
         ### Reco + ID SFs
-        self.file_sf_ee_reco = r.TFile("/afs/cern.ch/work/f/fernance/private/Long_Lived_Analysis/UL-analysis/CMSSW_10_6_20/src/MyAnalysis/Galapago-Framework/calibration/Electron_ScaleFactors_2018.root")
+        self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2018.root")
         self.sf_ee_reco = self.file_sf_ee_reco.Get("NUM_genTracksDown_DEN_tagsIntime_absdxy_2d_absdz_2d")
         if year != '2017':
-            self.file_sf_mm_reco = r.TFile("/afs/cern.ch/work/f/fernance/private/Long_Lived_Analysis/UL-analysis/CMSSW_10_6_20/src/MyAnalysis/Galapago-Framework/calibration/Muon_ScaleFactors_2018.root")
+            self.file_sf_mm_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Muon_ScaleFactors_2018.root")
             self.sf_mm_reco = self.file_sf_mm_reco.Get("NUM_dGlobalsUp_DEN_dGlobalsDown_absdxy_2d_absdz_2d")
 
         ### Trigger
-        self.file_sf_ee_trg = r.TFile("/afs/cern.ch/work/f/fernance/private/Long_Lived_Analysis/UL-analysis/CMSSW_10_6_20/src/MyAnalysis/Galapago-Framework/calibration/PhotonTrigger_ScaleFactors_"+year+".root")
+        self.file_sf_ee_trg = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/PhotonTrigger_ScaleFactors_"+year+".root")
         self.sf_ee_trg = self.file_sf_ee_trg.Get("ScaleFactor_pt2_pt")
         if year != '2017':
-            self.file_sf_mm_trg = r.TFile("/afs/cern.ch/work/f/fernance/private/Long_Lived_Analysis/UL-analysis/CMSSW_10_6_20/src/MyAnalysis/Galapago-Framework/calibration/MuonTrigger_ScaleFactors_"+year+".root")
+            self.file_sf_mm_trg = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/MuonTrigger_ScaleFactors_"+year+".root")
             self.sf_mm_trg = self.file_sf_mm_trg.Get("ScaleFactor_pt2_pt")
 
 
