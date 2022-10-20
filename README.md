@@ -119,14 +119,22 @@ and every notebook should run correctly.
 
 Several macros that make use of Galapago processing sequences are stored in folder macros/. They are scripts that perform several measurement e.g. specific efficiency plots.
 
+Notice that in some of the scripts the abspaths may need to be adjusted as by default some of them point to an specific user eos.
+
 ### Trigger-studies
 
 Scripts developed to measure the analysis trigger efficiencies in both data and simulation and extract scale factors. The datasets are included in MET dataset and their events were collected with MET triggers. The simulation is the same dileptonic ttbar simulation used in the analysis.
 
-How to run:
+How to run (inside `macros/Trigger-studies`):
 ```
 python MuonTrigger-efficiency.py -e [2016, 2016APV, 2018]
 python PhotonTrigger-efficiency.py -e [2016, 2016APV, 2017, 2018]
+```
+
+The last two scripts also derive the systematic uncertainty associated with the method by applying offline MET cuts to the events. The second systematic uncertainty, which is derived to account for the potential displacement of the target leptons is derived from signal simulation by running:
+
+```
+python Trigger-efficiency-displacement.py -e [2016, 2016APV, 2018]
 ```
 
 ### Cosmic studies

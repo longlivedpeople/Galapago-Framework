@@ -100,11 +100,13 @@ def passedMETTrigger(ev, year):
     passed = False
 
     if year == '2016':
-        passed = ev.HLT_PFMET120_PFMHT90_IDTight or ev.HLT_PFMET120_PFMHT100_IDTight or ev.HLT_PFMET120_PFMHT110_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_MET200 or ev.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight or ev.HLT_PFMET170_HBHECleaned or ev.HLT_PFMET300 or ev.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
+        #passed = ev.HLT_PFMET120_PFMHT90_IDTight or ev.HLT_PFMET120_PFMHT100_IDTight or ev.HLT_PFMET120_PFMHT110_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_MET200 or ev.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight or ev.HLT_PFMET170_HBHECleaned or ev.HLT_PFMET300 or ev.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
+        passed = ev.HLT_PFMET120_PFMHT90_IDTight or ev.HLT_PFMET120_PFMHT100_IDTight or ev.HLT_PFMET120_PFMHT110_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_MET200 or ev.HLT_PFMET170_HBHECleaned or ev.HLT_PFMET300 
     elif year == '2017':
         passed = ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight_PFHT60 or ev.HLT_CaloMET350_HBHECleaned or ev.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight or ev.HLT_PFMET250_HBHECleaned or ev.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
     elif year == '2018':
-        passed = ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight_PFHT60 or ev.HLT_CaloMET350_HBHECleaned or ev.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight or ev.HLT_PFMET250_HBHECleaned or ev.HLT_PFMET200_HBHE_BeamHaloCleaned or ev.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
+        #passed = ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight_PFHT60 or ev.HLT_CaloMET350_HBHECleaned or ev.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight or ev.HLT_PFMET250_HBHECleaned or ev.HLT_PFMET200_HBHE_BeamHaloCleaned or ev.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
+        passed = ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight_PFHT60 or ev.HLT_CaloMET350_HBHECleaned or ev.HLT_PFMET250_HBHECleaned or ev.HLT_PFMET200_HBHE_BeamHaloCleaned
 
     return passed
 
@@ -140,7 +142,8 @@ def combineEfficiency(effs, weights):
         final_total.Add(total)
         final_passed.Add(passed)
 
-    final_eff = r.TEfficiency(final_passed, final_total)
+    final_eff = final_passed.Clone(final_passed.GetName() + '_combined')
+    final_eff.Divide(final_total)
         
     return final_eff
 
@@ -225,24 +228,31 @@ if __name__ == "__main__":
     pt2_bin = np.array([30., 40., 60., 80., 100., 125., 200.])
     eta2_bin = np.array([-2.0, -1.6, -1.2, -0.9, -0.3, -0.2, 0.2, 0.3, 0.9, 1.2, 1.6, 2.0])
     eta2_bin = np.array([-2.0, -1.6, -1.2, -0.9, -0.3, -0.2, 0.2, 0.3, 0.9, 1.2, 1.6, 2.0])
+    mass_bin = np.array([15., 60., 100., 200.])
 
     plot = {}
+    plot['PassMET_pt2_pt1_DATA'] = copy.deepcopy(r.TH2F('PassMET_pt2_pt1_DATA', ";Subleading muon p_{T};Leading muon p_{T}", len(pt2_bin)-1, pt2_bin, len(pt1_bin)-1, pt1_bin))
+    plot['PassTRG_pt2_pt1_DATA'] = copy.deepcopy(r.TH2F('PassTRG_pt2_pt1_DATA', ";Subleading muon p_{T};Leading muon p_{T}", len(pt2_bin)-1, pt2_bin, len(pt1_bin)-1, pt1_bin))
     plot['Efficiency_HLT_Full_pt_2d_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_2d_DATA', ";Subleading muon p_{T};Leading muon p_{T}", len(pt2_bin)-1, pt2_bin, len(pt1_bin)-1, pt1_bin))
     plot['Efficiency_HLT_Full_eta_2d_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_eta_2d_DATA', ";Subleading muon #eta;Leading muon #eta", len(eta2_bin)-1, eta2_bin, len(eta2_bin)-1, eta2_bin))
     plot['Efficiency_HLT_Full_pt_eta_2d_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_eta_2d_DATA', ";Subleading muon p_{T};Subeading muon #eta", len(pt2_bin)-1, pt2_bin, len(eta2_bin)-1, eta2_bin))
     plot['Efficiency_HLT_Full_pt_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_DATA', ";Subleading muon p_{T} (GeV) ;Efficiency", len(pt2_bin)-1, pt2_bin))
-    plot['Efficiency_HLT_Full_pt_MET100_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET100_DATA', ";Subleading muon p_{T}; Efficiency", len(pt2_bin)-1, pt2_bin))
-    plot['Efficiency_HLT_Full_pt_MET150_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET150_DATA', ";Subleading muon p_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
-    plot['Efficiency_HLT_Full_pt_MET200_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET200_DATA', ";Subleading muon p_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
+    plot['Efficiency_HLT_Full_mass_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_mass_DATA', ";Dimuon mass m_{#mu#mu} (GeV) ;Efficiency", len(mass_bin)-1, mass_bin))
+    plot['Efficiency_HLT_Full_pt_MET40_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET40_DATA', ";Subleading muon p_{T}; Efficiency", len(pt2_bin)-1, pt2_bin))
+    plot['Efficiency_HLT_Full_pt_MET60_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET60_DATA', ";Subleading muon p_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
+    plot['Efficiency_HLT_Full_pt_MET80_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET80_DATA', ";Subleading muon p_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
 
     for key in ['TTTo2L2Nu', 'DYJetsToLL_M-50']:
+        plot['PassMET_pt2_pt1_'+key] = copy.deepcopy(r.TH2F('PassMET_pt2_pt1_'+key, ";Subleading muon p_{T};Leading muon p_{T}", len(pt2_bin)-1, pt2_bin, len(pt1_bin)-1, pt1_bin))
+        plot['PassTRG_pt2_pt1_'+key] = copy.deepcopy(r.TH2F('PassTRG_pt2_pt1_'+key, ";Subleading muon p_{T};Leading muon p_{T}", len(pt2_bin)-1, pt2_bin, len(pt1_bin)-1, pt1_bin))
         plot['Efficiency_HLT_Full_pt_2d_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_2d_'+key, ";Subleading muon p_{T};Leading muon p_{T}", len(pt2_bin)-1, pt2_bin, len(pt1_bin)-1, pt1_bin))
         plot['Efficiency_HLT_Full_eta_2d_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_eta_2d_+key', ";Subleading muon #eta;Leading muon #eta", len(eta2_bin)-1, eta2_bin, len(eta2_bin)-1, eta2_bin))
         plot['Efficiency_HLT_Full_pt_eta_2d_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_eta_2d_'+key, ";Subleading muon p_{T};Subleading muon #eta", len(pt2_bin)-1, pt2_bin, len(eta2_bin)-1, eta2_bin))
         plot['Efficiency_HLT_Full_pt_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_'+key, ";Subleading muon p_{T} (GeV) ;Efficiency", len(pt2_bin)-1, pt2_bin))
-        plot['Efficiency_HLT_Full_pt_MET100_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET100_'+key, ";Subleading muon p_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
-        plot['Efficiency_HLT_Full_pt_MET150_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET150_'+key, ";Subleading muon p_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
-        plot['Efficiency_HLT_Full_pt_MET200_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET200_'+key, ";Subleading muon p_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
+        plot['Efficiency_HLT_Full_mass_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_mass_'+key, ";Dimuon mass m_{#mu#mu} (GeV) ;Efficiency", len(mass_bin)-1, mass_bin))
+        plot['Efficiency_HLT_Full_pt_MET40_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET40_'+key, ";Subleading muon p_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
+        plot['Efficiency_HLT_Full_pt_MET60_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET60_'+key, ";Subleading muon p_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
+        plot['Efficiency_HLT_Full_pt_MET80_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET80_'+key, ";Subleading muon p_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
         
 
 
@@ -313,21 +323,25 @@ if __name__ == "__main__":
                          continue
 
 
-                     #print(ev.HLT_L2DoubleMu28_NoVertex_2Cha_Angle2p5_Mass10, pt_values[0], pt_values[1], (mu1+mu2).M(), mu1.DeltaR(mu2), mu1.Angle(mu2.Vect()))
                      plot['Efficiency_HLT_Full_pt_2d_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
                      plot['Efficiency_HLT_Full_eta_2d_DATA'].Fill(passedMuonTrigger(ev, year), eta_ord[1], eta_ord[0])
                      plot['Efficiency_HLT_Full_pt_eta_2d_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1], eta_ord[1])
                      plot['Efficiency_HLT_Full_pt_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1])
+                     plot['Efficiency_HLT_Full_mass_DATA'].Fill(passedMuonTrigger(ev, year), (mu1+mu2).M())
+
+                     plot['PassMET_pt2_pt1_DATA'].Fill(pt_ord[1], pt_ord[0])
+                     if passedMuonTrigger(ev, year):
+                         plot['PassTRG_pt2_pt1_DATA'].Fill(pt_ord[1], pt_ord[0])
                      
-                     if ev.MET_pt > 100:
-                         plot['Efficiency_HLT_Full_pt_MET100_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
-                     if ev.MET_pt > 120:
-                         plot['Efficiency_HLT_Full_pt_MET150_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
-                     if ev.MET_pt > 140:
-                         plot['Efficiency_HLT_Full_pt_MET200_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
+                     if ev.MET_pt > 40:
+                         plot['Efficiency_HLT_Full_pt_MET40_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
+                     if ev.MET_pt > 60:
+                         plot['Efficiency_HLT_Full_pt_MET60_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
+                     if ev.MET_pt > 80:
+                         plot['Efficiency_HLT_Full_pt_MET80_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
 
                      num += 1
-                     if num > 1000:
+                     if num > 100:
                          num = 0
                          #break
 
@@ -387,7 +401,7 @@ if __name__ == "__main__":
                          continue
 
                      num += 1
-                     if num > 100:
+                     if num > 10:
                           num = 0
                           #break
 
@@ -395,17 +409,23 @@ if __name__ == "__main__":
                      plot['Efficiency_HLT_Full_eta_2d_' + key].Fill(passedMuonTrigger(ev, year), eta_ord[1], eta_ord[0])
                      plot['Efficiency_HLT_Full_pt_eta_2d_' + key].Fill(passedMuonTrigger(ev, year), pt_ord[1], eta_ord[1])
                      plot['Efficiency_HLT_Full_pt_' + key].Fill(passedMuonTrigger(ev, year), pt_ord[1])
+                     plot['Efficiency_HLT_Full_mass_' + key].Fill(passedMuonTrigger(ev, year), (mu1+mu2).M())
 
-	             if ev.MET_pt > 100:
-                         plot['Efficiency_HLT_Full_pt_MET100_' + key].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
-                     if ev.MET_pt > 120:
-                         plot['Efficiency_HLT_Full_pt_MET150_' + key].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
-                     if ev.MET_pt > 140:
-                         plot['Efficiency_HLT_Full_pt_MET200_' + key].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
+                     plot['PassMET_pt2_pt1_' + key].Fill(pt_ord[1], pt_ord[0])
+                     if passedMuonTrigger(ev, year):
+                         plot['PassTRG_pt2_pt1_' + key].Fill(pt_ord[1], pt_ord[0])
+
+	             if ev.MET_pt > 40:
+                         plot['Efficiency_HLT_Full_pt_MET40_' + key].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
+                     if ev.MET_pt > 60:
+                         plot['Efficiency_HLT_Full_pt_MET60_' + key].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
+                     if ev.MET_pt > 80:
+                         plot['Efficiency_HLT_Full_pt_MET80_' + key].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
 
 
     ##################################################################################################
     ## Weight the histograms 
+    """
     for key in plot.keys():
         if 'DATA' in key:
             continue
@@ -413,7 +433,8 @@ if __name__ == "__main__":
             plot[key].SetWeight(weights['DYJetsToLL_M-50'])
         if 'TTTo2L2Nu' in key:
             plot[key].SetWeight(weights['TTTo2L2Nu'])
-        
+    """       
+ 
 
     ##################################################################################################
     ## Plot
@@ -422,30 +443,32 @@ if __name__ == "__main__":
     for key in plot.keys():
         plot[key].Write()
 
-    plot['Efficiency_HLT_Full_pt_2d_MC']     = combineEfficiency([plot['Efficiency_HLT_Full_pt_2d_DYJetsToLL_M-50'], plot['Efficiency_HLT_Full_pt_2d_TTTo2L2Nu']], [weights['DYJetsToLL_M-50'], weights['TTTo2L2Nu']]) 
-    plot['Efficiency_HLT_Full_eta_2d_MC']    = combineEfficiency([plot['Efficiency_HLT_Full_eta_2d_DYJetsToLL_M-50'], plot['Efficiency_HLT_Full_eta_2d_TTTo2L2Nu']], [weights['DYJetsToLL_M-50'], weights['TTTo2L2Nu']])
-    plot['Efficiency_HLT_Full_pt_eta_2d_MC'] = combineEfficiency([plot['Efficiency_HLT_Full_pt_eta_2d_DYJetsToLL_M-50'], plot['Efficiency_HLT_Full_pt_eta_2d_TTTo2L2Nu']], [weights['DYJetsToLL_M-50'], weights['TTTo2L2Nu']]) 
+    plot['Efficiency_HLT_Full_pt_2d_MC']     = plot['Efficiency_HLT_Full_pt_2d_TTTo2L2Nu'] 
+    plot['Efficiency_HLT_Full_eta_2d_MC']    = plot['Efficiency_HLT_Full_eta_2d_TTTo2L2Nu']
+    plot['Efficiency_HLT_Full_pt_eta_2d_MC'] = plot['Efficiency_HLT_Full_pt_eta_2d_TTTo2L2Nu'] 
     plot['Efficiency_HLT_Full_pt_MC']        = combineEfficiency([plot['Efficiency_HLT_Full_pt_DYJetsToLL_M-50'], plot['Efficiency_HLT_Full_eta_2d_TTTo2L2Nu']], [weights['DYJetsToLL_M-50'], weights['TTTo2L2Nu']])
-    plot['Efficiency_HLT_Full_pt_MET100_MC'] = combineEfficiency([plot['Efficiency_HLT_Full_pt_MET100_DYJetsToLL_M-50'], plot['Efficiency_HLT_Full_pt_MET100_TTTo2L2Nu']], [weights['DYJetsToLL_M-50'], weights['TTTo2L2Nu']])
-    plot['Efficiency_HLT_Full_pt_MET150_MC'] = combineEfficiency([plot['Efficiency_HLT_Full_pt_MET150_DYJetsToLL_M-50'], plot['Efficiency_HLT_Full_pt_MET150_TTTo2L2Nu']], [weights['DYJetsToLL_M-50'], weights['TTTo2L2Nu']])
-    plot['Efficiency_HLT_Full_pt_MET200_MC'] = combineEfficiency([plot['Efficiency_HLT_Full_pt_MET200_DYJetsToLL_M-50'], plot['Efficiency_HLT_Full_pt_MET200_TTTo2L2Nu']], [weights['DYJetsToLL_M-50'], weights['TTTo2L2Nu']])
+    plot['Efficiency_HLT_Full_pt_MET40_MC'] = combineEfficiency([plot['Efficiency_HLT_Full_pt_MET40_DYJetsToLL_M-50'], plot['Efficiency_HLT_Full_pt_MET40_TTTo2L2Nu']], [weights['DYJetsToLL_M-50'], weights['TTTo2L2Nu']])
+    plot['Efficiency_HLT_Full_pt_MET60_MC'] = combineEfficiency([plot['Efficiency_HLT_Full_pt_MET60_DYJetsToLL_M-50'], plot['Efficiency_HLT_Full_pt_MET60_TTTo2L2Nu']], [weights['DYJetsToLL_M-50'], weights['TTTo2L2Nu']])
+    plot['Efficiency_HLT_Full_pt_MET80_MC'] = combineEfficiency([plot['Efficiency_HLT_Full_pt_MET80_DYJetsToLL_M-50'], plot['Efficiency_HLT_Full_pt_MET80_TTTo2L2Nu']], [weights['DYJetsToLL_M-50'], weights['TTTo2L2Nu']])
 
+    ### Scale factor plot
+    plot['Efficiency_pt2_pt1_DATA'] = plot['PassTRG_pt2_pt1_DATA'].Clone('Efficiency_pt2_pt1_DATA')
+    plot['Efficiency_pt2_pt1_DATA'].Divide(plot['PassMET_pt2_pt1_DATA'])
+    plot['Efficiency_pt2_pt1_TTTo2L2Nu'] = plot['PassTRG_pt2_pt1_TTTo2L2Nu'].Clone('Efficiency_pt2_pt1_TTTo2L2Nu')
+    plot['Efficiency_pt2_pt1_TTTo2L2Nu'].Divide(plot['PassMET_pt2_pt1_TTTo2L2Nu'])
+    plot['ScaleFactor_pt2_pt1'] = plot['Efficiency_pt2_pt1_DATA'].Clone('ScaleFactor_pt2_pt') 
+    plot['ScaleFactor_pt2_pt1'].Divide(plot['Efficiency_pt2_pt1_TTTo2L2Nu'])
 
-    """
-    plot['Efficiency_HLT_Full_pt_2d_MC']     = plot['Efficiency_HLT_Full_eta_2d_DYJetsToLL_M-50'] 
-    plot['Efficiency_HLT_Full_eta_2d_MC']    = plot['Efficiency_HLT_Full_eta_2d_DYJetsToLL_M-50']
-    plot['Efficiency_HLT_Full_pt_eta_2d_MC'] = plot['Efficiency_HLT_Full_pt_eta_2d_DYJetsToLL_M-50'] 
-    plot['Efficiency_HLT_Full_pt_MC']        = plot['Efficiency_HLT_Full_pt_DYJetsToLL_M-50']
-    plot['Efficiency_HLT_Full_pt_MET100_MC'] = plot['Efficiency_HLT_Full_pt_MET100_DYJetsToLL_M-50']
-    plot['Efficiency_HLT_Full_pt_MET150_MC'] = plot['Efficiency_HLT_Full_pt_MET150_DYJetsToLL_M-50']
-    plot['Efficiency_HLT_Full_pt_MET200_MC'] = plot['Efficiency_HLT_Full_pt_MET200_DYJetsToLL_M-50']
-    """
+    plot['Efficiency_pt2_pt1_DATA'].Write()
+    plot['Efficiency_pt2_pt1_TTTo2L2Nu'].Write()
+    plot['ScaleFactor_pt2_pt1'].Write()
+
 
     ### Efficiency (1d)
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_Eff_full_pt_1D", 'png,pdf', 0.16, 0.72, 0.56, 0.82, 1)
     hdata_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
-    hMC_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MC'])
+    hMC_ = plot['Efficiency_HLT_Full_pt_MC']
     canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
     canvas.addHisto(hMC_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
     canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
@@ -467,74 +490,82 @@ if __name__ == "__main__":
     canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
     canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hTTTo2L2Nu_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False)
 
+    canvas = Canvas.Canvas("MuonTrigger_"+era+"_Eff_full_mass_1D_TTTo2L2Nu", 'png,pdf', 0.16, 0.72, 0.56, 0.82, 1)
+    hdata_ = getHistoFromEff(plot['Efficiency_HLT_Full_mass_DATA'])
+    hTTTo2L2Nu_ = getHistoFromEff(plot['Efficiency_HLT_Full_mass_TTTo2L2Nu'])
+    canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
+    canvas.addHisto(hTTTo2L2Nu_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
+    canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
+    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hTTTo2L2Nu_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False)
+
     ### Sys variations
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_SFvar_full_pt_1D_MC", 'png,pdf', 0.46, 0.72, 0.86, 0.89, 1)
     hSF_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
-    hMC_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MC'])
-    hSF_MET100 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET100_DATA'])
-    hMC_MET100 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET100_MC'])
-    hSF_MET150 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET150_DATA'])
-    hMC_MET150 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET150_MC'])
-    hSF_MET200 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET200_DATA'])
-    hMC_MET200 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET200_MC'])
+    hMC_ = plot['Efficiency_HLT_Full_pt_MC']
+    hSF_MET40 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET40_DATA'])
+    hMC_MET40 = plot['Efficiency_HLT_Full_pt_MET40_MC']
+    hSF_MET60 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET60_DATA'])
+    hMC_MET60 = plot['Efficiency_HLT_Full_pt_MET60_MC']
+    hSF_MET80 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET80_DATA'])
+    hMC_MET80 = plot['Efficiency_HLT_Full_pt_MET80_MC']
     hSF_.Divide(hMC_)
-    hSF_MET100.Divide(hMC_MET100)
-    hSF_MET150.Divide(hMC_MET150)
-    hSF_MET200.Divide(hMC_MET200)
+    hSF_MET40.Divide(hMC_MET40)
+    hSF_MET60.Divide(hMC_MET60)
+    hSF_MET80.Divide(hMC_MET80)
     hSF_.GetYaxis().SetTitle('Scale factor')
-    hsys_ = createSysPlot(hSF_, 0.1)
-    canvas.addHisto(hsys_,'E2', '', '', '', True, 99)
+    hsys_ = createSysPlot(hSF_, 0.03)
+    canvas.addHisto(hsys_,'E2', '3% syst.', 'f', '', True, 1)
     canvas.addHisto(hSF_,'P,SAME', 'Scale factor', 'pl', r.kBlack, True, 0, marker = 20)
-    canvas.addHisto(hSF_MET200,'P,SAME', 'MET > 140 GeV', 'pl', r.kBlue, True, 0, marker = 26)
-    canvas.addHisto(hSF_MET150,'P,SAME', 'MET > 120 GeV', 'pl', r.kBlue, True, 0, marker = 25)
-    canvas.addHisto(hSF_MET100,'P,SAME', 'MET > 100 GeV', 'pl', r.kBlue, True, 0, marker = 32)
+    canvas.addHisto(hSF_MET80,'P,SAME', 'MET > 80 GeV', 'pl', r.kBlue, True, 2, marker = 26)
+    canvas.addHisto(hSF_MET60,'P,SAME', 'MET > 60 GeV', 'pl', r.kBlue, True, 3, marker = 25)
+    canvas.addHisto(hSF_MET40,'P,SAME', 'MET > 40 GeV', 'pl', r.kBlue, True, 4, marker = 32)
     canvas.addLatex(0.9, 0.93, era, size = 0.035, align = 31)
     canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False)
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_SFvar_full_pt_1D_DYJetsToLL_M-50", 'png,pdf', 0.46, 0.72, 0.86, 0.89, 1)
     hSF_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
     hMC_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DYJetsToLL_M-50'])
-    hSF_MET100 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET100_DATA'])
-    hMC_MET100 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET100_DYJetsToLL_M-50'])
-    hSF_MET150 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET150_DATA'])
-    hMC_MET150 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET150_DYJetsToLL_M-50'])
-    hSF_MET200 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET200_DATA'])
-    hMC_MET200 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET200_DYJetsToLL_M-50'])
+    hSF_MET40 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET40_DATA'])
+    hMC_MET40 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET40_DYJetsToLL_M-50'])
+    hSF_MET60 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET60_DATA'])
+    hMC_MET60 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET60_DYJetsToLL_M-50'])
+    hSF_MET80 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET80_DATA'])
+    hMC_MET80 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET80_DYJetsToLL_M-50'])
     hSF_.Divide(hMC_)
-    hSF_MET100.Divide(hMC_MET100)
-    hSF_MET150.Divide(hMC_MET150)
-    hSF_MET200.Divide(hMC_MET200)
+    hSF_MET40.Divide(hMC_MET40)
+    hSF_MET60.Divide(hMC_MET60)
+    hSF_MET80.Divide(hMC_MET80)
     hSF_.GetYaxis().SetTitle('Scale factor')
-    hsys_ = createSysPlot(hSF_, 0.1)
-    canvas.addHisto(hsys_,'E2', '', '', '', True, 99)
+    hsys_ = createSysPlot(hSF_, 0.03)
+    canvas.addHisto(hsys_,'E2', '3% syst.', 'f', '', True, 1)
     canvas.addHisto(hSF_,'P,SAME', 'Scale factor', 'pl', r.kBlack, True, 0, marker = 20)
-    canvas.addHisto(hSF_MET200,'P,SAME', 'MET > 140 GeV', 'pl', r.kBlue, True, 0, marker = 26)
-    canvas.addHisto(hSF_MET150,'P,SAME', 'MET > 120 GeV', 'pl', r.kBlue, True, 0, marker = 25)
-    canvas.addHisto(hSF_MET100,'P,SAME', 'MET > 100 GeV', 'pl', r.kBlue, True, 0, marker = 32)
+    canvas.addHisto(hSF_MET80,'P,SAME', 'MET > 80 GeV', 'pl', r.kBlue, True, 2, marker = 26)
+    canvas.addHisto(hSF_MET60,'P,SAME', 'MET > 60 GeV', 'pl', r.kBlue, True, 3, marker = 25)
+    canvas.addHisto(hSF_MET40,'P,SAME', 'MET > 40 GeV', 'pl', r.kBlue, True, 4, marker = 32)
     canvas.addLatex(0.9, 0.93, era, size = 0.035, align = 31)
     canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False)
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_SFvar_full_pt_1D_TTTo2L2Nu", 'png,pdf', 0.46, 0.72, 0.86, 0.89, 1)
     hSF_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
     hMC_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_TTTo2L2Nu'])
-    hSF_MET100 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET100_DATA'])
-    hMC_MET100 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET100_TTTo2L2Nu'])
-    hSF_MET150 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET150_DATA'])
-    hMC_MET150 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET150_TTTo2L2Nu'])
-    hSF_MET200 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET200_DATA'])
-    hMC_MET200 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET200_TTTo2L2Nu'])
+    hSF_MET40 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET40_DATA'])
+    hMC_MET40 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET40_TTTo2L2Nu'])
+    hSF_MET60 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET60_DATA'])
+    hMC_MET60 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET60_TTTo2L2Nu'])
+    hSF_MET80 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET80_DATA'])
+    hMC_MET80 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET80_TTTo2L2Nu'])
     hSF_.Divide(hMC_)
-    hSF_MET100.Divide(hMC_MET100)
-    hSF_MET150.Divide(hMC_MET150)
-    hSF_MET200.Divide(hMC_MET200)
+    hSF_MET40.Divide(hMC_MET40)
+    hSF_MET60.Divide(hMC_MET60)
+    hSF_MET80.Divide(hMC_MET80)
     hSF_.GetYaxis().SetTitle('Scale factor')
-    hsys_ = createSysPlot(hSF_, 0.1)
-    canvas.addHisto(hsys_,'E2', '', '', '', True, 99)
+    hsys_ = createSysPlot(hSF_, 0.03)
+    canvas.addHisto(hsys_,'E2', '3% syst.', 'f', '', True, 1)
     canvas.addHisto(hSF_,'P,SAME', 'Scale factor', 'pl', r.kBlack, True, 0, marker = 20)
-    canvas.addHisto(hSF_MET200,'P,SAME', 'MET > 140 GeV', 'pl', r.kBlue, True, 0, marker = 26)
-    canvas.addHisto(hSF_MET150,'P,SAME', 'MET > 120 GeV', 'pl', r.kBlue, True, 0, marker = 25)
-    canvas.addHisto(hSF_MET100,'P,SAME', 'MET > 100 GeV', 'pl', r.kBlue, True, 0, marker = 32)
+    canvas.addHisto(hSF_MET80,'P,SAME', 'MET > 80 GeV', 'pl', r.kBlue, True, 2, marker = 26)
+    canvas.addHisto(hSF_MET60,'P,SAME', 'MET > 60 GeV', 'pl', r.kBlue, True, 3, marker = 25)
+    canvas.addHisto(hSF_MET40,'P,SAME', 'MET > 40 GeV', 'pl', r.kBlue, True, 4, marker = 32)
     canvas.addLatex(0.9, 0.93, era, size = 0.035, align = 31)
     canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False)
 

@@ -85,6 +85,17 @@ def getSFPlot(data, mc):
     return h_sf, h_sfErr
 
 
+def createSysPlot(hist, sys):
+    hsys = hist.Clone(hist.GetName() + '_sys')
+    hsys.Reset()
+    for i in range(1, hsys.GetNbinsX() + 1):
+        hsys.SetBinContent(i, hist.GetBinContent(i))
+        hsys.SetBinError(i, hist.GetBinContent(i)*sys)
+    hsys.SetMarkerSize(0)
+    hsys.SetFillColorAlpha(r.kBlue, 0.3)
+    hsys.SetLineColorAlpha(r.kBlue, 0.3)
+    return hsys
+
 
 def passedMETTrigger(ev, year):
 
@@ -107,11 +118,39 @@ def passedPhotonTrigger(ev, year):
     if year == '2016':
         passed = ev.HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15 or ev.HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55
     elif year == '2017':
-        passed = ev.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_PixelVeto_Mass55 or ev.HLT_DoublePhoton70
+        passed = ev.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_DoublePhoton70
+        #passed = ev.HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_PixelVeto_Mass55
     elif year == '2018':
         passed = ev.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_NoPixelVeto or ev.HLT_DoublePhoton70
 
     return passed
+
+
+def combineEfficiency(effs, weights):
+
+    final_total = effs[0].GetTotalHistogram().Clone(effs[0].GetName()+'_w')
+    final_passed = effs[0].GetPassedHistogram().Clone(effs[0].GetName()+'_w')
+    final_total.Sumw2()
+    final_passed.Sumw2()
+    final_total.Scale(weights[0])
+    final_passed.Scale(weights[0])
+
+    for i in range(1, len(effs) - 1):
+        total = effs[i].GetTotalHistogram().Clone(effs[i].GetName()+'_w')
+        passed = effs[i].GetPassedHistogram().Clone(effs[i].GetName()+'_w')
+        total.Sumw2()
+        passed.Sumw2()
+        total.Scale(weights[i])
+        passed.Scale(weights[i])
+        final_total.Add(total)
+        final_passed.Add(passed)
+
+    final_eff = final_passed.Clone(final_passed.GetName() + '_combined')
+    final_eff.Divide(final_total)
+
+    return final_eff
+
+
 
 
 ################################################################################################################
@@ -177,10 +216,10 @@ if __name__ == "__main__":
 
 
 
-    MC_2016APV = ['TTTo2L2Nu_preVFP']
-    MC_2016 = ['TTTo2L2Nu_postVFP']
-    MC_2017 = ['TTTo2L2Nu_2017']
-    MC_2018 = ['TTTo2L2Nu_2018']
+    MC_2016APV = ['TTTo2L2Nu_preVFP', 'DYJetsToLL_M-50_preVFP']
+    MC_2016 = ['TTTo2L2Nu_postVFP', 'DYJetsToLL_M-50_postVFP']
+    MC_2017 = ['TTTo2L2Nu_2017', 'DYJetsToLL_M-50_2017']
+    MC_2018 = ['TTTo2L2Nu_2018', 'DYJetsToLL_M-50_2018']
 
 
     if era == '2016APV':
@@ -200,20 +239,38 @@ if __name__ == "__main__":
     ####   Init plots    ####
     #########################
 
-    pt1_bin = np.array([30., 60., 80., 100., 125., 150., 200., 250.])
-    pt2_bin = np.array([30., 40., 60., 80., 100., 125., 200.])
+    pt1_bin = np.array([30., 50., 70., 100., 125., 150., 200., 250.])
+    pt2_bin = np.array([30., 50., 70., 100., 125., 200.])
     eta2_bin = np.array([-2.0, -1.6, -1.2, -0.9, -0.3, -0.2, 0.2, 0.3, 0.9, 1.2, 1.6, 2.0])
     eta2_bin = np.array([-2.0, -1.6, -1.2, -0.9, -0.3, -0.2, 0.2, 0.3, 0.9, 1.2, 1.6, 2.0])
+    mass_bin = np.array([15., 60., 100., 200.]) 
 
     plot = {}
+    plot['PassMET_pt2_pt1_DATA'] = copy.deepcopy(r.TH2F('PassMET_pt2_pt1_DATA', ";Subleading electron E_{T};Leading electron E_{T}", len(pt2_bin)-1, pt2_bin, len(pt1_bin)-1, pt1_bin))
+    plot['PassTRG_pt2_pt1_DATA'] = copy.deepcopy(r.TH2F('PassTRG_pt2_pt1_DATA', ";Subleading electron E_{T};Leading electron E_{T}", len(pt2_bin)-1, pt2_bin, len(pt1_bin)-1, pt1_bin))
     plot['Efficiency_HLT_Full_pt_2d_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_2d_DATA', ";Subleading electron E_{T};Leading electron E_{T}", len(pt2_bin)-1, pt2_bin, len(pt1_bin)-1, pt1_bin))
-    plot['Efficiency_HLT_Full_pt_2d_MC'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_2d_MC', ";Subleading electron E_{T};Leading electron E_{T}", len(pt2_bin)-1, pt2_bin, len(pt1_bin)-1, pt1_bin))
     plot['Efficiency_HLT_Full_eta_2d_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_eta_2d_DATA', ";Subleading electron #eta;Leading electron #eta", len(eta2_bin)-1, eta2_bin, len(eta2_bin)-1, eta2_bin))
-    plot['Efficiency_HLT_Full_eta_2d_MC'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_eta_2d_MC', ";Subleading electron #eta;Leading electron #eta", len(eta2_bin)-1, eta2_bin, len(eta2_bin)-1, eta2_bin))
     plot['Efficiency_HLT_Full_pt_eta_2d_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_eta_2d_DATA', ";Subleading electron E_{T};Subeading electron #eta", len(pt2_bin)-1, pt2_bin, len(eta2_bin)-1, eta2_bin))
-    plot['Efficiency_HLT_Full_pt_eta_2d_MC'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_eta_2d_MC', ";Subleading electron E_{T};Subleading electron #eta", len(pt2_bin)-1, pt2_bin, len(eta2_bin)-1, eta2_bin))
     plot['Efficiency_HLT_Full_pt_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_DATA', ";Subleading electron E_{T} (GeV) ;Efficiency", len(pt2_bin)-1, pt2_bin))
-    plot['Efficiency_HLT_Full_pt_MC'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MC', ";Subleading electron E_{T} (GeV) ;Efficiency", len(pt2_bin)-1, pt2_bin))
+    plot['Efficiency_HLT_Full_mass_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_mass_DATA', ";Dielectron m_{ee} (GeV) ;Efficiency", len(mass_bin)-1, mass_bin))
+    plot['Efficiency_HLT_Full_pt_MET40_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET40_DATA', ";Subleading electron E_{T}; Efficiency", len(pt2_bin)-1, pt2_bin))
+    plot['Efficiency_HLT_Full_pt_MET60_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET60_DATA', ";Subleading electron E_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
+    plot['Efficiency_HLT_Full_pt_MET80_DATA'] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET80_DATA', ";Subleading electron E_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
+
+
+    for key in ['TTTo2L2Nu', 'DYJetsToLL_M-50']:
+        plot['PassMET_pt2_pt1_'+key] = copy.deepcopy(r.TH2F('PassMET_pt2_pt1_'+key, ";Subleading electron E_{T};Leading electron E_{T}", len(pt2_bin)-1, pt2_bin, len(pt1_bin)-1, pt1_bin))
+        plot['PassTRG_pt2_pt1_'+key] = copy.deepcopy(r.TH2F('PassTRG_pt2_pt1_'+key, ";Subleading electron E_{T};Leading electron E_{T}", len(pt2_bin)-1, pt2_bin, len(pt1_bin)-1, pt1_bin))
+        plot['Efficiency_HLT_Full_pt_2d_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_2d_'+key, ";Subleading electron E_{T};Leading electron E_{T}", len(pt2_bin)-1, pt2_bin, len(pt1_bin)-1, pt1_bin))
+        plot['Efficiency_HLT_Full_eta_2d_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_eta_2d_+key', ";Subleading electron #eta;Leading electron #eta", len(eta2_bin)-1, eta2_bin, len(eta2_bin)-1, eta2_bin))
+        plot['Efficiency_HLT_Full_pt_eta_2d_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_eta_2d_'+key, ";Subleading electron E_{T};Subleading electron #eta", len(pt2_bin)-1, pt2_bin, len(eta2_bin)-1, eta2_bin))
+        plot['Efficiency_HLT_Full_pt_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_'+key, ";Subleading electron E_{T} (GeV) ;Efficiency", len(pt2_bin)-1, pt2_bin))
+        plot['Efficiency_HLT_Full_mass_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_mass_'+key, ";Dielectron m_{ee} (GeV) ;Efficiency", len(mass_bin)-1, mass_bin))
+        plot['Efficiency_HLT_Full_pt_MET40_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET40_'+key, ";Subleading electron E_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
+        plot['Efficiency_HLT_Full_pt_MET60_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET60_'+key, ";Subleading electron E_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
+        plot['Efficiency_HLT_Full_pt_MET80_'+key] = copy.deepcopy(r.TEfficiency('Efficiency_HLT_Full_pt_MET80_'+key, ";Subleading electron E_{T};Efficiency", len(pt2_bin)-1, pt2_bin))
+
+
 
     for p in plot.keys():
         r.SetOwnership(plot[p], 0)
@@ -279,15 +336,39 @@ if __name__ == "__main__":
                      plot['Efficiency_HLT_Full_eta_2d_DATA'].Fill(passedPhotonTrigger(ev, year), eta_ord[1], eta_ord[0])
                      plot['Efficiency_HLT_Full_pt_eta_2d_DATA'].Fill(passedPhotonTrigger(ev, year), et_ord[1], eta_ord[1])
                      plot['Efficiency_HLT_Full_pt_DATA'].Fill(passedPhotonTrigger(ev, year), et_ord[1])
+                     plot['Efficiency_HLT_Full_mass_DATA'].Fill(passedPhotonTrigger(ev, year), (el1+el2).M())
                      
+                     plot['PassMET_pt2_pt1_DATA'].Fill(et_ord[1], et_ord[0])
+                     if passedPhotonTrigger(ev, year):
+                         plot['PassTRG_pt2_pt1_DATA'].Fill(et_ord[1], et_ord[0])
+
+
+                     if ev.MET_pt > 40:
+                         plot['Efficiency_HLT_Full_pt_MET40_DATA'].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
+                     if ev.MET_pt > 60:
+                         plot['Efficiency_HLT_Full_pt_MET60_DATA'].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
+                     if ev.MET_pt > 80:
+                         plot['Efficiency_HLT_Full_pt_MET80_DATA'].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
+
+
                      num += 1
-                     if num > 1000:
+                     if num > 10:
                          num = 0
                          #break
 
     ### MC:
+    weights = {}
     for b in treeMC.blocks:
         for s in b.samples: 
+            if era == '2016APV':
+                key = s.name.replace('_preVFP', '')
+            elif era == '2016':
+                key = s.name.replace('_postVFP', '')
+            elif era == '2017':
+                key = s.name.replace('_2017', '')
+            elif era == '2018':
+                key = s.name.replace('_2018', '')
+            weights[key] = s.lumWeight
             for t in s.ttrees:
                 num = 0
                 for e,ev in enumerate(t):
@@ -329,16 +410,43 @@ if __name__ == "__main__":
                      if (el1+el2).M() < 15.:
                          continue
 
+                     plot['PassMET_pt2_pt1_' + key].Fill(et_ord[1], et_ord[0])
+                     if passedPhotonTrigger(ev, year):
+                         plot['PassTRG_pt2_pt1_' + key].Fill(et_ord[1], et_ord[0])
 
-                     plot['Efficiency_HLT_Full_pt_2d_MC'].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
-                     plot['Efficiency_HLT_Full_eta_2d_MC'].Fill(passedPhotonTrigger(ev, year), eta_ord[1], eta_ord[0])
-                     plot['Efficiency_HLT_Full_pt_eta_2d_MC'].Fill(passedPhotonTrigger(ev, year), et_ord[1], eta_ord[1])
-                     plot['Efficiency_HLT_Full_pt_MC'].Fill(passedPhotonTrigger(ev, year), et_ord[1])
+
+                     plot['Efficiency_HLT_Full_pt_2d_' + key].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
+                     plot['Efficiency_HLT_Full_eta_2d_' + key].Fill(passedPhotonTrigger(ev, year), eta_ord[1], eta_ord[0])
+                     plot['Efficiency_HLT_Full_pt_eta_2d_' + key].Fill(passedPhotonTrigger(ev, year), et_ord[1], eta_ord[1])
+                     plot['Efficiency_HLT_Full_pt_' + key].Fill(passedPhotonTrigger(ev, year), et_ord[1])
+                     plot['Efficiency_HLT_Full_mass_' + key].Fill(passedPhotonTrigger(ev, year), (el1+el2).M())
+
+                     if ev.MET_pt > 40:
+                         plot['Efficiency_HLT_Full_pt_MET40_' + key].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
+                     if ev.MET_pt > 60:
+                         plot['Efficiency_HLT_Full_pt_MET60_' + key].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
+                     if ev.MET_pt > 80:
+                         plot['Efficiency_HLT_Full_pt_MET80_' + key].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
+
 
                      num += 1
-                     if num > 1000:
+                     if num > 10:
                           num = 0
                           #break
+
+
+    ##################################################################################################
+    ## Weight the histograms 
+    """
+    for key in plot.keys():
+        if 'DATA' in key:
+            continue
+        if 'DYJetsToLL_M-50' in key:
+            plot[key].SetWeight(weights['DYJetsToLL_M-50'])
+        if 'TTTo2L2Nu' in key:
+            plot[key].SetWeight(weights['TTTo2L2Nu'])
+    """
+
 
     ##################################################################################################
 
@@ -346,16 +454,135 @@ if __name__ == "__main__":
     for key in plot.keys():
         plot[key].Write()
 
+    plot['Efficiency_HLT_Full_pt_2d_MC']     = plot['Efficiency_HLT_Full_pt_2d_TTTo2L2Nu']
+    plot['Efficiency_HLT_Full_eta_2d_MC']    = plot['Efficiency_HLT_Full_eta_2d_TTTo2L2Nu']
+    plot['Efficiency_HLT_Full_pt_eta_2d_MC'] = plot['Efficiency_HLT_Full_pt_eta_2d_TTTo2L2Nu']
+    plot['Efficiency_HLT_Full_pt_MC']        = combineEfficiency([plot['Efficiency_HLT_Full_pt_DYJetsToLL_M-50'], plot['Efficiency_HLT_Full_eta_2d_TTTo2L2Nu']], [weights['DYJetsToLL_M-50'], weights['TTTo2L2Nu']])
+    plot['Efficiency_HLT_Full_pt_MET40_MC'] = combineEfficiency([plot['Efficiency_HLT_Full_pt_MET40_DYJetsToLL_M-50'], plot['Efficiency_HLT_Full_pt_MET40_TTTo2L2Nu']], [weights['DYJetsToLL_M-50'], weights['TTTo2L2Nu']])
+    plot['Efficiency_HLT_Full_pt_MET60_MC'] = combineEfficiency([plot['Efficiency_HLT_Full_pt_MET60_DYJetsToLL_M-50'], plot['Efficiency_HLT_Full_pt_MET60_TTTo2L2Nu']], [weights['DYJetsToLL_M-50'], weights['TTTo2L2Nu']])
+    plot['Efficiency_HLT_Full_pt_MET80_MC'] = combineEfficiency([plot['Efficiency_HLT_Full_pt_MET80_DYJetsToLL_M-50'], plot['Efficiency_HLT_Full_pt_MET80_TTTo2L2Nu']], [weights['DYJetsToLL_M-50'], weights['TTTo2L2Nu']])
+
+
+    ### Scale factor plot
+    plot['Efficiency_pt2_pt1_DATA'] = plot['PassTRG_pt2_pt1_DATA'].Clone('Efficiency_pt2_pt1_DATA')
+    plot['Efficiency_pt2_pt1_DATA'].Divide(plot['PassMET_pt2_pt1_DATA'])
+    plot['Efficiency_pt2_pt1_TTTo2L2Nu'] = plot['PassTRG_pt2_pt1_TTTo2L2Nu'].Clone('Efficiency_pt2_pt1_TTTo2L2Nu')
+    plot['Efficiency_pt2_pt1_TTTo2L2Nu'].Divide(plot['PassMET_pt2_pt1_TTTo2L2Nu'])
+    plot['ScaleFactor_pt2_pt1'] = plot['Efficiency_pt2_pt1_DATA'].Clone('ScaleFactor_pt2_pt')
+    plot['ScaleFactor_pt2_pt1'].Divide(plot['Efficiency_pt2_pt1_TTTo2L2Nu'])
+
+    plot['Efficiency_pt2_pt1_DATA'].Write()
+    plot['Efficiency_pt2_pt1_TTTo2L2Nu'].Write()
+    plot['ScaleFactor_pt2_pt1'].Write()
+
 
     ### Efficiency 
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_Eff_full_pt_1D", 'png,pdf', 0.16, 0.72, 0.56, 0.82, 1)
     hdata_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
-    hMC_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MC'])
+    hMC_ = plot['Efficiency_HLT_Full_pt_MC']
     canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
     canvas.addHisto(hMC_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
     canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
     canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hMC_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False)
+
+    canvas = Canvas.Canvas("PhotonTrigger_"+era+"_Eff_full_pt_1D_DYJetsToLL_M-50", 'png,pdf', 0.16, 0.72, 0.56, 0.82, 1)
+    hdata_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
+    hDYJetsToLL_M50_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DYJetsToLL_M-50'])
+    canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
+    canvas.addHisto(hDYJetsToLL_M50_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
+    canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
+    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hDYJetsToLL_M50_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False)
+
+    canvas = Canvas.Canvas("PhotonTrigger_"+era+"_Eff_full_pt_1D_TTTo2L2Nu", 'png,pdf', 0.16, 0.72, 0.56, 0.82, 1)
+    hdata_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
+    hTTTo2L2Nu_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_TTTo2L2Nu'])
+    canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
+    canvas.addHisto(hTTTo2L2Nu_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
+    canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
+    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hTTTo2L2Nu_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False)
+
+    canvas = Canvas.Canvas("PhotonTrigger_"+era+"_Eff_full_mass_1D_TTTo2L2Nu", 'png,pdf', 0.16, 0.72, 0.56, 0.82, 1)
+    hdata_ = getHistoFromEff(plot['Efficiency_HLT_Full_mass_DATA'])
+    hTTTo2L2Nu_ = getHistoFromEff(plot['Efficiency_HLT_Full_mass_TTTo2L2Nu'])
+    canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
+    canvas.addHisto(hTTTo2L2Nu_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
+    canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
+    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hTTTo2L2Nu_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False)
+
+
+    ### Sys variations
+
+    canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SFvar_full_pt_1D_MC", 'png,pdf', 0.46, 0.72, 0.86, 0.89, 1)
+    hSF_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
+    hMC_ = plot['Efficiency_HLT_Full_pt_MC']
+    hSF_MET40 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET40_DATA'])
+    hMC_MET40 = plot['Efficiency_HLT_Full_pt_MET40_MC']
+    hSF_MET60 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET60_DATA'])
+    hMC_MET60 = plot['Efficiency_HLT_Full_pt_MET60_MC']
+    hSF_MET80 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET80_DATA'])
+    hMC_MET80 = plot['Efficiency_HLT_Full_pt_MET80_MC']
+    hSF_.Divide(hMC_)
+    hSF_MET40.Divide(hMC_MET40)
+    hSF_MET60.Divide(hMC_MET60)
+    hSF_MET80.Divide(hMC_MET80)
+    hSF_.GetYaxis().SetTitle('Scale factor')
+    hsys_ = createSysPlot(hSF_, 0.015)
+    canvas.addHisto(hsys_,'E2', '1.5% syst.', 'f', '', True, 1)
+    canvas.addHisto(hSF_,'P,SAME', 'Scale factor', 'pl', r.kBlack, True, 0, marker = 20)
+    canvas.addHisto(hSF_MET80,'P,SAME', 'MET > 80 GeV', 'pl', r.kBlue, True, 2, marker = 26)
+    canvas.addHisto(hSF_MET60,'P,SAME', 'MET > 60 GeV', 'pl', r.kBlue, True, 3, marker = 25)
+    canvas.addHisto(hSF_MET40,'P,SAME', 'MET > 40 GeV', 'pl', r.kBlue, True, 4, marker = 32)
+    canvas.addLatex(0.9, 0.93, era, size = 0.035, align = 31)
+    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False)
+
+    canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SFvar_full_pt_1D_DYJetsToLL_M-50", 'png,pdf', 0.46, 0.72, 0.86, 0.89, 1)
+    hSF_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
+    hMC_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DYJetsToLL_M-50'])
+    hSF_MET40 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET40_DATA'])
+    hMC_MET40 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET40_DYJetsToLL_M-50'])
+    hSF_MET60 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET60_DATA'])
+    hMC_MET60 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET60_DYJetsToLL_M-50'])
+    hSF_MET80 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET80_DATA'])
+    hMC_MET80 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET80_DYJetsToLL_M-50'])
+    hSF_.Divide(hMC_)
+    hSF_MET40.Divide(hMC_MET40)
+    hSF_MET60.Divide(hMC_MET60)
+    hSF_MET80.Divide(hMC_MET80)
+    hSF_.GetYaxis().SetTitle('Scale factor')
+    hsys_ = createSysPlot(hSF_, 0.015)
+    canvas.addHisto(hsys_,'E2', '1.5% syst.', 'f', '', True, 1)
+    canvas.addHisto(hSF_,'P,SAME', 'Scale factor', 'pl', r.kBlack, True, 0, marker = 20)
+    canvas.addHisto(hSF_MET80,'P,SAME', 'MET > 80 GeV', 'pl', r.kBlue, True, 2, marker = 26)
+    canvas.addHisto(hSF_MET60,'P,SAME', 'MET > 60 GeV', 'pl', r.kBlue, True, 3, marker = 25)
+    canvas.addHisto(hSF_MET40,'P,SAME', 'MET > 40 GeV', 'pl', r.kBlue, True, 4, marker = 32)
+    canvas.addLatex(0.9, 0.93, era, size = 0.035, align = 31)
+    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False)
+
+    canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SFvar_full_pt_1D_TTTo2L2Nu", 'png,pdf', 0.46, 0.72, 0.86, 0.89, 1)
+    hSF_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
+    hMC_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_TTTo2L2Nu'])
+    hSF_MET40 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET40_DATA'])
+    hMC_MET40 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET40_TTTo2L2Nu'])
+    hSF_MET60 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET60_DATA'])
+    hMC_MET60 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET60_TTTo2L2Nu'])
+    hSF_MET80 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET80_DATA'])
+    hMC_MET80 = getHistoFromEff(plot['Efficiency_HLT_Full_pt_MET80_TTTo2L2Nu'])
+    hSF_.Divide(hMC_)
+    hSF_MET40.Divide(hMC_MET40)
+    hSF_MET60.Divide(hMC_MET60)
+    hSF_MET80.Divide(hMC_MET80)
+    hSF_.GetYaxis().SetTitle('Scale factor')
+    hsys_ = createSysPlot(hSF_, 0.015)
+    canvas.addHisto(hsys_,'E2', '1.5% syst.', 'f', '', True, 1)
+    canvas.addHisto(hSF_,'P,SAME', 'Scale factor', 'pl', r.kBlack, True, 0, marker = 20)
+    canvas.addHisto(hSF_MET80,'P,SAME', 'MET > 80 GeV', 'pl', r.kBlue, True, 2, marker = 26)
+    canvas.addHisto(hSF_MET60,'P,SAME', 'MET > 60 GeV', 'pl', r.kBlue, True, 3, marker = 25)
+    canvas.addHisto(hSF_MET40,'P,SAME', 'MET > 40 GeV', 'pl', r.kBlue, True, 4, marker = 32)
+    canvas.addLatex(0.9, 0.93, era, size = 0.035, align = 31)
+    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False)
+
+
 
     r.gStyle.SetPadRightMargin(0.19)
 
