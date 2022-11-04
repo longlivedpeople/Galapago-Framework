@@ -1,4 +1,5 @@
-##################################################################################################
+#
+################################################################################################
 #                                                                                                #    
 #                                      ```...`                                                   #    
 #                                   `......-::::.`...---.`                                       #    
@@ -149,7 +150,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(usage='usage: %prog [args] FilenameWithSamples', version='%prog 1.0')
     parser.add_argument('-o', '--out', action='store', type=str, dest='out', default='', help='Output tag')
     parser.add_argument('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_UltraLegacy.dat', help='dat file')
-    parser.add_argument('-m', '--mode', action='store', type=str, dest='mode', help='Select mode to process config file')
+    parser.add_argument('-m', '--mode', action='store', type=str, dest='mode', default='plot', help='Select mode to process config file')
     parser.add_argument('-c', '--config', action='store', type=str, dest='config', help='Select config file')
     parser.add_argument('-q', '--condor', action='store_true', dest='condor', help='Select if you want to send the job a condor queue')
     parser.add_argument('-r', '--raw', action='store_true', dest='raw', help='Select if you DONT want to apply scale factors')
@@ -343,7 +344,7 @@ if __name__ == "__main__":
         if doSignals:
             print('Launching signal simulation...')
             treeSI_2016APV.Loop(lumi_preVFP, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2016APV', raw = args.raw)
-            treeSI_2016.Loop(lumi_preVFP, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2016', raw = args.raw)
+            treeSI_2016.Loop(lumi_postVFP, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2016', raw = args.raw)
             treeSI_2017.Loop(lumi_2017, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2017', raw = args.raw)
             treeSI_2018.Loop(lumi_2018, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2018', raw = args.raw)
     print("--- %s seconds ---" % (time.time() - start_time))
