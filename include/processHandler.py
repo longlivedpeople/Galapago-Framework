@@ -6,6 +6,11 @@ from ROOT import TVector3, TLorentzVector
 import include.CutManager as CutManager
 import numpy as np
 
+from calibration.f_DYCR_EffMu_RelIsoCutvsPt_lin100_2018 import findWisoMu2018
+from calibration.f_DYCR_EffMu_RelIsoCutvsPt_lin100_2016 import findWisoMu2016
+from calibration.f_DYCR_EffEl_RelIsoCutvsPt_lin100_2018 import findWisoEl2018
+from calibration.f_DYCR_EffEl_RelIsoCutvsPt_lin100_2017 import findWisoEl2017
+from calibration.f_DYCR_EffEl_RelIsoCutvsPt_lin100_2016 import findWisoEl2016
 
 class processHandler:
 
@@ -155,11 +160,23 @@ class processHandler:
         by2 = self.sf_mm_id.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxB[idx]]))
         sf = sf * self.sf_mm_id.GetBinContent(bx1, by1)*self.sf_mm_id.GetBinContent(bx2, by2)
 
-
         ### Trigger
         bx = self.sf_mm_trg.GetXaxis().FindBin(ev.DMDM_subleadingPt[idx])
         by = self.sf_mm_trg.GetYaxis().FindBin(ev.DMDM_leadingPt[idx])
         sf = sf * self.sf_mm_trg.GetBinContent(bx, by)
+
+        ### Isolation
+        passes_A = ev.DGM_relPFiso[ev.DMDM_idxA[idx]] < 0.2
+        passes_B = ev.DGM_relPFiso[ev.DMDM_idxB[idx]] < 0.2
+        wiso_A = 1.0
+        wiso_B = 1.0
+        if self.year == '2018':
+            wiso_A = findWisoMu2018(ev.DGM_pt[ev.DMDM_idxA[idx]], passes_A)
+            wiso_B = findWisoMu2018(ev.DGM_pt[ev.DMDM_idxB[idx]], passes_B)
+        elif self.year == '2016':
+            wiso_A = findWisoMu2016(ev.DGM_pt[ev.DMDM_idxA[idx]], passes_A)
+            wiso_B = findWisoMu2016(ev.DGM_pt[ev.DMDM_idxB[idx]], passes_B)
+        sf = sf*wiso_A*wiso_B
 
         return sf
 
@@ -182,6 +199,22 @@ class processHandler:
         bx = self.sf_ee_trg.GetXaxis().FindBin(ev.EE_subleadingEt[idx])
         by = self.sf_ee_trg.GetYaxis().FindBin(ev.EE_leadingEt[idx])
         sf = sf * self.sf_ee_trg.GetBinContent(bx, by)
+
+        ### Isolation
+        passes_A = ev.ElectronCandidate_relTrkiso[ev.EE_idxA[idx]] < 0.1
+        passes_B = ev.ElectronCandidate_relTrkiso[ev.EE_idxB[idx]] < 0.1
+        wiso_A = 1.0
+        wiso_B = 1.0
+        if self.year == '2018':
+            wiso_A = findWisoEl2018(ev.ElectronCandidate_pt[ev.EE_idxA[idx]], passes_A)
+            wiso_B = findWisoEl2018(ev.ElectronCandidate_pt[ev.EE_idxB[idx]], passes_B)
+        elif self.year == '2017':
+            wiso_A = findWisoEl2017(ev.ElectronCandidate_pt[ev.EE_idxA[idx]], passes_A)
+            wiso_B = findWisoEl2017(ev.ElectronCandidate_pt[ev.EE_idxB[idx]], passes_B)
+        elif self.year == '2016':
+            wiso_A = findWisoEl2016(ev.ElectronCandidate_pt[ev.EE_idxA[idx]], passes_A)
+            wiso_B = findWisoEl2016(ev.ElectronCandidate_pt[ev.EE_idxB[idx]], passes_B)
+        sf = sf * wiso_A*wiso_B
 
         return sf
 
