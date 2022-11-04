@@ -86,11 +86,23 @@ class processHandler:
         #### --------------------------------
 
         ### Reco + ID SFs
-        self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2018.root")
-        self.sf_ee_reco = self.file_sf_ee_reco.Get("NUM_genTracksDown_DEN_tagsIntime_absdxy_2d_absdz_2d")
-        if year != '2017':
-            self.file_sf_mm_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Muon_ScaleFactors_2018.root")
+        if '2016' in year:
+            self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2016_Fall22.root")
+            self.sf_ee_reco = self.file_sf_ee_reco.Get("NUM_genTracksDown_DEN_tagsInTime_absdxy_2d_absdz_2d")
+            self.file_sf_mm_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Muon_ScaleFactors_2016_Fall22.root")
             self.sf_mm_reco = self.file_sf_mm_reco.Get("NUM_dGlobalsUp_DEN_dGlobalsDown_absdxy_2d_absdz_2d")
+            self.file_sf_mm_id = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/MuonID_ScaleFactors_2016_Fall22.root")
+            self.sf_mm_id = self.file_sf_mm_id.Get("NUM_dGlobalID_DEN_dGlobalsUp_absdxy_2d_absdz_2d")
+        elif '2017' in year:
+            self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2017_Fall22.root")
+            self.sf_ee_reco = self.file_sf_ee_reco.Get("NUM_genTracksDown_DEN_tagsInTime_absdxy_2d_absdz_2d")
+        elif '2018' in year:
+            self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2018_Fall22.root")
+            self.sf_ee_reco = self.file_sf_ee_reco.Get("NUM_genTracksDown_DEN_tagsInTime_absdxy_2d_absdz_2d")
+            self.file_sf_mm_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Muon_ScaleFactors_2018_Fall22.root")
+            self.sf_mm_reco = self.file_sf_mm_reco.Get("NUM_dGlobalsUp_DEN_dGlobalsDown_absdxy_2d_absdz_2d")
+            self.file_sf_mm_id = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/MuonID_ScaleFactors_2018_Fall22.root")
+            self.sf_mm_id = self.file_sf_mm_id.Get("NUM_dGlobalID_DEN_dGlobalsUp_absdxy_2d_absdz_2d")
 
         ### Trigger
         self.file_sf_ee_trg = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/PhotonTrigger_ScaleFactors_"+year+".root")
@@ -123,12 +135,26 @@ class processHandler:
         if self.year == '2017' or self.raw:
             return sf
 
-        ### Reco + ID
+        ### Reco 
+        ## The corrections to account for early muons are applied by hand
+        ## (Numbers were extracted when measuring scale factors)
+        corr = {}
+        corr['2016'] = 0.976 ## Derived
+        corr['2016APV'] = 0.976 ## Derived
+        corr['2018'] = 1.097 ## Derived
         bx1 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxA[idx]]))
         bx2 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxB[idx]]))
-        by1 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxA[idx]]))
-        by2 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxB[idx]]))
-        sf = sf * self.sf_mm_reco.GetBinContent(bx1, by1)*self.sf_mm_reco.GetBinContent(bx2, by2)
+        by1 = self.sf_mm_reco.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxA[idx]]))
+        by2 = self.sf_mm_reco.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxB[idx]]))
+        sf = sf * self.sf_mm_reco.GetBinContent(bx1, by1)*self.sf_mm_reco.GetBinContent(bx2, by2) * (corr[self.year])**2
+
+        ### ID
+        bx1 = self.sf_mm_id.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxA[idx]]))
+        bx2 = self.sf_mm_id.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxB[idx]]))
+        by1 = self.sf_mm_id.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxA[idx]]))
+        by2 = self.sf_mm_id.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxB[idx]]))
+        sf = sf * self.sf_mm_id.GetBinContent(bx1, by1)*self.sf_mm_id.GetBinContent(bx2, by2)
+
 
         ### Trigger
         bx = self.sf_mm_trg.GetXaxis().FindBin(ev.DMDM_subleadingPt[idx])
