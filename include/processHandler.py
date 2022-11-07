@@ -6,6 +6,11 @@ from ROOT import TVector3, TLorentzVector
 import include.CutManager as CutManager
 import numpy as np
 
+from calibration.f_DYCR_EffMu_RelIsoCutvsPt_lin100_2018 import findWisoMu2018
+from calibration.f_DYCR_EffMu_RelIsoCutvsPt_lin100_2016 import findWisoMu2016
+from calibration.f_DYCR_EffEl_RelIsoCutvsPt_lin100_2018 import findWisoEl2018
+from calibration.f_DYCR_EffEl_RelIsoCutvsPt_lin100_2017 import findWisoEl2017
+from calibration.f_DYCR_EffEl_RelIsoCutvsPt_lin100_2016 import findWisoEl2016
 
 class processHandler:
 
@@ -86,11 +91,23 @@ class processHandler:
         #### --------------------------------
 
         ### Reco + ID SFs
-        self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2018.root")
-        self.sf_ee_reco = self.file_sf_ee_reco.Get("NUM_genTracksDown_DEN_tagsIntime_absdxy_2d_absdz_2d")
-        if year != '2017':
-            self.file_sf_mm_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Muon_ScaleFactors_2018.root")
+        if '2016' in year:
+            self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2016_Fall22.root")
+            self.sf_ee_reco = self.file_sf_ee_reco.Get("NUM_genTracksDown_DEN_tagsInTime_absdxy_2d_absdz_2d")
+            self.file_sf_mm_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Muon_ScaleFactors_2016_Fall22.root")
             self.sf_mm_reco = self.file_sf_mm_reco.Get("NUM_dGlobalsUp_DEN_dGlobalsDown_absdxy_2d_absdz_2d")
+            self.file_sf_mm_id = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/MuonID_ScaleFactors_2016_Fall22.root")
+            self.sf_mm_id = self.file_sf_mm_id.Get("NUM_dGlobalID_DEN_dGlobalsUp_absdxy_2d_absdz_2d")
+        elif '2017' in year:
+            self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2017_Fall22.root")
+            self.sf_ee_reco = self.file_sf_ee_reco.Get("NUM_genTracksDown_DEN_tagsInTime_absdxy_2d_absdz_2d")
+        elif '2018' in year:
+            self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2018_Fall22.root")
+            self.sf_ee_reco = self.file_sf_ee_reco.Get("NUM_genTracksDown_DEN_tagsInTime_absdxy_2d_absdz_2d")
+            self.file_sf_mm_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Muon_ScaleFactors_2018_Fall22.root")
+            self.sf_mm_reco = self.file_sf_mm_reco.Get("NUM_dGlobalsUp_DEN_dGlobalsDown_absdxy_2d_absdz_2d")
+            self.file_sf_mm_id = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/MuonID_ScaleFactors_2018_Fall22.root")
+            self.sf_mm_id = self.file_sf_mm_id.Get("NUM_dGlobalID_DEN_dGlobalsUp_absdxy_2d_absdz_2d")
 
         ### Trigger
         self.file_sf_ee_trg = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/PhotonTrigger_ScaleFactors_"+year+".root")
@@ -123,17 +140,43 @@ class processHandler:
         if self.year == '2017' or self.raw:
             return sf
 
-        ### Reco + ID
+        ### Reco 
+        ## The corrections to account for early muons are applied by hand
+        ## (Numbers were extracted when measuring scale factors)
+        corr = {}
+        corr['2016'] = 0.976 ## Derived
+        corr['2016APV'] = 0.976 ## Derived
+        corr['2018'] = 1.097 ## Derived
         bx1 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxA[idx]]))
         bx2 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxB[idx]]))
-        by1 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxA[idx]]))
-        by2 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxB[idx]]))
-        sf = sf * self.sf_mm_reco.GetBinContent(bx1, by1)*self.sf_mm_reco.GetBinContent(bx2, by2)
+        by1 = self.sf_mm_reco.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxA[idx]]))
+        by2 = self.sf_mm_reco.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxB[idx]]))
+        sf = sf * self.sf_mm_reco.GetBinContent(bx1, by1)*self.sf_mm_reco.GetBinContent(bx2, by2) * (corr[self.year])**2
+
+        ### ID
+        bx1 = self.sf_mm_id.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxA[idx]]))
+        bx2 = self.sf_mm_id.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxB[idx]]))
+        by1 = self.sf_mm_id.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxA[idx]]))
+        by2 = self.sf_mm_id.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxB[idx]]))
+        sf = sf * self.sf_mm_id.GetBinContent(bx1, by1)*self.sf_mm_id.GetBinContent(bx2, by2)
 
         ### Trigger
         bx = self.sf_mm_trg.GetXaxis().FindBin(ev.DMDM_subleadingPt[idx])
         by = self.sf_mm_trg.GetYaxis().FindBin(ev.DMDM_leadingPt[idx])
         sf = sf * self.sf_mm_trg.GetBinContent(bx, by)
+
+        ### Isolation
+        passes_A = ev.DGM_relPFiso[ev.DMDM_idxA[idx]] < 0.2
+        passes_B = ev.DGM_relPFiso[ev.DMDM_idxB[idx]] < 0.2
+        wiso_A = 1.0
+        wiso_B = 1.0
+        if self.year == '2018':
+            wiso_A = findWisoMu2018(ev.DGM_pt[ev.DMDM_idxA[idx]], passes_A)
+            wiso_B = findWisoMu2018(ev.DGM_pt[ev.DMDM_idxB[idx]], passes_B)
+        elif self.year == '2016':
+            wiso_A = findWisoMu2016(ev.DGM_pt[ev.DMDM_idxA[idx]], passes_A)
+            wiso_B = findWisoMu2016(ev.DGM_pt[ev.DMDM_idxB[idx]], passes_B)
+        sf = sf*wiso_A*wiso_B
 
         return sf
 
@@ -156,6 +199,22 @@ class processHandler:
         bx = self.sf_ee_trg.GetXaxis().FindBin(ev.EE_subleadingEt[idx])
         by = self.sf_ee_trg.GetYaxis().FindBin(ev.EE_leadingEt[idx])
         sf = sf * self.sf_ee_trg.GetBinContent(bx, by)
+
+        ### Isolation
+        passes_A = ev.ElectronCandidate_relTrkiso[ev.EE_idxA[idx]] < 0.1
+        passes_B = ev.ElectronCandidate_relTrkiso[ev.EE_idxB[idx]] < 0.1
+        wiso_A = 1.0
+        wiso_B = 1.0
+        if self.year == '2018':
+            wiso_A = findWisoEl2018(ev.ElectronCandidate_pt[ev.EE_idxA[idx]], passes_A)
+            wiso_B = findWisoEl2018(ev.ElectronCandidate_pt[ev.EE_idxB[idx]], passes_B)
+        elif self.year == '2017':
+            wiso_A = findWisoEl2017(ev.ElectronCandidate_pt[ev.EE_idxA[idx]], passes_A)
+            wiso_B = findWisoEl2017(ev.ElectronCandidate_pt[ev.EE_idxB[idx]], passes_B)
+        elif self.year == '2016':
+            wiso_A = findWisoEl2016(ev.ElectronCandidate_pt[ev.EE_idxA[idx]], passes_A)
+            wiso_B = findWisoEl2016(ev.ElectronCandidate_pt[ev.EE_idxB[idx]], passes_B)
+        sf = sf * wiso_A*wiso_B
 
         return sf
 
