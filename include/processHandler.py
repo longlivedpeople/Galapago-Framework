@@ -147,18 +147,20 @@ class processHandler:
         corr['2016'] = 0.976 ## Derived
         corr['2016APV'] = 0.976 ## Derived
         corr['2018'] = 1.097 ## Derived
-        bx1 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxA[idx]]))
-        bx2 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxB[idx]]))
-        by1 = self.sf_mm_reco.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxA[idx]]))
-        by2 = self.sf_mm_reco.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxB[idx]]))
-        sf = sf * self.sf_mm_reco.GetBinContent(bx1, by1)*self.sf_mm_reco.GetBinContent(bx2, by2) * (corr[self.year])**2
+        for i in range(0, ev.nDMDM):
+            bx1 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxA[i]]))
+            bx2 = self.sf_mm_reco.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxB[i]]))
+            by1 = self.sf_mm_reco.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxA[i]]))
+            by2 = self.sf_mm_reco.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxB[i]]))
+            sf = sf * self.sf_mm_reco.GetBinContent(bx1, by1)*self.sf_mm_reco.GetBinContent(bx2, by2) * (corr[self.year])**2
 
         ### ID
-        bx1 = self.sf_mm_id.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxA[idx]]))
-        bx2 = self.sf_mm_id.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxB[idx]]))
-        by1 = self.sf_mm_id.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxA[idx]]))
-        by2 = self.sf_mm_id.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxB[idx]]))
-        sf = sf * self.sf_mm_id.GetBinContent(bx1, by1)*self.sf_mm_id.GetBinContent(bx2, by2)
+        for i in range(0, ev.nDMDM):
+            bx1 = self.sf_mm_id.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxA[i]]))
+            bx2 = self.sf_mm_id.GetXaxis().FindBin(abs(ev.DGM_dxy_PV[ev.DMDM_idxB[i]]))
+            by1 = self.sf_mm_id.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxA[i]]))
+            by2 = self.sf_mm_id.GetYaxis().FindBin(abs(ev.DGM_dz[ev.DMDM_idxB[i]]))
+            sf = sf * self.sf_mm_id.GetBinContent(bx1, by1)*self.sf_mm_id.GetBinContent(bx2, by2)
 
         ### Trigger
         bx = self.sf_mm_trg.GetXaxis().FindBin(ev.DMDM_subleadingPt[idx])
@@ -189,11 +191,12 @@ class processHandler:
             return 1.0
 
         ### Reco + ID
-        bx1 = self.sf_ee_reco.GetXaxis().FindBin(abs(ev.ElectronCandidate_dxy_PV[ev.EE_idxA[idx]]))
-        bx2 = self.sf_ee_reco.GetXaxis().FindBin(abs(ev.ElectronCandidate_dxy_PV[ev.EE_idxB[idx]]))
-        by1 = self.sf_ee_reco.GetYaxis().FindBin(abs(ev.IsoTrackSel_dz[ev.ElectronCandidate_isotrackIdx[ev.EE_idxA[idx]]]))
-        by2 = self.sf_ee_reco.GetYaxis().FindBin(abs(ev.IsoTrackSel_dz[ev.ElectronCandidate_isotrackIdx[ev.EE_idxB[idx]]]))
-        sf = sf * self.sf_ee_reco.GetBinContent(bx1, by1)*self.sf_ee_reco.GetBinContent(bx2, by2)
+        for i in range(0, ev.nEE):
+            bx1 = self.sf_ee_reco.GetXaxis().FindBin(abs(ev.ElectronCandidate_dxy_PV[ev.EE_idxA[i]]))
+            bx2 = self.sf_ee_reco.GetXaxis().FindBin(abs(ev.ElectronCandidate_dxy_PV[ev.EE_idxB[i]]))
+            by1 = self.sf_ee_reco.GetYaxis().FindBin(abs(ev.IsoTrackSel_dz[ev.ElectronCandidate_isotrackIdx[ev.EE_idxA[i]]]))
+            by2 = self.sf_ee_reco.GetYaxis().FindBin(abs(ev.IsoTrackSel_dz[ev.ElectronCandidate_isotrackIdx[ev.EE_idxB[i]]]))
+            sf = sf * self.sf_ee_reco.GetBinContent(bx1, by1)*self.sf_ee_reco.GetBinContent(bx2, by2)
 
         ### Trigger
         bx = self.sf_ee_trg.GetXaxis().FindBin(ev.EE_subleadingEt[idx])
