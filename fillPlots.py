@@ -207,23 +207,33 @@ if __name__ == "__main__":
     ############# Background definition
     Backgrounds_preVFP = []
     Backgrounds_preVFP.append('DYJetsToLL_M-50_preVFP') 
+    Backgrounds_preVFP.append('DYJetsToLL_M-10to50_preVFP') 
     Backgrounds_preVFP.append('TTTo2L2Nu_preVFP') 
+    Backgrounds_preVFP.append('WJetsToLNu_preVFP') 
     Backgrounds_preVFP.append('WW_preVFP') 
     Backgrounds_preVFP.append('WZ_preVFP') 
+    Backgrounds_preVFP.append('ZZ_preVFP') 
     Backgrounds_postVFP = []
     Backgrounds_postVFP.append('DYJetsToLL_M-50_postVFP') 
+    Backgrounds_postVFP.append('DYJetsToLL_M-10to50_postVFP') 
     Backgrounds_postVFP.append('TTTo2L2Nu_postVFP') 
+    Backgrounds_postVFP.append('WJetsToLNu_postVFP') 
     Backgrounds_postVFP.append('WW_postVFP') 
     Backgrounds_postVFP.append('WZ_postVFP') 
+    Backgrounds_postVFP.append('ZZ_postVFP') 
     Backgrounds_2017 = []
     Backgrounds_2017.append('DYJetsToLL_M-50_2017') 
+    Backgrounds_2017.append('DYJetsToLL_M-10to50_2017') 
     Backgrounds_2017.append('TTTo2L2Nu_2017') 
+    Backgrounds_2017.append('WJetsToLNu_2017') 
     Backgrounds_2017.append('WW_2017') 
     Backgrounds_2017.append('WZ_2017') 
     Backgrounds_2017.append('ZZ_2017') 
     Backgrounds_2018 = []
     Backgrounds_2018.append('DYJetsToLL_M-50_2018') 
+    Backgrounds_2017.append('DYJetsToLL_M-10to50_2018') 
     Backgrounds_2018.append('TTTo2L2Nu_2018') 
+    Backgrounds_2018.append('WJetsToLNu_2018') 
     Backgrounds_2018.append('WW_2018') 
     Backgrounds_2018.append('WZ_2018') 
     Backgrounds_2018.append('ZZ_2018') 
@@ -231,34 +241,29 @@ if __name__ == "__main__":
 
 
     ############# Signal definition
+    Masses = []
+    Masses.append('HSS_125_50')
+    Masses.append('HSS_300_50')
+    Masses.append('HSS_500_50')
+    Masses.append('HSS_500_150')
+    Masses.append('HSS_600_50')
+    Masses.append('HSS_600_150')
+    Masses.append('HSS_600_250')
+    Masses.append('HSS_800_50')
+    Masses.append('HSS_800_250')
+    Masses.append('HSS_800_350')
+    Masses.append('HSS_1000_250')
+    Masses.append('HSS_1000_350')
+    Masses.append('HSS_1000_450')
+    Masses.append('RPV_350_148')
+    Masses.append('RPV_1500_494')
     Signals = []
-    Signals.append('HSS_300_50_1')
-    Signals.append('HSS_300_50_10')
-    Signals.append('HSS_300_50_100')
-    Signals.append('HSS_300_50_1000')
-    Signals.append('HSS_300_50_10000')
-    Signals.append('HSS_500_50_1')
-    Signals.append('HSS_500_50_10')
-    Signals.append('HSS_500_50_100')
-    Signals.append('HSS_500_50_1000')
-    Signals.append('HSS_500_50_10000')
-    Signals.append('HSS_1000_250_1')
-    Signals.append('HSS_1000_250_10')
-    Signals.append('HSS_1000_250_100')
-    Signals.append('HSS_1000_250_1000')
-    Signals.append('HSS_1000_250_10000')
-    Signals.append('RPV_350_148_1')
-    Signals.append('RPV_350_148_10')
-    Signals.append('RPV_350_148_100')
-    Signals.append('RPV_350_148_1000')
-    Signals.append('RPV_350_148_10000')
-    Signals.append('RPV_1500_494_1')
-    Signals.append('RPV_1500_494_10')
-    Signals.append('RPV_1500_494_100')
-    Signals.append('RPV_1500_494_1000')
-    Signals.append('RPV_1500_494_10000')
-
-
+    for mass in Masses:
+        Signals.append(mass + '_1')
+        Signals.append(mass + '_10')
+        Signals.append(mass + '_100')
+        Signals.append(mass + '_1000')
+        Signals.append(mass + '_10000')
     Signals_2016preVFP = [i + '_2016APV' for i in Signals]
     Signals_2016postVFP = [i + '_2016' for i in Signals]
     Signals_2017 = [i + '_2017' for i in Signals]
