@@ -12,8 +12,9 @@
 #-----------------------------------------------------------
 # BLOCK     COLOR         NAME                       LABEL                       LOCATION OF FRIENDS                                                                   XSEC    ISDATA
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#Diboson         r.kBlue-3       ZZ_preVFP                                  ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2017/ZZ_preVFP/                      12170      0 
-#Diboson         r.kBlue-3       ZZ_postVFP                                 ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2017/ZZ_postVFP/                     12170      0 
+Diboson         r.kBlue-3       ZZ_preVFP                                  ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2016/ZZ_postVFP/                      12170      0 
+##### Notice: ZZ_preVFP is not available throught rucio so we take postVFP as an approximation (preliminar)
+Diboson         r.kBlue-3       ZZ_postVFP                                 ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2016/ZZ_postVFP/                     12170      0 
 Diboson         r.kBlue-3       ZZ_2017                                    ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2017/ZZ/                             12170      0 
 Diboson         r.kBlue-3       ZZ_2018                                    ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2018/ZZ/                             12170      0 
 Diboson         r.kBlue-3       WZ_preVFP                                  ZZ,WZ,WW                       /eos/user/f/fernance/LLP_Analysis/UL/2016/WZ_preVFP/                      27590      0 
@@ -32,6 +33,14 @@ DYJets          r.kAzure+10     DYJetsToLL_M-50_2017                       Z/#ga
 DYJets          r.kAzure+10     DYJetsToLL_M-50_2018                       Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2018/DYJetsToLL_M-50/                6077220    0 
 DYJets          r.kAzure+10     DYJetsToLL_M-50_preVFP                     Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2016/DYJetsToLL_M-50_preVFP/         6077220    0 
 DYJets          r.kAzure+10     DYJetsToLL_M-50_postVFP                    Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2016/DYJetsToLL_M-50_postVFP/        6077220    0 
+DYJets          r.kAzure+10     DYJetsToLL_M-10to50_2017                       Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2017/DYJetsToLL_M-10to50/                18610000    0 
+DYJets          r.kAzure+10     DYJetsToLL_M-10to50_2018                       Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2018/DYJetsToLL_M-10to50/                18610000    0 
+DYJets          r.kAzure+10     DYJetsToLL_M-10to50_preVFP                     Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2016/DYJetsToLL_M-10to50_preVFP/         18610000    0 
+DYJets          r.kAzure+10     DYJetsToLL_M-10to50_postVFP                    Z/#gamma*#rightarrowl#bar{l}   /eos/user/f/fernance/LLP_Analysis/UL/2016/DYJetsToLL_M-10to50_postVFP/        18610000    0 
+WJet          r.kMagenta+1     WJetsToLNu_2017                       W+jets   /eos/user/f/fernance/LLP_Analysis/UL/2017/WJetsToLNu/                36300000    0 
+WJet          r.kMagenta+1     WJetsToLNu_2018                       W+jets   /eos/user/f/fernance/LLP_Analysis/UL/2018/WJetsToLNu/                36300000    0 
+WJet          r.kMagenta+1     WJetsToLNu_preVFP                     W+jets   /eos/user/f/fernance/LLP_Analysis/UL/2016/WJetsToLNu_preVFP/         36300000    0 
+WJet          r.kMagenta+1     WJetsToLNu_postVFP                    W+jets    /eos/user/f/fernance/LLP_Analysis/UL/2016/WJetsToLNu_postVFP/        36300000    0
 ###########################################################################
 ###########################################################################
 ###   DoubleEG Data   ########################################################################
