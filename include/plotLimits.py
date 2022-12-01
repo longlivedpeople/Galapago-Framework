@@ -24,6 +24,16 @@ style_magenta_dict = {
                'exp2' : { 'FillColor' : magenta_exp2}
                }
 
+red_exp0 = CreateTransparentColor(R.kRed+1, 0.9)
+red_exp1 = CreateTransparentColor(R.kRed-4, 0.3)
+red_exp2 = CreateTransparentColor(R.kRed-9, 0.3)
+
+style_red_dict = {
+               'obs' : { 'LineWidth' : 2},
+               'exp0' : { 'LineWidth' : 2, 'LineColor' : red_exp0},
+               'exp1' : { 'FillColor' : red_exp1},
+               'exp2' : { 'FillColor' : red_exp2}
+               }
 
 green_exp0 = CreateTransparentColor(R.kGreen+1, 0.9)
 green_exp1 = CreateTransparentColor(R.kGreen-4, 0.3)
@@ -49,22 +59,29 @@ style_blue_dict = {
                }
 
 styles = []
-styles.append(style_magenta_dict)
 styles.append(style_blue_dict)
+styles.append(style_red_dict)
 styles.append(style_green_dict)
 
 ##### Combined legend definition
 
 legend_dict = {
          'obs' : { 'Label' : 'Observed {0}', 'LegendStyle' : 'LP', 'DrawStyle' : 'PLSAME'},
-         'exp0' : { 'Label' : 'Median expected {0}', 'LegendStyle' : 'L', 'DrawStyle' : 'LSAME'},
+         'exp0' : { 'Label' : 'Median expected{0}', 'LegendStyle' : 'L', 'DrawStyle' : 'LSAME'},
+         'exp1' : { 'Label' : '68% expected', 'LegendStyle' : 'F', 'DrawStyle' : '3SAME'},
+         'exp2' : { 'Label' : '95% expected', 'LegendStyle' : 'F', 'DrawStyle' : '3SAME'}
+         }
+
+legend_red = {
+         'obs' : { 'Label' : '{0} (Observed)', 'LegendStyle' : 'LP', 'DrawStyle' : 'PLSAME'},
+         'exp0' : { 'Label' : '{0} (Expected)', 'LegendStyle' : 'L', 'DrawStyle' : 'LSAME'},
          'exp1' : { 'Label' : '68% expected', 'LegendStyle' : 'F', 'DrawStyle' : '3SAME'},
          'exp2' : { 'Label' : '95% expected', 'LegendStyle' : 'F', 'DrawStyle' : '3SAME'}
          }
 
 def setLegendLabel(legend, label):
-    legend_dict['obs']['Label'] = legend_dict['obs']['Label'].format(label)
-    legend_dict['exp0']['Label'] = legend_dict['exp0']['Label'].format(label)
+    legend['obs']['Label'] = legend['obs']['Label'].format(label)
+    legend['exp0']['Label'] = legend['exp0']['Label'].format(label)
 
 #
 # --- Main ()
@@ -85,25 +102,43 @@ if __name__ == "__main__":
     ROOT.gStyle.SetLegendFont(42)
     ROOT.gStyle.SetLegendTextSize(0.033)
     canv = ROOT.TCanvas('limit', 'limit')
+    canv.SetFillStyle(4000);
+    canv.SetFrameFillColor(4000);
+    canv.SetFrameFillStyle(4000);
     pads = OnePad()
  
     # Get limit TGraphs as a dictionary
     jsons = opts.json.split(',')
     graphs = []
+    masslabels = []
+    order = []
     for json in jsons:
+        print(json)
+        masslabels.append('m_{S} = ' + json.split('mS')[-1].split('__')[0] + ' GeV')
+        order.append(int(json.split('mS')[-1].split('__')[0]))
         graphs.append(StandardLimitsFromJSONFile(json))
+
+    graphs = [x for _,x in sorted(zip(order,graphs))]
+    masslabels = [x for _,x in sorted(zip(order,masslabels))]
+    jsons = [x for _,x in sorted(zip(order,jsons))]
 
     # Create an empty TH1 from the first TGraph to serve as the pad axis and frame
     axis = CreateAxisHist(graphs[0].values()[0])
     axis.GetXaxis().SetTitle('c#tau [cm]')
-    axis.GetYaxis().SetTitle('95% CL upper limit on #sigma(H)xB(H#rightarrowSS)')
+    axis.GetYaxis().SetTitle('#sigma(H)xB(H#rightarrowSS)')
     axis.GetYaxis().SetRangeUser(0.0001, 30)
     axis.GetXaxis().SetRangeUser(0.004, 100000)
+    axis.SetFillColor(4000);
     pads[0].cd()
+    pads[0].SetFillStyle(4000)
+    pads[0].SetFrameFillStyle(4000)
     axis.Draw('axis')
  
     # Create a legend in the top left
-    legend = PositionedLegend(0.33, 0.15, 3, 0.045)
+    if len(graphs) == 1:
+        legend = PositionedLegend(0.45, 0.15, 3, 0.045)
+    else:
+        legend = PositionedLegend(0.45, 0.07*len(graphs), 3, 0.1, 0.045)
  
     # Set the standard green and yellow colors and draw
     if len(graphs) == 1:
@@ -112,8 +147,22 @@ if __name__ == "__main__":
         DrawLimitBand(pads[0], graphs[0], draw=['exp2', 'exp1', 'exp0'], legend=legend, legend_overwrite=legend_dict)
     else:
         for n in range(0, len(graphs)):
+
             StyleLimitBand(graphs[n], overwrite_style_dict=styles[n])
-            DrawLimitBand(pads[0], graphs[n], draw=['exp2', 'exp1', 'exp0'], legend=legend, legend_overwrite=legend_dict)
+            ## Draw in pad
+            pads[0].cd()
+            for key in ['exp0', 'exp1']:
+                legend_label = ''
+                if key == 'obs':
+                    legend_label = masslabels[n] + ' (Observed)'
+                elif key == 'exp0':
+                    legend_label = masslabels[n] + ' (Expected)'
+                else:
+                    legend_label = legend_dict[key]['Label']
+                print(legend_label)
+                graphs[n][key].Draw(legend_dict[key]['DrawStyle'])
+                legend.AddEntry(graphs[n][key], legend_label, legend_dict[key]['LegendStyle'])
+            #DrawLimitBand(pads[0], graphs[n], draw=['exp1', 'exp0'], legend=legend, legend_overwrite=legend_red)
     legend.Draw()
  
     # Re-draw the frame and tick marks
@@ -146,7 +195,7 @@ if __name__ == "__main__":
     CMSextralabel.SetTextFont(42);
     CMSextralabel.SetTextAlign(22);
     CMSextralabel.SetTextSize(0.04);
-    CMSextralabel.DrawLatex(0.28, 0.84, "#it{Preliminary}")
+    CMSextralabel.DrawLatex(0.31, 0.84, "#it{Preliminary}")
     
     # Channel label
     Channellabel = ROOT.TLatex()
@@ -155,13 +204,13 @@ if __name__ == "__main__":
     Channellabel.SetTextColor(ROOT.kBlack);
     Channellabel.SetTextFont(42);
     Channellabel.SetTextAlign(13);
-    Channellabel.SetTextSize(0.03);
+    Channellabel.SetTextSize(0.04);
     if opts.flavor == 'Electron':
-        Channellabel.DrawLatex(0.20, 0.79, "Electron channel") 
+        Channellabel.DrawLatex(0.24, 0.79, "ee channel") 
     elif opts.flavor == 'Muon':
-        Channellabel.DrawLatex(0.20, 0.79, "Muon channel")
-    elif opts.flavor == 'Joint':
-        Channellabel.DrawLatex(0.20, 0.79, "Muon + electron channel")
+        Channellabel.DrawLatex(0.24, 0.79, "#mu#mu channel")
+    #elif opts.flavor == 'Joint':
+    #    Channellabel.DrawLatex(0.20, 0.79, "Muon + electron channel")
 
     # Year label
     Yearlabel = ROOT.TLatex()
@@ -170,15 +219,24 @@ if __name__ == "__main__":
     Yearlabel.SetTextColor(ROOT.kBlack);
     Yearlabel.SetTextFont(42);
     Yearlabel.SetTextAlign(33);
-    Yearlabel.SetTextSize(0.035);
+    Yearlabel.SetTextSize(0.04);
     if opts.year == '2016': 
-        Yearlabel.DrawLatex(0.96, 0.97, "2016")
+        Yearlabel.DrawLatex(0.96, 0.99, "35.9 fb^{-1} (13 TeV)")
     elif opts.year == '2017':
-        Yearlabel.DrawLatex(0.96, 0.97, "2017")
+        Yearlabel.DrawLatex(0.96, 0.99, "41.5 fb^{-1} (13 TeV)")
     elif opts.year == '2018':
-        Yearlabel.DrawLatex(0.96, 0.97, "2018")
+        Yearlabel.DrawLatex(0.96, 0.99, "59.7 fb^{-1} (13 TeV)")
     elif opts.year == 'Full':
-        Yearlabel.DrawLatex(0.96, 0.97, "Full Run 2")
+        Yearlabel.DrawLatex(0.96, 0.99, "137 fb^{-1} (13 TeV)")
+
+    CLlabel = ROOT.TLatex()
+    CLlabel.SetNDC();
+    CLlabel.SetTextAngle(0);
+    CLlabel.SetTextColor(ROOT.kBlack);
+    CLlabel.SetTextFont(42);
+    CLlabel.SetTextAlign(13);
+    CLlabel.SetTextSize(0.04);
+    CLlabel.DrawLatex(0.16, 0.98, "95% CL upper limits")
 
     # Model label
     Modellabel = ROOT.TLatex()
@@ -188,7 +246,7 @@ if __name__ == "__main__":
     Modellabel.SetTextFont(42);
     Modellabel.SetTextAlign(13);
     Modellabel.SetTextSize(0.037);
-    Modellabel.DrawLatex(0.20, 0.7, "H #rightarrow SS") # Hardcoded
+    Modellabel.DrawLatex(0.20, 0.55, "H\\rightarrow SS, S\\rightarrow\\ell^{+}\\ell^{-}, \\ell = e,\\mu") # Hardcoded
 
     Masslabel = ROOT.TLatex()
     Masslabel.SetNDC();
@@ -200,12 +258,16 @@ if __name__ == "__main__":
     if len(jsons) == 1:
         json = jsons[0]
         mS = json.split('__mS')[1].split('__')[0]
-        Masslabel.DrawLatex(0.20, 0.63, "m_{{H}} = {0} GeV, m_{{S}} = {1} GeV".format(opts.mH, mS))
+        Masslabel.DrawLatex(0.20, 0.7, "m_{{H}} = {0} GeV, m_{{S}} = {1} GeV".format(opts.mH, mS))
+    else:
+        Masslabel.DrawLatex(0.5, 0.9, "m_{{H}} = {0} GeV".format(opts.mH))
         
 
 
     # Re-draw axis
     axis.Draw('axis, same')
  
+    canv.Update()
+    canv.Modified()
     canv.Print(opts.outdir + 'limits_' + opts.flavor + opts.mH + opts.year + '.pdf')
     canv.Print(opts.outdir + 'limits_' + opts.flavor + opts.mH + opts.year + '.png')

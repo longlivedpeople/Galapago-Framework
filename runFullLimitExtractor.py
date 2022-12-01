@@ -43,7 +43,7 @@ WORKPATH = os.path.abspath('./') + '/'
 
 ##################################### FUNCTION DEFINITION ########################################
 
-def createDatacards(datacards, Backgrounds, Signals, flavor, year): 
+def createDatacards(datacards, Backgrounds, Signals, flavor, year, exclude = []):
 
     treeBKG = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'DATA'), name = 'DATA', isdata = 1 )
     datacard_list = []
@@ -55,6 +55,9 @@ def createDatacards(datacards, Backgrounds, Signals, flavor, year):
 
         ### Initialize channels with background information
         for channel_name in datacard.keys():
+
+            if channel_name in exclude:
+                continue
 
             xmin = datacard[channel_name]['bkg']['limits'][0] # minimum value
             xmax = datacard[channel_name]['bkg']['limits'][1] # minimum value
@@ -77,7 +80,13 @@ def createDatacards(datacards, Backgrounds, Signals, flavor, year):
          
         for sample in Signals:
 
-            treeSI = Sample.Tree(fileName = helper.selectSamples(WORKPATH + 'dat/CombSignal_'+year+'UL_Fall22.dat', [sample], 'SI'), name = 'SI', isdata = 0)
+            samplelist = []
+            if year=='2016':
+                samplelist = [sample, sample + 'APV']
+            else:
+                samplelist = [sample]
+
+            treeSI = Sample.Tree(fileName = helper.selectSamples(WORKPATH + 'dat/CombSignal_'+year+'UL_Fall22.dat', samplelist, 'SI'), name = 'SI', isdata = 0)
 
             sample_split = sample.split('_')
             mH = sample_split[1]
@@ -90,6 +99,8 @@ def createDatacards(datacards, Backgrounds, Signals, flavor, year):
             output_datacard = DatacardManager.Datacard(datacard_name)
 
             for channel_name in datacard.keys():
+                if channel_name in exclude:
+                    continue
                 histogram = datacard[channel_name]['sig']['histogram']
                 directory = datacard[channel_name]['sig']['dir']
                 _histo = treeSI.getLoopTH1F(directory, histogram)
@@ -110,7 +121,7 @@ def executeCombine(_d, year):
     ctau = (_d.split('__ctau')[1]).split('mm')[0]
     
     ### Move to the working dir:
-    command = 'combine -M AsymptoticLimits -n {0} -m {1} {2}'.format(name, ctau, _d)
+    command = 'combine -M AsymptoticLimits -n {0} -m {1} --run blind {2}'.format(name, ctau, _d)
     os.system(command)
     
 
@@ -146,77 +157,30 @@ if __name__ == "__main__":
     #####
 
     ############# Signal definition
-    """
-    Signals2016 = []
-    Signals2016.append('HSS_125_50_1_2016')
-    Signals2016.append('HSS_125_50_10_2016')
-    Signals2016.append('HSS_125_50_100_2016')
-    Signals2016.append('HSS_125_50_1000_2016')
-    Signals2016.append('HSS_125_50_10000_2016')
-    Signals2016.append('HSS_400_50_1_2016')
-    Signals2016.append('HSS_400_50_10_2016')
-    Signals2016.append('HSS_400_50_100_2016')
-    Signals2016.append('HSS_400_50_1000_2016')
-    Signals2016.append('HSS_400_50_10000_2016')
-    Signals2016.append('HSS_1000_350_1_2016')
-    Signals2016.append('HSS_1000_350_10_2016')
-    Signals2016.append('HSS_1000_350_100_2016')
-    Signals2016.append('HSS_1000_350_1000_2016')
-    Signals2016.append('HSS_1000_350_10000_2016')
-
-    Signals2017 = []
-    Signals2017.append('HSS_125_50_1_2017')
-    Signals2017.append('HSS_125_50_10_2017')
-    Signals2017.append('HSS_125_50_100_2017')
-    Signals2017.append('HSS_125_50_1000_2017')
-    Signals2017.append('HSS_125_50_10000_2017')
-    Signals2017.append('HSS_400_50_1_2017')
-    Signals2017.append('HSS_400_50_10_2017')
-    Signals2017.append('HSS_400_50_100_2017')
-    Signals2017.append('HSS_400_50_1000_2017')
-    Signals2017.append('HSS_400_50_10000_2017')
-    Signals2017.append('HSS_1000_350_1_2017')
-    Signals2017.append('HSS_1000_350_10_2017')
-    Signals2017.append('HSS_1000_350_100_2017')
-    Signals2017.append('HSS_1000_350_1000_2017')
-    Signals2017.append('HSS_1000_350_10000_2017')
-
-    Signals2018 = []
-    Signals2018.append('HSS_125_50_1_2018')
-    Signals2018.append('HSS_125_50_10_2018')
-    Signals2018.append('HSS_125_50_100_2018')
-    Signals2018.append('HSS_125_50_1000_2018')
-    Signals2018.append('HSS_125_50_10000_2018')
-    Signals2018.append('HSS_400_50_1_2018')
-    Signals2018.append('HSS_400_50_10_2018')
-    Signals2018.append('HSS_400_50_100_2018')
-    Signals2018.append('HSS_400_50_1000_2018')
-    Signals2018.append('HSS_400_50_10000_2018')
-    Signals2018.append('HSS_1000_350_1_2018')
-    Signals2018.append('HSS_1000_350_10_2018')
-    Signals2018.append('HSS_1000_350_100_2018')
-    Signals2018.append('HSS_1000_350_1000_2018')
-    Signals2018.append('HSS_1000_350_10000_2018')
-    """
+    Masses = []
+    Masses.append('HSS_125_50')
+    Masses.append('HSS_300_50')
+    Masses.append('HSS_500_50')
+    Masses.append('HSS_500_150')
+    Masses.append('HSS_600_50')
+    Masses.append('HSS_600_150')
+    Masses.append('HSS_600_250')
+    Masses.append('HSS_800_50')
+    Masses.append('HSS_800_250')
+    Masses.append('HSS_800_350')
+    Masses.append('HSS_1000_450')
+    Masses.append('HSS_1000_350')
+    Masses.append('HSS_1000_450')
     Signals = []
-    Signals.append('HSS_300_50_1')
-    Signals.append('HSS_300_50_10')
-    Signals.append('HSS_300_50_100')
-    Signals.append('HSS_300_50_1000')
-    Signals.append('HSS_300_50_10000')
-    Signals.append('HSS_500_50_1')
-    Signals.append('HSS_500_50_10')
-    Signals.append('HSS_500_50_100')
-    Signals.append('HSS_500_50_1000')
-    Signals.append('HSS_500_50_10000')
-    Signals.append('HSS_1000_250_1')
-    Signals.append('HSS_1000_250_10')
-    Signals.append('HSS_1000_250_100')
-    Signals.append('HSS_1000_250_1000')
-    Signals.append('HSS_1000_250_10000')
+    for mass in Masses:
+        Signals.append(mass + '_1')
+        Signals.append(mass + '_10')
+        Signals.append(mass + '_100')
+        Signals.append(mass + '_1000')
+        Signals.append(mass + '_10000')
     Signals_2016preVFP = [i + '_2016APV' for i in Signals]
     Signals_2016postVFP = [i + '_2016' for i in Signals]
-    Signals2016 = Signals_2016preVFP + Signals_2016postVFP
+    Signals2016 = [i + '_2016' for i in Signals]
     Signals2017 = [i + '_2017' for i in Signals]
     Signals2018 = [i + '_2018' for i in Signals]
 
@@ -306,7 +270,7 @@ if __name__ == "__main__":
         muon_datacard_names_2018 = createDatacards(datacards = muon_datacards, Backgrounds = DoubleMuon2018, Signals = Signals2018, flavor = 'Muon', year = '2018')
     if doElectrons:
         electron_datacard_names_2016 = createDatacards(datacards = electron_datacards, Backgrounds = DoubleEG2016, Signals = Signals2016, flavor = 'Electron', year = '2016')
-        electron_datacard_names_2017 = createDatacards(datacards = electron_datacards, Backgrounds = DoubleEG2017, Signals = Signals2017, flavor = 'Electron', year = '2017')
+        electron_datacard_names_2017 = createDatacards(datacards = electron_datacards, Backgrounds = DoubleEG2017, Signals = Signals2017, flavor = 'Electron', year = '2017', exclude = ['nEE_IaA', 'nEE_IaB', 'nEE_IaC'])
         electron_datacard_names_2018 = createDatacards(datacards = electron_datacards, Backgrounds = EGamma2018, Signals = Signals2018, flavor = 'Electron', year = '2018')
 
 
@@ -494,7 +458,7 @@ if __name__ == "__main__":
                 plot_input = ''
                 for json in sets[mH][year][flavor]:
                     plot_input = plot_input + json + ','
-                    plot_input = plot_input[:-1]
+                plot_input = plot_input[:-1]
 
                 command = 'python include/plotLimits.py -j {0} -m {1} -f {2} -o {3} -y {4}'.format(plot_input, mH, flavor, _outdir, year)
                 print(command)
