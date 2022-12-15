@@ -52,11 +52,109 @@ class Recipe:
         return channel
 
 
+class SystematicsHandler:
+
+     def __init__(self, Systematics):
+        
+        self.width = 15 # Normal column width
+        self.hwidth = 20 # First column width
+        self.name = []
+        self.value = []
+        self.signal = []
+        self.background = []
+        self.regions = []
+        self.correlated = []
+        self.year = []
+        for line in open(Systematics).readlines():
+            if line[0] == '#':
+                continue
+            if line[0] == '\n':
+                continue
+            print(len(line))
+            elems = line.split()
+            print(elems)
+            print(len(elems))
+            self.name.append(elems[0])
+            self.value.append(elems[1])
+            self.signal.append(elems[2])
+            self.background.append(elems[3].split(','))
+            self.regions.append(elems[4].split(','))
+            self.correlated.append(elems[5])
+            self.year.append(elems[6])
+                    
+     def toCell(self, string, width = False):
+        nSpace = self.width
+        if width: nSpace = width
+
+        cell = string + (nSpace - len(string))*' '
+
+        return cell
+
+
+     def numberOfSystematics(self, year, channels):
+
+        numberOfSystematics = 0
+        for i, thename in enumerate(self.name):
+            if self.correlated[i] == '0' and self.year[i] != year:
+                continue
+            activeRegion = False
+            for region in self.regions[i]:
+                for ch in channels:
+                    if region == ch.name:
+                        activeRegion = True
+                        break
+            if activeRegion:                    
+                numberOfSystematics += 1
+                activeRegion = False
+                        
+        return numberOfSystematics
+
+
+     def listOfSystematics(self, year, channels):
+
+        nuisanceList = []
+        nbck = len(channels[0].backgrounds)
+        for i, thename in enumerate(self.name):
+            print self.year[i], year
+            if self.correlated[i] == '0' and self.year[i] != year:
+                continue
+            nuisance = ''
+            nuisance += self.toCell(self.name[i], int(self.hwidth/2))
+            nuisance += self.toCell('lnN', int(self.hwidth/2))
+            for ch in channels:
+                activeChannel = False
+                for region in self.regions[i]:
+                    if region == ch.name:
+                        activeChannel = True
+                        if self.signal[i] == '1':
+                            nuisance += self.toCell(self.value[i])
+                            for bk in ch.backgrounds:                       
+                                nuisance += self.toCell('-')
+                        else:
+                            nuisance += self.toCell('-')
+                            for bk in ch.backgrounds:
+                                if bk.name in self.background[i]:
+                                    nuisance += self.toCell(self.value[i])
+                                else:    
+                                    nuisance += self.toCell('-')
+                if not activeChannel:
+                    nuisance += self.toCell('-')
+                    for bk in ch.backgrounds:                       
+                        nuisance += self.toCell('-')
+                activeChannel = False
+            nuisance += '\n'
+            nuisanceList.append(nuisance)                
+        nuisance = ''
+        for i in nuisanceList:
+            nuisance = nuisance + i
+        return nuisance
+                        
+
 class Datacard:
 
     """ Class Datacard """
 
-    def __init__(self, name):
+    def __init__(self, name, year, Systematics):
 
         self.channels = []
         self.channelCounter = 0
@@ -70,6 +168,9 @@ class Datacard:
         self.expected = ''
         self.separator = self.hwidth*'-'
         self.name = name
+        self.year = year
+        self.Systematics = SystematicsHandler(Systematics)
+        
 
     def addChannel(self, channel):
 
@@ -103,7 +204,7 @@ class Datacard:
     def saveDatacard(self, outputDir = False):
 
         self.separator += '\n' # we suppose we have added all the backgrounds we wanted
-
+        self.nNuisance = self.Systematics.numberOfSystematics(self.year, self.channels)
         # heading definition
         self.heading = 'imax ' + str(self.channelCounter) + ' number of bins'
         self.heading += '\n'
@@ -151,45 +252,9 @@ class Datacard:
         self.expected += '\n'
 
         # nuisances
-        # (por el momeno solo podemos poner constantes, TO BE UPDATED)
-        self.nuisance = ''
-        self.nuisance += self.toCell('lumi', int(self.hwidth/2))
-        self.nuisance += self.toCell('lnN', int(self.hwidth/2))
-        for i in range(0, self.channelCounter*(self.nBackground + 1)):
-            if ((i%2) == 0):
-                self.nuisance += self.toCell('1.025')
-            else:
-                self.nuisance += self.toCell('-')
-        self.nuisance += '\n'
-
-        self.nuisance += self.toCell('PU', int(self.hwidth/2))
-        self.nuisance += self.toCell('lnN', int(self.hwidth/2))
-        for i in range(0, self.channelCounter*(self.nBackground + 1)):
-            if ((i%2) == 0):
-                self.nuisance += self.toCell('0.975/1.030')
-            else:
-                self.nuisance += self.toCell('-')
-        self.nuisance += '\n'
- 
-        self.nuisance += self.toCell('recoID', int(self.hwidth/2))
-        self.nuisance += self.toCell('lnN', int(self.hwidth/2))
-        for i in range(0, self.channelCounter*(self.nBackground + 1)):
-            if ((i%2) == 0):
-                self.nuisance += self.toCell('1.10')
-            else:
-                self.nuisance += self.toCell('-')
-        self.nuisance += '\n'
-
-        self.nuisance += self.toCell('dphi', int(self.hwidth/2))
-        self.nuisance += self.toCell('lnN', int(self.hwidth/2))
-        for i in range(0, self.channelCounter*(self.nBackground + 1)):
-            if ((i%2) == 0):
-                self.nuisance += self.toCell('-')
-            else:
-                self.nuisance += self.toCell('1.10')
+        self.nuisance = self.Systematics.listOfSystematics(self.year, self.channels)
 
         ### Write file:
-
         if not os.path.exists(outputDir):
             os.makedirs(outputDir)
 

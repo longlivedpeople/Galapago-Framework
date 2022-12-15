@@ -1,0 +1,12 @@
+#Name              Value                     Signal                    Background                              Regions                                      Correlated         Year
+lumi2016           1.020                     1                         bkg         nMM_IaA,nMM_IaB,nMM_IaC,nMM_IaD,nMM_IbA,nMM_IbB,nMM_IbC,nMM_IbD,nMM_II       0              2016
+pu2016             1.020                     1                         bkg         nMM_IaA,nMM_IaB,nMM_IaC,nMM_IaD,nMM_IbA,nMM_IbB,nMM_IbC,nMM_IbD,nMM_II       0              2016
+reco2016           1.020                     1                         bkg         nMM_IaA,nMM_IaB,nMM_IaC,nMM_IaD,nMM_IbA,nMM_IbB,nMM_IbC,nMM_IbD,nMM_II       0              2016
+trig2016           1.020                     1                         bkg         nMM_IaA,nMM_IaB,nMM_IaC,nMM_IaD,nMM_IbA,nMM_IbB,nMM_IbC,nMM_IbD,nMM_II       0              2016
+iso2016            1.020                     1                         bkg         nMM_IaA,nMM_IaB,nMM_IaC,nMM_IaD,nMM_IbA,nMM_IbB,nMM_IbC,nMM_IbD,nMM_II       0              2016
+lumi2018           1.020                     1                         bkg         nMM_IaA,nMM_IaB,nMM_IaC,nMM_IaD,nMM_IbA,nMM_IbB,nMM_IbC,nMM_IbD,nMM_II       0              2018
+pu2018             1.020                     1                         bkg         nMM_IaA,nMM_IaB,nMM_IaC,nMM_IaD,nMM_IbA,nMM_IbB,nMM_IbC,nMM_IbD,nMM_II       0              2018
+reco2018           1.020                     1                         bkg         nMM_IaA,nMM_IaB,nMM_IaC,nMM_IaD,nMM_IbA,nMM_IbB,nMM_IbC,nMM_IbD,nMM_II       0              2018
+trig2018           1.020                     1                         bkg         nMM_IaA,nMM_IaB,nMM_IaC,nMM_IaD,nMM_IbA,nMM_IbB,nMM_IbC,nMM_IbD,nMM_II       0              2018
+iso2018            1.020                     1                         bkg         nMM_IaA,nMM_IaB,nMM_IaC,nMM_IaD,nMM_IbA,nMM_IbB,nMM_IbC,nMM_IbD,nMM_II       0              2018
+bkg                1.025                     0                         bkg         nMM_IaA,nMM_IaB,nMM_IaC,nMM_IaD,nMM_IbA,nMM_IbB,nMM_IbC,nMM_IbD,nMM_II       1               - 

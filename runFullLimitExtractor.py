@@ -43,7 +43,7 @@ WORKPATH = os.path.abspath('./') + '/'
 
 ##################################### FUNCTION DEFINITION ########################################
 
-def createDatacards(datacards, Backgrounds, Signals, flavor, year, exclude = []):
+def createDatacards(datacards, Systematics, Backgrounds, Signals, flavor, year, exclude = []):
 
     treeBKG = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'DATA'), name = 'DATA', isdata = 1 )
     datacard_list = []
@@ -96,7 +96,7 @@ def createDatacards(datacards, Backgrounds, Signals, flavor, year, exclude = [])
 
             ## Create datacard:
             datacard_name = 'Datacard__' + flavor + '__' + sample_label + '__' + year  + '.txt'
-            output_datacard = DatacardManager.Datacard(datacard_name)
+            output_datacard = DatacardManager.Datacard(datacard_name, year, Systematics)
 
             for channel_name in datacard.keys():
                 if channel_name in exclude:
@@ -131,10 +131,12 @@ if __name__ == "__main__":
 
 
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
-    parser.add_option('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_Legacy.dat', help='dat file')
+    parser.add_option('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_UltraLegacy.dat', help='dat file')
     parser.add_option('-t', '--t', action='store', type=str, dest='tag', default='', help='tag')
-    parser.add_option('-e', '--electronRecipe', action='store', type=str, dest='electronRecipe', default='', help='the input dir')
-    parser.add_option('-m', '--muonRecipe', action='store', type=str, dest='muonRecipe', default='', help='the input dir')
+    parser.add_option('-e', '--electronRecipe', action='store', type=str, dest='muonRecipe', default='recipes-datacards/recipe_Fall22_Muon.txt', help='the input dir')
+    parser.add_option('-m', '--muonRecipe',   action='store', type=str, dest='electronRecipe', default='recipes-datacards/recipe_Fall22_Electron.txt', help='the input dir')
+    parser.add_option('-s', '--Esystematics', action='store', type=str, dest='electron_systematics', default='recipes-datacards/recipe_Systematics_UltraLegacy_Electron.txt', help='file with systematics table')
+    parser.add_option('-S', '--Msystematics', action='store', type=str, dest='muon_systematics', default='recipes-datacards/recipe_Systematics_UltraLegacy_Muon.txt', help='file with systematics table')
 
     (opts, args) = parser.parse_args()
 
@@ -159,25 +161,25 @@ if __name__ == "__main__":
     ############# Signal definition
     Masses = []
     Masses.append('HSS_125_50')
-    Masses.append('HSS_300_50')
-    Masses.append('HSS_500_50')
-    Masses.append('HSS_500_150')
-    Masses.append('HSS_600_50')
-    Masses.append('HSS_600_150')
-    Masses.append('HSS_600_250')
-    Masses.append('HSS_800_50')
-    Masses.append('HSS_800_250')
-    Masses.append('HSS_800_350')
-    Masses.append('HSS_1000_450')
-    Masses.append('HSS_1000_350')
-    Masses.append('HSS_1000_450')
+    #Masses.append('HSS_300_50')
+    #Masses.append('HSS_500_50')
+    #Masses.append('HSS_500_150')
+    #Masses.append('HSS_600_50')
+    #Masses.append('HSS_600_150')
+    #Masses.append('HSS_600_250')
+    #Masses.append('HSS_800_50')
+    #Masses.append('HSS_800_250')
+    #Masses.append('HSS_800_350')
+    #Masses.append('HSS_1000_450')
+    #Masses.append('HSS_1000_350')
+    #Masses.append('HSS_1000_450')
     Signals = []
     for mass in Masses:
         Signals.append(mass + '_1')
         Signals.append(mass + '_10')
         Signals.append(mass + '_100')
         Signals.append(mass + '_1000')
-        Signals.append(mass + '_10000')
+        #Signals.append(mass + '_10000')
     Signals_2016preVFP = [i + '_2016APV' for i in Signals]
     Signals_2016postVFP = [i + '_2016' for i in Signals]
     Signals2016 = [i + '_2016' for i in Signals]
@@ -266,12 +268,12 @@ if __name__ == "__main__":
     electron_datacard_names_2018 = []
 
     if doMuons:
-        muon_datacard_names_2016 = createDatacards(datacards = muon_datacards, Backgrounds = DoubleMuon2016, Signals = Signals2016, flavor = 'Muon', year = '2016')
-        muon_datacard_names_2018 = createDatacards(datacards = muon_datacards, Backgrounds = DoubleMuon2018, Signals = Signals2018, flavor = 'Muon', year = '2018')
+        muon_datacard_names_2016 = createDatacards(datacards = muon_datacards, Systematics = opts.muon_systematics, Backgrounds = DoubleMuon2016, Signals = Signals2016, flavor = 'Muon', year = '2016')
+        muon_datacard_names_2018 = createDatacards(datacards = muon_datacards, Systematics = opts.muon_systematics, Backgrounds = DoubleMuon2018, Signals = Signals2018, flavor = 'Muon', year = '2018')
     if doElectrons:
-        electron_datacard_names_2016 = createDatacards(datacards = electron_datacards, Backgrounds = DoubleEG2016, Signals = Signals2016, flavor = 'Electron', year = '2016')
-        electron_datacard_names_2017 = createDatacards(datacards = electron_datacards, Backgrounds = DoubleEG2017, Signals = Signals2017, flavor = 'Electron', year = '2017', exclude = ['nEE_IaA', 'nEE_IaB', 'nEE_IaC'])
-        electron_datacard_names_2018 = createDatacards(datacards = electron_datacards, Backgrounds = EGamma2018, Signals = Signals2018, flavor = 'Electron', year = '2018')
+        electron_datacard_names_2016 = createDatacards(datacards = electron_datacards, Systematics = opts.electron_systematics, Backgrounds = DoubleEG2016, Signals = Signals2016, flavor = 'Electron', year = '2016')
+        electron_datacard_names_2017 = createDatacards(datacards = electron_datacards, Systematics = opts.electron_systematics, Backgrounds = DoubleEG2017, Signals = Signals2017, flavor = 'Electron', year = '2017', exclude = ['nEE_IaA', 'nEE_IaB', 'nEE_IaC'])
+        electron_datacard_names_2018 = createDatacards(datacards = electron_datacards, Systematics = opts.electron_systematics, Backgrounds = EGamma2018, Signals = Signals2018, flavor = 'Electron', year = '2018')
 
 
     os.chdir(_outdir) 

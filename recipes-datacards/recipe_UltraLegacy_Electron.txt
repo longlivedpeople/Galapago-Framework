@@ -1,9 +1,20 @@
-#######################################################################################################################################
+Mu	#######################################################################################################################################
 #
 # NAME ;      CHANNEL NAME ;      TYPE ;      HISTOGRAM ;                LIMITS (min,max);         DIRECTORY ; 
 #
 #######################################################################################################################################
-Electron      nEE_I              bkg         hEE_BCRI                    0.0,1.0                   yields_Summer22_February22Limits
-Electron      nEE_I              sig         hEE_SRI                     0.0,1.0                   yields_Summer22_February22Limits
-Electron      nEE_II             bkg         hEE_BCRII                   0.0,1.0                   yields_Summer22_February22Limits
-Electron      nEE_II             sig         hEE_SRII                    0.0,1.0                   yields_Summer22_February22Limits
+Electron      nEE_IaA            bkg         hEE_BCRIaA                      0.0,1.0                 yields_Fall2022
+Electron      nEE_IaA            sig         hEE_SRIaA                       0.0,1.0                 yields_Fall2022
+Electron      nEE_IaB            bkg         hEE_BCRIaB                      0.0,1.0                 yields_Fall2022
+Electron      nEE_IaB            sig         hEE_SRIaB                       0.0,1.0                 yields_Fall2022
+Electron      nEE_IaC            bkg         hEE_BCRIaC                      0.0,1.0                 yields_Fall2022
+Electron      nEE_IaC            sig         hEE_SRIaC                       0.0,1.0                 yields_Fall2022
+Electron      nEE_IaD            bkg         hEE_BCRIaD                      0.0,1.0                 yields_Fall2022
+Electron      nEE_IaD            sig         hEE_SRIaD                       0.0,1.0                 yields_Fall2022
+Electron      nEE_IbA            bkg         hEE_BCRIbA                      0.0,1.0                 yields_Fall2022
+Electron      nEE_IbA            sig         hEE_SRIbA                       0.0,1.0                 yields_Fall2022
+Electron      nEE_IbB            bkg         hEE_BCRIbB                      0.0,1.0                 yields_Fall2022
+Electron      nEE_IbB            sig         hEE_SRIbB                       0.0,1.0                 yields_Fall2022
+Electron      nEE_II             bkg         hEE_BCRII                       0.0,1.0                 yields_Fall2022
+Electron      nEE_II             sig         hEE_SRII                        0.0,1.0                 yields_Fall2022
+
