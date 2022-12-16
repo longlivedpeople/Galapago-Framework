@@ -47,7 +47,7 @@ sigpalette = np.array(sigpalette_, dtype=np.int32)
 #####
 #####################
 
-def makeBackgroundPlot2D(lumi, hname_bkg, zlog, treeDATA, inputdir, rebin = False, lines = [], xlabel = '', outtag = '', outdir = '', LLlabel = '', extralabel = ''):
+def makeBackgroundPlot2D(lumi, hname_bkg, zlog, treeDATA, inputdir, rebin = False, lines = [], xlabel = '', outtag = '', outdir = '', LLlabel = '', extralabel = '', xlog = False, ylog = False):
 
 
     ### Get histograms
@@ -71,16 +71,16 @@ def makeBackgroundPlot2D(lumi, hname_bkg, zlog, treeDATA, inputdir, rebin = Fals
     plot.addHisto(hbkg, 'COLZ', '', '', '', 1, 0)
     
     for line in lines:
-        plot.addLine(line, hbkg.GetMinimum(), line, hbkg.GetMaximum(), r.kBlack, 2)
+        plot.addLine(line[0], line[1], line[2], line[3], r.kRed, 2)
 
     ### Extralabel
     plot.addLatex(0.13, 0.93, 'Background (predicted)', font = 42)
-    plot.addLatex(0.5, 0.85, extralabel, font = 42, size = 0.03)
+    plot.addLatex(0.4, 0.85, extralabel, font = 42, size = 0.03)
 
     ### Save it
     if not outdir:
         outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/2DPlots_' + outtag + '/'
-    plot.save(1, 1, 0, luminosity, '', outputDir = outdir, zlog = zlog, is2d = True)
+    plot.save(1, 1, ylog, luminosity, '', outputDir = outdir, zlog = zlog, is2d = False, xlog = xlog)
 
     
 #####################
@@ -95,7 +95,7 @@ def makeBackgroundPlot2D(lumi, hname_bkg, zlog, treeDATA, inputdir, rebin = Fals
 #####
 #####################
 
-def makeSignalPlot2D(lumi, hname_sig, zlog, treeSI, inputdir, rebin = False, lines = [], legend = '', xlabel = '', outtag = '', outdir = '', LLlabel = '', extralabel = ''):
+def makeSignalPlot2D(name, lumi, hname_sig, zlog, treeSI, inputdir, rebin = False, lines = [], legend = '', xlabel = '', outtag = '', outdir = '', LLlabel = '', extralabel = '', xlog = False, ylog = False):
 
 
     ### Get histograms
@@ -106,21 +106,24 @@ def makeSignalPlot2D(lumi, hname_sig, zlog, treeSI, inputdir, rebin = False, lin
     hsig.GetXaxis().SetTitleSize(0.045)
     hsig.GetYaxis().SetTitleSize(0.045)
 
-    r.gStyle.SetPalette(255, sigpalette)
+    r.gStyle.SetPalette(r.kBird)
 
 
     ### Canvas object
-    plot = Canvas.Canvas('SIOnly_'+hname_sig, 'png,pdf', 0.35, 0.65, 0.7, 0.89, 1, ww = 610, hh = 600, lsize = 0.028)
+    plot = Canvas.Canvas('SIOnly_'+name, 'png,pdf', 0.35, 0.65, 0.7, 0.89, 1, ww = 610, hh = 600, lsize = 0.028)
     plot.addHisto(hsig, 'COLZ', '', '', '', 1, 0)
     
     ### Extralabel
     plot.addLatex(0.13, 0.93, legend, font = 42, size = 0.032)
-    plot.addLatex(0.5, 0.85, extralabel, font = 42, size = 0.03)
+    plot.addLatex(0.4, 0.85, extralabel, font = 42, size = 0.03)
+
+    for line in lines:
+        plot.addLine(line[0], line[1], line[2], line[3], r.kRed, 2)
 
     ### Save it
     if not outdir:
         outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/2DPlots_' + outtag + '/'
-    plot.save(1, 1, 0, luminosity, '', outputDir = outdir, zlog = zlog, is2d = True)
+    plot.save(1, 1, ylog, luminosity, '', outputDir = outdir, zlog = zlog, xlog = xlog, is2d = False)
 
 
 def countJointYields2D(hname_bkg, hname_sig, treeDATA, treeSI, inputdir, xmins, ymins):
@@ -184,12 +187,12 @@ if __name__ == "__main__":
 
     ############# EG data definition
     DoubleEG2016 = []
-    DoubleEG2016.append('DoubleEG_Run2016B_HIPM')
-    DoubleEG2016.append('DoubleEG_Run2016C_HIPM')
-    DoubleEG2016.append('DoubleEG_Run2016D_HIPM')
-    DoubleEG2016.append('DoubleEG_Run2016E_HIPM')
-    DoubleEG2016.append('DoubleEG_Run2016F_HIPM')
-    DoubleEG2016.append('DoubleEG_Run2016F_noHIPM')
+    #DoubleEG2016.append('DoubleEG_Run2016B_HIPM')
+    #DoubleEG2016.append('DoubleEG_Run2016C_HIPM')
+    #DoubleEG2016.append('DoubleEG_Run2016D_HIPM')
+    #DoubleEG2016.append('DoubleEG_Run2016E_HIPM')
+    #DoubleEG2016.append('DoubleEG_Run2016F_HIPM')
+    #DoubleEG2016.append('DoubleEG_Run2016F_noHIPM')
     DoubleEG2016.append('DoubleEG_Run2016G_noHIPM')
     DoubleEG2016.append('DoubleEG_Run2016H_noHIPM')
     DoubleEG2017 = []
@@ -222,13 +225,14 @@ if __name__ == "__main__":
     DoubleMuon2018.append('DoubleMuon_Run2018D')
 
     ############# Luminosity definition
-    lumi2016 = 35.9 # fb-1
+    lumi2016_MM = 35.9 # fb-1
+    lumi2016_EE = 16.2 # fb-1
     lumi2017 = 41.5 # fb-1
     lumi2018 = 59.7 # fb-1
 
 
     ############# Galapago Tree definitions
-
+    EE_SRIa_lines = []
     treeDATA_EG2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016, 'DATA'), name = 'DATA', isdata = 1 )
     treeDATA_EG2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2017, 'DATA'), name = 'DATA', isdata = 1 )
     treeDATA_EG2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, EGamma2018, 'DATA'), name = 'DATA', isdata = 1 )
@@ -236,68 +240,81 @@ if __name__ == "__main__":
     treeDATA_Mu2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016, 'DATA'), name = 'DATA', isdata = 1 )
     treeDATA_Mu2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1 )
 
-    #####################################################
-    ######## Background optimization (mass bins) ########
-    #####################################################
-    """   
-    #### -> Electron plots
-
-    makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hEEBCRIM50_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'EE', extralabel = 'Mass range: [15, 76] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hEEBCRIM150_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'EE', extralabel = 'Mass range: [106, 200] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hEEBCRIM250_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'EE', extralabel = 'Mass range: [200, 300] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hEEBCRIM350_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'EE', extralabel = 'Mass range: [300, #inf) GeV') 
-
-    makeBackgroundPlot2D(lumi = lumi2017, hname_bkg = 'hEEBCRIM50_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, xlabel = '', outtag = '2017', LLlabel = 'EE', extralabel = 'Mass range: [15, 76] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2017, hname_bkg = 'hEEBCRIM150_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, xlabel = '', outtag = '2017', LLlabel = 'EE', extralabel = 'Mass range: [106, 200] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2017, hname_bkg = 'hEEBCRIM250_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, xlabel = '', outtag = '2017', LLlabel = 'EE', extralabel = 'Mass range: [200, 300] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2017, hname_bkg = 'hEEBCRIM350_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, xlabel = '', outtag = '2017', LLlabel = 'EE', extralabel = 'Mass range: [300, #inf) GeV') 
-
-    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hEEBCRIM50_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = 'Mass range: [15, 76] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hEEBCRIM150_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = 'Mass range: [106, 200] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hEEBCRIM250_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = 'Mass range: [200, 300] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hEEBCRIM350_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = 'Mass range: [300, #inf) GeV') 
-
-    #### -> Muon plots
-
-    makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hMMBCRIM50_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'MM', extralabel = 'Mass range: [15, 76] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hMMBCRIM150_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'MM', extralabel = 'Mass range: [106, 200] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hMMBCRIM250_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'MM', extralabel = 'Mass range: [200, 300] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hMMBCRIM350_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'MM', extralabel = 'Mass range: [300, #inf) GeV') 
-
-    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hMMBCRIM50_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = 'Mass range: [15, 76] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hMMBCRIM150_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = 'Mass range: [106, 200] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hMMBCRIM250_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = 'Mass range: [200, 300] GeV') 
-    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hMMBCRIM350_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = 'Mass range: [300, #inf) GeV') 
-
-
-    ### Signal optimization
-    treeSI_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/signals_2018UL.dat', ['HSS_400_50_100_2018'], 'SI'), name = 'SI', isdata = 0 )
-    makeSignalPlot2D(lumi = lumi2018, hname_sig = 'hMMSRIM50_Lxy_trackIxy', zlog = True, treeSI = treeSI_2018, inputdir = opts.input, legend = 'H#rightarrowSS (400 GeV, 50 GeV, 100 mm)', xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = 'Mass range: [15, 76] GeV') 
-    makeSignalPlot2D(lumi = lumi2018, hname_sig = 'hEESRIM50_Lxy_trackIxy', zlog = True, treeSI = treeSI_2018, inputdir = opts.input, legend = 'H#rightarrowSS (400 GeV, 50 GeV, 100 mm)', xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = 'Mass range: [15, 76] GeV') 
-
-    countJointYields2D(hname_bkg = 'hMMBCRIM50_Lxy_trackIxy', hname_sig = 'hMMSRIM50_Lxy_trackIxy', treeDATA = treeDATA_Mu2018, treeSI = treeSI_2018, inputdir = opts.input, xmins = [0.0, 0.1], ymins = [5.0, 10.0, 14.0]) 
-    countJointYields2D(hname_bkg = 'hEEBCRIM50_Lxy_trackIxy', hname_sig = 'hEESRIM50_Lxy_trackIxy', treeDATA = treeDATA_EG2018, treeSI = treeSI_2018, inputdir = opts.input, xmins = [0.0, 0.1], ymins = [5.0, 10.0, 14.0]) 
-    """
 
 
     ########################################################
     ######## Background optimization (Lxy/dxy bins) ########
     ########################################################
 
-    www = '/eos/user/f/fernance/www/LLP/SignalRegion-optimization/2DPlots_nLL1'
+    www = '/eos/user/f/fernance/www/DisplacedLeptons-analysis/SignalRegionOptimization/2DPlots_nLL1_mass/'
 
     #### -> Electron plots
-    makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hEEBCRI_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'EE', extralabel = 'Off-Z region, N_{DV} = 1', outdir = www) 
-    makeBackgroundPlot2D(lumi = lumi2017, hname_bkg = 'hEEBCRI_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, xlabel = '', outtag = '2017', LLlabel = 'EE', extralabel = 'Off-Z region, N_{DV} = 1', outdir = www) 
-    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hEEBCRI_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = 'Off-Z region, N_{DV} = 1', outdir = www) 
+    EE_SRIa_lines = []
+    EE_SRIa_lines.append([3e-2, 20, 1e2, 20])
+    EE_SRIa_lines.append([3e-2, 6, 1e2, 6])
+    EE_SRIa_lines.append([3e-2, 3, 1e2, 3])
+    EE_SRIa_lines.append([3e-2, 3, 3e-2, 1e4])
+    makeBackgroundPlot2D(lumi = lumi2016_EE, hname_bkg = 'hEEBCRIa_Lxy_trackIxy_log', zlog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, lines = EE_SRIa_lines, xlabel = '', outtag = '2016', LLlabel = 'EE', extralabel = 'm_{ee} < 81 GeV,  N_{ee} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = True, xlog = True) 
+    makeBackgroundPlot2D(lumi = lumi2017, hname_bkg = 'hEEBCRIa_Lxy_trackIxy_log', zlog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, lines = EE_SRIa_lines, xlabel = '', outtag = '2017', LLlabel = 'EE', extralabel = 'm_{ee} < 81 GeV,  N_{ee} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = True, xlog = True)
+    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hEEBCRIa_Lxy_trackIxy_log', zlog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, lines = EE_SRIa_lines, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = 'm_{ee} < 81 GeV,  N_{ee} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = True, xlog = True) 
+
+    EE_SRIb_lines = []
+    EE_SRIb_lines.append([2e-2, 15, 1e2, 15])
+    EE_SRIb_lines.append([2e-2, 6, 1e2, 6])
+    EE_SRIb_lines.append([2e-2, 3, 1e2, 3])
+    EE_SRIb_lines.append([2e-2, 3, 2e-2, 1e4])
+    makeBackgroundPlot2D(lumi = lumi2016_EE, hname_bkg = 'hEEBCRIb_Lxy_trackIxy_log', zlog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, lines = EE_SRIb_lines, xlabel = '', outtag = '2016', LLlabel = 'EE', extralabel = 'm_{ee} > 101 GeV,  N_{ee} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = True, xlog = True) 
+    makeBackgroundPlot2D(lumi = lumi2017, hname_bkg = 'hEEBCRIb_Lxy_trackIxy_log', zlog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, lines = EE_SRIb_lines, xlabel = '', outtag = '2017', LLlabel = 'EE', extralabel = 'm_{ee} > 101 GeV,  N_{ee} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = True, xlog = True)
+    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hEEBCRIb_Lxy_trackIxy_log', zlog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, lines = EE_SRIb_lines, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = 'm_{ee} > 101 GeV,  N_{ee} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = True, xlog = True) 
 
     #### -> Muon plots
-    makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hMMBCRI_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'MM', extralabel = 'Off-Z region, N_{DV} = 1', outdir = www) 
-    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hMMBCRI_Lxy_trackIxy', zlog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = 'Off-Z region, N_{DV} = 1', outdir = www) 
+    MM_SRIa_lines = []
+    MM_SRIa_lines.append([2e-2, 3, 1e2, 3])
+    MM_SRIa_lines.append([2e-2, 9, 1e2, 9])
+    MM_SRIa_lines.append([0.2, 3, 0.2, 1e4])
+    MM_SRIa_lines.append([2e-2, 3, 2e-2, 1e4])
+    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hMMBCRIa_Lxy_trackIxy_log', zlog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, lines = MM_SRIa_lines, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = 'm_{#mu#mu} < 81 GeV,  N_{#mu#mu} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = True, xlog = True) 
+    makeBackgroundPlot2D(lumi = lumi2016_MM, hname_bkg = 'hMMBCRIa_Lxy_trackIxy_log', zlog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, lines = MM_SRIa_lines, xlabel = '', outtag = '2016', LLlabel = 'MM', extralabel = 'm_{#mu#mu} < 81 GeV,  N_{#mu#mu} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = True, xlog = True) 
+
+    MM_SRIb_lines = []
+    MM_SRIb_lines.append([2e-2, 3, 1e2, 3])
+    MM_SRIb_lines.append([2e-2, 9, 1e2, 9])
+    MM_SRIb_lines.append([7e-2, 3, 7e-2, 1e4])
+    MM_SRIb_lines.append([2e-2, 3, 2e-2, 1e4])
+    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hMMBCRIb_Lxy_trackIxy_log', zlog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, lines = MM_SRIb_lines, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = 'm_{#mu#mu} < 101 GeV,  N_{#mu#mu} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = True, xlog = True) 
+    makeBackgroundPlot2D(lumi = lumi2016_MM, hname_bkg = 'hMMBCRIb_Lxy_trackIxy_log', zlog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, lines = MM_SRIb_lines, xlabel = '', outtag = '2016', LLlabel = 'MM', extralabel = 'm_{#mu#mu} > 101 GeV,  N_{#mu#mu} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = True, xlog = True) 
 
 
+    ####################################################
+    ######## Signal optimization (Lxy/dxy bins) ########
+    ####################################################
+    Signals = []
+    Signals.append('HSS_500_50_1')
+    Signals.append('HSS_500_50_10')
+    Signals.append('HSS_500_50_100')
+    Signals.append('HSS_500_50_1000')
+    Signals.append('HSS_500_150_1')
+    Signals.append('HSS_500_150_10')
+    Signals.append('HSS_500_150_100')
+    Signals.append('HSS_500_150_1000')
+    #Signals.append('RPV_350_148_1')
+    #Signals.append('RPV_350_148_10')
+    #Signals.append('RPV_350_148_100')
+    #Signals.append('RPV_350_148_1000')
+
+    for signal in Signals:
+        label = signal + '_2018'
+        values = signal.split('_')
+        point = '({0} GeV, {1} GeV, {2} mm)'.format(values[1], values[2], values[3])
+        llegend = 'H#rightarrowSS ' + point if 'HSS' in signal else 'RPV ' + point
+        treeSI_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/CombSignal_2018UL_Fall22.dat', [label], 'SI'), name = 'SI', isdata = 0 )
 
 
+        makeSignalPlot2D(name = 'hMMSRIa_'+label, lumi = lumi2018, hname_sig = 'hMMSRIa_Lxy_trackIxy_log', zlog = True, treeSI = treeSI_2018, inputdir = opts.input, legend = llegend, lines = MM_SRIa_lines, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = 'm_{#mu#mu} < 81 GeV,  N_{#mu#mu} = 1,  |#Delta#Phi| < #pi/4', outdir = www, xlog = True, ylog = True) 
+        makeSignalPlot2D(name = 'hEESRIa_'+label, lumi = lumi2018, hname_sig = 'hEESRIa_Lxy_trackIxy_log', zlog = True, treeSI = treeSI_2018, inputdir = opts.input, legend = llegend, lines = EE_SRIa_lines, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = 'm_{ee} < 81 GeV,  N_{ee} = 1,  |#Delta#Phi| < #pi/4', outdir = www, xlog = True, ylog = True) 
+
+        makeSignalPlot2D(name = 'hMMSRIb_'+label, lumi = lumi2018, hname_sig = 'hMMSRIb_Lxy_trackIxy_log', zlog = True, treeSI = treeSI_2018, inputdir = opts.input, legend = llegend, lines = MM_SRIb_lines, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = 'm_{#mu#mu} > 101 GeV,  N_{#mu#mu} = 1,  |#Delta#Phi| < #pi/4', outdir = www, xlog = True, ylog = True) 
+        makeSignalPlot2D(name = 'hEESRIb_'+label, lumi = lumi2018, hname_sig = 'hEESRIb_Lxy_trackIxy_log', zlog = True, treeSI = treeSI_2018, inputdir = opts.input, legend = llegend, lines = EE_SRIb_lines, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = 'm_{ee} > 101 GeV,  N_{ee} = 1,  |#Delta#Phi| < #pi/4', outdir = www, xlog = True, ylog = True) 
 
 
 

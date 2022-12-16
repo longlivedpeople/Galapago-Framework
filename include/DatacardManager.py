@@ -56,8 +56,8 @@ class SystematicsHandler:
 
      def __init__(self, Systematics):
         
-        self.width = 15 # Normal column width
-        self.hwidth = 20 # First column width
+        self.width = 20 # Normal column width
+        self.hwidth = 25 # First column width
         self.name = []
         self.value = []
         self.signal = []

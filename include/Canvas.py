@@ -448,7 +448,7 @@ class Canvas:
               time.sleep(1.0)
               pass
 
-   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, label ="Data/Prediction", hsys = False, outputDir = 'plots/', xlog = False, maxYnumbers = False, inProgress = False):
+   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, r_xmin=0, r_xmax=0, label ="Data/Prediction", hsys = False, outputDir = 'plots/', xlog = False, maxYnumbers = False, inProgress = False):
 
       self.myCanvas.cd()
 
@@ -582,7 +582,10 @@ class Canvas:
           rat.Draw('P E0 E1,same');
 
       ## Lines
-      line = TLine(xmin, 1, xmax, 1)
+      if (not r_xmin) and (not r_xmax):
+          r_xmin = xmin
+          r_xmax = xmax
+      line = TLine(r_xmin, 1, r_xmax, 1)
       line.SetLineColor(r.kGray+2);
       line.Draw('');
 

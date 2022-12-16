@@ -160,7 +160,7 @@ if __name__ == "__main__":
 
     ############# Signal definition
     Masses = []
-    Masses.append('HSS_125_50')
+    #Masses.append('HSS_125_50')
     #Masses.append('HSS_300_50')
     #Masses.append('HSS_500_50')
     #Masses.append('HSS_500_150')
@@ -170,16 +170,16 @@ if __name__ == "__main__":
     #Masses.append('HSS_800_50')
     #Masses.append('HSS_800_250')
     #Masses.append('HSS_800_350')
-    #Masses.append('HSS_1000_450')
-    #Masses.append('HSS_1000_350')
-    #Masses.append('HSS_1000_450')
+    Masses.append('HSS_1000_450')
+    Masses.append('HSS_1000_350')
+    Masses.append('HSS_1000_450')
     Signals = []
     for mass in Masses:
         Signals.append(mass + '_1')
         Signals.append(mass + '_10')
         Signals.append(mass + '_100')
         Signals.append(mass + '_1000')
-        #Signals.append(mass + '_10000')
+        Signals.append(mass + '_10000')
     Signals_2016preVFP = [i + '_2016APV' for i in Signals]
     Signals_2016postVFP = [i + '_2016' for i in Signals]
     Signals2016 = [i + '_2016' for i in Signals]
