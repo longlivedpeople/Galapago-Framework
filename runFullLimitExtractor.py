@@ -133,8 +133,8 @@ if __name__ == "__main__":
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
     parser.add_option('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_UltraLegacy.dat', help='dat file')
     parser.add_option('-t', '--t', action='store', type=str, dest='tag', default='', help='tag')
-    parser.add_option('-e', '--electronRecipe', action='store', type=str, dest='muonRecipe', default='recipes-datacards/recipe_Fall22_Muon.txt', help='the input dir')
-    parser.add_option('-m', '--muonRecipe',   action='store', type=str, dest='electronRecipe', default='recipes-datacards/recipe_Fall22_Electron.txt', help='the input dir')
+    parser.add_option('-e', '--electronRecipe', action='store', type=str, dest='electronRecipe', default='recipes-datacards/recipe_Fall22_Muon.txt', help='the input dir')
+    parser.add_option('-m', '--muonRecipe',   action='store', type=str, dest='muonRecipe', default='recipes-datacards/recipe_Fall22_Electron.txt', help='the input dir')
     parser.add_option('-s', '--Esystematics', action='store', type=str, dest='electron_systematics', default='recipes-datacards/recipe_Systematics_UltraLegacy_Electron.txt', help='file with systematics table')
     parser.add_option('-S', '--Msystematics', action='store', type=str, dest='muon_systematics', default='recipes-datacards/recipe_Systematics_UltraLegacy_Muon.txt', help='file with systematics table')
 
