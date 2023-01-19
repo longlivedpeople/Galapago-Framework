@@ -81,7 +81,8 @@ class yieldHandler(processHandler):
         try:
             mm_maxIxy = -99
             mm_maxIxy, nBSMM = self.processDimuons(ev)
-            if not mm_maxIxy < 0:
+            passMuonTrigger = eval(self.mumu_path)
+            if not mm_maxIxy < 0 and eval(self.mumu_path):
                 imm = mm_maxIxy
 
                 ## Compute SF
@@ -102,7 +103,8 @@ class yieldHandler(processHandler):
         try:
             ee_maxIxy = -99
             ee_maxIxy, nBSEE = self.processDielectrons(ev)
-            if not ee_maxIxy < 0:
+            passElectronTrigger = eval(self.ee_path) and not eval(self.mumu_path)
+            if not ee_maxIxy < 0 and passElectronTrigger:
                 iee = ee_maxIxy
                 ## Compute SF
                 sf = 1.0

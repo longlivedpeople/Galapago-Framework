@@ -244,7 +244,7 @@ class processHandler:
             mm_maxIxy = -99
             mm_maxIxy, nBSMM = self.processDimuons(ev)
 
-            if not mm_maxIxy < 0:
+            if not mm_maxIxy < 0 and eval(self.mumu_path):
 
                 imm = mm_maxIxy
                 self.hMM_yield.Fill(0, weight)
@@ -259,7 +259,7 @@ class processHandler:
             ee_maxIxy = -99
             ee_maxIxy, nBSEE = self.processDielectrons(ev)
 
-            if not ee_maxIxy < 0:
+            if not ee_maxIxy < 0 and eval(self.ee_path) and not eval(self.mumu_path):
 
                 iee = ee_maxIxy
                 self.hEE_yield.Fill(0, weight)
@@ -279,8 +279,6 @@ class processHandler:
 
     def processDimuons(self, ev):
 
-        if not eval(self.mumu_path):
-            return -99, -99
         if ev.nDMDM < 1:
             return -99, -99
 
@@ -317,8 +315,6 @@ class processHandler:
     def processDielectrons(self, ev):
 
 
-        if not eval(self.ee_path) or eval(self.mumu_path):
-            return -99, -99
         if ev.nEE < 1:
             return -99, -99
 
