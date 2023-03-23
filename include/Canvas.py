@@ -3,6 +3,7 @@ import ROOT as r
 import os, copy, math, array
 from array import array
 import time
+import numpy as np
 
 class Canvas:
    'Common base class for all Samples'
@@ -430,7 +431,24 @@ class Canvas:
           for j in range(0, len(self.orderForLegend)):
               if(self.orderForLegend[j] != -1 and self.orderForLegend[j] == i):
                   self.myLegend.AddEntry(self.histos[j], self.labels[j], self.labelsOption[j])
-          
+   
+   '''
+   Function to build the histogram of systematic errors
+   Arguments:
+       - sys_errors: list with all the systematics to apply, e.g. [0.02, 0.1, 0.015]
+       - hMC       : base histogram to get the binning and values
+   '''       
+   def makeSystematicsHist(self, sys_errors, hMC):
+      self.hsys = hMC.Clone()
+      for i in range(self.hsys.GetNbinsX()):
+          MCvalue = hMC.GetBinContent(i)
+          # compute MC systematic error
+          error_values = 1 * np.array(sys_errors)
+          band_error = np.linalg.norm(error_values)
+          # Fill histogram
+          self.hsys.SetBinContent(i,1)
+          self.hsys.SetBinError(i,band_error)
+
 
    def ensurePath(self, _path):
 
@@ -448,7 +466,7 @@ class Canvas:
               time.sleep(1.0)
               pass
 
-   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, r_xmin=0, r_xmax=0, label ="Data/Prediction", hsys = False, outputDir = 'plots/', xlog = False, maxYnumbers = False, inProgress = False):
+   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, r_xmin=0, r_xmax=0, label ="Data/Prediction", sys_errors = None, outputDir = 'plots/', xlog = False, maxYnumbers = False, inProgress = False):
 
       self.myCanvas.cd()
 
@@ -531,6 +549,7 @@ class Canvas:
               tmp_ratio = hdata.Clone(tmp_hMC.GetName()+'_ratio')
               tmp_ratio.Divide(tmp_hMC)
 
+
           ## Ratio tunning
           tmp_ratio.SetTitle("")
           tmp_ratio.GetYaxis().SetRangeUser(r_ymin, r_ymax);
@@ -561,22 +580,23 @@ class Canvas:
 
       pad2.cd();  
       ## Draw systematics (if included)
-      if hsys:
-          hsys.GetYaxis().SetTitle(label);
-          hsys.GetYaxis().CenterTitle();
-          hsys.GetYaxis().SetLabelSize(0.10);
-          hsys.GetYaxis().SetNdivisions(4);
-          hsys.GetYaxis().SetTitleOffset(0.5);
-          hsys.GetXaxis().SetLabelSize(0.10);
-          hsys.GetYaxis().SetTitleSize(0.11);
-          hsys.GetXaxis().SetTitleSize(0.12);
-          hsys.GetXaxis().SetLabelOffset(0.02);
-          hsys.SetLineColor(r.kGray)
-          hsys.SetFillColor(r.kGray)
-          hsys.SetMarkerSize(0)
-          #hsys.SetFillStyle(3013)
-          hsys.GetYaxis().SetRangeUser(r_ymin, r_ymax);
-          hsys.Draw('E2,same')
+      if sys_errors is not None:
+          self.makeSystematicsHist(sys_errors, hMC);
+          self.hsys.GetYaxis().SetTitle(label);
+          self.hsys.GetYaxis().CenterTitle();
+          self.hsys.GetYaxis().SetLabelSize(0.10);
+          self.hsys.GetYaxis().SetNdivisions(4);
+          self.hsys.GetYaxis().SetTitleOffset(0.5);
+          self.hsys.GetXaxis().SetLabelSize(0.10);
+          self.hsys.GetYaxis().SetTitleSize(0.11);
+          self.hsys.GetXaxis().SetTitleSize(0.12);
+          self.hsys.GetXaxis().SetLabelOffset(0.02);
+          self.hsys.SetLineColor(r.kBlue-10)
+          self.hsys.SetFillColor(r.kBlue-10)
+          self.hsys.SetMarkerSize(0)
+          #self.hsys.SetFillStyle(3013)
+          self.hsys.GetYaxis().SetRangeUser(r_ymin, r_ymax);
+          self.hsys.Draw('E2,same')
       ## Draw ratio
       for rat in ratios:
           rat.Draw('P E0 E1,same');
