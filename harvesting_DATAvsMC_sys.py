@@ -16,6 +16,22 @@ from include.galapagoStyle import sigpalette, gcolors, dcolors
 
 
 
+'''
+Function to build the histogram of systematic errors
+Arguments:
+   - sys_errors: list with all the systematics to apply, e.g. [0.02, 0.1, 0.015]
+'''
+def makeSystematicsHist(sys_errors, hMC):
+    hsys = hMC.Clone()
+    for i in range(hsys.GetNbinsX()):
+        # compute MC systematic error
+        error_values = 1 * np.array(sys_errors)
+        band_error = np.linalg.norm(error_values)
+        # Fill histogram
+        hsys.SetBinContent(i,1)
+        hsys.SetBinError(i,band_error)
+    return hsys
+
 def makeDataMCPlot(lumi, hname_DATA, hname_MC, ylog, treeDATA, treeMC, inputdir, hname_extra = '', label_extra = '', treeEXTRA = False, xlabel = '', outtag = '', yshift = 100.0, LLlabel = '', leftlabel = '', xlog = False, sys_errors = None):
 
     
@@ -111,11 +127,14 @@ def makeDataMCPlot(lumi, hname_DATA, hname_MC, ylog, treeDATA, treeMC, inputdir,
     if leftlabel:
         plot.addLatex(0.17, 0.76, leftlabel, font = 42)
 
+    ### Systematics
+    hsys = None
+    if sys_errors is not None: hsys = makeSystematicsHist(sys_errors, hMCtotal)
+
     ### Save it
     outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/PlotsDATAMC_' + outtag + '/'
-    plot.saveRatio(1, 1, ylog, luminosity, hDATA, hMCtotal, r_ymin = 0.0, r_ymax = 2.0, label="Data/BKG", outputDir = outdir, xlog = xlog, sys_errors = sys_errors)
+    plot.saveRatio(1, 1, ylog, luminosity, hDATA, hMCtotal, r_ymin = 0.0, r_ymax = 2.0, label="Data/BKG", outputDir = outdir, xlog = xlog, hsys = hsys)
     
-
 
 def makeMCPlot(lumi, hname_MC, ylog, treeMC, inputdir, treeSI = False, hname_extra = '', label_extra = '', treeEXTRA = False, xlabel = '', outtag = '', yshift = 100.0, LLlabel = '', leftlabel = '', xlog = False):
 
