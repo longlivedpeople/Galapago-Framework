@@ -3,6 +3,7 @@ import ROOT as r
 import os, copy, math, array
 from array import array
 import time
+import numpy as np
 
 class Canvas:
    'Common base class for all Samples'
@@ -430,7 +431,7 @@ class Canvas:
           for j in range(0, len(self.orderForLegend)):
               if(self.orderForLegend[j] != -1 and self.orderForLegend[j] == i):
                   self.myLegend.AddEntry(self.histos[j], self.labels[j], self.labelsOption[j])
-          
+   
 
    def ensurePath(self, _path):
 
@@ -448,7 +449,7 @@ class Canvas:
               time.sleep(1.0)
               pass
 
-   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, r_xmin=0, r_xmax=0, label ="Data/Prediction", hsys = False, outputDir = 'plots/', xlog = False, maxYnumbers = False, inProgress = False):
+   def saveRatio(self, legend, isData, log, lumi, hdata, hMC, r_ymin=0, r_ymax=2, r_xmin=0, r_xmax=0, label ="Data/Prediction", hsys = None, outputDir = 'plots/', xlog = False, maxYnumbers = False, inProgress = False):
 
       self.myCanvas.cd()
 
@@ -531,6 +532,7 @@ class Canvas:
               tmp_ratio = hdata.Clone(tmp_hMC.GetName()+'_ratio')
               tmp_ratio.Divide(tmp_hMC)
 
+
           ## Ratio tunning
           tmp_ratio.SetTitle("")
           tmp_ratio.GetYaxis().SetRangeUser(r_ymin, r_ymax);
@@ -561,7 +563,7 @@ class Canvas:
 
       pad2.cd();  
       ## Draw systematics (if included)
-      if hsys:
+      if hsys is not None:
           hsys.GetYaxis().SetTitle(label);
           hsys.GetYaxis().CenterTitle();
           hsys.GetYaxis().SetLabelSize(0.10);
@@ -571,8 +573,8 @@ class Canvas:
           hsys.GetYaxis().SetTitleSize(0.11);
           hsys.GetXaxis().SetTitleSize(0.12);
           hsys.GetXaxis().SetLabelOffset(0.02);
-          hsys.SetLineColor(r.kGray)
-          hsys.SetFillColor(r.kGray)
+          hsys.SetLineColor(r.kBlue-10)
+          hsys.SetFillColor(r.kBlue-10)
           hsys.SetMarkerSize(0)
           #hsys.SetFillStyle(3013)
           hsys.GetYaxis().SetRangeUser(r_ymin, r_ymax);
