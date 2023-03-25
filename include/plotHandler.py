@@ -24,7 +24,9 @@ class plotHandler(processHandler):
     #### ------------------------
 
     def initHistograms(self):
-
+        
+        bins_mass     = np.array([15., 65., 115., 165., 215., 265., 315., 365., 415., 465.])
+        bins_trackIxy = np.array([1., 3., 6., 10., 15., 25., 35., 60.])
         #### ---------------
         #### ---- EE plots
         #### ---------------
@@ -49,6 +51,7 @@ class plotHandler(processHandler):
         self.hEE_Ixy            = {}
         self.hEE_leadingEt      = {}
         self.hEE_subleadingEt   = {}
+        self.hEE_eta            = {}
         self.hEE_normalizedChi2 = {}
         self.hEE_normalizedChi2_log = {}
         self.hEE_vx_vy          = {}
@@ -67,27 +70,28 @@ class plotHandler(processHandler):
             self.hEE_dPhi[region]           = r.TH1F('hEE{0}_dPhi'.format(region) + self.sufix, ';Dielectron collinearity |#Delta#Phi|;', 30, 0, 3.14)
             self.hEE_dPhi_scan[region]      = r.TH1F('hEE{0}_dPhi_scan'.format(region) + self.sufix, ';Dielectron collinearity |#Delta#Phi|;', 4, 0, 3.14)
             self.hEE_dPhi_inv[region]       = r.TH1F('hEE{0}_dPhi_inv'.format(region) + self.sufix, ';Dielectron inverted collinearity #pi - |#Delta#Phi|;', 30, 0, 3.14)
-            self.hEE_mass[region]           = r.TH1F('hEE{0}_mass'.format(region) + self.sufix, ';Dielectron invariant mass m_{ee} (GeV);', 100, 0, 500)
+            self.hEE_mass[region]           = r.TH1F('hEE{0}_mass'.format(region) + self.sufix, ';Dielectron invariant mass m_{ee} (GeV);', 50, 0, 300)
             self.hEE_mass_Z[region]         = r.TH1F('hEE{0}_mass_Z'.format(region) + self.sufix, ';Dielectron invariant mass m_{ee} (GeV);', 50, 75, 105)
             self.hEE_mass_log[region]       = r.TH1F('hEE{0}_mass_log'.format(region) + self.sufix, ';Dielectron invariant mass m_{ee} (GeV);', len(np.logspace(-1, 2, 100))-1, np.logspace(-1, 2, 100))
             self.hEE_mass_scan[region]      = r.TH1F('hEE{0}_mass_scan'.format(region) + self.sufix, ';Dielectron invariant mass m_{ee} (GeV);', 8, np.array([0., 21, 41., 61., 81., 101., 121., 141., 161.]))
             self.hEE_cosAlpha[region]       = r.TH1F('hEE{0}_cosAlpha'.format(region) + self.sufix, ';Dielectron cos(#alpha_{ee});', 44, -1.1, 1.1)
             self.hEE_trackIxy[region]       = r.TH1F('hEE{0}_trackIxy'.format(region) + self.sufix, ';Dielectron |d_{0}|/#sigma_{d};', 40, 0, 40)
             self.hEE_trackIxy_log[region]   = r.TH1F('hEE{0}_trackIxy_log'.format(region) + self.sufix, ';Dielectron |d_{0}|/#sigma_{d};', len(np.logspace(-3, 3, 50))-1, np.logspace(-3, 3, 50))
-            self.hEE_trackDxy[region]       = r.TH1F('hEE{0}_trackDxy'.format(region) + self.sufix, ';Dielectron |d_{0}| (cm);', 100, 0, 10.0)
+            self.hEE_trackDxy[region]       = r.TH1F('hEE{0}_trackDxy'.format(region) + self.sufix, ';Dielectron |d_{0}| (cm);', 20, 0, 5.0)
             self.hEE_sigmaD[region]         = r.TH1F('hEE{0}_sigmaD'.format(region) + self.sufix, ';Dielectron #sigma_{d} (cm);', 100, 0, 0.01)
             self.hEE_Lxy[region]            = r.TH1F('hEE{0}_Lxy'.format(region) + self.sufix, ';Dielectron vertex |L_{xy}| (cm);', 50, 0, 10)
             self.hEE_Ixy[region]            = r.TH1F('hEE{0}_Ixy'.format(region) + self.sufix, ';Dielectron vertex |L_{xy}|/#sigma_{L};', 40, 0, 40)
-            self.hEE_leadingEt[region]      = r.TH1F('hEE{0}_leadingEt'.format(region) + self.sufix, ';Dielectron leading E_{T};', 60, 0, 300)
-            self.hEE_subleadingEt[region]   = r.TH1F('hEE{0}_subleadingEt'.format(region) + self.sufix, ';Dielectron subleading E_{T};', 60, 0, 300)
+            self.hEE_leadingEt[region]      = r.TH1F('hEE{0}_leadingEt'.format(region) + self.sufix, ';Dielectron leading E_{T};', 40, 0, 200)
+            self.hEE_subleadingEt[region]   = r.TH1F('hEE{0}_subleadingEt'.format(region) + self.sufix, ';Dielectron subleading E_{T};', 40, 0, 200)
+            self.hEE_eta[region]            = r.TH1F('hEE{0}_eta'.format(region) + self.sufix, ';Electron #eta;', 24, -2.4, 2.4)
             self.hEE_normalizedChi2[region] = r.TH1F('hEE{0}_normalizedChi2'.format(region) + self.sufix, ';Dielectron vertex fit #chi^{2}/ndof;', 50, 0, 50)
             self.hEE_normalizedChi2_log[region] = r.TH1F('hEE{0}_normalizedChi2_log'.format(region) + self.sufix, ';Dielectron vertex fit #chi^{2}/ndof;', 60, np.logspace(-3, 4, 61))
             self.hEE_vx_vy[region]          = r.TH2F('hEE{0}_vx_vy'.format(region) + self.sufix, ';Dielectron vertex v_{x} (cm) ; Dielectron vertex v_{y} (cm)', 200, -4.0, 4.0, 200, -4.0, 4.0)
-            self.hEE_mass_trackIxy[region]  = r.TH2F('hEE{0}_mass_trackIxy'.format(region) + self.sufix, ';Dielectron invariant mass m_{ee} (GeV); Dielectron |d_{0}|/#sigma_{d}', 7, np.array([0., 15., 75., 105., 200., 300., 400., 500.]), 10, np.array([0., 5., 10., 15., 20., 25., 30., 35., 40., 50., 60.]))
             self.hEE_mass_Lxy[region]       = r.TH2F('hEE{0}_mass_Lxy'.format(region) + self.sufix, ';Dielectron invariant mass m_{ee} (GeV); Dielectron vertex |L_{xy}| (cm)', 7, np.array([0., 15., 75., 105., 200., 300., 400., 500.]), 50, np.linspace(0, 5, 51))
             self.hEE_Lxy_trackIxy[region]   = r.TH2F('hEE{0}_Lxy_trackIxy'.format(region) + self.sufix, ';Dielectron vertex |L_{xy}| (cm);Dielectron |d_{0}|/#sigma_{d}', 40, np.linspace(0, 2, 41), 40, np.linspace(0, 40, 41))
             self.hEE_Lxy_trackIxy_log[region]   = r.TH2F('hEE{0}_Lxy_trackIxy_log'.format(region) + self.sufix, ';Dielectron vertex |L_{xy}| (cm);Dielectron |d_{0}|/#sigma_{d}', 80, np.logspace(-2, 2, 81), 80, np.logspace(0, 4, 81))
             self.hEE_trackDxy_trackIxy_log[region]   = r.TH2F('hEE{0}_trackDxy_trackIxy_log'.format(region) + self.sufix, ';Dielectron vertex |d_{0}| (cm);Dielectron |d_{0}|/#sigma_{d}', 80, np.logspace(-2, 2, 81), 80, np.logspace(0, 4, 81))
+            self.hEE_mass_trackIxy[region]  = r.TH2F('hEE{0}_mass_trackIxy'.format(region) + self.sufix, ';Dielectron invariant mass (GeV) ; Dielectron |d_{0}|/#sigma_{d}', len(bins_mass)-1, bins_mass, len(bins_trackIxy)-1, bins_trackIxy)
 
         #### ---------------
         #### ---- MM plots
@@ -113,6 +117,7 @@ class plotHandler(processHandler):
         self.hMM_Ixy            = {}
         self.hMM_leadingPt      = {}
         self.hMM_subleadingPt   = {}
+        self.hMM_eta            = {}
         self.hMM_normalizedChi2 = {}
         self.hMM_normalizedChi2_log = {}
         self.hMM_vx_vy          = {}
@@ -131,27 +136,28 @@ class plotHandler(processHandler):
             self.hMM_dPhi[region]           = r.TH1F('hMM{0}_dPhi'.format(region) + self.sufix, ';Dimuon collinearity |#Delta#Phi|;', 30, 0, 3.14)
             self.hMM_dPhi_inv[region]       = r.TH1F('hMM{0}_dPhi_inv'.format(region) + self.sufix, ';Dimuon inverted collinearity #pi - |#Delta#Phi|;', 30, 0, 3.14)
             self.hMM_dPhi_scan[region]      = r.TH1F('hMM{0}_dPhi_scan'.format(region) + self.sufix, ';Dimuon collinearity |#Delta#Phi|;', 4, 0, 3.14)
-            self.hMM_mass[region]           = r.TH1F('hMM{0}_mass'.format(region) + self.sufix, ';Dimuon invariant mass m_{#mu#mu} (GeV);', 100, 0, 500)
-            self.hMM_mass_Z[region]         = r.TH1F('hMM{0}_mass_Z'.format(region) + self.sufix, ';Dimuon invariant mass m_{#mu#mu} (GeV);', 50, 75, 105)
+            self.hMM_mass[region]           = r.TH1F('hMM{0}_mass'.format(region) + self.sufix, ';Dimuon invariant mass m_{#mu#mu} (GeV);', 50, 0, 300)
+            self.hMM_mass_Z[region]         = r.TH1F('hMM{0}_mass_Z'.format(region) + self.sufix, ';Dimuon invariant mass m_{#mu#mu} (GeV);', 50, 80, 105)
             self.hMM_mass_log[region]       = r.TH1F('hMM{0}_mass_log'.format(region) + self.sufix, ';Dimuon invariant mass m_{#mu#mu} (GeV);', len(np.logspace(-1, 2, 100))-1, np.logspace(-1, 2, 100))
             self.hMM_mass_scan[region]      = r.TH1F('hMM{0}_mass_scan'.format(region) + self.sufix, ';Dimuon invariant mass m_{#mu#mu} (GeV);', 8, np.array([0., 21, 41., 61., 81., 101., 121., 141., 161.]))
             self.hMM_cosAlpha[region]       = r.TH1F('hMM{0}_cosAlpha'.format(region) + self.sufix, ';Dimuon cos(#alpha_{#mu#mu});', 44, -1.1, 1.1)
             self.hMM_trackIxy[region]       = r.TH1F('hMM{0}_trackIxy'.format(region) + self.sufix, ';Dimuon |d_{0}|/#sigma_{d};', 40, 0, 40)
             self.hMM_trackIxy_log[region]   = r.TH1F('hMM{0}_trackIxy_log'.format(region) + self.sufix, ';Dimuon |d_{0}|/#sigma_{d};', len(np.logspace(-3, 3, 50))-1, np.logspace(-3, 3, 50))
-            self.hMM_trackDxy[region]       = r.TH1F('hMM{0}_trackDxy'.format(region) + self.sufix, ';Dimuon |d_{0}| (cm);', 100, 0, 10.0)
+            self.hMM_trackDxy[region]       = r.TH1F('hMM{0}_trackDxy'.format(region) + self.sufix, ';Dimuon |d_{0}| (cm);', 20, 0, 5.0)
             self.hMM_sigmaD[region]         = r.TH1F('hMM{0}_sigmaD'.format(region) + self.sufix, ';Dimuon #sigma_{d} (cm);', 100, 0, 0.01)
             self.hMM_Lxy[region]            = r.TH1F('hMM{0}_Lxy'.format(region) + self.sufix, ';Dimuon vertex |L_{xy}| (cm);', 50, 0, 10)
             self.hMM_Ixy[region]            = r.TH1F('hMM{0}_Ixy'.format(region) + self.sufix, ';Dimuon vertex |L_{xy}|/#sigma_{L};', 40, 0, 40)
-            self.hMM_leadingPt[region]      = r.TH1F('hMM{0}_leadingPt'.format(region) + self.sufix, ';Dimuon leading p_{T};', 60, 0, 300)
-            self.hMM_subleadingPt[region]   = r.TH1F('hMM{0}_subleadingPt'.format(region) + self.sufix, ';Dimuon subleading p_{T};', 60, 0, 300)
+            self.hMM_leadingPt[region]      = r.TH1F('hMM{0}_leadingPt'.format(region) + self.sufix, ';Dimuon leading p_{T};', 40, 0, 200)
+            self.hMM_subleadingPt[region]   = r.TH1F('hMM{0}_subleadingPt'.format(region) + self.sufix, ';Dimuon subleading p_{T};', 40, 0, 200)
+            self.hMM_eta[region]            = r.TH1F('hMM{0}_eta'.format(region) + self.sufix, ';Muon #eta;', 24, -2.4, 2.4)
             self.hMM_normalizedChi2[region] = r.TH1F('hMM{0}_normalizedChi2'.format(region) + self.sufix, ';Dimuon vertex fit #chi^{2}/ndof;', 50, 0, 50)
             self.hMM_normalizedChi2_log[region] = r.TH1F('hMM{0}_normalizedChi2_log'.format(region) + self.sufix, ';Dimuon vertex fit #chi^{2}/ndof;', 60, np.logspace(-3, 4, 61))
             self.hMM_vx_vy[region]          = r.TH2F('hMM{0}_vx_vy'.format(region) + self.sufix, ';Dimuon vertex v_{x} (cm) ; Dimuon vertex v_{y} (cm)', 200, -4.0, 4.0, 200, -4.0, 4.0)
-            self.hMM_mass_trackIxy[region]  = r.TH2F('hMM{0}_mass_trackIxy'.format(region) + self.sufix, ';Dimuon invariant mass m_{#mu#mu} (GeV); Dimuon |d_{0}|/#sigma_{d}', 7, np.array([0., 15., 75., 105., 200., 300., 400., 500.]), 10, np.array([0., 5., 10., 15., 20., 25., 30., 35., 40., 50., 60.]))
             self.hMM_mass_Lxy[region]       = r.TH2F('hMM{0}_mass_Lxy'.format(region) + self.sufix, ';Dimuon invariant mass m_{#mu#mu} (GeV); Dimuon vertex |L_{xy}| (cm)', 7, np.array([0., 15., 75., 105., 200., 300., 400., 500.]), 50, np.linspace(0, 5, 51))
             self.hMM_Lxy_trackIxy[region]   = r.TH2F('hMM{0}_Lxy_trackIxy'.format(region) + self.sufix, ';Dimuon vertex |L_{xy}| (cm);Dimuon |d_{0}|/#sigma_{d}', 40, np.linspace(0, 2, 41), 40, np.linspace(0, 40, 41))
             self.hMM_Lxy_trackIxy_log[region]   = r.TH2F('hMM{0}_Lxy_trackIxy_log'.format(region) + self.sufix, ';Dimuon vertex |L_{xy}| (cm);Dimuon |d_{0}|/#sigma_{d}', 80, np.logspace(-2, 2, 81), 80, np.logspace(0, 4, 81))
             self.hMM_trackDxy_trackIxy_log[region]   = r.TH2F('hMM{0}_trackDxy_trackIxy_log'.format(region) + self.sufix, ';Dimuon vertex |d_{0}| (cm);Dimuon |d_{0}|/#sigma_{d}', 80, np.logspace(-2, 2, 81), 80, np.logspace(0, 4, 81))
+            self.hMM_mass_trackIxy[region]  = r.TH2F('hMM{0}_mass_trackIxy'.format(region) + self.sufix, ';Dimuon invariant mass (GeV) ; Dimuon |d_{0}|/#sigma_{d}', len(bins_mass)-1, bins_mass, len(bins_trackIxy)-1, bins_trackIxy)
 
 
         #### --------------------------------
@@ -200,7 +206,8 @@ class plotHandler(processHandler):
         try:
             ee_maxIxy = -99
             ee_maxIxy, nBSEE = self.processDielectrons(ev)
-            passElectronTrigger = eval(self.ee_path) and not eval(self.mumu_path)
+            passElectronTrigger = eval(self.ee_path)
+            #passElectronTrigger = eval(self.ee_path) and not eval(self.mumu_path)
             if not ee_maxIxy < 0 and passElectronTrigger:
                 iee = ee_maxIxy
                 for region in self.dielectronRegions:
@@ -246,6 +253,8 @@ class plotHandler(processHandler):
         self.hMM_cosAlpha[region].Fill(ev.DMDM_cosAlpha[mm_maxIxy], weight*sf)
         self.hMM_leadingPt[region].Fill(ev.DMDM_leadingPt[mm_maxIxy], weight*sf)
         self.hMM_subleadingPt[region].Fill(ev.DMDM_subleadingPt[mm_maxIxy], weight*sf)
+        self.hMM_eta[region].Fill(ev.DGM_eta[ev.DMDM_idxA[mm_maxIxy]], weight*sf)
+        self.hMM_eta[region].Fill(ev.DGM_eta[ev.DMDM_idxB[mm_maxIxy]], weight*sf)
         self.hMM_vx_vy[region].Fill(ev.DMDM_vx[mm_maxIxy], ev.DMDM_vy[mm_maxIxy], weight*sf)
         self.hMM_mass_trackIxy[region].Fill(ev.DMDM_mass[mm_maxIxy], ev.DMDM_trackIxy_PV[mm_maxIxy], weight*sf)
         self.hMM_mass_Lxy[region].Fill(ev.DMDM_mass[mm_maxIxy], abs(ev.DMDM_Lxy_PV[mm_maxIxy]), weight*sf)
@@ -285,6 +294,8 @@ class plotHandler(processHandler):
         self.hEE_Ixy[region].Fill(abs(ev.EE_Ixy_PV[ee_maxIxy]), weight*sf)
         self.hEE_leadingEt[region].Fill(ev.EE_leadingEt[ee_maxIxy], weight*sf)
         self.hEE_subleadingEt[region].Fill(ev.EE_subleadingEt[ee_maxIxy], weight*sf)
+        self.hEE_eta[region].Fill(ev.ElectronCandidate_eta[ev.EE_idxA[ee_maxIxy]], weight*sf)
+        self.hEE_eta[region].Fill(ev.ElectronCandidate_eta[ev.EE_idxB[ee_maxIxy]], weight*sf)
         self.hEE_normalizedChi2[region].Fill(ev.EE_normalizedChi2[ee_maxIxy], weight*sf)
         self.hEE_normalizedChi2_log[region].Fill(ev.EE_normalizedChi2[ee_maxIxy], weight*sf)
         self.hEE_vx_vy[region].Fill(ev.EE_vx[ee_maxIxy], ev.EE_vy[ee_maxIxy], weight*sf)
