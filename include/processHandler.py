@@ -70,13 +70,15 @@ class processHandler:
         #### ---- Regions initialization
         #### ------------------------------
     
-        self.dielectronRegions = [] # region name : region cut
+        dielectronRegionList = [] # region name : region cut
         for region in self.config["regions"]["electrons"].keys():
-           self.dielectronRegions.append([region, self.cm.AddList(self.config["regions"]["electrons"][region])])
+           dielectronRegionList.append([region, self.cm.AddList(self.config["regions"]["electrons"][region])])
+        self.dielectronRegions = sorted(dielectronRegionList, key = lambda x: (x[0], x[1]))
         
-        self.dimuonRegions = [] # region name : region cut
+        dimuonRegionList = [] # region name : region cut
         for region in self.config["regions"]["muons"].keys():
-           self.dimuonRegions.append([region, self.cm.AddList(self.config["regions"]["muons"][region])])
+           dimuonRegionList.append([region, self.cm.AddList(self.config["regions"]["muons"][region])])
+        self.dimuonRegions = sorted(dimuonRegionList, key = lambda x: (x[0], x[1]))
 
         #### -------------------------------
         #### ---- Histogram initialization
@@ -110,11 +112,25 @@ class processHandler:
             self.sf_mm_id = self.file_sf_mm_id.Get("NUM_dGlobalID_DEN_dGlobalsUp_absdxy_2d_absdz_2d")
 
         ### Trigger
-        self.file_sf_ee_trg = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/PhotonTrigger_ScaleFactors_"+year+".root")
+        self.file_sf_ee_trg = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/PhotonTrigger_ScaleFactors_"+year+"_Winter23.root")
         self.sf_ee_trg = self.file_sf_ee_trg.Get("ScaleFactor_pt2_pt")
         if year != '2017':
-            self.file_sf_mm_trg = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/MuonTrigger_ScaleFactors_"+year+".root")
+            self.file_sf_mm_trg = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/MuonTrigger_ScaleFactors_"+year+"_Winter23.root")
             self.sf_mm_trg = self.file_sf_mm_trg.Get("ScaleFactor_pt2_pt")
+
+        ### Isolation
+        self.file_sf_iso = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Isolation_ScaleFactors_Winter23.root")
+        if '2016APV' == year:
+            self.sf_mm_iso = self.file_sf_iso.Get("SF_Iso_DMDM_2016APV")
+            self.sf_ee_iso = self.file_sf_iso.Get("SF_Iso_EE_2016APV")
+        elif '2016' == year:
+            self.sf_mm_iso = self.file_sf_iso.Get("SF_Iso_DMDM_2016")
+            self.sf_ee_iso = self.file_sf_iso.Get("SF_Iso_EE_2016")
+        elif '2017' == year:
+            self.sf_ee_iso = self.file_sf_iso.Get("SF_Iso_EE_2017")
+        elif '2018' == year:
+            self.sf_mm_iso = self.file_sf_iso.Get("SF_Iso_DMDM_2018")
+            self.sf_ee_iso = self.file_sf_iso.Get("SF_Iso_EE_2018")
 
 
     #### -------------------------------------------
@@ -127,6 +143,7 @@ class processHandler:
 
         if not self.isdata:
             weight = self.lumiweight*ev.wPU*ev.genWeight/abs(ev.genWeight)
+            #weight = self.lumiweight*ev.wPU*ev.genWeight/abs(ev.genWeight)*4 # Solo para re-scaling
         else: 
             weight = 1.
 
@@ -172,12 +189,21 @@ class processHandler:
         passes_B = ev.DGM_relPFiso[ev.DMDM_idxB[idx]] < 0.2
         wiso_A = 1.0
         wiso_B = 1.0
+        """ Old implementation (Fall2022)
         if self.year == '2018':
             wiso_A = findWisoMu2018(ev.DGM_pt[ev.DMDM_idxA[idx]], passes_A)
             wiso_B = findWisoMu2018(ev.DGM_pt[ev.DMDM_idxB[idx]], passes_B)
         elif self.year == '2016':
             wiso_A = findWisoMu2016(ev.DGM_pt[ev.DMDM_idxA[idx]], passes_A)
             wiso_B = findWisoMu2016(ev.DGM_pt[ev.DMDM_idxB[idx]], passes_B)
+        """
+        # New implementation (Winter2023)
+        if passes_A:
+            bxA = self.sf_mm_iso.GetXaxis().FindBin(abs(ev.DGM_pt[ev.DMDM_idxA[idx]]))
+            wiso_A = self.sf_mm_iso.GetBinContent(bxA)
+        if passes_B:
+            bxB = self.sf_mm_iso.GetXaxis().FindBin(abs(ev.DGM_pt[ev.DMDM_idxB[idx]]))
+            wiso_B = self.sf_mm_iso.GetBinContent(bxB)
         sf = sf*wiso_A*wiso_B
 
         return sf
@@ -208,6 +234,7 @@ class processHandler:
         passes_B = ev.ElectronCandidate_relTrkiso[ev.EE_idxB[idx]] < 0.1
         wiso_A = 1.0
         wiso_B = 1.0
+        """ Old implementation (Fall2022)
         if self.year == '2018':
             wiso_A = findWisoEl2018(ev.ElectronCandidate_pt[ev.EE_idxA[idx]], passes_A)
             wiso_B = findWisoEl2018(ev.ElectronCandidate_pt[ev.EE_idxB[idx]], passes_B)
@@ -217,7 +244,27 @@ class processHandler:
         elif self.year == '2016':
             wiso_A = findWisoEl2016(ev.ElectronCandidate_pt[ev.EE_idxA[idx]], passes_A)
             wiso_B = findWisoEl2016(ev.ElectronCandidate_pt[ev.EE_idxB[idx]], passes_B)
+        """
+        # New implementation (Winter2023)
+        if passes_A:
+            bxA = self.sf_ee_iso.GetXaxis().FindBin(abs(ev.ElectronCandidate_et[ev.EE_idxA[idx]]))
+            if bxA < 7: bxA = 7
+            wiso_A = self.sf_ee_iso.GetBinContent(bxA)
+        if passes_B:
+            bxB = self.sf_ee_iso.GetXaxis().FindBin(abs(ev.ElectronCandidate_et[ev.EE_idxB[idx]]))
+            if bxB < 7: bxB = 7
+            wiso_B = self.sf_ee_iso.GetBinContent(bxB)
         sf = sf * wiso_A*wiso_B
+
+        # Track to SC correction
+        TRKSC_corr = 1.0
+        if self.year == '2016' or self.year == '2016APV':
+            TRKSC_corr = 1.003
+        elif self.year == '2017':
+            TRKSC_corr = 0.98
+        elif self.year == '2018':
+            TRKSC_corr = 0.97
+        sf = sf * TRKSC_corr* TRKSC_corr
 
         return sf
 

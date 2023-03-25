@@ -49,6 +49,22 @@ class yieldHandler(processHandler):
             self.hMM_wPU[region] = r.TH1F('hMM_{0}_wPU'.format(region) + self.sufix, ';;Dimuon w_{PU}', 100, 0, 2)
             self.hMM_wSF[region] = r.TH1F('hMM_{0}_wSF'.format(region) + self.sufix, ';;Dimuon w_{SF}', 100, 0, 10)
 
+        #### --------------------
+        #### ---- Summary plots
+        #### --------------------
+        self.hEE_summary = r.TH2F('hEE_summary'+ self.sufix, ';Dimuon regions;Dielectron regions', len(self.dimuonRegions) + 1, 0, len(self.dimuonRegions) + 1, len(self.dielectronRegions) + 1, 0, len(self.dielectronRegions) + 1)
+        self.hMM_summary = r.TH2F('hMM_summary'+ self.sufix, ';Dimuon regions;Dielectron regions', len(self.dimuonRegions) + 1, 0, len(self.dimuonRegions) + 1, len(self.dielectronRegions) + 1, 0, len(self.dielectronRegions) + 1)
+        self.hEEMM_summary = r.TH2F('hEEMM_summary'+ self.sufix, ';Dimuon regions;Dielectron regions', len(self.dimuonRegions) + 1, 0, len(self.dimuonRegions) + 1, len(self.dielectronRegions) + 1, 0, len(self.dielectronRegions) + 1)
+        for re,region in enumerate(self.dimuonRegions):
+            self.hEE_summary.GetXaxis().SetBinLabel(re+2, region[0])
+            self.hMM_summary.GetXaxis().SetBinLabel(re+2, region[0])
+            self.hEEMM_summary.GetXaxis().SetBinLabel(re+2, region[0])
+        for re,region in enumerate(self.dielectronRegions):
+            self.hEE_summary.GetYaxis().SetBinLabel(re+2, region[0])
+            self.hMM_summary.GetYaxis().SetBinLabel(re+2, region[0])
+            self.hEEMM_summary.GetYaxis().SetBinLabel(re+2, region[0])
+
+
         #### --------------------------------
         #### ---- Apply sumw2 to histograms
         #### --------------------------------
@@ -77,46 +93,86 @@ class yieldHandler(processHandler):
         if not ev.PV_passAcceptance: return
 
 
-        # Dimuon processing
+        # Select MM and EE candidates
+        mm_maxIxy = -99
         try:
-            mm_maxIxy = -99
             mm_maxIxy, nBSMM = self.processDimuons(ev)
-            passMuonTrigger = eval(self.mumu_path)
-            if not mm_maxIxy < 0 and eval(self.mumu_path):
-                imm = mm_maxIxy
-
-                ## Compute SF
-                sf = 1.0
-                if not self.isdata:
-                    sf = self.getDimuonSF(ev, mm_maxIxy)
-
-                for region in self.dimuonRegions:
-                    if eval(region[1]):
-                        self.hMM_yields[region[0]].Fill(0, weight*sf)
-                        self.hMM_wPU[region[0]].Fill(ev.wPU)
-                        self.hMM_wSF[region[0]].Fill(sf)
         except AttributeError:
             print('There are some collections missed in this file: Dimuon histograms will be empty')
 
-
-        # Dielectron processing
+        ee_maxIxy = -99
         try:
-            ee_maxIxy = -99
             ee_maxIxy, nBSEE = self.processDielectrons(ev)
-            passElectronTrigger = eval(self.ee_path) and not eval(self.mumu_path)
-            if not ee_maxIxy < 0 and passElectronTrigger:
-                iee = ee_maxIxy
-                ## Compute SF
-                sf = 1.0
-                if not self.isdata:
-                    sf = self.getDielectronSF(ev, ee_maxIxy)
-
-                for region in self.dielectronRegions:
-                    if eval(region[1]):
-                        self.hEE_yields[region[0]].Fill(0, weight*sf)
-                        self.hEE_wPU[region[0]].Fill(ev.wPU)
-                        self.hEE_wSF[region[0]].Fill(sf)
         except AttributeError:
             print('There are some collections missed in this file: Dielectron histograms will be empty')
+
+
+        # Fill Dimuon channel histograms
+        passMuonTrigger = eval(self.mumu_path)
+
+        if not mm_maxIxy < 0 and eval(self.mumu_path):
+
+            imm = mm_maxIxy
+
+            ## Compute SF
+            sf = 1.0
+            if not self.isdata:
+                sf = self.getDimuonSF(ev, mm_maxIxy)
+
+            for region in self.dimuonRegions:
+                if eval(region[1]):
+                    self.hMM_yields[region[0]].Fill(0, weight*sf)
+                    self.hMM_wPU[region[0]].Fill(ev.wPU)
+                    self.hMM_wSF[region[0]].Fill(sf)
+
+
+        # Fill Dielectron channel histograms
+        #passElectronTrigger = eval(self.ee_path) and not eval(self.mumu_path)
+        passElectronTrigger = eval(self.ee_path) 
+
+        if not ee_maxIxy < 0 and passElectronTrigger:
+
+            iee = ee_maxIxy
+
+            ## Compute SF
+            sf = 1.0
+
+            if not self.isdata:
+                sf = self.getDielectronSF(ev, ee_maxIxy)
+
+            for region in self.dielectronRegions:
+                if eval(region[1]):
+                    self.hEE_yields[region[0]].Fill(0, weight*sf)
+                    self.hEE_wPU[region[0]].Fill(ev.wPU)
+                    self.hEE_wSF[region[0]].Fill(sf)
+
+        ### Fill summary plot
+        # Note: Bin label and bin content are shifted by one i.e. bin 1 will contain value 0
+        ee_bin = 0
+        mm_bin = 0
+        for er,ee_region in enumerate(self.dielectronRegions):
+            if ee_maxIxy < 0:
+                ee_bin = 0
+            else:
+                iee = ee_maxIxy
+                if eval(ee_region[1]):
+                    ee_bin = er + 1
+            for mr,mm_region in enumerate(self.dimuonRegions):
+                if mm_maxIxy < 0:
+                    mm_bin = 0
+                else:
+                    imm = mm_maxIxy
+                    if eval(mm_region[1]):
+                        mm_bin = mr + 1
+
+        if eval(self.ee_path):
+            self.hEE_summary.Fill(mm_bin, ee_bin)
+        if eval(self.mumu_path):
+            self.hMM_summary.Fill(mm_bin, ee_bin)
+        if eval(self.ee_path) and eval(self.mumu_path):
+            self.hEEMM_summary.Fill(mm_bin, ee_bin)
+
+
+
 
 
