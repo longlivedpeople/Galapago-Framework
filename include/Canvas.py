@@ -492,7 +492,7 @@ class Canvas:
                   if self.histos[i].GetMaximum() > maxYAxisValue:
                       maxYAxisValue = self.histos[i].GetMaximum()
 
-      ## Draw frame again
+      ## Draw frame 1 again
       pad1.Update()
       pad1.RedrawAxis()
       aux_frame = TLine()
@@ -612,9 +612,15 @@ class Canvas:
       for rat in ratios:
           rat.Draw('P,same');
 
-      pad1.cd()
+      ## Draw frame 2 again
+      pad2.Update()
+      pad2.RedrawAxis()
+      aux_frame2 = TLine()
+      aux_frame2.SetLineWidth(2) 
+      aux_frame2.DrawLine(pad2.GetUxmax(), pad2.GetUymin(), pad2.GetUxmax(), r_ymax);
 
-      ## Ratio
+      ## Banner
+      pad1.cd()
       if maxYnumbers:
           r.TGaxis().SetMaxDigits(maxYnumbers)
           self.bannerRatio(isData, lumi, scy = True, inProgress = inProgress)
