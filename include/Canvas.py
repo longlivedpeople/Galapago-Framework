@@ -158,7 +158,7 @@ class Canvas:
       latexb.SetTextAlign(31);
       latexb.SetTextSize(0.045);            
 
-      if(isData):
+      if(isData) and not inProgress:
          if not scy:
              latexb.DrawLatex(0.39, 0.88, "#it{Preliminary}")
          else:
@@ -171,9 +171,9 @@ class Canvas:
                  latexb.DrawLatex(0.44, 0.88, "#it{Simulation}")
          else:
              if not scy:
-                 latexb.DrawLatex(0.37, 0.88, "#it{Work in progress}")
+                 latexb.DrawLatex(0.46, 0.88, "#it{Work in progress}")
              else:
-                 latexb.DrawLatex(0.44, 0.88, "#it{Work in progress}")
+                 latexb.DrawLatex(0.53, 0.88, "#it{Work in progress}")
 
 
 
@@ -283,7 +283,7 @@ class Canvas:
          newhisto.SetBinError  (i,histo.GetBinError  (i))
       return newhisto
         
-   def makeRate(self, eff, option, is2d = False, ymin = 0.0, ymax = 1.2):
+   def makeRate(self, eff, option, is2d = False, ymin = 0.0, ymax = 1.2, ratio = False):
 
       eff.Draw(option)
       self.myCanvas.Update()
@@ -296,6 +296,11 @@ class Canvas:
       xmax = _h.GetXaxis().GetBinUpEdge(_h.GetNbinsX())
       xmin = _h.GetXaxis().GetBinLowEdge(1)
       _g.GetXaxis().SetLimits(xmin,xmax)
+      if ratio:
+          _g.GetXaxis().SetLabelSize(0)
+          _g.GetYaxis().SetTitleSize(0.045)
+          _g.GetYaxis().SetTitleOffset(1.25);
+          _g.GetYaxis().SetLabelSize(0.04)
 
       return eff
 
@@ -473,16 +478,27 @@ class Canvas:
           pad2.SetLogx(1)
 
       ## Draw histograms
+      maxYAxisValue = 0.0
       for i in range(0, len(self.histos)):
           if(self.ToDraw[i] != 0):
               if str(type(self.histos[i])) == "<class 'ROOT.TEfficiency'>":
-                  self.makeRate(self.histos[i], self.options[i])
+                  self.makeRate(self.histos[i], self.options[i], ratio = True)
               else:
                   self.histos[i].GetYaxis().SetTitleSize(0.045)
                   self.histos[i].GetYaxis().SetTitleOffset(1.25);
                   self.histos[i].GetXaxis().SetLabelSize(0)
                   self.histos[i].GetYaxis().SetLabelSize(0.04)
                   self.histos[i].Draw(self.options[i])
+                  if self.histos[i].GetMaximum() > maxYAxisValue:
+                      maxYAxisValue = self.histos[i].GetMaximum()
+
+      ## Draw frame again
+      pad1.Update()
+      pad1.RedrawAxis()
+      aux_frame = TLine()
+      aux_frame.SetLineWidth(2) 
+      aux_frame.DrawLine(pad1.GetUxmax(), pad1.GetUymin(), pad1.GetUxmax(), maxYAxisValue);
+
 
       if(legend):
           self.makeLegend()
@@ -555,6 +571,7 @@ class Canvas:
           tmp_ratio.SetMarkerColor(r.kBlack if len(hMClist) == 1 else tmp_hMC.GetMarkerColor());
           tmp_ratio.SetLineColor  (r.kBlack if len(hMClist) == 1 else tmp_hMC.GetLineColor  ());
           tmp_ratio.SetLineColor(r.kBlack);
+          tmp_ratio.SetLineWidth(2);
           tmp_ratio.SetLineStyle(tmp_hMC.GetLineStyle())
 
           ratios.append(tmp_ratio)
@@ -562,7 +579,9 @@ class Canvas:
           xmax = tmp_ratio.GetBinLowEdge(tmp_ratio.GetNbinsX()+1)
 
       pad2.cd();  
+
       ## Draw systematics (if included)
+      ratios[0].Draw('AXIS')
       if hsys is not None:
           hsys.GetYaxis().SetTitle(label);
           hsys.GetYaxis().CenterTitle();
@@ -579,9 +598,6 @@ class Canvas:
           #hsys.SetFillStyle(3013)
           hsys.GetYaxis().SetRangeUser(r_ymin, r_ymax);
           hsys.Draw('E2,same')
-      ## Draw ratio
-      for rat in ratios:
-          rat.Draw('P E0 E1,same');
 
       ## Lines
       if (not r_xmin) and (not r_xmax):
@@ -589,7 +605,12 @@ class Canvas:
           r_xmax = xmax
       line = TLine(r_xmin, 1, r_xmax, 1)
       line.SetLineColor(r.kGray+2);
+      line.SetLineWidth(2);
       line.Draw('');
+
+      ## Draw ratio
+      for rat in ratios:
+          rat.Draw('P,same');
 
       pad1.cd()
 

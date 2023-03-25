@@ -220,365 +220,53 @@ def makePlot(queue, lumi, var, name, nbin, xmin, xmax, xlabel, logx, treeMC, cut
         return 
 
 
-def makeDataMCPlot(lumi, hname, ylog, treeMC, treeDATA, treeSI, inputdir, xlabel = '', outtag = '', yshift = 0.0):
+#####################
+#####
+###
+###   Function to plot histograms with signal simulation and estimated background
+###   (could accept either data-driven or Monte Carlo)
+###
+###     - Plots are drawn without ratio nor data in signal region (by the moment)
+###     - xsec to normalize the signal given in fb
+###
+#####
+#####################
+
+def makeSignalPlot2D(name, lumi, hname_sig, zlog, treeSI, inputdir, rebin = False, lines = [], legend = '', xlabel = '', outtag = '', outdir = '', LLlabel = '', extralabel = '', xlog = False, ylog = False, text = False):
 
 
+    ### Get histograms
     luminosity = lumi
-    SShname = hname.split('__')[0] + '_SS'
-    for n in range(1, len(hname.split('__'))): OShname = OShname + hname.split('__')[n]
 
-    hSS = treeDATA.getLoopTH1F(inputdir, SShname)
-    hOS = treeMC.getLoopStack(inputdir, hname)
+    hsig = treeSI.getLoopTH2F(inputdir, hname_sig)
 
-    # hSS tunning:
-    hSS.SetLineColor(r.kBlack)
-    hSS.SetFillColor(r.kMagenta+1)
-    hSS.SetTitle('QCD, W+jets')
+    hsig.GetXaxis().SetTitleSize(0.045)
+    hsig.GetYaxis().SetTitleSize(0.045)
+    
+    hsig.GetYaxis().SetTitle('Dielectron regions')
+    hsig.GetYaxis().SetTitleOffset(1.3)
+    r.gStyle.SetPalette(r.kBird)
 
-    ### Combine SS + OS contributions:
-    hBKG = r.THStack('hBKG_%s'%(hname), '') # Background stacked
-    hBKGtotal = copy.deepcopy(hSS) # Background total (for ratio)
-    hBKG.Add(copy.deepcopy(hSS))
 
-    for _h in hOS.GetHists():
-        _h.Scale(lumi/35.87)
-        hBKG.Add(copy.deepcopy(_h))
-        hBKGtotal.Add(copy.deepcopy(_h))
-
-    ### Axis definition
-    can_aux = TCanvas("can_%s"%(hname))
-    can_aux.cd()
-    hBKG.Draw()
-    hBKG.GetXaxis().SetTitle(hOS.GetXaxis().GetTitle())
-    hBKG.GetYaxis().SetTitle(hOS.GetYaxis().GetTitle())
-    del can_aux
-
-    nBCK = len(hOS.GetHists()) + 1
-    hBKGtotal.SetMarkerStyle(20) # Auxiliar to save the ratio correctly 
-    
-    
-    ### Signal histograms
-    if treeSI:
-    
-        hSIS = treeSI.getLoopStack(inputdir, hname)
-    
-        s_histos = []
-        for _i, _h in enumerate(hSIS.GetHists()):
-            s_histos.append(copy.deepcopy(_h))
-   
-        
-    ### Data histogram
-    hDATA = treeDATA.getLoopTH1F(inputdir, hname)
-    hDATA.SetMarkerStyle(20)
-    hDATA.SetMarkerSize(0.8)
-        
-    
-    ### Get maximum
-    maxValMC = hBKGtotal.GetMaximum()
-    maxValSI = 0 if not treeSI else max([s_histos[i].GetMaximum() for i in range(0, len(s_histos))])
-    maxValDATA = 0 if not treeDATA else hDATA.GetMaximum()
-    maxVal = max([maxValMC, maxValSI, maxValDATA])
-    
-        ### Set Maximum
-    if not ylog:
-        hBKG.SetMaximum(1.3*maxVal)
-        hBKG.SetMinimum(0.0)
-        hBKGtotal.SetMaximum(1.3*maxVal)
-        hBKGtotal.SetMinimum(0.0)
-        if treeSI:
-            for _h in s_histos: 
-                if not yshift:
-                    _h.SetMaximum(1.3*maxVal)
-                else:
-                    _h.SetMaximum(yshift*maxVal)
-                _h.SetMinimum(0.0)
-        if treeDATA:
-            if not yshift:
-                hDATA.SetMaximum(1.3*maxVal)
-            else:
-                hDATA.SetMaximum(yshift*maxVal)
-            hDATA.SetMinimum(0.0)
-    else:
-        if not yshift:
-            hBKG.SetMaximum(10.0*maxVal)
-        else:
-            hBKG.SetMaximum(yshift*maxVal)
-        hBKG.SetMinimum(0.1)
-        if not yshift:
-            hBKGtotal.SetMaximum(10.0*maxVal)
-        else:
-            hBKGtotal.SetMaximum(yshift*maxVal)
-        hBKGtotal.SetMinimum(0.1)
-        if treeSI:
-            for _h in s_histos: 
-                if not yshift:
-                    _h.SetMaximum(10.0*maxVal)
-                else:
-                    _h.SetMaximum(yshift*maxVal)
-                _h.SetMinimum(0.1)
-        if treeDATA:
-            if not yshift:
-                hDATA.SetMaximum(10.0*maxVal)
-            else:
-                hDATA.SetMaximum(yshift*maxVal)
-            hDATA.SetMinimum(0.1)
-    
-    
     ### Canvas object
-    if treeDATA:
-        plot = Canvas.Canvas(hname, 'png', 0.6, 0.5, 0.9, 0.9, 1)
+    plot = Canvas.Canvas('SIOnly_'+name, 'png,pdf', 0.35, 0.65, 0.7, 0.89, 1, ww = 650, hh = 600, lsize = 0.028)
+    if text:
+        plot.addHisto(hsig, 'COLZ, TEXT', '', '', '', 1, 0)
     else:
-        plot = Canvas.Canvas(hname, 'png', 0.6, 0.74, 0.9, 0.9, 1)
-    
-    plot.addStack(hBKG, 'HIST', 1, 0) # Background
-    
-    if treeSI:
-        for i,_h in enumerate(s_histos):
-            _h.SetLineWidth(2) # provisional
-            plot.addHisto(_h, 'HIST, SAME', _h.GetTitle(), 'l', _h.GetFillColor(), 1, i+nBCK) # Signal
-    
-    if treeDATA:
-        plot.addHisto(hDATA, 'P, SAME', '', 'p', r.kBlack, 1, nBCK + len(s_histos))
-    
-    
-        ### Dilepton banner
-        """
-        if LLlabel == 'EE':
-            plot.addLatex(0.17, 0.86, 'e^{+}e^{-} channel')
-        if LLlabel == 'MM':
-            plot.addLatex(0.17, 0.86, '#mu^{+}#mu^{-} channel')
-        """
+        plot.addHisto(hsig, 'COLZ', '', '', '', 1, 0)
+
+    ### Extralabel
+    plot.addLatex(0.13, 0.93, legend, font = 42, size = 0.032)
+    plot.addLatex(0.4, 0.85, extralabel, font = 42, size = 0.03)
+
+    for line in lines:
+        plot.addLine(line[0], line[1], line[2], line[3], r.kRed, 2)
 
     ### Save it
-    outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/Plots_' + outtag + '/'
-    if treeDATA:
-        plot.saveRatio(1, 0, ylog, luminosity, hDATA, hBKGtotal, label="Data/BKG", outputDir = outdir)
-    else:
-        plot.save(1, 0, ylog, luminosity, '', outputDir = outdir)
+    if not outdir:
+        outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/2DPlots_' + outtag + '/'
+    plot.save(1, 1, ylog, luminosity, '', outputDir = outdir, zlog = zlog, xlog = xlog, is2d = False)
 
-
-    del plot
-    return 
-
-
-def makeFullPlot(queue, lumi, var, name, nbin, xmin, xmax, xlabel, ylog, treeMC, treeDATA, treeSI, cuts, outtag = '', normed = False, yshift = 0.0):
-
-    if queue:
-
-        launchToQueue('makeFullPlot', queue, name, outtag)
-
-    else:
-
-        luminosity = lumi
-
-        ### Get charged-symmetric background contributions from data:
-        SScut = ''
-        if 'EEBase' in var:
-            SScut = 'IsoTrackSel_charge[ElectronCandidate_isotrackIdx[EEBase_idxA[EEBase_maxIxy]]]*IsoTrackSel_charge[ElectronCandidate_isotrackIdx[EEBase_idxB[EEBase_maxIxy]]] > 0'
-        else:
-            SScut = 'DGM_charge[DMDMBase_idxA[DMDMBase_maxIxy]]*DGM_charge[DMDMBase_idxB[DMDMBase_maxIxy]] > 0' 
-        OScut = ''
-        if 'EEBase' in var:
-            OScut = 'IsoTrackSel_charge[ElectronCandidate_isotrackIdx[EEBase_idxA[EEBase_maxIxy]]]*IsoTrackSel_charge[ElectronCandidate_isotrackIdx[EEBase_idxB[EEBase_maxIxy]]] < 0'
-        else:
-            OScut = 'DGM_charge[DMDMBase_idxA[DMDMBase_maxIxy]]*DGM_charge[DMDMBase_idxB[DMDMBase_maxIxy]] < 0' 
-            
-        cutManager = CutManager.CutManager()
-        SSRegion = cutManager.AddListB([cuts, SScut])
-        OSRegion = cutManager.AddListB([cuts, OScut])
-
-        hSS = treeDATA.getTH1F(lumi, 'hSS_%s'%(name), var, nbin, xmin, xmax, SSRegion, '', xlabel)
-        hOS = treeMC.getStack(lumi, "hOS_%s"%(name), var, nbin, xmin, xmax, OSRegion, "", xlabel)
-
-        # hSS tunning:
-        hSS.SetLineColor(r.kBlack)
-        hSS.SetFillColor(r.kMagenta+1)
-        hSS.SetTitle('QCD')
-
-        ### Combine SS + OS contributions:
-        hBKG = r.THStack('hBKG_%s'%(name), '') # Background stacked
-        hBKGtotal = copy.deepcopy(hSS) # Background total (for ratio)
-        hBKG.Add(copy.deepcopy(hSS))
-
-        for _h in hOS.GetHists():
-            hBKG.Add(copy.deepcopy(_h))
-            hBKGtotal.Add(copy.deepcopy(_h))
-
-        ### Axis definition
-        can_aux = TCanvas("can_%s"%(name))
-        can_aux.cd()
-        hBKG.Draw()
-        hBKG.GetXaxis().SetTitle(xlabel)
-        hBKG.GetYaxis().SetTitle(hOS.GetYaxis().GetTitle())
-        del can_aux
-
-        nBCK = len(hOS.GetHists()) + 1
-        hBKGtotal.SetMarkerStyle(20) # Auxiliar to save the ratio correctly 
-    
-    
-        ### Signal histograms
-        if treeSI:
-    
-            hSIS = treeSI.getStack(lumi, "hMCS_%s"%(name), var, nbin, xmin, xmax, OSRegion, "", xlabel)
-    
-            s_histos = []
-            for _i, _h in enumerate(hSIS.GetHists()):
-                s_histos.append(copy.deepcopy(_h))
-   
-        
-        ### Data histogram
-        hDATA = treeDATA.getTH1F(lumi, 'hDATA%s'%(name), var, nbin, xmin, xmax, OSRegion, '', xlabel)
-        hDATA.SetMarkerStyle(20)
-        hDATA.SetMarkerSize(0.8)
-        
-    
-        # Normalization
-        if normed:
-            hBKGtotal.Scale(1.0/hBKGtotal.Integral())
-            for _h in s_histos: _h.Scale(1.0/_h.Integral())
-            luminosity = 1.0
-    
-        ### Get maximum
-        maxValMC = hBKGtotal.GetMaximum()
-        maxValSI = 0 if not treeSI else max([s_histos[i].GetMaximum() for i in range(0, len(s_histos))])
-        maxValDATA = 0 if not treeDATA else hDATA.GetMaximum()
-        maxVal = max([maxValMC, maxValSI, maxValDATA])
-    
-        ### Set Maximum
-        if not ylog:
-            hBKG.SetMaximum(1.3*maxVal)
-            hBKG.SetMinimum(0.0)
-            hBKGtotal.SetMaximum(1.3*maxVal)
-            hBKGtotal.SetMinimum(0.0)
-            if treeSI:
-                for _h in s_histos: 
-                    if not yshift:
-                        _h.SetMaximum(1.3*maxVal)
-                    else:
-                        _h.SetMaximum(yshift*maxVal)
-                    _h.SetMinimum(0.0)
-            if treeDATA:
-                if not yshift:
-                    hDATA.SetMaximum(1.3*maxVal)
-                else:
-                    hDATA.SetMaximum(yshift*maxVal)
-                hDATA.SetMinimum(0.0)
-        else:
-            if not yshift:
-                hBKG.SetMaximum(10.0*maxVal)
-            else:
-                hBKG.SetMaximum(yshift*maxVal)
-            hBKG.SetMinimum(0.1)
-            if not yshift:
-                hBKGtotal.SetMaximum(10.0*maxVal)
-            else:
-                hBKGtotal.SetMaximum(yshift*maxVal)
-            hBKGtotal.SetMinimum(0.1)
-            if treeSI:
-                for _h in s_histos: 
-                    if not yshift:
-                        _h.SetMaximum(10.0*maxVal)
-                    else:
-                        _h.SetMaximum(yshift*maxVal)
-                    _h.SetMinimum(0.1)
-            if treeDATA:
-                if not yshift:
-                    hDATA.SetMaximum(10.0*maxVal)
-                else:
-                    hDATA.SetMaximum(yshift*maxVal)
-                hDATA.SetMinimum(0.1)
-    
-    
-        ### Canvas object
-        if treeDATA:
-            plot = Canvas.Canvas('hist_'+name, 'png', 0.6, 0.5, 0.9, 0.9, 1)
-        else:
-            plot = Canvas.Canvas('hist_'+name, 'png', 0.6, 0.74, 0.9, 0.9, 1)
-    
-        if normed: plot.addHisto(hBKGtotal, 'HIST', '', 'l', r.kBlue, 1, 0) # Background
-        else: plot.addStack(hBKG, 'HIST', 1, 0) # Background
-    
-        if treeSI:
-            for i,_h in enumerate(s_histos):
-                _h.SetLineWidth(2) # provisional
-                plot.addHisto(_h, 'HIST, SAME', _h.GetTitle(), 'l', _h.GetFillColor(), 1, i+nBCK) # Signal
-    
-        if treeDATA:
-            plot.addHisto(hDATA, 'P, SAME', '', 'p', r.kBlack, 1, nBCK + len(s_histos))
-    
-    
-        ### Dilepton banner
-        """
-        if LLlabel == 'EE':
-            plot.addLatex(0.17, 0.86, 'e^{+}e^{-} channel')
-        if LLlabel == 'MM':
-            plot.addLatex(0.17, 0.86, '#mu^{+}#mu^{-} channel')
-        """
-
-        ### Save it
-        outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/Plots_' + outtag + '/'
-        if treeDATA:
-            plot.saveRatio(1, 0, ylog, luminosity, hDATA, hBKGtotal, label="Data/BKG", outputDir = outdir)
-        else:
-            plot.save(1, 0, ylog, luminosity, '', outputDir = outdir)
-
-
-        del plot
-        return 
-
-
-
-def makeComparison(queue, lumi, tree, name, var1, var2, nbin, xmin, xmax, cuts1, cuts2, label1, label2, xlabel, title2, log = False, normed = False):
-
-    if queue: 
-        # queue launcher
-        launcher = Launcher.Launcher(script = os.path.dirname(os.path.abspath(__file__)) +'/'+ __file__, env = queue, ID = name, output = outtag)
-        order = "makeComparison(queue = False, lumi = {0}, tree = treeMC, name = '{1}', var1 = '{2}', var2 = '{3}', nbin = {4}, xmin = {5}, xmax = {6}, cuts1 = '{7}', cuts2 = '{8}', label1 = '{9}', label2 = '{10}', xlabel = '{11}', title2 = '{12}', log = {13}, normed = {14})".format(lumi, name, var1, var2, nbin, xmin, xmax, cuts1, cuts2, label1, label2, xlabel, title2, log, normed)
-        launcher.addOrder(order)
-        launcher.launch()
-        time.sleep(1.0)
-
-    else: 
-
-        # Get the two distributions:
-        h1 = tree.getTH1F(lumi, "h1", var1, nbin, xmin, xmax, cuts1, "", xlabel)
-        h2 = tree.getTH1F(lumi, "h2", var2, nbin, xmin, xmax, cuts2, "", xlabel)
-
-        h1.SetMarkerStyle(34)
-        h2.SetMarkerStyle(34)
-        h1.SetMarkerSize(1)
-        h2.SetMarkerSize(1)
-        h1.SetLineWidth(2)
-        h2.SetLineWidth(2)
-
-        if normed: 
-            h1.Scale(1.0/h1.Integral())
-            h2.Scale(1.0/h2.Integral())
-            h1.GetYaxis().SetTitle('Event density')
-            h2.GetYaxis().SetTitle('Event density')
-
-        # Get maximum:
-        max1 = h1.GetMaximum()
-        max2 = h2.GetMaximum()
-        maxVal = max(max1, max2)
-
-        # Set maximum:
-        if log:
-            h1.SetMaximum(100.0*maxVal)
-            h2.SetMaximum(100.0*maxVal)
-            #if not normed: h1.SetMinimum(0.1)
-            #if not normed: h2.SetMinimum(0.1)
-        else:
-            h1.SetMaximum(1.3*maxVal)
-            h2.SetMaximum(1.3*maxVal)
-
-
-        # Draw canvas with points
-        plot = Canvas.Canvas('comp_'+name, 'png', 0.7, 0.78, 0.9, 0.87, 1)
-        plot.addHisto(h1, 'P', label1, 'p', r.kBlue-3, 1, 0)
-        plot.addHisto(h2, 'P, SAME', label2, 'p', r.kMagenta+1, 1, 0)
-
-        plot.saveRatio(1, 0, log, lumi, h1, h2, label = title2, outputDir = WORKPATH + 'closurePlots_'+outtag+'/')
 
 
 ##################################################################################################
