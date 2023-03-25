@@ -518,3 +518,20 @@ def makeSensitivity(queue, lumi, var, name, nbin, xmin, xmax, xlabel, logx, tree
 
         return
 
+'''
+Function to build the histogram of systematic errors
+Arguments:
+   - sys_errors: list with all the systematics to apply, e.g. [0.02, 0.1, 0.015]
+'''
+def makeSystematicsHist(sys_errors, hMC):
+    hsys = hMC.Clone()
+    for i in range(hsys.GetNbinsX() + 1):
+        # compute MC systematic error
+        error_values = 1 * np.array(sys_errors)
+        band_error = np.linalg.norm(error_values)
+        # Fill histogram
+        hsys.SetBinContent(i,1)
+        hsys.SetBinError(i,band_error)
+    return hsys
+
+
