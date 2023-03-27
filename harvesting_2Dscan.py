@@ -68,7 +68,7 @@ def makeBackgroundPlot2D(lumi, hname_bkg, zlog, treeDATA, inputdir, rebin = Fals
 
     ### Canvas object
     plot = Canvas.Canvas(outtag+hname_bkg, 'png,pdf', 0.35, 0.65, 0.7, 0.89, 1, ww = 610, hh = 600, lsize = 0.028)
-    plot.addHisto(hbkg, 'COLZ', '', '', '', 1, 0)
+    plot.addHisto(hbkg, 'COLZ,TEXT', '', '', '', 1, 0)
     
     for line in lines:
         plot.addLine(line[0], line[1], line[2], line[3], r.kRed, 2)
@@ -246,8 +246,19 @@ if __name__ == "__main__":
     ######## Background optimization (Lxy/dxy bins) ########
     ########################################################
 
-    www = '/eos/user/f/fernance/www/DisplacedLeptons-analysis/SignalRegionOptimization/2DPlots_nLL1_mass/'
+    www = '/eos/user/f/fernance/www/DisplacedLeptons-analysis/SignalRegionOptimization/2DPlots_nLL1_forMassWindows_plusLxy_160223/'
+    #www = '/eos/user/f/fernance/www/DisplacedLeptons-analysis/SignalRegionOptimization/2DPlots_nLL1_forMassWindows_140223/'
 
+    #### -> Electron plots
+    makeBackgroundPlot2D(lumi = lumi2016_EE, hname_bkg = 'hEEBCRI_mass_trackIxy', zlog = True, treeDATA = treeDATA_EG2016, inputdir = opts.input, lines = [], xlabel = '', outtag = '2016', LLlabel = 'EE', extralabel = 'm_{ee} < 81 GeV,  N_{ee} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = False, xlog = False) 
+    makeBackgroundPlot2D(lumi = lumi2017, hname_bkg = 'hEEBCRI_mass_trackIxy', zlog = True, treeDATA = treeDATA_EG2017, inputdir = opts.input, lines = [], xlabel = '', outtag = '2017', LLlabel = 'EE', extralabel = 'm_{ee} < 81 GeV,  N_{ee} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = False, xlog = False)
+    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hEEBCRI_mass_trackIxy', zlog = True, treeDATA = treeDATA_EG2018, inputdir = opts.input, lines = [], xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = 'm_{ee} < 81 GeV,  N_{ee} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = False, xlog = False) 
+
+    #### -> Muon plots
+    makeBackgroundPlot2D(lumi = lumi2016_MM, hname_bkg = 'hMMBCRI_mass_trackIxy', zlog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, lines = [], xlabel = '', outtag = '2016', LLlabel = 'MM', extralabel = 'm_{#mu#mu} < 81 GeV,  N_{#mu#mu} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = False, xlog = False) 
+    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hMMBCRI_mass_trackIxy', zlog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, lines = [], xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = 'm_{#mu#mu} < 81 GeV,  N_{#mu#mu} = 1,  |#Delta#Phi| < #pi/4', outdir = www, ylog = False, xlog = False) 
+
+    """
     #### -> Electron plots
     EE_SRIa_lines = []
     EE_SRIa_lines.append([3e-2, 20, 1e2, 20])
@@ -315,7 +326,7 @@ if __name__ == "__main__":
 
         makeSignalPlot2D(name = 'hMMSRIb_'+label, lumi = lumi2018, hname_sig = 'hMMSRIb_Lxy_trackIxy_log', zlog = True, treeSI = treeSI_2018, inputdir = opts.input, legend = llegend, lines = MM_SRIb_lines, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = 'm_{#mu#mu} > 101 GeV,  N_{#mu#mu} = 1,  |#Delta#Phi| < #pi/4', outdir = www, xlog = True, ylog = True) 
         makeSignalPlot2D(name = 'hEESRIb_'+label, lumi = lumi2018, hname_sig = 'hEESRIb_Lxy_trackIxy_log', zlog = True, treeSI = treeSI_2018, inputdir = opts.input, legend = llegend, lines = EE_SRIb_lines, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = 'm_{ee} > 101 GeV,  N_{ee} = 1,  |#Delta#Phi| < #pi/4', outdir = www, xlog = True, ylog = True) 
-
+    """
 
 
 
