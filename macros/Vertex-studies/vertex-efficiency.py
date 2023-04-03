@@ -23,7 +23,7 @@ import include.Sample as Sample
 import include.helper as helper
 import include.CutManager as CutManager
 
-from include.galapagoStyle import sigpalette, gcolors, dcolors
+from include.galapagoStyle import sigpalette, gcolors, dcolors, acolors
 
 def combinePlots(plotList):
 
@@ -68,10 +68,10 @@ if __name__ == "__main__":
         chi_logbin = np.logspace(-3, 2, 51)
 
         ## Efficiencies
-        plot[signal + '_EE_vertexEff_Lxy']  = copy.deepcopy(r.TEfficiency(signal + '_EE_vertexEff_Lxy', ";Generated LLP decay radius (cm);Vertex efficiency", 14, 0, 70))    
-        plot[signal + '_MM_vertexEff_Lxy']  = copy.deepcopy(r.TEfficiency(signal + '_MM_vertexEff_Lxy', ";Generated LLP decay radius (cm);Vertex efficiency", 14, 0, 70))    
-        plot[signal + '_EE_vertexEff_Lxy_4e']  = copy.deepcopy(r.TEfficiency(signal + '_EE_vertexEff_Lxy_4e', ";Generated LLP decay radius (cm);Vertex efficiency", 14, 0, 70))    
-        plot[signal + '_MM_vertexEff_Lxy_4mu']  = copy.deepcopy(r.TEfficiency(signal + '_MM_vertexEff_Lxy_4mu', ";Generated LLP decay radius (cm);Vertex efficiency", 14, 0, 70))    
+        plot[signal + '_EE_vertexEff_Lxy']  = copy.deepcopy(r.TEfficiency(signal + '_EE_vertexEff_Lxy', ";Generated LLP decay radius (cm);Vertex efficiency", 10, 0, 70))    
+        plot[signal + '_MM_vertexEff_Lxy']  = copy.deepcopy(r.TEfficiency(signal + '_MM_vertexEff_Lxy', ";Generated LLP decay radius (cm);Vertex efficiency", 10, 0, 70))    
+        plot[signal + '_EE_vertexEff_Lxy_4e']  = copy.deepcopy(r.TEfficiency(signal + '_EE_vertexEff_Lxy_4e', ";Generated LLP decay radius (cm);Vertex efficiency", 10, 0, 70))    
+        plot[signal + '_MM_vertexEff_Lxy_4mu']  = copy.deepcopy(r.TEfficiency(signal + '_MM_vertexEff_Lxy_4mu', ";Generated LLP decay radius (cm);Vertex efficiency", 10, 0, 70))    
         plot[signal + '_EE_absEff_Lxy']  = copy.deepcopy(r.TEfficiency(signal + '_EE_absEff_Lxy', ";Generated LLP decay radius (cm);Vertex efficiency", len(Lxy_binning) -1, Lxy_binning))    
         plot[signal + '_MM_absEff_Lxy']  = copy.deepcopy(r.TEfficiency(signal + '_MM_absEff_Lxy', ";Generated LLP decay radius (cm);Vertex efficiency", len(Lxy_binning) -1, Lxy_binning))    
         plot[signal + '_MM_normChi2']  = copy.deepcopy(r.TH1F(signal + '_MM_normChi2', ";Vertex fit #chi^{2}/ndof;Dimuon vertex yield", len(chi_logbin)-1, chi_logbin))    
@@ -92,7 +92,7 @@ if __name__ == "__main__":
         for p in plot.keys():
             r.SetOwnership(plot[p], 0)
 
-        tree = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'dat/signals_'+year+'UL_Spring22.dat', [signal], 'MC'), name = year, isdata = 0 )
+        tree = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'dat/CombSignal_2018UL_Fall22.dat', [signal], 'MC'), name = year, isdata = 0 )
         #tree = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'dat/signals_'+year+'UL.dat', [signal], 'MC'), name = year, isdata = 0 )
 
         print("Processing " + signal)
@@ -396,7 +396,7 @@ if __name__ == "__main__":
     mmEff_4lep.Add(plot['HSS_1000_150_100_2018_MM_vertexEff_Lxy_4mu'])
     mmEff_4lep.Add(plot['HSS_1000_150_1000_2018_MM_vertexEff_Lxy_4mu'])
     mmEff_4lep.Add(plot['HSS_1000_150_10000_2018_MM_vertexEff_Lxy_4mu'])
-    canvas = Canvas.Canvas("HSS_1000_150_2018_vertexEff_Lxy", 'png,pdf', 0.35, 0.7, 0.65, 0.9, 1)
+    canvas = Canvas.Canvas("HSS_1000_150_2018_vertexEff_Lxy", 'png,pdf', 0.4, 0.7, 0.70, 0.9, 1)
     canvas.addHisto(eeEff,'AP', 'Electron vertex (All pairs)', 'p', r.kBlue, True, 0, marker = 20)
     canvas.addHisto(eeEff_4lep,'P,SAME', 'Electron vertex (4 reco electrons)', 'p', r.kBlue, True, 1, marker = 24)
     canvas.addHisto(mmEff,'P,SAME', 'Muon vertex (All pairs)', 'p', r.kRed, True, 2, marker = 21)
@@ -405,7 +405,7 @@ if __name__ == "__main__":
     canvas.addLatex(0.2, 0.28, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.2, 0.24, 'M_{H} = 1000 GeV, M_{S} = 150 GeV', size = 0.03)
     canvas.addLatex(0.2, 0.2, '(all lifetimes combined)', size = 0.03)
-    canvas.save(1, 0, 0, '', '', ymin = 0.6, ymax = 1.2, outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 0, '', '', ymin = 0.6, ymax = 1.2, outputDir = WORKPATH + 'plots/', inProgress = True)
 
 
     plot['HSS_1000_150_1_2018_EE_normChi2'].Scale(1./plot['HSS_1000_150_1_2018_EE_normChi2'].Integral())
@@ -464,16 +464,21 @@ if __name__ == "__main__":
     type4.Add(plot['HSS_1000_150_100_2018_EE_mass_type4'])
     type4.Add(plot['HSS_1000_150_1000_2018_EE_mass_type4'])
     type4.Add(plot['HSS_1000_150_10000_2018_EE_mass_type4'])
-    canvas = Canvas.Canvas("HSS_1000_150_2018_EE_mass_types", 'png,pdf', 0.4, 0.6, 0.79, 0.75, 1)
-    canvas.addHisto(type1,'HIST', 'S#rightarrowee [{0}]'.format(type1.GetEntries()), 'l', gcolors['green'], True, 0, doOF= False)
-    canvas.addHisto(type2,'HIST,SAME', 'e (from S) + random [{0}]'.format(type2.GetEntries()), 'l', gcolors['blue'], True, 1, doOF = False)
-    canvas.addHisto(type3,'HIST,SAME', 'Different S parent [{0}]'.format(type3.GetEntries()), 'l', gcolors['yellow'], True, 2, doOF = False)
-    canvas.addHisto(type4,'HIST,SAME', 'Not gen-matched [{0}]'.format(type4.GetEntries()), 'l', gcolors['red'], True, 3, doOF = False)
+    type1.SetMaximum(1e6)
+    type1.SetLineWidth(2)
+    type2.SetLineWidth(2)
+    type3.SetLineWidth(2)
+    type4.SetLineWidth(2)
+    canvas = Canvas.Canvas("HSS_1000_150_2018_EE_mass_types", 'png,pdf', 0.43, 0.6, 0.79, 0.75, 1)
+    canvas.addHisto(type1,'HIST', 'S#rightarrowee [{0}]'.format(type1.GetEntries()), 'l', acolors['1'], True, 0, doOF= False)
+    canvas.addHisto(type2,'HIST,SAME', 'e (from S) + random [{0}]'.format(type2.GetEntries()), 'l', acolors['2'], True, 1, doOF = False)
+    canvas.addHisto(type3,'HIST,SAME', 'Different S parent [{0}]'.format(type3.GetEntries()), 'l', acolors['3'], True, 2, doOF = False)
+    canvas.addHisto(type4,'HIST,SAME', 'Not gen-matched [{0}]'.format(type4.GetEntries()), 'l', acolors['4'], True, 3, doOF = False)
     canvas.addLatex(0.9, 0.93, '2018 UL', size = 0.035, align = 31)
     canvas.addLatex(0.4, 0.85, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.4, 0.81, 'M_{H} = 1000 GeV', size = 0.03)
     canvas.addLatex(0.4, 0.77, 'M_{S} = 150 GeV', size = 0.03)
-    canvas.save(1, 0, 1, '', '', outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 1, '', '', outputDir = WORKPATH + 'plots/', inProgress = True)
 
 
     type1 = plot['HSS_1000_150_1_2018_MM_mass_type1']
@@ -496,16 +501,21 @@ if __name__ == "__main__":
     type4.Add(plot['HSS_1000_150_100_2018_MM_mass_type4'])
     type4.Add(plot['HSS_1000_150_1000_2018_MM_mass_type4'])
     type4.Add(plot['HSS_1000_150_10000_2018_MM_mass_type4'])
-    canvas = Canvas.Canvas("HSS_1000_150_2018_MM_mass_types", 'png,pdf', 0.4, 0.6, 0.79, 0.75, 1)
-    canvas.addHisto(type1,'HIST', 'S#rightarrow#mu#mu [{0}]'.format(type1.GetEntries()), 'l', gcolors['green'], True, 0, doOF= False)
-    canvas.addHisto(type2,'HIST,SAME', '#mu (from S) + random [{0}]'.format(type2.GetEntries()), 'l', gcolors['blue'], True, 1, doOF = False)
-    canvas.addHisto(type3,'HIST,SAME', 'Different S parent [{0}]'.format(type3.GetEntries()), 'l', gcolors['yellow'], True, 2, doOF = False)
-    canvas.addHisto(type4,'HIST,SAME', 'Not gen-matched [{0}]'.format(type4.GetEntries()), 'l', gcolors['red'], True, 3, doOF = False)
+    type1.SetMaximum(1e6)
+    type1.SetLineWidth(2)
+    type2.SetLineWidth(2)
+    type3.SetLineWidth(2)
+    type4.SetLineWidth(2)
+    canvas = Canvas.Canvas("HSS_1000_150_2018_MM_mass_types", 'png,pdf', 0.43, 0.6, 0.79, 0.75, 1)
+    canvas.addHisto(type1,'HIST', 'S#rightarrow#mu#mu [{0}]'.format(type1.GetEntries()), 'l', acolors['1'], True, 0, doOF= False)
+    canvas.addHisto(type2,'HIST,SAME', '#mu (from S) + random [{0}]'.format(type2.GetEntries()), 'l', acolors['2'], True, 1, doOF = False)
+    canvas.addHisto(type3,'HIST,SAME', 'Different S parent [{0}]'.format(type3.GetEntries()), 'l', acolors['3'], True, 2, doOF = False)
+    canvas.addHisto(type4,'HIST,SAME', 'Not gen-matched [{0}]'.format(type4.GetEntries()), 'l', acolors['4'], True, 3, doOF = False)
     canvas.addLatex(0.9, 0.93, '2018 UL', size = 0.035, align = 31)
     canvas.addLatex(0.4, 0.85, 'H#rightarrowSS#rightarrow 2#mu + X', size = 0.03)
     canvas.addLatex(0.4, 0.81, 'M_{H} = 1000 GeV', size = 0.03)
     canvas.addLatex(0.4, 0.77, 'M_{S} = 150 GeV', size = 0.03)
-    canvas.save(1, 0, 1, '', '', outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 1, '', '', outputDir = WORKPATH + 'plots/', inProgress = True)
 
     ## 2D plots
     r.gStyle.SetPadRightMargin(0.14)

@@ -81,7 +81,7 @@ def createDatacards(datacards, Systematics, Backgrounds, Signals, flavor, year, 
         for sample in Signals:
 
             samplelist = []
-            if year=='2016':
+            if year=='2016' and flavor!='Electron':
                 samplelist = [sample, sample + 'APV']
             else:
                 samplelist = [sample]
@@ -133,10 +133,11 @@ if __name__ == "__main__":
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
     parser.add_option('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_UltraLegacy.dat', help='dat file')
     parser.add_option('-t', '--t', action='store', type=str, dest='tag', default='', help='tag')
-    parser.add_option('-e', '--electronRecipe', action='store', type=str, dest='electronRecipe', default='recipes-datacards/recipe_Fall22_Muon.txt', help='the input dir')
-    parser.add_option('-m', '--muonRecipe',   action='store', type=str, dest='muonRecipe', default='recipes-datacards/recipe_Fall22_Electron.txt', help='the input dir')
+    parser.add_option('-e', '--electronRecipe', action='store', type=str, dest='electronRecipe', default='', help='the input dir')
+    parser.add_option('-m', '--muonRecipe',   action='store', type=str, dest='muonRecipe', default='', help='the input dir')
     parser.add_option('-s', '--Esystematics', action='store', type=str, dest='electron_systematics', default='recipes-datacards/recipe_Systematics_UltraLegacy_Electron.txt', help='file with systematics table')
     parser.add_option('-S', '--Msystematics', action='store', type=str, dest='muon_systematics', default='recipes-datacards/recipe_Systematics_UltraLegacy_Muon.txt', help='file with systematics table')
+    parser.add_option('-T', '--theory', action='store', type=str, dest='theory', default='', help='theory')
 
     (opts, args) = parser.parse_args()
 
@@ -160,19 +161,25 @@ if __name__ == "__main__":
 
     ############# Signal definition
     Masses = []
-    #Masses.append('HSS_125_50')
-    #Masses.append('HSS_300_50')
-    #Masses.append('HSS_500_50')
-    #Masses.append('HSS_500_150')
-    #Masses.append('HSS_600_50')
-    #Masses.append('HSS_600_150')
-    #Masses.append('HSS_600_250')
-    #Masses.append('HSS_800_50')
-    #Masses.append('HSS_800_250')
-    #Masses.append('HSS_800_350')
-    Masses.append('HSS_1000_450')
+    """
+    Masses.append('HSS_125_50')
+    Masses.append('HSS_300_50')
+    Masses.append('HSS_500_50')
+    Masses.append('HSS_500_150')
+    """
+    Masses.append('HSS_600_50')
+    Masses.append('HSS_600_150')
+    """
+    Masses.append('HSS_600_250')
+    Masses.append('HSS_800_50')
+    Masses.append('HSS_800_250')
+    Masses.append('HSS_800_350')
+    """
+    Masses.append('HSS_1000_250')
     Masses.append('HSS_1000_350')
     Masses.append('HSS_1000_450')
+    #Masses.append('RPV_350_148')
+    #Masses.append('RPV_1500_494')
     Signals = []
     for mass in Masses:
         Signals.append(mass + '_1')
@@ -180,8 +187,6 @@ if __name__ == "__main__":
         Signals.append(mass + '_100')
         Signals.append(mass + '_1000')
         Signals.append(mass + '_10000')
-    Signals_2016preVFP = [i + '_2016APV' for i in Signals]
-    Signals_2016postVFP = [i + '_2016' for i in Signals]
     Signals2016 = [i + '_2016' for i in Signals]
     Signals2017 = [i + '_2017' for i in Signals]
     Signals2018 = [i + '_2018' for i in Signals]
@@ -207,12 +212,12 @@ if __name__ == "__main__":
 
     ############# Electron data definition
     DoubleEG2016 = []
-    DoubleEG2016.append('DoubleEG_Run2016B_HIPM')
-    DoubleEG2016.append('DoubleEG_Run2016C_HIPM')
-    DoubleEG2016.append('DoubleEG_Run2016D_HIPM')
-    DoubleEG2016.append('DoubleEG_Run2016E_HIPM')
-    DoubleEG2016.append('DoubleEG_Run2016F_HIPM')
-    DoubleEG2016.append('DoubleEG_Run2016F_noHIPM')
+    #DoubleEG2016.append('DoubleEG_Run2016B_HIPM')
+    #DoubleEG2016.append('DoubleEG_Run2016C_HIPM')
+    #DoubleEG2016.append('DoubleEG_Run2016D_HIPM')
+    #DoubleEG2016.append('DoubleEG_Run2016E_HIPM')
+    #DoubleEG2016.append('DoubleEG_Run2016F_HIPM')
+    #DoubleEG2016.append('DoubleEG_Run2016F_noHIPM')
     DoubleEG2016.append('DoubleEG_Run2016G_noHIPM')
     DoubleEG2016.append('DoubleEG_Run2016H_noHIPM')
 
@@ -255,7 +260,6 @@ if __name__ == "__main__":
         electron_recipe = DatacardManager.Recipe(opts.electronRecipe)
         electron_datacards = electron_recipe.dcs
 
-
     ###########################################
     ########## Loop over datacards
     #####
@@ -274,7 +278,6 @@ if __name__ == "__main__":
         electron_datacard_names_2016 = createDatacards(datacards = electron_datacards, Systematics = opts.electron_systematics, Backgrounds = DoubleEG2016, Signals = Signals2016, flavor = 'Electron', year = '2016')
         electron_datacard_names_2017 = createDatacards(datacards = electron_datacards, Systematics = opts.electron_systematics, Backgrounds = DoubleEG2017, Signals = Signals2017, flavor = 'Electron', year = '2017', exclude = ['nEE_IaA', 'nEE_IaB', 'nEE_IaC'])
         electron_datacard_names_2018 = createDatacards(datacards = electron_datacards, Systematics = opts.electron_systematics, Backgrounds = EGamma2018, Signals = Signals2018, flavor = 'Electron', year = '2018')
-
 
     os.chdir(_outdir) 
 
@@ -386,7 +389,6 @@ if __name__ == "__main__":
     ###########################################
     ########## Make json
     #####
-
     # Collect combine output:
     grouped = {}
     for _f in os.listdir(_outdir):
@@ -462,7 +464,7 @@ if __name__ == "__main__":
                     plot_input = plot_input + json + ','
                 plot_input = plot_input[:-1]
 
-                command = 'python include/plotLimits.py -j {0} -m {1} -f {2} -o {3} -y {4}'.format(plot_input, mH, flavor, _outdir, year)
+                command = 'python include/plotLimits.py -j {0} -m {1} -f {2} -o {3} -y {4} -t {5}'.format(plot_input, mH, flavor, _outdir, year, opts.theory)
                 print(command)
                 os.system(command)
 

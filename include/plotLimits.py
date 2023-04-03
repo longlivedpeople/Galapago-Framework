@@ -95,6 +95,7 @@ if __name__ == "__main__":
     parser.add_option('-f', '--flavor', action='store', type=str, dest='flavor', default='', help='flavor')
     parser.add_option('-o', '--outdir', action='store', type=str, dest='outdir', default='', help='out')
     parser.add_option('-y', '--year', action='store', type=str, dest='year', default='2016', help='year')
+    parser.add_option('-t', '--theory', action='store', type=str, dest='theory', default='HSS', help='year')
     (opts, args) = parser.parse_args()
 
     # Style and pads
@@ -125,7 +126,10 @@ if __name__ == "__main__":
     # Create an empty TH1 from the first TGraph to serve as the pad axis and frame
     axis = CreateAxisHist(graphs[0].values()[0])
     axis.GetXaxis().SetTitle('c#tau [cm]')
-    axis.GetYaxis().SetTitle('#sigma(H)xB(H#rightarrowSS)')
+    if opts.theory == 'HSS':
+        axis.GetYaxis().SetTitle('#sigma(H#rightarrowSS) [pb]')
+    elif opts.theory == 'RPV':
+        axis.GetYaxis().SetTitle('#sigma(#tilde{q}#bar{#tilde{q}}+#tilde{q}#tilde{q})xB(#tilde{q}#rightarrowq#tilde{#chi}^{0}_{1}) [pb]')
     axis.GetYaxis().SetRangeUser(0.0001, 30)
     axis.GetXaxis().SetRangeUser(0.004, 100000)
     axis.SetFillColor(4000);
@@ -227,7 +231,8 @@ if __name__ == "__main__":
     elif opts.year == '2018':
         Yearlabel.DrawLatex(0.96, 0.99, "59.7 fb^{-1} (13 TeV)")
     elif opts.year == 'Full':
-        Yearlabel.DrawLatex(0.96, 0.99, "137 fb^{-1} (13 TeV)")
+        #Yearlabel.DrawLatex(0.96, 0.99, "96 fb^{-1} (13 TeV)")
+        Yearlabel.DrawLatex(0.96, 0.99, "117 fb^{-1} (13 TeV)")
 
     CLlabel = ROOT.TLatex()
     CLlabel.SetNDC();
@@ -246,7 +251,10 @@ if __name__ == "__main__":
     Modellabel.SetTextFont(42);
     Modellabel.SetTextAlign(13);
     Modellabel.SetTextSize(0.037);
-    Modellabel.DrawLatex(0.20, 0.55, "H\\rightarrow SS, S\\rightarrow\\ell^{+}\\ell^{-}, \\ell = e,\\mu") # Hardcoded
+    if opts.theory=='HSS':
+        Modellabel.DrawLatex(0.20, 0.55, "H #rightarrow SS, S #rightarrow l^{+}l^{-}") # Hardcoded
+    elif opts.theory=='RPV':
+        Modellabel.DrawLatex(0.20, 0.55, "2#tilde{q}, #tilde{q}#rightarrowq#tilde{#chi}^{0}, #tilde{#chi}^{0}_{1} #rightarrow l^{+}l^{-}#nu") # Hardcoded
 
     Masslabel = ROOT.TLatex()
     Masslabel.SetNDC();
@@ -258,9 +266,15 @@ if __name__ == "__main__":
     if len(jsons) == 1:
         json = jsons[0]
         mS = json.split('__mS')[1].split('__')[0]
-        Masslabel.DrawLatex(0.20, 0.7, "m_{{H}} = {0} GeV, m_{{S}} = {1} GeV".format(opts.mH, mS))
+        if opts.theory=='HSS':
+            Masslabel.DrawLatex(0.20, 0.7, "m_{{H}} = {0} GeV, m_{{S}} = {1} GeV".format(opts.mH, mS))
+        elif opts.theory=='RPV':
+            Masslabel.DrawLatex(0.20, 0.7, "m_{#tilde{q}} = "+opts.mH+" GeV, m_{#tilde{#chi}_{1}^{0}} = "+mS+" GeV")
     else:
-        Masslabel.DrawLatex(0.5, 0.9, "m_{{H}} = {0} GeV".format(opts.mH))
+        if opts.theory=='HSS':
+            Masslabel.DrawLatex(0.5, 0.9, "m_{{H}} = {0} GeV".format(opts.mH))
+        elif opts.theory=='RPV':
+            Masslabel.DrawLatex(0.5, 0.9, "m_{#tilde{q}} = "+opts.mH+" GeV")
         
 
 

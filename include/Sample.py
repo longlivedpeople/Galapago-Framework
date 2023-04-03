@@ -122,7 +122,10 @@ class Sample:
           for j in ttree:
             gw = abs(j.genWeight)
             if gw: break
-          self.count = self.count + self.ftfiles[i].Get('sum2Weights').GetBinContent(1)/(abs(gw)*abs(gw))
+          try:
+              self.count = self.count + self.ftfiles[i].Get('sumWeights').GetBinContent(1)/(abs(gw))
+          except AttributeError:
+              self.count = self.count + self.ftfiles[i].Get('sum2Weights').GetBinContent(1)/(abs(gw)*abs(gw))
       else:
         for ttree in self.ttrees:
           self.count = self.count + ttree.GetEntries()

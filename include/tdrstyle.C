@@ -32,7 +32,7 @@ void setTDRStyle(bool fatline=true) {
   tdrStyle->SetFrameFillStyle(0);
   tdrStyle->SetFrameLineColor(1);
   tdrStyle->SetFrameLineStyle(1);
-  tdrStyle->SetFrameLineWidth(1);
+  tdrStyle->SetFrameLineWidth(2);
 
   // For the histo:
   // tdrStyle->SetHistFillColor(1);

@@ -13,6 +13,18 @@ gcolors['blue']      = r.TColor.GetColor('#4285f4');
 gcolors['violet']    = r.TColor.GetColor('#8f00ff');
 gcolors['magenta']    = r.TColor.GetColor('#ff00ff');
 
+acolors = {}
+acolors['1']    = r.TColor.GetColor('#219ebc');
+acolors['2']    = r.TColor.GetColor('#023047');
+acolors['3']    = r.TColor.GetColor('#ffb703');
+acolors['4']    = r.TColor.GetColor('#fb8500');
+
+bcolors = {}
+bcolors['1']    = r.TColor.GetColor('#177e89');
+bcolors['2']    = r.TColor.GetColor('#084c61');
+bcolors['3']    = r.TColor.GetColor('#db3a34');
+bcolors['4']    = r.TColor.GetColor('#ffc857');
+
 dcolors = {}
 dcolors['1mm'] = r.kAzure+10
 dcolors['10mm'] = r.kAzure-4

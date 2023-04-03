@@ -231,7 +231,7 @@ if __name__ == "__main__":
     Backgrounds_2017.append('ZZ_2017') 
     Backgrounds_2018 = []
     Backgrounds_2018.append('DYJetsToLL_M-50_2018') 
-    Backgrounds_2017.append('DYJetsToLL_M-10to50_2018') 
+    Backgrounds_2018.append('DYJetsToLL_M-10to50_2018') 
     Backgrounds_2018.append('TTTo2L2Nu_2018') 
     Backgrounds_2018.append('WJetsToLNu_2018') 
     Backgrounds_2018.append('WW_2018') 
@@ -281,8 +281,8 @@ if __name__ == "__main__":
     lumiH = 8.61
     lumi =  lumiB + lumiC + lumiD + lumiE + lumiF + lumiG + lumiH# luminosity
 
-    lumi_preVFP = 5.79 + 2.57 + 4.25 + 4.01 + 2.53
-    lumi_postVFP = 0.57 + 7.54 + 8.61
+    lumi_preVFP = 5.79 + 2.57 + 4.25 + 4.01 + 3.10
+    lumi_postVFP = 7.54 + 8.61
     lumi_2017 = 41.48
     lumi_2018 = 59.83
 
@@ -330,10 +330,10 @@ if __name__ == "__main__":
             treeDATA2018.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2018')
         if doSignals:
             print('Launching signal simulation...')
-            treeSI_2016APV.launchLoop(lumi_preVFP, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2016APV', queue = 'espresso', raw = args.raw)
-            treeSI_2016.launchLoop(lumi_postVFP, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2016', queue = 'espresso', raw = args.raw)
-            treeSI_2017.launchLoop(lumi_2017, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2017', queue = 'espresso', raw = args.raw)
-            treeSI_2018.launchLoop(lumi_2018, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2018', queue = 'espresso', raw = args.raw)
+            treeSI_2016APV.launchLoop(lumi_preVFP, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2016APV', queue = 'microcentury', raw = args.raw)
+            treeSI_2016.launchLoop(lumi_postVFP, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2016', queue = 'microcentury', raw = args.raw)
+            treeSI_2017.launchLoop(lumi_2017, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2017', queue = 'microcentury', raw = args.raw)
+            treeSI_2018.launchLoop(lumi_2018, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2018', queue = 'microcentury', raw = args.raw)
     else:
         if doMC:
             print('Launching background Monte Carlo...')

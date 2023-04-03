@@ -1,6 +1,7 @@
 import ROOT as r
 import optparse
 import os
+import re
 
 ##
 ## -- Parser object
@@ -8,6 +9,7 @@ import os
 
 parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
 parser.add_option('-d', '--dir', action='store', type=str, dest='dir', default='', help='Path to TFile')
+parser.add_option('-s', '--submit', action='store_true', dest='submit', default='', help='Submit?')
 (opts, args) = parser.parse_args()
 
 ##
@@ -61,10 +63,28 @@ for rname in missedroots:
     print(rname)
 
 print('>>> Missed err files:')
+missederrs_noerr = []
 for rname in missederrs:
     print(rname)
+    missederrs_noerr.append(rname[:-4])
 
+failed = [value for value in missedroots if value[:-5] not in missederrs_noerr]
+print('>>> Failed jobs:')
+for rname in failed:
+    print(rname)
 
+submitted = []
 
+if opts.submit:
+
+    for rname in missedroots:
+        sname = rname
+        index = [n for (n, e) in enumerate(sname) if e == '_']
+        sname = sname[:index[-1]]
+        sname = 'sub/sub_'+sname+'.sh'
+        if sname not in submitted:
+            os.system('condor_submit ' + sname)
+            submitted.append(sname)
+     
 
 

@@ -18,8 +18,6 @@ import include.CutManager as CutManager
 
 def makeClosureTestMC(lumi, name, hBKG_A, hBKG_B, ylog, tree, inputdir, labelA = 'A', labelB = 'B', xlabel = '', outtag = '', yshift = 0.0, LLlabel = '', DATAlabel = '', extralabel = '', rmin = 0.0, rmax = 2.0):
 
-    print(rmin, rmax)
-
     ### Get histograms
     luminosity = lumi
 
@@ -96,7 +94,7 @@ def makeClosureTestMC(lumi, name, hBKG_A, hBKG_B, ylog, tree, inputdir, labelA =
         hBKG_B.SetMaximum(0.1)
 
     ### Canvas object
-    plot = Canvas.Canvas('closuretest_'+name, 'png,pdf', 0.5, 0.66, 0.7, 0.78, 1)
+    plot = Canvas.Canvas('closuretest_'+name, 'png,pdf', 0.45, 0.66, 0.65, 0.78, 1)
     plot.addHisto(cumA, 'P', labelA, 'p', r.kBlue, 1, 0)
     plot.addHisto(cumB, 'P, SAME', labelB, 'p', r.kRed, 1, 1)
     
@@ -112,10 +110,10 @@ def makeClosureTestMC(lumi, name, hBKG_A, hBKG_B, ylog, tree, inputdir, labelA =
 
     ### Save it
     outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/ClosureTests_' + outtag + '/'
-    plot.saveRatio(1, 0, ylog, luminosity, cumA, cumB, r_ymin = rmin, r_ymax = rmax, label="SR/BCR", outputDir = outdir)
+    plot.saveRatio(1, tree.isData, ylog, luminosity, cumA, cumB, r_ymin = rmin, r_ymax = rmax, label="SR/BCR", outputDir = outdir)
 
     ### Main comparison
-    cplot = Canvas.Canvas('plaincomparison_'+name, 'png,pdf', 0.5, 0.66, 0.7, 0.78, 1)
+    cplot = Canvas.Canvas('plaincomparison_'+name, 'png,pdf', 0.45, 0.66, 0.65, 0.78, 1)
     cplot.addHisto(hBKG_A, 'P', labelA, 'p', r.kBlue, 1, 0)
     cplot.addHisto(hBKG_B, 'P, SAME', labelB, 'p', r.kRed, 1, 1)
     if LLlabel == 'EE':
@@ -124,7 +122,7 @@ def makeClosureTestMC(lumi, name, hBKG_A, hBKG_B, ylog, tree, inputdir, labelA =
         cplot.addLatex(0.17, 0.75, 'Dimuon vertices', font = 42)
     cplot.addLatex(0.17, 0.81, extralabel, font = 42, align = 11, size = 0.045)
     cplot.addLatex(0.9, 0.88, DATAlabel, font = 42, align = 31, size = 0.045)
-    cplot.saveRatio(1, 0, ylog, luminosity, hBKG_A, hBKG_B, label="SR/BCR", outputDir = outdir)
+    cplot.saveRatio(1, tree.isData, ylog, luminosity, hBKG_A, hBKG_B, label="SR/BCR", outputDir = outdir)
 
     
 
@@ -189,22 +187,30 @@ if __name__ == "__main__":
     ############# Load background simulation
     Backgrounds_preVFP = []
     Backgrounds_preVFP.append('DYJetsToLL_M-50_preVFP')
+    Backgrounds_preVFP.append('DYJetsToLL_M-10to50_preVFP')
     Backgrounds_preVFP.append('TTTo2L2Nu_preVFP')
+    Backgrounds_preVFP.append('WJetsToLNu_preVFP')
     Backgrounds_preVFP.append('WW_preVFP')
     Backgrounds_preVFP.append('WZ_preVFP')
+    Backgrounds_preVFP.append('ZZ_preVFP')
     Backgrounds_postVFP = []
     Backgrounds_postVFP.append('DYJetsToLL_M-50_postVFP')
+    Backgrounds_postVFP.append('DYJetsToLL_M-10to50_postVFP')
     Backgrounds_postVFP.append('TTTo2L2Nu_postVFP')
     Backgrounds_postVFP.append('WW_postVFP')
     Backgrounds_postVFP.append('WZ_postVFP')
+    Backgrounds_postVFP.append('ZZ_postVFP')
     Backgrounds_2017 = []
     Backgrounds_2017.append('DYJetsToLL_M-50_2017')
+    Backgrounds_2017.append('DYJetsToLL_M-10to50_2017')
     Backgrounds_2017.append('TTTo2L2Nu_2017')
+    Backgrounds_2017.append('WJetsToLNu_2017')
     Backgrounds_2017.append('WW_2017')
     Backgrounds_2017.append('WZ_2017')
     Backgrounds_2017.append('ZZ_2017')
     Backgrounds_2018 = []
     Backgrounds_2018.append('DYJetsToLL_M-50_2018')
+    Backgrounds_2018.append('DYJetsToLL_M-10to50_2018')
     Backgrounds_2018.append('TTTo2L2Nu_2018')
     Backgrounds_2018.append('WW_2018')
     Backgrounds_2018.append('WZ_2018')
@@ -213,155 +219,369 @@ if __name__ == "__main__":
     ################ Define the .dat file
     filename = 'dat/Samples_cern_UltraLegacy.dat'
 
+    stabin = np.array([0., 1., 2., 3., 4., 6., 8., 10., 15., 20., 30., 40.])
+
     ################################
     ######## DoubleEG Plots ########
     ################################
-    """
     #
     # -- DY Closure
     #
-    treeDY_preVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-50_preVFP'], 'MC'), name = 'MC', isdata = 0 )
+    treeDY_preVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-10to50_preVFP', 'DYJetsToLL_M-50_preVFP'], 'MC'), name = 'MC', isdata = 0 )
 
     hBKG_A = treeDY_preVFP.getLoopTH1F(opts.input, 'hEESR_trackIxy')
     hBKG_B = treeDY_preVFP.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
-    newbin = np.linspace(0., 25., 26)
+    #newbin = np.linspace(0., 30., 16)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'DY_EE_2016preVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: preVFP', extralabel = 'Drell-Yan (Baseline selection)')
+    makeClosureTestMC(lumi = '', name = 'DY_EE_2016preVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: preVFP', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3)
+
+    hBKG_A = treeDY_preVFP.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeDY_preVFP.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'DY_EE_2016preVFP_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: preVFP', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3)
+
 
     hBKG_A = treeDY_preVFP.getLoopTH1F(opts.input, 'hMMSR_trackIxy')
     hBKG_B = treeDY_preVFP.getLoopTH1F(opts.input, 'hMMBCR_trackIxy')
-    newbin = np.linspace(0., 25., 26)
+    newbin = np.linspace(0., 40., 21)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'DY_MM_2016preVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: preVFP', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'DY_MM_2016preVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: preVFP', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3.0)
 
-    treeDY_postVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-50_postVFP'], 'MC'), name = 'MC', isdata = 0 )
+    hBKG_A = treeDY_preVFP.getLoopTH1F(opts.input, 'hMMSRTight_trackIxy')
+    hBKG_B = treeDY_preVFP.getLoopTH1F(opts.input, 'hMMBCRTight_trackIxy')
+    newbin = np.linspace(0., 40., 21)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'DY_MM_2016preVFP_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: preVFP', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3.0)
+
+
+    treeDY_postVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-10to50_postVFP', 'DYJetsToLL_M-50_postVFP'], 'MC'), name = 'MC', isdata = 0 )
 
     hBKG_A = treeDY_postVFP.getLoopTH1F(opts.input, 'hEESR_trackIxy')
     hBKG_B = treeDY_postVFP.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
-    newbin = np.linspace(0., 25., 26)
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'DY_EE_2016postVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: postVFP', extralabel = 'Drell-Yan (Baseline selection)')
+    makeClosureTestMC(lumi = '', name = 'DY_EE_2016postVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: postVFP', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3)
+
+    hBKG_A = treeDY_postVFP.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeDY_postVFP.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'DY_EE_2016postVFP_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: postVFP', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3)
 
     hBKG_A = treeDY_postVFP.getLoopTH1F(opts.input, 'hMMSR_trackIxy')
     hBKG_B = treeDY_postVFP.getLoopTH1F(opts.input, 'hMMBCR_trackIxy')
-    newbin = np.linspace(0., 25., 26)
+    newbin = np.linspace(0., 40., 21)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'DY_MM_2016postVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: postVFP', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'DY_MM_2016postVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: postVFP', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3.0)
 
-    treeDY_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-50_2017'], 'MC'), name = 'MC', isdata = 0 )
+    hBKG_A = treeDY_postVFP.getLoopTH1F(opts.input, 'hMMSRTight_trackIxy')
+    hBKG_B = treeDY_postVFP.getLoopTH1F(opts.input, 'hMMBCRTight_trackIxy')
+    newbin = np.linspace(0., 40., 21)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'DY_MM_2016postVFP_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: postVFP', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3.0)
+
+    treeDY_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-10to50_2017' , 'DYJetsToLL_M-50_2017'], 'MC'), name = 'MC', isdata = 0 )
 
     hBKG_A = treeDY_2017.getLoopTH1F(opts.input, 'hEESR_trackIxy')
     hBKG_B = treeDY_2017.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
-    newbin = np.linspace(0., 25., 26)
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'DY_EE_2017', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2017 UL', extralabel = 'Drell-Yan (Baseline selection)')
+    makeClosureTestMC(lumi = '', name = 'DY_EE_2017', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2017 UL', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3)
 
-    treeDY_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-50_2018'], 'MC'), name = 'MC', isdata = 0 )
+    hBKG_A = treeDY_2017.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeDY_2017.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'DY_EE_2017_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2017 UL', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3)
+
+    treeDY_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-10to50_2018', 'DYJetsToLL_M-50_2018'], 'MC'), name = 'MC', isdata = 0 )
 
     hBKG_A = treeDY_2018.getLoopTH1F(opts.input, 'hEESR_trackIxy')
     hBKG_B = treeDY_2018.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
-    newbin = np.linspace(0., 25., 26)
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'DY_EE_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2018 UL', extralabel = 'Drell-Yan (Baseline selection)')
+    makeClosureTestMC(lumi = '', name = 'DY_EE_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2018 UL', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3)
+
+    hBKG_A = treeDY_2018.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeDY_2018.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'DY_EE_2018_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2018 UL', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3)
 
     hBKG_A = treeDY_2018.getLoopTH1F(opts.input, 'hMMSR_trackIxy')
     hBKG_B = treeDY_2018.getLoopTH1F(opts.input, 'hMMBCR_trackIxy')
-    newbin = np.linspace(0., 25., 26)
+    newbin = np.linspace(0., 40., 21)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'DY_MM_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2018 UL', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3.0)
-    """ 
+    makeClosureTestMC(lumi = '', name = 'DY_MM_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2018 UL', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3.0)
+
+    hBKG_A = treeDY_2018.getLoopTH1F(opts.input, 'hMMSRTight_trackIxy')
+    hBKG_B = treeDY_2018.getLoopTH1F(opts.input, 'hMMBCRTight_trackIxy')
+    newbin = np.linspace(0., 40., 21)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'DY_MM_2018_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2018 UL', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3.0)
 
 
+    treeDY_EEFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-10to50_postVFP', 'DYJetsToLL_M-50_postVFP', 'DYJetsToLL_M-10to50_2017' , 'DYJetsToLL_M-50_2017', 'DYJetsToLL_M-10to50_2018', 'DYJetsToLL_M-50_2018'], 'MC'), name = 'MC', isdata = 0 )
+
+    hBKG_A = treeDY_EEFull.getLoopTH1F(opts.input, 'hEESR_trackIxy')
+    hBKG_B = treeDY_EEFull.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'DY_EE_Full', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_EEFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'Run 2', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3)
+
+    hBKG_A = treeDY_EEFull.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeDY_EEFull.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'DY_EE_Full_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_EEFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'Run 2', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3)
+
+    treeDY_MMFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-10to50_preVFP', 'DYJetsToLL_M-50_preVFP', 'DYJetsToLL_M-10to50_postVFP', 'DYJetsToLL_M-50_postVFP', 'DYJetsToLL_M-10to50_2018', 'DYJetsToLL_M-50_2018'], 'MC'), name = 'MC', isdata = 0 )
+
+    hBKG_A = treeDY_MMFull.getLoopTH1F(opts.input, 'hMMSR_trackIxy')
+    hBKG_B = treeDY_MMFull.getLoopTH1F(opts.input, 'hMMBCR_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'DY_MM_Full', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_MMFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'Run 2', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3)
+
+    hBKG_A = treeDY_MMFull.getLoopTH1F(opts.input, 'hMMSRTight_trackIxy')
+    hBKG_B = treeDY_MMFull.getLoopTH1F(opts.input, 'hMMBCRTight_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'DY_MM_Full_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeDY_MMFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'Run 2', extralabel = 'Drell-Yan (Baseline selection)', rmax = 3)
 
 
     #
     # -- ttbar Closure
     #
-    """
     treeTT_preVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TTTo2L2Nu_preVFP'], 'MC'), name = 'MC', isdata = 0 )
 
     hBKG_A = treeTT_preVFP.getLoopTH1F(opts.input, 'hEESR_trackIxy')
     hBKG_B = treeTT_preVFP.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'TT_EE_2016preVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: preVFP', extralabel = 't#bar{t} dilep. (Baseline selection)')
+    makeClosureTestMC(lumi = '', name = 'TT_EE_2016preVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: preVFP', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3)
 
     hBKG_A = treeTT_preVFP.getLoopTH1F(opts.input, 'hMMSR_trackIxy')
     hBKG_B = treeTT_preVFP.getLoopTH1F(opts.input, 'hMMBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'TT_MM_2016preVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: preVFP', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'TT_MM_2016preVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: preVFP', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3.0)
+
+    hBKG_A = treeTT_preVFP.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeTT_preVFP.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'TT_EE_2016preVFP_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: preVFP', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3)
+
+    hBKG_A = treeTT_preVFP.getLoopTH1F(opts.input, 'hMMSRTight_trackIxy')
+    hBKG_B = treeTT_preVFP.getLoopTH1F(opts.input, 'hMMBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'TT_MM_2016preVFP_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: preVFP', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3.0)
 
     treeTT_postVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TTTo2L2Nu_postVFP'], 'MC'), name = 'MC', isdata = 0 )
 
     hBKG_A = treeTT_postVFP.getLoopTH1F(opts.input, 'hEESR_trackIxy')
     hBKG_B = treeTT_postVFP.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'TT_EE_2016postVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: postVFP', extralabel = 't#bar{t} dilep. (Baseline selection)')
+    makeClosureTestMC(lumi = '', name = 'TT_EE_2016postVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: postVFP', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3)
 
     hBKG_A = treeTT_postVFP.getLoopTH1F(opts.input, 'hMMSR_trackIxy')
     hBKG_B = treeTT_postVFP.getLoopTH1F(opts.input, 'hMMBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'TT_MM_2016postVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: postVFP', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'TT_MM_2016postVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: postVFP', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3.0)
+
+    hBKG_A = treeTT_postVFP.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeTT_postVFP.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'TT_EE_2016postVFP_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: postVFP', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3)
+
+    hBKG_A = treeTT_postVFP.getLoopTH1F(opts.input, 'hMMSRTight_trackIxy')
+    hBKG_B = treeTT_postVFP.getLoopTH1F(opts.input, 'hMMBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'TT_MM_2016postVFP_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: postVFP', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3.0)
 
     treeTT_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TTTo2L2Nu_2017'], 'MC'), name = 'MC', isdata = 0 )
 
     hBKG_A = treeTT_2017.getLoopTH1F(opts.input, 'hEESR_trackIxy')
     hBKG_B = treeTT_2017.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'TT_EE_2017', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2017 UL', extralabel = 't#bar{t} dilep. (Baseline selection)')
+    makeClosureTestMC(lumi = '', name = 'TT_EE_2017', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2017 UL', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3)
+
+    hBKG_A = treeTT_2017.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeTT_2017.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'TT_EE_2017_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #3pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2017 UL', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3)
 
     treeTT_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TTTo2L2Nu_2018'], 'MC'), name = 'MC', isdata = 0 )
 
     hBKG_A = treeTT_2018.getLoopTH1F(opts.input, 'hEESR_trackIxy')
     hBKG_B = treeTT_2018.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'TT_EE_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2018 UL', extralabel = 't#bar{t} dilep. (Baseline selection)')
+    makeClosureTestMC(lumi = '', name = 'TT_EE_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2018 UL', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3)
 
     hBKG_A = treeTT_2018.getLoopTH1F(opts.input, 'hMMSR_trackIxy')
     hBKG_B = treeTT_2018.getLoopTH1F(opts.input, 'hMMBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'TT_MM_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2018 UL', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3.0)
-    """
+    makeClosureTestMC(lumi = '', name = 'TT_MM_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2018 UL', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3.0)
+
+    hBKG_A = treeTT_2018.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeTT_2018.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'TT_EE_2018_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2018 UL', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3)
+
+    hBKG_A = treeTT_2018.getLoopTH1F(opts.input, 'hMMSRTight_trackIxy')
+    hBKG_B = treeTT_2018.getLoopTH1F(opts.input, 'hMMBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'TT_MM_2018_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2018 UL', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3.0)
+
+    treeTT_EEFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TTTo2L2Nu_postVFP', 'TTTo2L2Nu_2017', 'TTTo2L2Nu_2018'], 'MC'), name = 'MC', isdata = 0 )
+
+    hBKG_A = treeTT_EEFull.getLoopTH1F(opts.input, 'hEESR_trackIxy')
+    hBKG_B = treeTT_EEFull.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'TT_EE_Full', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_EEFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'Run 2', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3)
+
+    hBKG_A = treeTT_EEFull.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeTT_EEFull.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'TT_EE_Full_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_EEFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'Run 2', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3)
+
+    treeTT_MMFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TTTo2L2Nu_preVFP', 'TTTo2L2Nu_postVFP', 'TTTo2L2Nu_2018'], 'MC'), name = 'MC', isdata = 0 )
+
+    hBKG_A = treeTT_MMFull.getLoopTH1F(opts.input, 'hMMSR_trackIxy')
+    hBKG_B = treeTT_MMFull.getLoopTH1F(opts.input, 'hMMBCR_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'TT_MM_Full', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_MMFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'Run 2', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3)
+
+    hBKG_A = treeTT_MMFull.getLoopTH1F(opts.input, 'hMMSRTight_trackIxy')
+    hBKG_B = treeTT_MMFull.getLoopTH1F(opts.input, 'hMMBCRTight_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'TT_MM_Full_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeTT_MMFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'Run 2', extralabel = 't#bar{t} dilep. (Baseline selection)', rmax = 3)
 
     #
     # -- Diboson Closure
     #
-    """
     treeVV_preVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['WW_preVFP', 'WZ_preVFP'], 'MC'), name = 'MC', isdata = 0 )
 
     hBKG_A = treeVV_preVFP.getLoopTH1F(opts.input, 'hEESR_trackIxy')
     hBKG_B = treeVV_preVFP.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'VV_EE_2016preVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: preVFP', extralabel = 'WW, WZ, ZZ (Baseline selection)')
+    makeClosureTestMC(lumi = '', name = 'VV_EE_2016preVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: preVFP', extralabel = 'WW, WZ, ZZ (Baseline selection)')
 
     hBKG_A = treeVV_preVFP.getLoopTH1F(opts.input, 'hMMSR_trackIxy')
     hBKG_B = treeVV_preVFP.getLoopTH1F(opts.input, 'hMMBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'VV_MM_2016preVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: preVFP', extralabel = 'WW, WZ, ZZ (Baseline selection)', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'VV_MM_2016preVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: preVFP', extralabel = 'WW, WZ, ZZ (Baseline selection)', rmax = 3.0)
+
+    hBKG_A = treeVV_preVFP.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeVV_preVFP.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'VV_EE_2016preVFP_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: preVFP', extralabel = 'WW, WZ, ZZ (Baseline selection)')
+
+    hBKG_A = treeVV_preVFP.getLoopTH1F(opts.input, 'hMMSRTight_trackIxy')
+    hBKG_B = treeVV_preVFP.getLoopTH1F(opts.input, 'hMMBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'VV_MM_2016preVFP_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_preVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: preVFP', extralabel = 'WW, WZ, ZZ (Baseline selection)', rmax = 3.0)
 
 
     treeVV_postVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['WW_postVFP', 'WZ_postVFP'], 'MC'), name = 'MC', isdata = 0 )
@@ -369,16 +589,34 @@ if __name__ == "__main__":
     hBKG_A = treeVV_postVFP.getLoopTH1F(opts.input, 'hEESR_trackIxy')
     hBKG_B = treeVV_postVFP.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'VV_EE_2016postVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: postVFP', extralabel = 'WW, WZ, ZZ (Baseline selection)')
+    makeClosureTestMC(lumi = '', name = 'VV_EE_2016postVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: postVFP', extralabel = 'WW, WZ, ZZ (Baseline selection)')
 
     hBKG_A = treeVV_postVFP.getLoopTH1F(opts.input, 'hMMSR_trackIxy')
     hBKG_B = treeVV_postVFP.getLoopTH1F(opts.input, 'hMMBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'VV_MM_2016postVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: postVFP', extralabel = 'WW, WZ, ZZ (Baseline selection)', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'VV_MM_2016postVFP', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: postVFP', extralabel = 'WW, WZ, ZZ (Baseline selection)', rmax = 3.0)
+
+    hBKG_A = treeVV_postVFP.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeVV_postVFP.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'VV_EE_2016postVFP_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2016 UL: postVFP', extralabel = 'WW, WZ, ZZ (Baseline selection)')
+
+    hBKG_A = treeVV_postVFP.getLoopTH1F(opts.input, 'hMMSRTight_trackIxy')
+    hBKG_B = treeVV_postVFP.getLoopTH1F(opts.input, 'hMMBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'VV_MM_2016postVFP_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_postVFP, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2016 UL: postVFP', extralabel = 'WW, WZ, ZZ (Baseline selection)', rmax = 3.0)
 
 
     treeVV_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['WW_2017', 'WZ_2017', 'ZZ_2017'], 'MC'), name = 'MC', isdata = 0 )
@@ -386,9 +624,18 @@ if __name__ == "__main__":
     hBKG_A = treeVV_2017.getLoopTH1F(opts.input, 'hEESR_trackIxy')
     hBKG_B = treeVV_2017.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'VV_EE_2017', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2017 UL', extralabel = 'WW, WZ, ZZ (Baseline selection)')
+    makeClosureTestMC(lumi = '', name = 'VV_EE_2017', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2017 UL', extralabel = 'WW, WZ, ZZ (Baseline selection)')
+
+    hBKG_A = treeVV_2017.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeVV_2017.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'VV_EE_2017_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2017 UL', extralabel = 'WW, WZ, ZZ (Baseline selection)')
 
 
     treeVV_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['WW_2018', 'WZ_2018', 'ZZ_2018'], 'MC'), name = 'MC', isdata = 0 )
@@ -396,16 +643,72 @@ if __name__ == "__main__":
     hBKG_A = treeVV_2018.getLoopTH1F(opts.input, 'hEESR_trackIxy')
     hBKG_B = treeVV_2018.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'VV_EE_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2018 UL', extralabel = 'WW, WZ, ZZ (Baseline selection)')
+    makeClosureTestMC(lumi = '', name = 'VV_EE_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2018 UL', extralabel = 'WW, WZ, ZZ (Baseline selection)')
 
     hBKG_A = treeVV_2018.getLoopTH1F(opts.input, 'hMMSR_trackIxy')
     hBKG_B = treeVV_2018.getLoopTH1F(opts.input, 'hMMBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'VV_MM_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2018 UL', extralabel = 'WW, WZ, ZZ (Baseline selection)', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'VV_MM_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2018 UL', extralabel = 'WW, WZ, ZZ (Baseline selection)', rmax = 3.0)
+
+    hBKG_A = treeVV_2018.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeVV_2018.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'VV_EE_2018_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '2018 UL', extralabel = 'WW, WZ, ZZ (Baseline selection)')
+
+    hBKG_A = treeVV_2018.getLoopTH1F(opts.input, 'hMMSRTight_trackIxy')
+    hBKG_B = treeVV_2018.getLoopTH1F(opts.input, 'hMMBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'VV_MM_2018_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '2018 UL', extralabel = 'WW, WZ, ZZ (Baseline selection)', rmax = 3.0)
+
+    treeVV_EEFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['WW_postVFP', 'WZ_postVFP', 'ZZ_postVFP', 'WW_2017', 'WZ_2017', 'ZZ_2017', 'WW_2018', 'WZ_2018', 'ZZ_2018'], 'MC'), name = 'MC', isdata = 0 )
+
+    hBKG_A = treeVV_EEFull.getLoopTH1F(opts.input, 'hEESR_trackIxy')
+    hBKG_B = treeVV_EEFull.getLoopTH1F(opts.input, 'hEEBCR_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'VV_EE_Full', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_EEFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'Run 2', extralabel = 'WW, WZ, ZZ (Baseline selection)', rmax = 3)
+
+    hBKG_A = treeVV_EEFull.getLoopTH1F(opts.input, 'hEESRTight_trackIxy')
+    hBKG_B = treeVV_EEFull.getLoopTH1F(opts.input, 'hEEBCRTight_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'VV_EE_Full_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_EEFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'Run 2', extralabel = 'WW, WZ, ZZ (Baseline selection)', rmax = 3)
+
+    treeVV_MMFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['WW_preVFP', 'WZ_preVFP', 'ZZ_preVFP', 'WW_postVFP', 'WZ_postVFP', 'ZZ_postVFP', 'WW_2018', 'WZ_2018', 'ZZ_2018'], 'MC'), name = 'MC', isdata = 0 )
+
+    hBKG_A = treeVV_MMFull.getLoopTH1F(opts.input, 'hMMSR_trackIxy')
+    hBKG_B = treeVV_MMFull.getLoopTH1F(opts.input, 'hMMBCR_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'VV_MM_Full', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_MMFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'Run 2', extralabel = 'WW, WZ, ZZ (Baseline selection)', rmax = 3)
+
+    hBKG_A = treeVV_MMFull.getLoopTH1F(opts.input, 'hMMSRTight_trackIxy')
+    hBKG_B = treeVV_MMFull.getLoopTH1F(opts.input, 'hMMBCRTight_trackIxy')
+    newbin = np.linspace(0., 30., 16)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'VV_MM_Full_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_MMFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'Run 2', extralabel = 'WW, WZ, ZZ (Baseline selection)', rmax = 3)
+
+
 
     """
 
@@ -418,30 +721,66 @@ if __name__ == "__main__":
     hBKG_A = tree_EE2016_HIPM.getLoopTH1F(opts.input, 'hEEQCDSR_trackIxy')
     hBKG_B = tree_EE2016_HIPM.getLoopTH1F(opts.input, 'hEEQCDBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'QCD_EE_2016HIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2016_HIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'HIP affected runs', extralabel = 'QCD Control Region', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'QCD_EE_2016HIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2016_HIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'HIP affected runs', extralabel = 'QCD Control Region', rmax = 3.0)
 
     hBKG_A = tree_MM2016_HIPM.getLoopTH1F(opts.input, 'hMMQCDSR_trackIxy')
     hBKG_B = tree_MM2016_HIPM.getLoopTH1F(opts.input, 'hMMQCDBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'QCD_MM_2016HIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2016_HIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'HIP affected runs', extralabel = 'QCD Control Region', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'QCD_MM_2016HIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2016_HIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'HIP affected runs', extralabel = 'QCD Control Region', rmax = 3.0)
+
+    hBKG_A = tree_EE2016_HIPM.getLoopTH1F(opts.input, 'hEEQCDSRTight_trackIxy')
+    hBKG_B = tree_EE2016_HIPM.getLoopTH1F(opts.input, 'hEEQCDBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'QCD_EE_2016HIPM_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2016_HIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'HIP affected runs', extralabel = 'QCD Control Region', rmax = 3.0)
+
+    hBKG_A = tree_MM2016_HIPM.getLoopTH1F(opts.input, 'hMMQCDSRTight_trackIxy')
+    hBKG_B = tree_MM2016_HIPM.getLoopTH1F(opts.input, 'hMMQCDBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'QCD_MM_2016HIPM_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2016_HIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'HIP affected runs', extralabel = 'QCD Control Region', rmax = 3.0)
 
     hBKG_A = tree_EE2016_HIPM.getLoopTH1F(opts.input, 'hEEWjetsSR_trackIxy')
     hBKG_B = tree_EE2016_HIPM.getLoopTH1F(opts.input, 'hEEWjetsBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'Wjets_EE_2016HIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2016_HIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'HIP affected runs', extralabel = 'W+jets Control Region', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'Wjets_EE_2016HIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2016_HIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'HIP affected runs', extralabel = 'W+jets Control Region', rmax = 3.0)
 
     hBKG_A = tree_MM2016_HIPM.getLoopTH1F(opts.input, 'hMMWjetsSR_trackIxy')
     hBKG_B = tree_MM2016_HIPM.getLoopTH1F(opts.input, 'hMMWjetsBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'Wjets_MM_2016HIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2016_HIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'HIP affected runs', extralabel = 'W+jets Control Region', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'Wjets_MM_2016HIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2016_HIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'HIP affected runs', extralabel = 'W+jets Control Region', rmax = 3.0)
+
+    hBKG_A = tree_EE2016_HIPM.getLoopTH1F(opts.input, 'hEEWjetsSRTight_trackIxy')
+    hBKG_B = tree_EE2016_HIPM.getLoopTH1F(opts.input, 'hEEWjetsBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'Wjets_EE_2016HIPM_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2016_HIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'HIP affected runs', extralabel = 'W+jets Control Region', rmax = 3.0)
+
+    hBKG_A = tree_MM2016_HIPM.getLoopTH1F(opts.input, 'hMMWjetsSRTight_trackIxy')
+    hBKG_B = tree_MM2016_HIPM.getLoopTH1F(opts.input, 'hMMWjetsBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'Wjets_MM_2016HIPM_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2016_HIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'HIP affected runs', extralabel = 'W+jets Control Region', rmax = 3.0)
 
     tree_EE2016_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016_noHIPM, 'MC'), name = 'DATA', isdata = 1 )
     tree_MM2016_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016_noHIPM, 'MC'), name = 'DATA', isdata = 1 )
@@ -449,30 +788,66 @@ if __name__ == "__main__":
     hBKG_A = tree_EE2016_noHIPM.getLoopTH1F(opts.input, 'hEEQCDSR_trackIxy')
     hBKG_B = tree_EE2016_noHIPM.getLoopTH1F(opts.input, 'hEEQCDBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'QCD_EE_2016noHIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2016_noHIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'HIP unaffected runs', extralabel = 'QCD Control Region', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'QCD_EE_2016noHIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2016_noHIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'HIP unaffected runs', extralabel = 'QCD Control Region', rmax = 3.0)
 
     hBKG_A = tree_MM2016_noHIPM.getLoopTH1F(opts.input, 'hMMQCDSR_trackIxy')
     hBKG_B = tree_MM2016_noHIPM.getLoopTH1F(opts.input, 'hMMQCDBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'QCD_MM_2016noHIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2016_noHIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'HIP unaffected runs', extralabel = 'QCD Control Region', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'QCD_MM_2016noHIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2016_noHIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'HIP unaffected runs', extralabel = 'QCD Control Region', rmax = 3.0)
+
+    hBKG_A = tree_EE2016_noHIPM.getLoopTH1F(opts.input, 'hEEQCDSRTight_trackIxy')
+    hBKG_B = tree_EE2016_noHIPM.getLoopTH1F(opts.input, 'hEEQCDBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'QCD_EE_2016noHIPM_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2016_noHIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'HIP unaffected runs', extralabel = 'QCD Control Region', rmax = 3.0)
+
+    hBKG_A = tree_MM2016_noHIPM.getLoopTH1F(opts.input, 'hMMQCDSRTight_trackIxy')
+    hBKG_B = tree_MM2016_noHIPM.getLoopTH1F(opts.input, 'hMMQCDBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'QCD_MM_2016noHIPM_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2016_noHIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'HIP unaffected runs', extralabel = 'QCD Control Region', rmax = 3.0)
 
     hBKG_A = tree_EE2016_noHIPM.getLoopTH1F(opts.input, 'hEEWjetsSR_trackIxy')
     hBKG_B = tree_EE2016_noHIPM.getLoopTH1F(opts.input, 'hEEWjetsBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'Wjets_EE_2016noHIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2016_noHIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'HIP unaffected runs', extralabel = 'W+jets Control Region', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'Wjets_EE_2016noHIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2016_noHIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'HIP unaffected runs', extralabel = 'W+jets Control Region', rmax = 3.0)
 
     hBKG_A = tree_MM2016_noHIPM.getLoopTH1F(opts.input, 'hMMWjetsSR_trackIxy')
     hBKG_B = tree_MM2016_noHIPM.getLoopTH1F(opts.input, 'hMMWjetsBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '', name = 'Wjets_MM_2016noHIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2016_noHIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'HIP unaffected runs', extralabel = 'W+jets Control Region', rmax = 3.0)
+    makeClosureTestMC(lumi = '', name = 'Wjets_MM_2016noHIPM', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2016_noHIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'HIP unaffected runs', extralabel = 'W+jets Control Region', rmax = 3.0)
+
+    hBKG_A = tree_EE2016_noHIPM.getLoopTH1F(opts.input, 'hEEWjetsSRTight_trackIxy')
+    hBKG_B = tree_EE2016_noHIPM.getLoopTH1F(opts.input, 'hEEWjetsBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'Wjets_EE_2016noHIPM_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2016_noHIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = 'HIP unaffected runs', extralabel = 'W+jets Control Region', rmax = 3.0)
+
+    hBKG_A = tree_MM2016_noHIPM.getLoopTH1F(opts.input, 'hMMWjetsSRTight_trackIxy')
+    hBKG_B = tree_MM2016_noHIPM.getLoopTH1F(opts.input, 'hMMWjetsBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '', name = 'Wjets_MM_2016noHIPM_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2016_noHIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'HIP unaffected runs', extralabel = 'W+jets Control Region', rmax = 3.0)
 
 
 
@@ -481,16 +856,34 @@ if __name__ == "__main__":
     hBKG_A = tree_EE2017.getLoopTH1F(opts.input, 'hEEQCDSR_trackIxy')
     hBKG_B = tree_EE2017.getLoopTH1F(opts.input, 'hEEQCDBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '41.5', name = 'QCD_EE_2017', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'QCD Control Region', rmax = 3.0)
+    makeClosureTestMC(lumi = '41.5', name = 'QCD_EE_2017', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'QCD Control Region', rmax = 3.0)
+
+    hBKG_A = tree_EE2017.getLoopTH1F(opts.input, 'hEEQCDSRTight_trackIxy')
+    hBKG_B = tree_EE2017.getLoopTH1F(opts.input, 'hEEQCDBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '41.5', name = 'QCD_EE_2017_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'QCD Control Region', rmax = 3.0)
 
     hBKG_A = tree_EE2017.getLoopTH1F(opts.input, 'hEEWjetsSR_trackIxy')
     hBKG_B = tree_EE2017.getLoopTH1F(opts.input, 'hEEWjetsBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = '41.5', name = 'Wjets_EE_2017', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'W+jets Control Region', rmax = 3.0)
+    makeClosureTestMC(lumi = '41.5', name = 'Wjets_EE_2017', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'W+jets Control Region', rmax = 3.0)
+
+    hBKG_A = tree_EE2017.getLoopTH1F(opts.input, 'hEEWjetsSRTight_trackIxy')
+    hBKG_B = tree_EE2017.getLoopTH1F(opts.input, 'hEEWjetsBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = '41.5', name = 'Wjets_EE_2017_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2017, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'W+jets Control Region', rmax = 3.0)
 
 
 
@@ -500,34 +893,140 @@ if __name__ == "__main__":
     hBKG_A = tree_EE2018.getLoopTH1F(opts.input, 'hEEQCDSR_trackIxy')
     hBKG_B = tree_EE2018.getLoopTH1F(opts.input, 'hEEQCDBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = 59.8, name = 'QCD_EE_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'QCD Control Region', rmax = 3.0)
+    makeClosureTestMC(lumi = 59.8, name = 'QCD_EE_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'QCD Control Region', rmax = 3.0)
 
     hBKG_A = tree_MM2018.getLoopTH1F(opts.input, 'hMMQCDSR_trackIxy')
     hBKG_B = tree_MM2018.getLoopTH1F(opts.input, 'hMMQCDBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = 59.8, name = 'QCD_MM_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'QCD Control Region', rmax = 3.0)
+    makeClosureTestMC(lumi = 59.8, name = 'QCD_MM_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'QCD Control Region', rmax = 3.0)
+
+    hBKG_A = tree_EE2018.getLoopTH1F(opts.input, 'hEEQCDSRTight_trackIxy')
+    hBKG_B = tree_EE2018.getLoopTH1F(opts.input, 'hEEQCDBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = 59.8, name = 'QCD_EE_2018_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'QCD Control Region', rmax = 3.0)
+
+    hBKG_A = tree_MM2018.getLoopTH1F(opts.input, 'hMMQCDSRTight_trackIxy')
+    hBKG_B = tree_MM2018.getLoopTH1F(opts.input, 'hMMQCDBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = 59.8, name = 'QCD_MM_2018_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'QCD Control Region', rmax = 3.0)
 
     hBKG_A = tree_EE2018.getLoopTH1F(opts.input, 'hEEWjetsSR_trackIxy')
     hBKG_B = tree_EE2018.getLoopTH1F(opts.input, 'hEEWjetsBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = 59.8, name = 'Wjets_EE_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{ee} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannelV2', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'W+jets Control Region', rmax = 3.0)
+    makeClosureTestMC(lumi = 59.8, name = 'Wjets_EE_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'W+jets Control Region', rmax = 3.0)
 
     hBKG_A = tree_MM2018.getLoopTH1F(opts.input, 'hMMWjetsSR_trackIxy')
     hBKG_B = tree_MM2018.getLoopTH1F(opts.input, 'hMMWjetsBCR_trackIxy')
     newbin = np.linspace(0., 25., 26)
+    newbin = stabin
     hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
-    makeClosureTestMC(lumi = 59.8, name = 'Wjets_MM_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi|_{#mu#mu} > #pi/2', labelA = 'Signal Region: |#Delta#Phi|_{ee} < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannelV2', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'W+jets Control Region', rmax = 3.0)
+    makeClosureTestMC(lumi = 59.8, name = 'Wjets_MM_2018', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'W+jets Control Region', rmax = 3.0)
+
+    hBKG_A = tree_EE2018.getLoopTH1F(opts.input, 'hEEWjetsSRTight_trackIxy')
+    hBKG_B = tree_EE2018.getLoopTH1F(opts.input, 'hEEWjetsBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = 59.8, name = 'Wjets_EE_2018_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EE2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'W+jets Control Region', rmax = 3.0)
+
+    hBKG_A = tree_MM2018.getLoopTH1F(opts.input, 'hMMWjetsSRTight_trackIxy')
+    hBKG_B = tree_MM2018.getLoopTH1F(opts.input, 'hMMWjetsBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = 59.8, name = 'Wjets_MM_2018_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'W+jets Control Region', rmax = 3.0)
+
+    """
+
+    """
+    tree_EEFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016_noHIPM + DoubleEG2017 + DoubleEG2018, 'DATA'), name = 'DATA', isdata = 1 )
+
+    hBKG_A = tree_EEFull.getLoopTH1F(opts.input, 'hEEWjetsSR_trackIxy')
+    hBKG_B = tree_EEFull.getLoopTH1F(opts.input, 'hEEWjetsBCR_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = 117, name = 'Wjets_EE_Full', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EEFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'W+jets Control Region', rmax = 3.0)
+
+    hBKG_A = tree_EEFull.getLoopTH1F(opts.input, 'hEEWjetsSRTight_trackIxy')
+    hBKG_B = tree_EEFull.getLoopTH1F(opts.input, 'hEEWjetsBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = 117, name = 'Wjets_EE_Full_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EEFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'W+jets Control Region', rmax = 3.0)
 
 
+    hBKG_A = tree_EEFull.getLoopTH1F(opts.input, 'hEEQCDSR_trackIxy')
+    hBKG_B = tree_EEFull.getLoopTH1F(opts.input, 'hEEQCDBCR_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = 117, name = 'QCD_EE_Full', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EEFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'QCD Control Region', rmax = 3.0)
+
+    hBKG_A = tree_EEFull.getLoopTH1F(opts.input, 'hEEQCDSRTight_trackIxy')
+    hBKG_B = tree_EEFull.getLoopTH1F(opts.input, 'hEEQCDBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = 117, name = 'QCD_EE_Full_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EEFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'QCD Control Region', rmax = 3.0)
 
 
+    tree_MMFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016_noHIPM + DoubleMuon2016_HIPM + DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1 )
+
+    hBKG_A = tree_MMFull.getLoopTH1F(opts.input, 'hMMWjetsSR_trackIxy')
+    hBKG_B = tree_MMFull.getLoopTH1F(opts.input, 'hMMWjetsBCR_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = 96, name = 'Wjets_MM_Full', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MMFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'W+jets Control Region', rmax = 3.0)
+
+    hBKG_A = tree_MMFull.getLoopTH1F(opts.input, 'hMMWjetsSRTight_trackIxy')
+    hBKG_B = tree_MMFull.getLoopTH1F(opts.input, 'hMMWjetsBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = 96, name = 'Wjets_MM_Full_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MMFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'W+jets Control Region', rmax = 3.0)
 
 
+    hBKG_A = tree_MMFull.getLoopTH1F(opts.input, 'hMMQCDSR_trackIxy')
+    hBKG_B = tree_MMFull.getLoopTH1F(opts.input, 'hMMQCDBCR_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = 96, name = 'QCD_MM_Full', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MMFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > #pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/2', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'QCD Control Region', rmax = 3.0)
+
+    hBKG_A = tree_MMFull.getLoopTH1F(opts.input, 'hMMQCDSRTight_trackIxy')
+    hBKG_B = tree_MMFull.getLoopTH1F(opts.input, 'hMMQCDBCRTight_trackIxy')
+    newbin = np.linspace(0., 25., 26)
+    newbin = stabin
+    hBKG_A_rebin = hBKG_A.Rebin(len(newbin)-1, 'hBKG_A_rebin', newbin)
+    hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
+    makeClosureTestMC(lumi = 96, name = 'QCD_MM_Full_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MMFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'QCD Control Region', rmax = 3.0)
+
+    """
 
