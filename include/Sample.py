@@ -540,6 +540,11 @@ class Tree:
      # Sample <----> Cluster with x jobs (x = number of TTrees per sample)
      # 
 
+     ## Create identifier to be able to launch multiple tasks at the same time
+     # (otherwise they will overwritte)
+     idcode = os.popen("date +%H%M").read()
+     idcode = idcode.replace('\n', '')
+     idcode = '_' + idcode
 
      outdir = outdir + '/' if outdir[-1] != '/' else outdir # outdir correction
 
@@ -595,17 +600,18 @@ queue {3}
 
            #print(scommand)
 
+
            ## Bash file
-           if not os.path.exists(absdir + 'bash/'): os.makedirs(absdir + 'bash/')
-           _bashname = absdir + 'bash/' + 'bash_{0}_{1}_{2}_{3}.sh'.format(self.name, b.name, s.name, str(t))
+           if not os.path.exists(absdir + 'bash' + idcode + '/'): os.makedirs(absdir + 'bash' + idcode + '/')
+           _bashname = absdir + 'bash' + idcode + '/' + 'bash_{0}_{1}_{2}_{3}.sh'.format(self.name, b.name, s.name, str(t))
            _bashfile = open(_bashname, 'w')
            _bashfile.write(bashfile.format(scommand))
            _bashfile.close()
 
          ## Submission file
-         if not os.path.exists(absdir + 'sub/'): os.makedirs(absdir + 'sub/')
-         _subname = absdir + 'sub/' +'sub_{0}_{1}_{2}.sh'.format(self.name, b.name, s.name)
-         _bashtemplate = absdir + 'bash/' + 'bash_{0}_{1}_{2}_$(ProcId).sh'.format(self.name, b.name, s.name)
+         if not os.path.exists(absdir + 'sub' + idcode + '/'): os.makedirs(absdir + 'sub' + idcode + '/')
+         _subname = absdir + 'sub' + idcode + '/' +'sub_{0}_{1}_{2}.sh'.format(self.name, b.name, s.name)
+         _bashtemplate = absdir + 'bash' + idcode + '/' + 'bash_{0}_{1}_{2}_$(ProcId).sh'.format(self.name, b.name, s.name)
          _subfile = open(_subname, 'w')
          _subtext = subfile.format(_bashtemplate, outdir + '{0}_{1}_{2}_$(ProcId)'.format(self.name, b.name, s.name, str(t)), str(len(s.ttrees)))
          _subfile.write(_subtext)
@@ -614,7 +620,7 @@ queue {3}
          ## Launch and clear
          os.system('chmod +x ' + _bashname)
          os.system('chmod +x ' + _subname)
-         os.system('condor_submit ' + _subname + ' -batch-name ' + s.name)
+         os.system('condor_submit ' + _subname + ' -batch-name ' + s.name + idcode)
          #os.system('rm ' + _subname)
 
 
