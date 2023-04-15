@@ -64,7 +64,7 @@ Data     r.kBlack     DoubleEG_Run2017D            Data     /eos/user/f/fernance
 Data     r.kBlack     DoubleEG_Run2017E            Data     /eos/user/f/fernance/LLP_Analysis/UL/2017/EG_Run2017E/      1    1
 Data     r.kBlack     DoubleEG_Run2017F            Data     /eos/user/f/fernance/LLP_Analysis/UL/2017/EG_Run2017F/      1    1
 ###########################################################################
-Data     r.kBlack     EGamma_Run2018A            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/EGamma_A/      1    1
+Data     r.kBlack     EGamma_Run2018A            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/EGamma_A_red/      1    1
 Data     r.kBlack     EGamma_Run2018B            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/EGamma_B/      1    1
 Data     r.kBlack     EGamma_Run2018C            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/EGamma_C/      1    1
 Data     r.kBlack     EGamma_Run2018D            Data     /eos/user/f/fernance/LLP_Analysis/UL/2018/EGamma_D/      1    1
