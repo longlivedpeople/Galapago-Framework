@@ -94,17 +94,18 @@ class processHandler:
 
         ### Reco + ID SFs
         if '2016' in year:
-            self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2016_Fall22.root")
+            self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2016_Spring23.root")
+            #self.file_sf_ee_reco = r.TFile("/afs/cern.ch/work/f/fernance/private/MuonPOG/CMSSW_10_6_18/src/Cosmics-development/spark_tnp/generalTrackRECO_Spring23version_2016_timeVar/efficiencies/muon/generalTracks/Cosmics/Run2016/NUM_genTracksDown_DEN_tagsInTime/NUM_genTracksDown_DEN_tagsInTime_absdxy_2d_absdz_2d.root")
             self.sf_ee_reco = self.file_sf_ee_reco.Get("NUM_genTracksDown_DEN_tagsInTime_absdxy_2d_absdz_2d")
             self.file_sf_mm_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Muon_ScaleFactors_2016_Fall22.root")
             self.sf_mm_reco = self.file_sf_mm_reco.Get("NUM_dGlobalsUp_DEN_dGlobalsDown_absdxy_2d_absdz_2d")
             self.file_sf_mm_id = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/MuonID_ScaleFactors_2016_Fall22.root")
             self.sf_mm_id = self.file_sf_mm_id.Get("NUM_dGlobalID_DEN_dGlobalsUp_absdxy_2d_absdz_2d")
         elif '2017' in year:
-            self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2017_Fall22.root")
+            self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2017_Spring23.root")
             self.sf_ee_reco = self.file_sf_ee_reco.Get("NUM_genTracksDown_DEN_tagsInTime_absdxy_2d_absdz_2d")
         elif '2018' in year:
-            self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2018_Fall22.root")
+            self.file_sf_ee_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Electron_ScaleFactors_2018_Spring23.root")
             self.sf_ee_reco = self.file_sf_ee_reco.Get("NUM_genTracksDown_DEN_tagsInTime_absdxy_2d_absdz_2d")
             self.file_sf_mm_reco = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Muon_ScaleFactors_2018_Fall22.root")
             self.sf_mm_reco = self.file_sf_mm_reco.Get("NUM_dGlobalsUp_DEN_dGlobalsDown_absdxy_2d_absdz_2d")
@@ -112,14 +113,27 @@ class processHandler:
             self.sf_mm_id = self.file_sf_mm_id.Get("NUM_dGlobalID_DEN_dGlobalsUp_absdxy_2d_absdz_2d")
 
         ### Trigger
-        self.file_sf_ee_trg = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/PhotonTrigger_ScaleFactors_"+year+"_Winter23.root")
-        self.sf_ee_trg = self.file_sf_ee_trg.Get("ScaleFactor_pt2_pt")
+        #self.file_sf_ee_trg = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/PhotonTrigger_ScaleFactors_"+year+"_Winter23.root")
+        self.file_sf_ee_trg = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/ScaleFactors_PhotonTrigger_Spring23.root")
+        if '2016APV' == year or '2016' == year:
+            self.sf_ee_trg = self.file_sf_ee_trg.Get("SF_subleadingEt_2016")
+        elif '2017' == year:
+            self.sf_ee_trg = self.file_sf_ee_trg.Get("SF_subleadingEt_2017")
+        elif '2018' == year:
+            self.sf_ee_trg = self.file_sf_ee_trg.Get("SF_subleadingEt_2018")
         if year != '2017':
-            self.file_sf_mm_trg = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/MuonTrigger_ScaleFactors_"+year+"_Winter23.root")
+            #self.file_sf_mm_trg = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/MuonTrigger_ScaleFactors_"+year+"_Winter23.root")
+            self.file_sf_mm_trg = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/ScaleFactors_MuonTrigger_Spring23.root")
             self.sf_mm_trg = self.file_sf_mm_trg.Get("ScaleFactor_pt2_pt")
+            if year == '2016APV':
+                self.sf_mm_trg = self.file_sf_mm_trg.Get("SF_subleadingPt_2016APV")
+            elif year == '2016':
+                self.sf_mm_trg = self.file_sf_mm_trg.Get("SF_subleadingPt_2016")
+            elif year == '2018':
+                self.sf_mm_trg = self.file_sf_mm_trg.Get("SF_subleadingPt_2018")
 
         ### Isolation
-        self.file_sf_iso = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Isolation_ScaleFactors_Winter23.root")
+        self.file_sf_iso = r.TFile("/eos/user/f/fernance/LLP_Analysis/calibration/Isolation_ScaleFactors_Spring23.root")
         if '2016APV' == year:
             self.sf_mm_iso = self.file_sf_iso.Get("SF_Iso_DMDM_2016APV")
             self.sf_ee_iso = self.file_sf_iso.Get("SF_Iso_EE_2016APV")
@@ -142,8 +156,10 @@ class processHandler:
     def getWeight(self, ev, isData):
 
         if not self.isdata:
-            weight = self.lumiweight*ev.wPU*ev.genWeight/abs(ev.genWeight)
-            #weight = self.lumiweight*ev.wPU*ev.genWeight/abs(ev.genWeight)*4 # Solo para re-scaling
+            if 'rescaling' in self.config.keys():
+                weight = self.lumiweight*ev.wPU*ev.genWeight/abs(ev.genWeight)*self.config["rescaling"][self.year]
+            else:
+                weight = self.lumiweight*ev.wPU*ev.genWeight/abs(ev.genWeight)
         else: 
             weight = 1.
 
@@ -180,9 +196,12 @@ class processHandler:
             sf = sf * self.sf_mm_id.GetBinContent(bx1, by1)*self.sf_mm_id.GetBinContent(bx2, by2)
 
         ### Trigger
+        #bx = self.sf_mm_trg.GetXaxis().FindBin(ev.DMDM_subleadingPt[idx])
+        #by = self.sf_mm_trg.GetYaxis().FindBin(ev.DMDM_leadingPt[idx])
+        #sf = sf * self.sf_mm_trg.GetBinContent(bx, by)
+        #print(self.sf_mm_trg.GetBinContent(bx, by))
         bx = self.sf_mm_trg.GetXaxis().FindBin(ev.DMDM_subleadingPt[idx])
-        by = self.sf_mm_trg.GetYaxis().FindBin(ev.DMDM_leadingPt[idx])
-        sf = sf * self.sf_mm_trg.GetBinContent(bx, by)
+        sf = sf * self.sf_mm_trg.GetBinContent(bx)
 
         ### Isolation
         passes_A = ev.DGM_relPFiso[ev.DMDM_idxA[idx]] < 0.2
@@ -224,10 +243,19 @@ class processHandler:
             by2 = self.sf_ee_reco.GetYaxis().FindBin(abs(ev.IsoTrackSel_dz[ev.ElectronCandidate_isotrackIdx[ev.EE_idxB[i]]]))
             sf = sf * self.sf_ee_reco.GetBinContent(bx1, by1)*self.sf_ee_reco.GetBinContent(bx2, by2)
 
+        #print("RECO", self.sf_ee_reco.GetBinContent(bx1, by1)*self.sf_ee_reco.GetBinContent(bx2, by2))
+
         ### Trigger
+        trgc = {}
+        trgc['2016APV'] = 0.935
+        trgc['2016'] = 0.935
+        trgc['2017'] = 0.979
+        trgc['2018'] = 1.00 # To be checked
         bx = self.sf_ee_trg.GetXaxis().FindBin(ev.EE_subleadingEt[idx])
-        by = self.sf_ee_trg.GetYaxis().FindBin(ev.EE_leadingEt[idx])
-        sf = sf * self.sf_ee_trg.GetBinContent(bx, by)
+        #sf = sf * self.sf_ee_trg.GetBinContent(bx, by)
+        sf = sf * self.sf_ee_trg.GetBinContent(bx)
+        #sf = sf * trgc[self.year]
+        #print("TRG", self.sf_ee_trg.GetBinContent(bx, by))
 
         ### Isolation
         passes_A = ev.ElectronCandidate_relTrkiso[ev.EE_idxA[idx]] < 0.1
@@ -249,12 +277,17 @@ class processHandler:
         if passes_A:
             bxA = self.sf_ee_iso.GetXaxis().FindBin(abs(ev.ElectronCandidate_et[ev.EE_idxA[idx]]))
             if bxA < 7: bxA = 7
+            if bxA > self.sf_ee_iso.GetNbinsX(): bxA = self.sf_ee_iso.GetNbinsX()
             wiso_A = self.sf_ee_iso.GetBinContent(bxA)
         if passes_B:
             bxB = self.sf_ee_iso.GetXaxis().FindBin(abs(ev.ElectronCandidate_et[ev.EE_idxB[idx]]))
             if bxB < 7: bxB = 7
+            if bxB > self.sf_ee_iso.GetNbinsX(): bxB = self.sf_ee_iso.GetNbinsX()
             wiso_B = self.sf_ee_iso.GetBinContent(bxB)
         sf = sf * wiso_A*wiso_B
+        #print("ISO", wiso_A*wiso_B)
+        #print("ISOA", ev.ElectronCandidate_et[ev.EE_idxA[idx]], abs(ev.ElectronCandidate_et[ev.EE_idxA[idx]]), wiso_A)
+        #print("ISOB", ev.ElectronCandidate_et[ev.EE_idxB[idx]], abs(ev.ElectronCandidate_et[ev.EE_idxB[idx]]), wiso_B)
 
         # Track to SC correction
         TRKSC_corr = 1.0

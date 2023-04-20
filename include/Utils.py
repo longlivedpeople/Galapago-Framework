@@ -24,6 +24,527 @@ import helper as helper
 import Canvas as Canvas
 import CutManager as CutManager
 
+#### Cross sections of the models
+XSECS = {}
+
+XSECS['HSS(1000,450,10000)'] = 0.107e3
+XSECS['HSS(1000,450,1000)'] = 0.107e3
+XSECS['HSS(1000,450,100)'] = 0.107e3
+XSECS['HSS(1000,450,10)'] = 0.107e3
+XSECS['HSS(1000,450,1)'] = 0.107e3
+XSECS['HSS(1000,350,10000)'] = 0.107e3
+XSECS['HSS(1000,350,1000)'] = 0.107e3
+XSECS['HSS(1000,350,100)'] = 0.107e3
+XSECS['HSS(1000,350,10)'] = 0.107e3
+XSECS['HSS(1000,350,1)'] = 0.107e3
+XSECS['HSS(1000,250,10000)'] = 0.107e3
+XSECS['HSS(1000,250,1000)'] = 0.107e3
+XSECS['HSS(1000,250,100)'] = 0.107e3
+XSECS['HSS(1000,250,10)'] = 0.107e3
+XSECS['HSS(1000,250,1)'] = 0.107e3
+XSECS['HSS(1000,150,10000)'] = 0.107e3
+XSECS['HSS(1000,150,1000)'] = 0.107e3
+XSECS['HSS(1000,150,100)'] = 0.107e3
+XSECS['HSS(1000,150,10)'] = 0.107e3
+XSECS['HSS(1000,150,1)'] = 0.107e3
+XSECS['HSS(1000,50,10000)'] = 0.107e3
+XSECS['HSS(1000,50,1000)'] = 0.107e3
+XSECS['HSS(1000,50,100)'] = 0.107e3
+XSECS['HSS(1000,50,10)'] = 0.107e3
+XSECS['HSS(1000,50,1)'] = 0.107e3
+
+XSECS['HSS(800,350,10000)'] = 0.3025e3
+XSECS['HSS(800,350,1000)'] = 0.3025e3
+XSECS['HSS(800,350,100)'] = 0.3025e3
+XSECS['HSS(800,350,10)'] = 0.3025e3
+XSECS['HSS(800,350,1)'] = 0.3025e3
+XSECS['HSS(800,250,10000)'] = 0.3025e3
+XSECS['HSS(800,250,1000)'] = 0.3025e3
+XSECS['HSS(800,250,100)'] = 0.3025e3
+XSECS['HSS(800,250,10)'] = 0.3025e3
+XSECS['HSS(800,250,1)'] = 0.3025e3
+XSECS['HSS(800,150,10000)'] = 0.3025e3
+XSECS['HSS(800,150,1000)'] = 0.3025e3
+XSECS['HSS(800,150,100)'] = 0.3025e3
+XSECS['HSS(800,150,10)'] = 0.3025e3
+XSECS['HSS(800,150,1)'] = 0.3025e3
+XSECS['HSS(800,50,10000)'] = 0.3025e3
+XSECS['HSS(800,50,1000)'] = 0.3025e3
+XSECS['HSS(800,50,100)'] = 0.3025e3
+XSECS['HSS(800,50,10)'] = 0.3025e3
+XSECS['HSS(800,50,1)'] = 0.3025e3
+
+XSECS['HSS(600,250,10000)'] = 1.17846e3
+XSECS['HSS(600,250,1000)'] = 1.17846e3
+XSECS['HSS(600,250,100)'] = 1.17846e3
+XSECS['HSS(600,250,10)'] = 1.17846e3
+XSECS['HSS(600,250,1)'] = 1.17846e3
+XSECS['HSS(600,150,10000)'] = 1.17846e3
+XSECS['HSS(600,150,1000)'] = 1.17846e3
+XSECS['HSS(600,150,100)'] = 1.17846e3
+XSECS['HSS(600,150,10)'] = 1.17846e3
+XSECS['HSS(600,150,1)'] = 1.17846e3
+XSECS['HSS(600,50,10000)'] = 1.17846e3
+XSECS['HSS(600,50,1000)'] = 1.17846e3
+XSECS['HSS(600,50,100)'] = 1.17846e3
+XSECS['HSS(600,50,10)'] = 1.17846e3
+XSECS['HSS(600,50,1)'] = 1.17846e3
+
+XSECS['HSS(500,150,10000)'] = 2.5884e3
+XSECS['HSS(500,150,1000)'] = 2.5884e3
+XSECS['HSS(500,150,100)'] = 2.5884e3
+XSECS['HSS(500,150,10)'] = 2.5884e3
+XSECS['HSS(500,150,1)'] = 2.5884e3
+XSECS['HSS(500,50,10000)'] = 2.5884e3
+XSECS['HSS(500,50,1000)'] = 2.5884e3
+XSECS['HSS(500,50,100)'] = 2.5884e3
+XSECS['HSS(500,50,10)'] = 2.5884e3
+XSECS['HSS(500,50,1)'] = 2.5884e3
+
+XSECS['HSS(400,150,10000)'] = 5.0403e3
+XSECS['HSS(400,150,1000)'] = 5.0403e3
+XSECS['HSS(400,150,100)'] = 5.0403e3
+XSECS['HSS(400,150,10)'] = 5.0403e3
+XSECS['HSS(400,150,1)'] = 5.0403e3
+XSECS['HSS(400,50,10000)'] = 5.0403e3
+XSECS['HSS(400,50,1000)'] = 5.0403e3
+XSECS['HSS(400,50,100)'] = 5.0403e3
+XSECS['HSS(400,50,10)'] = 5.0403e3
+XSECS['HSS(400,50,1)'] = 5.0403e3
+
+XSECS['HSS(300,50,10000)']  = 4.93829e3
+XSECS['HSS(300,50,1000)']  = 4.93829e3
+XSECS['HSS(300,50,100)']  = 4.93829e3
+XSECS['HSS(300,50,10)']  = 4.93829e3
+XSECS['HSS(300,50,1)']  = 4.93829e3
+
+XSECS['HSS(125,50,10000)']  = 21.459897e3
+XSECS['HSS(125,50,1000)']  = 21.459897e3
+XSECS['HSS(125,50,100)']  = 21.459897e3
+XSECS['HSS(125,50,10)']  = 21.459897e3
+XSECS['HSS(125,50,1)']  = 21.459897e3
+
+XSECS['RPV(1500,494,10000)'] = 0.67
+XSECS['RPV(1500,494,1000)'] = 0.67
+XSECS['RPV(1500,494,100)'] = 0.67
+XSECS['RPV(1500,494,10)'] = 0.67
+XSECS['RPV(1500,494,1)'] = 0.67
+
+XSECS['RPV(350,148,10000)'] = 10e3
+XSECS['RPV(350,148,1000)'] = 10e3
+XSECS['RPV(350,148,100)'] = 10e3
+XSECS['RPV(350,148,10)'] = 10e3
+XSECS['RPV(350,148,1)'] = 10e3
+
+
+
+def makeClosureTest(lumi, name, hBKG_A, hBKG_B, ylog, tree, inputdir, labelA = 'A', labelB = 'B', xlabel = '', outpath = '', sys = 0.1, yshift = 0.0, LLlabel = '', DATAlabel = '', extralabel = '', rmin = 0.0, rmax = 2.0):
+
+    ### Get histograms
+    luminosity = lumi
+
+    ### Initialize cumulative histograms
+    cumA = hBKG_A.Clone('cumA')
+    cumB = hBKG_B.Clone('cumB')
+    cumA.Reset()
+    cumB.Reset()
+
+    #cumA = r.TH1F('cumA', '', hBKG_A.GetNbinsX(), hBKG_A.GetXaxis().GetXmin(), hBKG_A.GetXaxis().GetXmax())
+    #cumB = r.TH1F('cumB', '', hBKG_B.GetNbinsX(), hBKG_B.GetXaxis().GetXmin(), hBKG_B.GetXaxis().GetXmax())
+    cumA.SetTitle(';min('+xlabel+');Number of events with '+xlabel+ ' > ('+xlabel+')_{min}')
+
+    ### Set cumulative values
+    for n in range(1, hBKG_A.GetNbinsX() + 1):
+        valA = 0.0
+        errA = 0.0
+        valB = 0.0
+        errB = 0.0
+        for j in range(n, hBKG_A.GetNbinsX() + 1):
+            valA = valA + hBKG_A.GetBinContent(j)
+            errA = errA + hBKG_A.GetBinError(j)
+            valB = valB + hBKG_B.GetBinContent(j)
+            errB = errB + hBKG_B.GetBinError(j)
+        cumA.SetBinContent(n, valA)
+        cumA.SetBinError(n, errA)
+        cumB.SetBinContent(n, valB)
+        cumB.SetBinError(n, errB)
+
+    ### Histogram tuning 
+    cumA.SetMarkerStyle(20)
+    cumA.SetMarkerSize(1)
+    cumA.SetMarkerColor(r.kBlue)
+    cumA.SetLineWidth(2)
+    cumA.GetYaxis().SetTitleOffset(1.3)
+    cumB.SetMarkerStyle(25)
+    cumB.SetMarkerSize(1)
+    cumB.SetLineWidth(2)
+    cumB.SetMarkerColor(r.kRed)
+    hBKG_A.SetMarkerStyle(20)
+    hBKG_A.SetMarkerSize(1)
+    hBKG_A.SetLineWidth(2)
+    hBKG_A.SetMarkerColor(r.kBlue)
+    hBKG_B.SetMarkerStyle(25)
+    hBKG_B.SetMarkerSize(1)
+    hBKG_B.SetLineWidth(2)
+    hBKG_B.SetMarkerColor(r.kRed)
+
+
+    ### Get maximum
+    maxValA = cumA.GetMaximum()
+    maxValB = cumB.GetMaximum()
+    maxVal = max(maxValA, maxValB)
+
+    ### Set Maximum
+    if not ylog:
+        cumA.SetMaximum(1.3*maxVal)
+        cumB.SetMaximum(1.3*maxVal)
+    else:
+        cumA.SetMaximum(100.0*maxVal)
+        cumB.SetMaximum(100.0*maxVal)
+        cumA.SetMinimum(0.1)
+        cumB.SetMaximum(0.1)
+
+    ### Get maximum
+    maxValA = hBKG_A.GetMaximum()
+    maxValB = hBKG_B.GetMaximum()
+    maxVal = max(maxValA, maxValB)
+
+    ### Set Maximum
+    if not ylog:
+        hBKG_A.SetMaximum(1.3*maxVal)
+        hBKG_B.SetMaximum(1.3*maxVal)
+    else:
+        hBKG_A.SetMaximum(100.0*maxVal)
+        hBKG_B.SetMaximum(100.0*maxVal)
+        hBKG_A.SetMinimum(0.1)
+        hBKG_B.SetMaximum(0.1)
+
+    ## Systematic bar
+    hsys = False
+    if sys:
+        hsys = hBKG_A.Clone("sys_up")
+        hsys.Reset()
+        for n in range(1, hBKG_A.GetNbinsX() +1):
+            hsys.SetBinContent(n, 1.0 )
+            hsys.SetBinError(n, sys)
+
+    ### Canvas object
+    plot = Canvas.Canvas('closuretest_'+name, 'png,pdf', 0.45, 0.66, 0.65, 0.78, 1)
+    plot.addHisto(cumA, 'P', labelA, 'p', r.kBlue, 1, 0)
+    plot.addHisto(cumB, 'P, SAME', labelB, 'p', r.kRed, 1, 1)
+
+    ### Channel banner:
+    if LLlabel == 'EE':
+        plot.addLatex(0.17, 0.75, 'Dielectron vertices', font = 42)
+    if LLlabel == 'MM':
+        plot.addLatex(0.17, 0.75, 'Dimuon vertices', font = 42)
+
+    plot.addLatex(0.85, 0.56, 'Tail cumulative of x = #int^{#infty}_{x_{min}} N(x) dx', font = 42, align = 31)
+    plot.addLatex(0.17, 0.81, extralabel, font = 42, align = 11, size = 0.045)
+    plot.addLatex(0.9, 0.88, DATAlabel, font = 42, align = 31, size = 0.045)
+
+    ### Save it
+    #outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/ClosureTests_' + outtag + '/'
+    outdir = outpath + '/'
+    plot.saveRatio(1, tree.isData, ylog, luminosity, cumA, cumB, r_ymin = rmin, r_ymax = rmax, label="SR/BCR", hsys = hsys, outputDir = outdir, inProgress = True)
+
+    ### Main comparison
+    cplot = Canvas.Canvas('plaincomparison_'+name, 'png,pdf', 0.45, 0.66, 0.65, 0.78, 1)
+    cplot.addHisto(hBKG_A, 'P', labelA, 'p', r.kBlue, 1, 0)
+    cplot.addHisto(hBKG_B, 'P, SAME', labelB, 'p', r.kRed, 1, 1)
+    if LLlabel == 'EE':
+        cplot.addLatex(0.17, 0.75, 'Dielectron vertices', font = 42)
+    if LLlabel == 'MM':
+        cplot.addLatex(0.17, 0.75, 'Dimuon vertices', font = 42)
+    cplot.addLatex(0.17, 0.81, extralabel, font = 42, align = 11, size = 0.045)
+    cplot.addLatex(0.9, 0.88, DATAlabel, font = 42, align = 31, size = 0.045)
+    cplot.saveRatio(1, tree.isData, ylog, luminosity, hBKG_A, hBKG_B, label="SR/BCR", hsys = hsys, outputDir = outdir, inProgress = True)
+
+
+
+
+#####################
+#####
+###
+###   Function to plot histograms with signal simulation and estimated background
+###   (could accept either data-driven or Monte Carlo)
+###
+###     - Plots are drawn without ratio nor data in signal region (by the moment)
+###     - xsec to normalize the signal given in fb
+###
+#####
+#####################
+
+
+def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI, treeBKG = False, treeBKGlabel = '', rebin = False, lines = [], line_ymax = False, xlabel = '', outtag = '', ymax = 0.0, LLlabel = '', DATAlabel = '', extralabel = '', xsec = False, xlog = False, text = False, outpath = ''):
+
+
+    ### Get histograms
+    luminosity = lumi
+
+    ### Get background estimation from data
+    hbkg_ = treeDATA.getLoopTH1F(inputdir, hname_bkg)
+
+    ### Get background estimation from simulation
+    if treeBKG:
+        hbkgsim_ = treeBKG.getLoopTH1F(inputdir, hname_SI)
+
+    ### rebinins:
+    if type(rebin) != bool:
+        if type(rebin) == int:
+            hbkg = hbkg_.Rebin(rebin)
+            if treeBKG:
+                hbkgsim = hbkgsim_.Rebin(rebin)
+        else:
+            if len(rebin) > 1:
+                hbkg = hbkg_.Rebin(len(rebin)-1, hbkg_.GetName() + '_rebined', rebin)
+                if treeBKG:
+                    hbkgsim = hbkgsim_.Rebin(len(rebin)-1, hbkgsim_.GetName() + '_rebined', rebin)
+    else:
+        hbkg = hbkg_.Clone()
+        if treeBKG:
+            hbkgsim = hbkgsim_.Clone()
+
+    ### Set background histos style
+    hbkg.SetFillColorAlpha(r.kCyan-6, 0.8)
+    hbkg.SetLineColor(r.kCyan-2)
+    hbkg.GetXaxis().SetTitleSize(0.045)
+    hbkg.GetYaxis().SetTitleSize(0.045)
+
+    if treeBKG:
+        hbkgsim.SetLineColor(r.kBlack)
+        hbkgsim.SetLineStyle(10)
+
+    ### Signal histograms
+    s_histos = []
+
+    hSIS = treeSI.getLoopStack(inputdir, hname_SI)
+    xsecs = [0.107e3, 4.938e3, 2.588e3, 0.67, 10e3] # HARDCODED THIS NEEDS TO CHANGE
+
+    for _i, _h in enumerate(hSIS.GetHists()):
+
+        if type(rebin) != bool:
+            if type(rebin) == int:
+                _h2 = _h.Rebin(rebin)
+            else:
+                if len(rebin) > 1:
+                    _h2 = _h.Rebin(len(rebin)-1, hbkg_.GetName() + '_rebined', rebin)
+        else:
+            _h2 = _h.Clone()
+
+        s_histos.append(copy.deepcopy(_h2))
+        print(_h2.GetName(), xsecs[_i])
+        s_histos[-1].Scale(XSECS[_h2.GetTitle()])
+
+
+    ### Get maximum
+    maxValbkg = hbkg.GetMaximum()
+    maxValSI = max([s_histos[i].GetMaximum() for i in range(0, len(s_histos))])
+    maxVal = max([maxValSI, maxValbkg])
+
+    ### Set Maximum
+    if not ylog:
+        hbkg.SetMaximum(1.3*maxVal)
+    else:
+        hbkg.SetMaximum(100.0*maxVal)
+        hbkg.SetMinimum(0.1)
+
+    if ymax: hbkg.SetMaximum(ymax)
+
+
+    ### Canvas object
+    plot = Canvas.Canvas('Blinded_'+hname_bkg, 'png,pdf', 0.15, 0.65, 0.45, 0.89, 1, lsize = 0.03)
+    if text:
+        plot.addHisto(hbkg, 'HIST, TEXT', 'Background (predicted)', 'f', '', 1, 0)
+    else:
+        plot.addHisto(hbkg, 'HIST', 'Background (predicted)', 'f', '', 1, 0)
+
+    ### Add signals:
+    colors = [r.kRed, r.kOrange, r.kGreen+2, r.kBlue, r.kMagenta]
+    for i,_h in enumerate(s_histos):
+
+        _h.SetLineWidth(2) # provisional
+        masses = eval(_h.GetTitle()[3:])
+        if 'HSS' in _h.GetTitle():
+            legend = 'H#rightarrowSS (%d GeV, %d GeV,%d mm)'%(masses[0], masses[1], masses[2])
+        else:
+            legend = 'RPV (%d GeV, %d GeV,%d mm)'%(masses[0], masses[1], masses[2])
+        if text:
+            plot.addHisto(_h, 'HIST TEXT, SAME', legend, 'l', colors[i], 1, i+1) # Signal
+        else:
+            plot.addHisto(_h, 'HIST, SAME', legend, 'l', colors[i], 1, i+1) # Signal
+
+    if treeBKG:
+        plot.addHisto(hbkgsim, 'HIST, SAME', treeBKGlabel, 'l', '', 1, 2 + len(s_histos)) # Signal
+
+    if LLlabel == 'EE':
+        plot.addLatex(0.7, 0.86, 'e^{+}e^{-} channel', font = 42, size = 0.035)
+    if LLlabel == 'MM':
+        plot.addLatex(0.7, 0.86, '#mu^{+}#mu^{-} channel', font = 42, size = 0.035)
+
+    ## Lines
+    if not line_ymax:
+        line_ymax = hbkg.GetMaximum()
+    for line in lines:
+        plot.addLine(line, hbkg.GetMinimum(), line, line_ymax, r.kBlack, 2)
+
+    if extralabel:
+        plot.addLatex(0.5, 0.6, extralabel, font = 42, align = 22, size = 0.035)
+
+    ### Save it
+    #outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/SRPlots_' + outtag + '/'
+    outdir = outpath + '/SRPlots_' + outtag + '/'
+    plot.save(1, 1, ylog, luminosity, '', outputDir = outdir, xlog = xlog, maxYnumbers = 4, is2d = True, inProgress = True)
+
+
+
+
+########################################################################
+####   Function to compare observed data and predicted data
+#
+#        * Originally developed for background validation tests
+#
+
+
+def makeBackgroundValidationPlot(name, lumi, hname_SR, hname_CR, ylog, treeDATA, inputdir, rebin = False, limit = 0.0, xlabel = '', outpath = False, yshift = 0.0, LLlabel = '', extralabel = '', xlog = False, sys = 0.0):
+
+
+    ### Get histograms
+    luminosity = lumi
+
+    hSR_ = treeDATA.getLoopTH1F(inputdir, hname_SR)
+    hCR_ = treeDATA.getLoopTH1F(inputdir, hname_CR)
+
+    ### rebinins:
+    if type(rebin) != bool and type(rebin) != int:
+        if len(rebin) > 1:
+            hSR = hSR_.Rebin(len(rebin)-1, hSR_.GetName() + '_rebined', rebin)
+            hCR = hCR_.Rebin(len(rebin)-1, hCR_.GetName() + '_rebined', rebin)
+    if type(rebin) == int:
+        hSR = hSR_.Rebin(rebin)
+        hCR = hCR_.Rebin(rebin)
+    else:
+        hSR = hSR_.Clone()
+        hCR = hCR_.Clone()
+
+    ### Blinding limits:
+    if limit:
+        for n in range(1, hSR.GetNbinsX()):
+            if hSR.GetBinLowEdge(n) > limit: hSR.SetBinContent(n, 0.0)
+            #if hCR_.GetBinLowEdge(n) > limit: hCR_.SetBinContent(n, 0.0)
+
+    hCR.SetFillColorAlpha(r.kCyan-6, 0.8)
+    #hCR.SetLineColor(r.kCyan-6) 
+    hCR.SetLineWidth(0)
+    hSR.SetMarkerStyle(20)
+    hSR.SetMarkerSize(0.8)
+    hSR.SetMarkerColor(r.kBlack)
+    hSR.SetLineColor(r.kBlack)
+    hSR.SetLineWidth(2)
+    hCR.GetXaxis().SetTitleSize(0.045)
+    hSR.GetXaxis().SetTitleSize(0.045)
+    hCR.GetYaxis().SetTitleSize(0.045)
+    hSR.GetYaxis().SetTitleSize(0.045)
+
+    ### Get maximum
+    maxValSR = hSR.GetMaximum()
+    maxValCR = hCR.GetMaximum()
+    maxVal = max([maxValSR, maxValCR])
+
+    ### Set Maximum
+    if not ylog:
+        hCR.SetMaximum(1.3*maxVal)
+    else:
+        hCR.SetMaximum(100.0*maxVal)
+        hCR.SetMinimum(0.1)
+
+    ## Systematic bar
+    hsys = False
+    if sys:
+        hsys = hSR.Clone("sys_up")
+        hsys.Reset()
+        for n in range(1, hSR.GetNbinsX() +1):
+            hsys.SetBinContent(n, 1.0 )
+            hsys.SetBinError(n, sys)
+
+    ### Canvas object
+    plot = Canvas.Canvas('BKGVal_'+name, 'png,pdf', 0.51, 0.65, 0.7, 0.77, 1)
+    plot.addHisto(hCR, 'HIST', 'Background (Data-driven)', 'f', '', 1, 0)
+    plot.addHisto(hSR, 'P, SAME', 'Data', 'p', '', 1, 1)
+    plot.addLatex(0.17, 0.8, extralabel, font = 42)
+
+    ### Channel banner:
+    if LLlabel == 'EE':
+        plot.addLatex(0.17, 0.74, 'Dielectron channel', font = 42)
+    if LLlabel == 'MM':
+        plot.addLatex(0.17, 0.74, 'Dimuon channel', font = 42)
+
+
+    ### Save it
+    if not outpath:
+        outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/BKGValidation/'
+    else:
+        outdir = outpath
+    plot.saveRatio(1, 1, ylog, luminosity, hSR, hCR, r_ymin = 0.0, r_ymax = 2.0, label="Obs./Pred.", hsys = hsys, outputDir = outdir, xlog = xlog, inProgress = True)
+
+
+
+
+########################################################################
+####   Function to compare two histograms in the same Galapago Tree
+#
+#        * Originally developed for symmetry tests
+#
+
+def makeAgreementTest(lumi, hname1, hname2, ylog, tree, inputdir, label1, label2, labela, labelb, name, isData, sys = False, xlabel = '', outtag = '', yshift = 0.0, LLlabel = '', rebin = 0, ranges = [], rmin = 0.8, rmax = 1.2, maxY = False, outpath = False):
+
+    ## Get the histogram
+    histo1 = tree.getLoopTH1F(inputdir, hname1, doOF = False)
+    histo2 = tree.getLoopTH1F(inputdir, hname2, doOF = False)
+
+    ## Histogram tunning
+    if rebin:
+        histo1.Rebin(rebin)
+        histo2.Rebin(rebin)
+
+    if len(ranges) > 0:
+        histo1.SetAxisRange(ranges[0], ranges[1], "X")
+        histo2.SetAxisRange(ranges[0], ranges[1], "X")
+        r_xmin = ranges[0]
+        r_xmax = ranges[1]
+    else:
+        r_xmin = 0
+        r_xmax = 0
+
+    histo1.SetMaximum(1.6*histo1.GetMaximum())
+    histo1.SetMinimum(0.0)
+    histo1.SetMarkerStyle(20)
+    histo2.SetMarkerStyle(20)
+
+    ## Systematic bar
+    hsys = False
+    if sys:
+        hsys = histo1.Clone("sys_up")
+        hsys.Reset()
+        for n in range(1, histo1.GetNbinsX() +1):
+            hsys.SetBinContent(n, 1.0 )
+            hsys.SetBinError(n, sys)
+
+    if outpath:
+        outdir = outpath
+    else:
+        outdir = WORKPATH + 'SymmetryResults/'
+
+    plot = Canvas.Canvas(name, 'png,pdf', 0.15, 0.6, 0.45, 0.75, 1, lsize = 0.045)
+    plot.addHisto(histo1, 'P', label1, 'p', r.kBlack, 1, 0)
+    plot.addHisto(histo2, 'P,SAME', label2, 'p', r.kRed, 1, 1)
+    plot.addLatex(0.18, 0.78, labela, font = 42, size = 0.045, align = 11)
+    plot.addLatex(0.9, 0.88, labelb, font = 42, size = 0.045, align = 31)
+    plot.saveRatio(1, isData, 0, str(lumi), histo1, histo2, r_ymin = rmin, r_ymax = rmax, r_xmin = r_xmin, r_xmax = r_xmax, label = 'Ratio', hsys = hsys, xlog = False, outputDir = outdir, maxYnumbers = maxY)
+
+    return
+
+
 ##################################################################################################
 #################
 ####   Function to launch each task to a queue by using Launcher.py

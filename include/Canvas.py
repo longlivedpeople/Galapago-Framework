@@ -63,9 +63,26 @@ class Canvas:
       latexb.SetTextAngle(0);
       latexb.SetTextColor(r.kBlack);
       latexb.SetTextFont(42);
-      latexb.SetTextAlign(31);
+      latexb.SetTextAlign(11);
       latexb.SetTextSize(0.04);            
 
+      if inProgress:
+         if not scy:
+             latexb.DrawLatex(0.26, 0.93, "#it{Work in progress}")
+         else:
+             latexb.DrawLatex(0.35, 0.93, "#it{Work in progress}")
+      elif(isData):
+         if not scy:
+             latexb.DrawLatex(0.26, 0.93, "#it{Preliminary}")
+         else:
+             latexb.DrawLatex(0.35, 0.93, "#it{Preliminary}")
+      else:
+         if not scy:
+             latexb.DrawLatex(0.26, 0.93, "#it{Simulation}")
+         else:
+             latexb.DrawLatex(0.35, 0.93, "#it{Simulation}")
+
+      """
       if(isData):
          if not scy:
              latexb.DrawLatex(0.43, 0.93, "#it{Preliminary}")
@@ -82,6 +99,7 @@ class Canvas:
                  latexb.DrawLatex(0.54, 0.93, "#it{Work in progress}")
              else:
                  latexb.DrawLatex(0.63, 0.93, "#it{Work in progress}")
+      """
 
       text_lumi = ''
       if lumi: text_lumi = str(lumi)+" fb^{-1}  (13 TeV)"
@@ -115,13 +133,12 @@ class Canvas:
       latexb.SetTextAlign(11);
       latexb.SetTextSize(0.033);            
 
-      if(isData):
-             latexb.DrawLatex(0.17, 0.8, "#it{Preliminary}")
+      if inProgress:
+          latexb.DrawLatex(0.17, 0.8, "#it{Work in progress}")
+      elif(isData):
+          latexb.DrawLatex(0.17, 0.8, "#it{Preliminary}")
       else:
-         if not inProgress:
-             latexb.DrawLatex(0.17, 0.8, "#it{Simulation}")
-         else:
-             latexb.DrawLatex(0.17, 0.8, "#it{Work in progress}")
+          latexb.DrawLatex(0.17, 0.8, "#it{Simulation}")
 
       text_lumi = ''
       if lumi: text_lumi = str(lumi)+" fb^{-1}  (13 TeV)"
@@ -497,7 +514,8 @@ class Canvas:
       pad1.RedrawAxis()
       aux_frame = TLine()
       aux_frame.SetLineWidth(2) 
-      aux_frame.DrawLine(pad1.GetUxmax(), pad1.GetUymin(), pad1.GetUxmax(), maxYAxisValue);
+      #aux_frame.DrawLine(pad1.GetUxmax(), pad1.GetUymin(), pad1.GetUxmax(), maxYAxisValue);
+      aux_frame.DrawLine(pad1.GetUxmax(), pad1.GetUymin(), pad1.GetUxmax(), pad1.GetUymax());
 
 
       if(legend):
@@ -617,7 +635,8 @@ class Canvas:
       pad2.RedrawAxis()
       aux_frame2 = TLine()
       aux_frame2.SetLineWidth(2) 
-      aux_frame2.DrawLine(pad2.GetUxmax(), pad2.GetUymin(), pad2.GetUxmax(), r_ymax);
+      #aux_frame2.DrawLine(pad2.GetUxmax(), pad2.GetUymin(), pad2.GetUxmax(), r_ymax);
+      aux_frame2.DrawLine(pad2.GetUxmax(), pad2.GetUymin(), pad2.GetUxmax(), pad2.GetUymax());
 
       ## Banner
       pad1.cd()
