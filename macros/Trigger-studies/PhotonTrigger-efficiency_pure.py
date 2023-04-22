@@ -18,7 +18,7 @@ for d in WORKPATH.split('/'):
 
 sys.path.insert(0, GALAPAGOPATH)
 
-EOSPATH = '/eos/user/f/fernance/www/DisplacedLeptons-analysis/Trigger-studies/FullComparisons/'
+EOSPATH = '/eos/user/f/fernance/www/DisplacedLeptons-analysis/Trigger-studies/Winter23Pure/'
 
 import include.Canvas as Canvas
 import include.Sample as Sample
@@ -116,9 +116,7 @@ def passedPhotonTrigger(ev, year):
     passed = False
 
     if year == '2016':
-        #passed = ev.HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15 or ev.HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55
-        #passed = ev.HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15
-        passed = ev.HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90
+        passed = ev.HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15
     elif year == '2017':
         passed = ev.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_DoublePhoton70
         #passed = ev.HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_PixelVeto_Mass55
@@ -304,66 +302,50 @@ if __name__ == "__main__":
                 num = 0
                 for e,ev in enumerate(t):
 
-                     if not (ev.nEE > 0):
+                     if not (ev.nEE == 1):
                          continue
 
                      if not passedMETTrigger(ev, year):
                          continue
 
-                     et_values = []
-                     eta_values = []
-                     indexes = []
-                     for i in range(0, ev.nElectronCandidate):
-                         if abs(ev.ElectronCandidate_eta[i]) > 2.:
-                             continue
-                         if ev.ElectronCandidate_relTrkiso[i] > 0.1:
-                             continue
-                         et_values.append(ev.ElectronCandidate_et[i])
-                         eta_values.append(ev.ElectronCandidate_eta[i])
-                         indexes.append(i)
-
-                     if len(et_values) < 2:
+                     if not ev.EE_mass[0] > 15:
                          continue
-
-                     et_eta = zip(et_values, eta_values)
-                     et_idx = zip(et_values, indexes)
-                     et_eta.sort(reverse = True)
-                     et_idx.sort(reverse = True)
-                     et_ord = [x[0] for x in et_eta]
-                     eta_ord = [x[1] for x in et_eta]
-                     idx_ord = [x[1] for x in et_idx]
-
-
-                     el1 = r.TLorentzVector()
-                     el2 = r.TLorentzVector()
-                     el1.SetPtEtaPhiM(ev.ElectronCandidate_et[idx_ord[0]], ev.ElectronCandidate_eta[idx_ord[0]], ev.ElectronCandidate_phi[idx_ord[0]], 0.0)
-                     el2.SetPtEtaPhiM(ev.ElectronCandidate_et[idx_ord[1]], ev.ElectronCandidate_eta[idx_ord[1]], ev.ElectronCandidate_phi[idx_ord[1]], 0.0)
-
-                     if et_values[0] < 40 or et_values[1] < 25:
+                     #if not ev.EE_normalizedChi2[0] < 20:
+                     #    continue
+                     if not abs(ev.ElectronCandidate_eta[ev.EE_idxA[0]]) < 2.0:
                          continue
-                     if (el1+el2).M() < 15.:
+                     if not abs(ev.ElectronCandidate_eta[ev.EE_idxB[0]]) < 2.0:
                          continue
+                     if not ev.EE_leadingEt[0] > 40:
+                         continue
+                     if not ev.EE_subleadingEt[0] > 25:
+                         continue
+                     if not ev.EE_relisoA[0] < 1.:
+                         continue
+                     if not ev.EE_relisoB[0] < 1.:
+                         continue
+                     #if not ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EE_idxA[0]]]*ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EE_idxB[0]]] < 0:
+                     #    continue
 
-
-                     plot['Efficiency_HLT_Full_pt_2d_DATA'].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
-                     plot['Efficiency_HLT_Full_eta_2d_DATA'].Fill(passedPhotonTrigger(ev, year), eta_ord[1], eta_ord[0])
-                     plot['Efficiency_HLT_Full_pt_eta_2d_DATA'].Fill(passedPhotonTrigger(ev, year), et_ord[1], eta_ord[1])
-                     plot['Efficiency_HLT_Full_pt_DATA'].Fill(passedPhotonTrigger(ev, year), et_ord[1])
-                     plot['Efficiency_HLT_Full_mass_DATA'].Fill(passedPhotonTrigger(ev, year), (el1+el2).M())
-                     
-                     plot['PassMET_pt2_pt1_DATA'].Fill(et_ord[1], et_ord[0])
-                     plot['PassMET_pt2_DATA'].Fill(et_ord[1])
+                     plot['PassMET_pt2_pt1_DATA'].Fill(ev.EE_subleadingEt[0], ev.EE_leadingEt[0])
+                     plot['PassMET_pt2_DATA'].Fill(ev.EE_subleadingEt[0])
                      if passedPhotonTrigger(ev, year):
-                         plot['PassTRG_pt2_pt1_DATA'].Fill(et_ord[1], et_ord[0])
-                         plot['PassTRG_pt2_DATA'].Fill(et_ord[1])
+                         plot['PassTRG_pt2_pt1_DATA'].Fill(ev.EE_subleadingEt[0], ev.EE_leadingEt[0])
+                         plot['PassTRG_pt2_DATA'].Fill(ev.EE_subleadingEt[0])
 
+
+                     plot['Efficiency_HLT_Full_pt_2d_DATA'].Fill(passedPhotonTrigger(ev, year), ev.EE_subleadingEt[0], ev.EE_leadingEt[0])
+                     plot['Efficiency_HLT_Full_eta_2d_DATA'].Fill(passedPhotonTrigger(ev, year), 0, 0)
+                     plot['Efficiency_HLT_Full_pt_eta_2d_DATA'].Fill(passedPhotonTrigger(ev, year), ev.EE_subleadingEt[0], 0)
+                     plot['Efficiency_HLT_Full_pt_DATA'].Fill(passedPhotonTrigger(ev, year), ev.EE_subleadingEt[0])
+                     plot['Efficiency_HLT_Full_mass_DATA'].Fill(passedPhotonTrigger(ev, year), ev.EE_mass[0])
 
                      if ev.MET_pt > 40:
-                         plot['Efficiency_HLT_Full_pt_MET40_DATA'].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
+                         plot['Efficiency_HLT_Full_pt_MET40_DATA'].Fill(passedPhotonTrigger(ev, year), ev.EE_subleadingEt[0], ev.EE_leadingEt[0])
                      if ev.MET_pt > 60:
-                         plot['Efficiency_HLT_Full_pt_MET60_DATA'].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
+                         plot['Efficiency_HLT_Full_pt_MET60_DATA'].Fill(passedPhotonTrigger(ev, year), ev.EE_subleadingEt[0], ev.EE_leadingEt[0])
                      if ev.MET_pt > 80:
-                         plot['Efficiency_HLT_Full_pt_MET80_DATA'].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
+                         plot['Efficiency_HLT_Full_pt_MET80_DATA'].Fill(passedPhotonTrigger(ev, year), ev.EE_subleadingEt[0], ev.EE_leadingEt[0])
 
 
                      num += 1
@@ -388,67 +370,51 @@ if __name__ == "__main__":
                 num = 0
                 for e,ev in enumerate(t):
 
-                     if not (ev.nEE > 0):
+                     if not (ev.nEE == 1):
                          continue
 
                      if not passedMETTrigger(ev, year):
                          continue
 
-                     et_values = []
-                     eta_values = []
-                     indexes = []
-                     for i in range(0, ev.nElectronCandidate):
-                         if abs(ev.ElectronCandidate_eta[i]) > 2.:
-                             continue
-                         if ev.ElectronCandidate_relTrkiso[i] > 0.1:
-                             continue
-                         et_values.append(ev.ElectronCandidate_et[i])
-                         eta_values.append(ev.ElectronCandidate_eta[i])
-                         indexes.append(i)
-
-                     if len(et_values) < 2:
+                     if not ev.EE_mass[0] > 15:
+                         continue
+                     if not ev.EE_normalizedChi2[0] < 20:
+                         continue
+                     if not abs(ev.ElectronCandidate_eta[ev.EE_idxA[0]]) < 2.0:
+                         continue
+                     if not abs(ev.ElectronCandidate_eta[ev.EE_idxB[0]]) < 2.0:
+                         continue
+                     if not ev.EE_leadingEt[0] > 40:
+                         continue
+                     if not ev.EE_subleadingEt[0] > 25:
+                         continue
+                     if not ev.EE_relisoA[0] < 0.1:
+                         continue
+                     if not ev.EE_relisoB[0] < 0.1:
+                         continue
+                     if not ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EE_idxA[0]]]*ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EE_idxB[0]]] < 0:
                          continue
 
-                     et_eta = zip(et_values, eta_values)
-                     et_idx = zip(et_values, indexes)
-                     et_eta.sort(reverse = True)
-                     et_idx.sort(reverse = True)
-                     et_ord = [x[0] for x in et_eta]
-                     eta_ord = [x[1] for x in et_eta]
-                     idx_ord = [x[1] for x in et_idx]
-
-
-                     el1 = r.TLorentzVector()
-                     el2 = r.TLorentzVector()
-                     el1.SetPtEtaPhiM(ev.ElectronCandidate_et[idx_ord[0]], ev.ElectronCandidate_eta[idx_ord[0]], ev.ElectronCandidate_phi[idx_ord[0]], 0.0)
-                     el2.SetPtEtaPhiM(ev.ElectronCandidate_et[idx_ord[1]], ev.ElectronCandidate_eta[idx_ord[1]], ev.ElectronCandidate_phi[idx_ord[1]], 0.0)
-
-                     if et_values[0] < 40 or et_values[1] < 25:
-                         continue
-                     if (el1+el2).M() < 15.:
-                         continue
-
-                     plot['PassMET_pt2_pt1_' + key].Fill(et_ord[1], et_ord[0])
-                     plot['PassMET_pt2_pt1_MC'].Fill(et_ord[1], et_ord[0], s.lumWeight)
-                     plot['PassMET_pt2_MC'].Fill(et_ord[1], s.lumWeight)
+                     plot['PassMET_pt2_pt1_' + key].Fill(ev.EE_subleadingEt[0], ev.EE_leadingEt[0])
+                     plot['PassMET_pt2_pt1_MC'].Fill(ev.EE_subleadingEt[0], ev.EE_leadingEt[0], s.lumWeight)
+                     plot['PassMET_pt2_MC'].Fill(ev.EE_subleadingEt[0], s.lumWeight)
                      if passedPhotonTrigger(ev, year):
-                         plot['PassTRG_pt2_pt1_' + key].Fill(et_ord[1], et_ord[0])
-                         plot['PassTRG_pt2_MC'].Fill(et_ord[1], s.lumWeight)
-                         plot['PassTRG_pt2_pt1_MC'].Fill(et_ord[1], et_ord[0], s.lumWeight)
+                         plot['PassTRG_pt2_pt1_' + key].Fill(ev.EE_subleadingEt[0], ev.EE_leadingEt[0])
+                         plot['PassTRG_pt2_MC'].Fill(ev.EE_subleadingEt[0], s.lumWeight)
 
 
-                     plot['Efficiency_HLT_Full_pt_2d_' + key].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
-                     plot['Efficiency_HLT_Full_eta_2d_' + key].Fill(passedPhotonTrigger(ev, year), eta_ord[1], eta_ord[0])
-                     plot['Efficiency_HLT_Full_pt_eta_2d_' + key].Fill(passedPhotonTrigger(ev, year), et_ord[1], eta_ord[1])
-                     plot['Efficiency_HLT_Full_pt_' + key].Fill(passedPhotonTrigger(ev, year), et_ord[1])
-                     plot['Efficiency_HLT_Full_mass_' + key].Fill(passedPhotonTrigger(ev, year), (el1+el2).M())
+                     plot['Efficiency_HLT_Full_pt_2d_' + key].Fill(passedPhotonTrigger(ev, year), ev.EE_subleadingEt[0], ev.EE_leadingEt[0])
+                     plot['Efficiency_HLT_Full_eta_2d_' + key].Fill(passedPhotonTrigger(ev, year), 0, 0)
+                     plot['Efficiency_HLT_Full_pt_eta_2d_' + key].Fill(passedPhotonTrigger(ev, year), ev.EE_subleadingEt[0], 0)
+                     plot['Efficiency_HLT_Full_pt_' + key].Fill(passedPhotonTrigger(ev, year), ev.EE_subleadingEt[0])
+                     plot['Efficiency_HLT_Full_mass_' + key].Fill(passedPhotonTrigger(ev, year), ev.EE_mass[0])
 
                      if ev.MET_pt > 40:
-                         plot['Efficiency_HLT_Full_pt_MET40_' + key].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
+                         plot['Efficiency_HLT_Full_pt_MET40_' + key].Fill(passedPhotonTrigger(ev, year), ev.EE_subleadingEt[0], ev.EE_leadingEt[0])
                      if ev.MET_pt > 60:
-                         plot['Efficiency_HLT_Full_pt_MET60_' + key].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
+                         plot['Efficiency_HLT_Full_pt_MET60_' + key].Fill(passedPhotonTrigger(ev, year), ev.EE_subleadingEt[0], ev.EE_leadingEt[0])
                      if ev.MET_pt > 80:
-                         plot['Efficiency_HLT_Full_pt_MET80_' + key].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
+                         plot['Efficiency_HLT_Full_pt_MET80_' + key].Fill(passedPhotonTrigger(ev, year), ev.EE_subleadingEt[0], ev.EE_leadingEt[0])
 
 
                      num += 1
@@ -645,15 +611,6 @@ if __name__ == "__main__":
     SF.Write()
     SFErr.Write()
 
-    canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SF_ttbar_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
-    canvas.addHisto(plot['ScaleFactor_pt2_pt1'],'COLZ,TEXT', '', '', '', True, 0)
-    canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
-
-    canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SF_comp_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
-    canvas.addHisto(plot['ScaleFactor_pt2_pt1_v2'],'COLZ,TEXT', '', '', '', True, 0)
-    canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
 
     ### eta dependence
 

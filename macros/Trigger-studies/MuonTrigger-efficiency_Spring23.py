@@ -269,6 +269,7 @@ if __name__ == "__main__":
     minPt = 30 if year == '2016' else 25
     minCosAlpha = -0.8 if year == '2016' else -0.9
 
+    print(minPt, minCosAlpha)
 
     ###############################
     ####   Loop over events    ####
@@ -355,7 +356,8 @@ if __name__ == "__main__":
             if era == '2016APV': 
                 key = s.name.replace('_preVFP', '')
             elif era == '2016': 
-                key = s.name.replace('_postVFP', '')
+                if '_postVFP' in s.name: key = s.name.replace('_postVFP', '')
+                if '_preVFP' in s.name: key = s.name.replace('_preVFP', '')
             elif era == '2018': 
                 key = s.name.replace('_2018', '')
             weights[key] = s.lumWeight

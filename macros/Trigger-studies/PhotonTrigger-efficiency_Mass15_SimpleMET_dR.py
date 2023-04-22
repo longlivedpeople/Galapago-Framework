@@ -102,9 +102,9 @@ def passedMETTrigger(ev, year):
     passed = False
 
     if year == '2016':
-        passed = ev.HLT_PFMET120_PFMHT90_IDTight or ev.HLT_PFMET120_PFMHT100_IDTight or ev.HLT_PFMET120_PFMHT110_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_MET200 or ev.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight or ev.HLT_PFMET170_HBHECleaned or ev.HLT_PFMET300 or ev.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
+        passed = ev.HLT_PFMET120_PFMHT90_IDTight or ev.HLT_PFMET120_PFMHT100_IDTight or ev.HLT_PFMET120_PFMHT110_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_MET200 
     elif year == '2017':
-        passed = ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight_PFHT60 or ev.HLT_CaloMET350_HBHECleaned or ev.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight or ev.HLT_PFMET250_HBHECleaned or ev.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
+        passed = ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight_PFHT60 
     elif year == '2018':
         passed = ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight_PFHT60 or ev.HLT_CaloMET350_HBHECleaned or ev.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight or ev.HLT_PFMET250_HBHECleaned or ev.HLT_PFMET200_HBHE_BeamHaloCleaned or ev.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
 
@@ -117,13 +117,17 @@ def passedPhotonTrigger(ev, year):
 
     if year == '2016':
         #passed = ev.HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15 or ev.HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55
-        #passed = ev.HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15
-        passed = ev.HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90
+        passed = ev.HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15
+        #passed = ev.HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90
+        #passed = ev.HLT_DoublePhoton60
     elif year == '2017':
-        passed = ev.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_DoublePhoton70
+        #passed = ev.HLT_DoublePhoton70
+        passed = ev.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 
+        #passed = ev.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_DoublePhoton70
         #passed = ev.HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_PixelVeto_Mass55
     elif year == '2018':
         passed = ev.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_NoPixelVeto or ev.HLT_DoublePhoton70
+        #passed = ev.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_Diphoton30_18_R9IdL_AND_HE_AND_IsoCaloId_NoPixelVeto or ev.HLT_DoublePhoton70
 
     return passed
 
@@ -344,6 +348,8 @@ if __name__ == "__main__":
                      if (el1+el2).M() < 15.:
                          continue
 
+                     if (el1.DeltaR(el2) < 0.5):
+                         continue
 
                      plot['Efficiency_HLT_Full_pt_2d_DATA'].Fill(passedPhotonTrigger(ev, year), et_ord[1], et_ord[0])
                      plot['Efficiency_HLT_Full_eta_2d_DATA'].Fill(passedPhotonTrigger(ev, year), eta_ord[1], eta_ord[0])
@@ -369,7 +375,7 @@ if __name__ == "__main__":
                      num += 1
                      if num > 10:
                          num = 0
-                         break
+                         #break
 
     ### MC:
     weights = {}
@@ -428,6 +434,9 @@ if __name__ == "__main__":
                      if (el1+el2).M() < 15.:
                          continue
 
+                     if (el1.DeltaR(el2) < 0.5):
+                         continue
+
                      plot['PassMET_pt2_pt1_' + key].Fill(et_ord[1], et_ord[0])
                      plot['PassMET_pt2_pt1_MC'].Fill(et_ord[1], et_ord[0], s.lumWeight)
                      plot['PassMET_pt2_MC'].Fill(et_ord[1], s.lumWeight)
@@ -454,7 +463,7 @@ if __name__ == "__main__":
                      num += 1
                      if num > 10:
                           num = 0
-                          break
+                          #break
 
 
     ##################################################################################################
@@ -472,7 +481,7 @@ if __name__ == "__main__":
 
     ##################################################################################################
 
-    outputFile = TFile(EOSPATH + 'PhotonTrigger-SFs/TH1F_photontrigger_'+era+'.root', 'RECREATE')
+    outputFile = TFile(EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/TH1F_photontrigger_'+era+'.root', 'RECREATE')
     for key in plot.keys():
         plot[key].Write()
 
@@ -517,7 +526,7 @@ if __name__ == "__main__":
     canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
     canvas.addHisto(hMC_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
     canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
-    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hMC_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False)
+    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hMC_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False)
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_Eff_full_pt_1D_DYJetsToLL_M-50", 'png,pdf', 0.16, 0.72, 0.56, 0.82, 1)
     hdata_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
@@ -525,7 +534,7 @@ if __name__ == "__main__":
     canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
     canvas.addHisto(hDYJetsToLL_M50_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
     canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
-    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hDYJetsToLL_M50_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False)
+    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hDYJetsToLL_M50_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False)
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_Eff_full_pt_1D_TTTo2L2Nu", 'png,pdf', 0.16, 0.72, 0.56, 0.82, 1)
     hdata_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
@@ -533,7 +542,7 @@ if __name__ == "__main__":
     canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
     canvas.addHisto(hTTTo2L2Nu_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
     canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
-    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hTTTo2L2Nu_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False)
+    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hTTTo2L2Nu_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False)
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_Eff_full_mass_1D_TTTo2L2Nu", 'png,pdf', 0.16, 0.72, 0.56, 0.82, 1)
     hdata_ = getHistoFromEff(plot['Efficiency_HLT_Full_mass_DATA'])
@@ -541,8 +550,15 @@ if __name__ == "__main__":
     canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
     canvas.addHisto(hTTTo2L2Nu_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
     canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
-    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hTTTo2L2Nu_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False)
+    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hTTTo2L2Nu_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False)
 
+    canvas = Canvas.Canvas("PhotonTrigger_"+era+"_Eff_full_mass_1D_DYJetsToLL_M-50", 'png,pdf', 0.16, 0.72, 0.56, 0.82, 1)
+    hdata_ = getHistoFromEff(plot['Efficiency_HLT_Full_mass_DATA'])
+    hDYJetsToLL_ = getHistoFromEff(plot['Efficiency_HLT_Full_mass_DYJetsToLL_M-50'])
+    canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
+    canvas.addHisto(hDYJetsToLL_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
+    canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
+    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hDYJetsToLL_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False)
 
     ### Sys variations
 
@@ -567,7 +583,7 @@ if __name__ == "__main__":
     canvas.addHisto(hSF_MET60,'P,SAME', 'MET > 60 GeV', 'pl', r.kBlue, True, 3, marker = 25)
     canvas.addHisto(hSF_MET40,'P,SAME', 'MET > 40 GeV', 'pl', r.kBlue, True, 4, marker = 32)
     canvas.addLatex(0.9, 0.93, era, size = 0.035, align = 31)
-    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False)
+    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False)
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SFvar_full_pt_1D_DYJetsToLL_M-50", 'png,pdf', 0.46, 0.72, 0.86, 0.89, 1)
     hSF_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
@@ -590,7 +606,7 @@ if __name__ == "__main__":
     canvas.addHisto(hSF_MET60,'P,SAME', 'MET > 60 GeV', 'pl', r.kBlue, True, 3, marker = 25)
     canvas.addHisto(hSF_MET40,'P,SAME', 'MET > 40 GeV', 'pl', r.kBlue, True, 4, marker = 32)
     canvas.addLatex(0.9, 0.93, era, size = 0.035, align = 31)
-    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False)
+    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False)
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SFvar_full_pt_1D_TTTo2L2Nu", 'png,pdf', 0.46, 0.72, 0.86, 0.89, 1)
     hSF_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
@@ -613,7 +629,7 @@ if __name__ == "__main__":
     canvas.addHisto(hSF_MET60,'P,SAME', 'MET > 60 GeV', 'pl', r.kBlue, True, 3, marker = 25)
     canvas.addHisto(hSF_MET40,'P,SAME', 'MET > 40 GeV', 'pl', r.kBlue, True, 4, marker = 32)
     canvas.addLatex(0.9, 0.93, era, size = 0.035, align = 31)
-    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False)
+    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False)
 
 
 
@@ -624,23 +640,23 @@ if __name__ == "__main__":
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_Data_full_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_HLT_Full_pt_2d_DATA'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_MC_full_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_HLT_Full_pt_2d_MC'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     SF, SFErr = getSFPlot(plot['Efficiency_HLT_Full_pt_2d_DATA'], plot['Efficiency_HLT_Full_pt_2d_MC'])
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SF_full_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SF,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False, is2d = True, labelz = 'Scale factor')
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SFErr_full_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SFErr,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
 
     SF.Write()
     SFErr.Write()
@@ -648,35 +664,35 @@ if __name__ == "__main__":
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SF_ttbar_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(plot['ScaleFactor_pt2_pt1'],'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False, is2d = True, labelz = 'Scale factor')
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SF_comp_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(plot['ScaleFactor_pt2_pt1_v2'],'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False, is2d = True, labelz = 'Scale factor')
 
     ### eta dependence
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_Data_full_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_HLT_Full_eta_2d_DATA'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_MC_full_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_HLT_Full_eta_2d_MC'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     SF, SFErr = getSFPlot(plot['Efficiency_HLT_Full_eta_2d_DATA'], plot['Efficiency_HLT_Full_eta_2d_MC'])
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SF_full_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SF,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False, is2d = True, labelz = 'Scale factor')
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SFErr_full_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SFErr,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
 
     SF.Write()
     SFErr.Write()
@@ -686,23 +702,23 @@ if __name__ == "__main__":
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_Data_full_pt_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_HLT_Full_pt_eta_2d_DATA'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_MC_full_pt_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_HLT_Full_pt_eta_2d_MC'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     SF, SFErr = getSFPlot(plot['Efficiency_HLT_Full_pt_eta_2d_DATA'], plot['Efficiency_HLT_Full_pt_eta_2d_MC'])
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SF_full_pt_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SF,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False, is2d = True, labelz = 'Scale factor')
 
     canvas = Canvas.Canvas("PhotonTrigger_"+era+"_SFErr_full_pt_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SFErr,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'PhotonTrigger-SFs_Mass15_SimpleMET_dR/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
 
     SF.Write()
     SFErr.Write()

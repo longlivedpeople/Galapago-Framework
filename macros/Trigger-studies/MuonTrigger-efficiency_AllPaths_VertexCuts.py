@@ -100,13 +100,13 @@ def passedMETTrigger(ev, year):
     passed = False
 
     if year == '2016':
-        #passed = ev.HLT_PFMET120_PFMHT90_IDTight or ev.HLT_PFMET120_PFMHT100_IDTight or ev.HLT_PFMET120_PFMHT110_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_MET200 or ev.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight or ev.HLT_PFMET170_HBHECleaned or ev.HLT_PFMET300 or ev.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
-        passed = ev.HLT_PFMET120_PFMHT90_IDTight or ev.HLT_PFMET120_PFMHT100_IDTight or ev.HLT_PFMET120_PFMHT110_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_MET200 or ev.HLT_PFMET170_HBHECleaned or ev.HLT_PFMET300 
+        passed = ev.HLT_PFMET120_PFMHT90_IDTight or ev.HLT_PFMET120_PFMHT100_IDTight or ev.HLT_PFMET120_PFMHT110_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_MET200 or ev.HLT_MonoCentralPFJet80_PFMETNoMu110_PFMHTNoMu110_IDTight or ev.HLT_PFMET170_HBHECleaned or ev.HLT_PFMET300 or ev.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
+        #passed = ev.HLT_PFMET120_PFMHT90_IDTight or ev.HLT_PFMET120_PFMHT100_IDTight or ev.HLT_PFMET120_PFMHT110_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight 
     elif year == '2017':
         passed = ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight_PFHT60 or ev.HLT_CaloMET350_HBHECleaned or ev.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight or ev.HLT_PFMET250_HBHECleaned or ev.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
     elif year == '2018':
-        #passed = ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight_PFHT60 or ev.HLT_CaloMET350_HBHECleaned or ev.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight or ev.HLT_PFMET250_HBHECleaned or ev.HLT_PFMET200_HBHE_BeamHaloCleaned or ev.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
-        passed = ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight_PFHT60 or ev.HLT_CaloMET350_HBHECleaned or ev.HLT_PFMET250_HBHECleaned or ev.HLT_PFMET200_HBHE_BeamHaloCleaned
+        passed = ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight_PFHT60 or ev.HLT_CaloMET350_HBHECleaned or ev.HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight or ev.HLT_PFMET250_HBHECleaned or ev.HLT_PFMET200_HBHE_BeamHaloCleaned or ev.HLT_PFMETNoMu120_PFMHTNoMu120_IDTight
+        #passed = ev.HLT_PFMET120_PFMHT120_IDTight or ev.HLT_PFMET120_PFMHT120_IDTight_PFHT60
 
     return passed
 
@@ -266,8 +266,8 @@ if __name__ == "__main__":
     #########################
     ####   Cut values    ####
     #########################
-    minPt = 30 if year == '2016' else 25
-    minCosAlpha = -0.8 if year == '2016' else -0.9
+    minPt = 30 if year == '2016' else 30
+    minCosAlpha = -0.8 if year == '2016' else -0.8
 
 
     ###############################
@@ -287,61 +287,33 @@ if __name__ == "__main__":
                      if not passedMETTrigger(ev, year):
                          continue
 
-                     pt_values = []
-                     eta_values = []
-                     indexes = []
-                     for i in range(0, ev.nDGM):
-                         if abs(ev.DGM_eta[i]) > 2.:
-                             continue
-                         if ev.DGM_relPFiso[i] > 0.2:
-                             continue
-                         pt_values.append(ev.DGM_pt[i])
-                         eta_values.append(ev.DGM_eta[i])
-                         indexes.append(i)
-
-                     if len(pt_values) < 2:
+                     if abs(ev.DGM_eta[ev.DMDM_idxA[0]]) > 2.0:
                          continue
-
-                     pt_eta = zip(pt_values, eta_values)
-                     pt_idx = zip(pt_values, indexes)
-                     pt_eta.sort(reverse = True)
-                     pt_idx.sort(reverse = True)
-                     pt_ord = [x[0] for x in pt_eta]
-                     eta_ord = [x[1] for x in pt_eta]
-                     idx_ord = [x[1] for x in pt_idx]
-
-
-                     mu1 = r.TLorentzVector()
-                     mu2 = r.TLorentzVector()
-                     mu1.SetPtEtaPhiM(ev.DGM_pt[idx_ord[0]], ev.DGM_eta[idx_ord[0]], ev.DGM_phi[idx_ord[0]], 105e-3)
-                     mu2.SetPtEtaPhiM(ev.DGM_pt[idx_ord[1]], ev.DGM_eta[idx_ord[1]], ev.DGM_phi[idx_ord[1]], 105e-3)
-
-                     if pt_values[0] < minPt or pt_values[1] < minPt:
+                     if abs(ev.DGM_eta[ev.DMDM_idxB[0]]) > 2.0:
                          continue
-                     if (mu1+mu2).M() < 15.:
+                     if ev.DGM_pt[ev.DMDM_idxA[0]] < minPt or ev.DGM_pt[ev.DMDM_idxB[0]] < minPt:
                          continue
-                     if math.cos(mu1.Angle(mu2.Vect())) < minCosAlpha:
-                         continue
-                     if mu1.DeltaR(mu2) < 0.1:
-                         continue
+                     if ev.DMDM_cosAlpha[0] < minCosAlpha: continue
+                     if ev.DMDM_mass[0] < 15: continue
+                     if ev.DGM_relPFiso[ev.DMDM_idxA[0]] > 0.2 or ev.DGM_relPFiso[ev.DMDM_idxB[0]] > 0.2: continue
 
 
-                     plot['Efficiency_HLT_Full_pt_2d_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
-                     plot['Efficiency_HLT_Full_eta_2d_DATA'].Fill(passedMuonTrigger(ev, year), eta_ord[1], eta_ord[0])
-                     plot['Efficiency_HLT_Full_pt_eta_2d_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1], eta_ord[1])
-                     plot['Efficiency_HLT_Full_pt_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1])
-                     plot['Efficiency_HLT_Full_mass_DATA'].Fill(passedMuonTrigger(ev, year), (mu1+mu2).M())
+                     plot['Efficiency_HLT_Full_pt_2d_DATA'].Fill(passedMuonTrigger(ev, year), ev.DMDM_subleadingPt[0], ev.DMDM_leadingPt[0])
+                     #plot['Efficiency_HLT_Full_eta_2d_DATA'].Fill(passedMuonTrigger(ev, year), eta_ord[1], eta_ord[0])
+                     #plot['Efficiency_HLT_Full_pt_eta_2d_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1], eta_ord[1])
+                     plot['Efficiency_HLT_Full_pt_DATA'].Fill(passedMuonTrigger(ev, year), ev.DMDM_subleadingPt[0])
+                     plot['Efficiency_HLT_Full_mass_DATA'].Fill(passedMuonTrigger(ev, year), ev.DMDM_mass[0])
 
-                     plot['PassMET_pt2_pt1_DATA'].Fill(pt_ord[1], pt_ord[0])
+                     plot['PassMET_pt2_pt1_DATA'].Fill(ev.DMDM_subleadingPt[0], ev.DMDM_leadingPt[0])
                      if passedMuonTrigger(ev, year):
-                         plot['PassTRG_pt2_pt1_DATA'].Fill(pt_ord[1], pt_ord[0])
+                         plot['PassTRG_pt2_pt1_DATA'].Fill(ev.DMDM_subleadingPt[0], ev.DMDM_leadingPt[0])
                      
                      if ev.MET_pt > 40:
-                         plot['Efficiency_HLT_Full_pt_MET40_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
+                         plot['Efficiency_HLT_Full_pt_MET40_DATA'].Fill(passedMuonTrigger(ev, year), ev.DMDM_subleadingPt[0], ev.DMDM_leadingPt[0])
                      if ev.MET_pt > 60:
-                         plot['Efficiency_HLT_Full_pt_MET60_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
+                         plot['Efficiency_HLT_Full_pt_MET60_DATA'].Fill(passedMuonTrigger(ev, year), ev.DMDM_subleadingPt[0], ev.DMDM_leadingPt[0])
                      if ev.MET_pt > 80:
-                         plot['Efficiency_HLT_Full_pt_MET80_DATA'].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
+                         plot['Efficiency_HLT_Full_pt_MET80_DATA'].Fill(passedMuonTrigger(ev, year), ev.DMDM_subleadingPt[0], ev.DMDM_leadingPt[0])
 
                      num += 1
                      if num > 10:
@@ -355,7 +327,8 @@ if __name__ == "__main__":
             if era == '2016APV': 
                 key = s.name.replace('_preVFP', '')
             elif era == '2016': 
-                key = s.name.replace('_postVFP', '')
+                if '_postVFP' in s.name: key = s.name.replace('_postVFP', '')
+                if '_preVFP' in s.name: key = s.name.replace('_preVFP', '')
             elif era == '2018': 
                 key = s.name.replace('_2018', '')
             weights[key] = s.lumWeight
@@ -369,65 +342,37 @@ if __name__ == "__main__":
                      if not passedMETTrigger(ev, year):
                          continue
 
-                     pt_values = []
-                     eta_values = []
-                     indexes = []
-                     for i in range(0, ev.nDGM):
-                         if abs(ev.DGM_eta[i]) > 2.:
-                             continue
-                         if ev.DGM_relPFiso[i] > 0.2:
-                             continue
-                         pt_values.append(ev.DGM_pt[i])
-                         eta_values.append(ev.DGM_eta[i])
-                         indexes.append(i)
-
-                     if len(pt_values) < 2:
+                     if abs(ev.DGM_eta[ev.DMDM_idxA[0]]) > 2.0:
                          continue
-
-                     pt_eta = zip(pt_values, eta_values)
-                     pt_idx = zip(pt_values, indexes)
-                     pt_eta.sort(reverse = True)
-                     pt_idx.sort(reverse = True)
-                     pt_ord = [x[0] for x in pt_eta]
-                     eta_ord = [x[1] for x in pt_eta]
-                     idx_ord = [x[1] for x in pt_idx]
-
-
-                     mu1 = r.TLorentzVector()
-                     mu2 = r.TLorentzVector()
-                     mu1.SetPtEtaPhiM(ev.DGM_pt[idx_ord[0]], ev.DGM_eta[idx_ord[0]], ev.DGM_phi[idx_ord[0]], 105e-3)
-                     mu2.SetPtEtaPhiM(ev.DGM_pt[idx_ord[1]], ev.DGM_eta[idx_ord[1]], ev.DGM_phi[idx_ord[1]], 105e-3)
-
-                     if pt_values[0] < minPt or pt_values[1] < minPt:
+                     if abs(ev.DGM_eta[ev.DMDM_idxB[0]]) > 2.0:
                          continue
-                     if (mu1+mu2).M() < 15.:
+                     if ev.DGM_pt[ev.DMDM_idxA[0]] < minPt or ev.DGM_pt[ev.DMDM_idxB[0]] < minPt:
                          continue
-                     if math.cos(mu1.Angle(mu2.Vect())) < minCosAlpha:
-                         continue
-                     if mu1.DeltaR(mu2) < 0.1:
-                         continue
+                     if ev.DMDM_cosAlpha[0] < minCosAlpha: continue
+                     if ev.DMDM_mass[0] < 15: continue
+                     if ev.DGM_relPFiso[ev.DMDM_idxA[0]] > 0.2 or ev.DGM_relPFiso[ev.DMDM_idxB[0]] > 0.2: continue
 
                      num += 1
                      if num > 10:
                           num = 0
                           #break
 
-                     plot['Efficiency_HLT_Full_pt_2d_' + key].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
-                     plot['Efficiency_HLT_Full_eta_2d_' + key].Fill(passedMuonTrigger(ev, year), eta_ord[1], eta_ord[0])
-                     plot['Efficiency_HLT_Full_pt_eta_2d_' + key].Fill(passedMuonTrigger(ev, year), pt_ord[1], eta_ord[1])
-                     plot['Efficiency_HLT_Full_pt_' + key].Fill(passedMuonTrigger(ev, year), pt_ord[1])
-                     plot['Efficiency_HLT_Full_mass_' + key].Fill(passedMuonTrigger(ev, year), (mu1+mu2).M())
+                     plot['Efficiency_HLT_Full_pt_2d_' + key].Fill(passedMuonTrigger(ev, year), ev.DMDM_subleadingPt[0], ev.DMDM_leadingPt[0])
+                     #plot['Efficiency_HLT_Full_eta_2d_' + key].Fill(passedMuonTrigger(ev, year), ev.DMDM_subleadingPt[0], ev.DMDM_leadingPt[0])
+                     #plot['Efficiency_HLT_Full_pt_eta_2d_' + key].Fill(passedMuonTrigger(ev, year), ev.DMDM_subleadingPt[0], ev.DMDM_leadingPt[0])
+                     plot['Efficiency_HLT_Full_pt_' + key].Fill(passedMuonTrigger(ev, year), ev.DMDM_subleadingPt[0])
+                     plot['Efficiency_HLT_Full_mass_' + key].Fill(passedMuonTrigger(ev, year), ev.DMDM_mass[0])
 
-                     plot['PassMET_pt2_pt1_' + key].Fill(pt_ord[1], pt_ord[0])
+                     plot['PassMET_pt2_pt1_' + key].Fill(ev.DMDM_subleadingPt[0], ev.DMDM_leadingPt[0])
                      if passedMuonTrigger(ev, year):
-                         plot['PassTRG_pt2_pt1_' + key].Fill(pt_ord[1], pt_ord[0])
+                         plot['PassTRG_pt2_pt1_' + key].Fill(ev.DMDM_subleadingPt[0], ev.DMDM_leadingPt[0])
 
 	             if ev.MET_pt > 40:
-                         plot['Efficiency_HLT_Full_pt_MET40_' + key].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
+                         plot['Efficiency_HLT_Full_pt_MET40_' + key].Fill(passedMuonTrigger(ev, year), ev.DMDM_subleadingPt[0], ev.DMDM_leadingPt[0])
                      if ev.MET_pt > 60:
-                         plot['Efficiency_HLT_Full_pt_MET60_' + key].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
+                         plot['Efficiency_HLT_Full_pt_MET60_' + key].Fill(passedMuonTrigger(ev, year), ev.DMDM_subleadingPt[0], ev.DMDM_leadingPt[0])
                      if ev.MET_pt > 80:
-                         plot['Efficiency_HLT_Full_pt_MET80_' + key].Fill(passedMuonTrigger(ev, year), pt_ord[1], pt_ord[0])
+                         plot['Efficiency_HLT_Full_pt_MET80_' + key].Fill(passedMuonTrigger(ev, year), ev.DMDM_subleadingPt[0], ev.DMDM_leadingPt[0])
 
 
     ##################################################################################################
@@ -446,7 +391,7 @@ if __name__ == "__main__":
     ##################################################################################################
     ## Plot
 
-    outputFile = TFile(EOSPATH + 'MuonTrigger-SFs/TH1F_muontrigger_'+era+'.root', 'RECREATE')
+    outputFile = TFile(EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/TH1F_muontrigger_'+era+'.root', 'RECREATE')
     for key in plot.keys():
         plot[key].Write()
 
@@ -479,7 +424,7 @@ if __name__ == "__main__":
     canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
     canvas.addHisto(hMC_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
     canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
-    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hMC_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False)
+    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hMC_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False)
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_Eff_full_pt_1D_DYJetsToLL_M-50", 'png,pdf', 0.16, 0.72, 0.56, 0.82, 1)
     hdata_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
@@ -487,7 +432,7 @@ if __name__ == "__main__":
     canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
     canvas.addHisto(hDYJetsToLL_M50_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
     canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
-    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hDYJetsToLL_M50_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False)
+    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hDYJetsToLL_M50_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False)
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_Eff_full_pt_1D_TTTo2L2Nu", 'png,pdf', 0.16, 0.72, 0.56, 0.82, 1)
     hdata_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
@@ -495,7 +440,7 @@ if __name__ == "__main__":
     canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
     canvas.addHisto(hTTTo2L2Nu_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
     canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
-    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hTTTo2L2Nu_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False)
+    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hTTTo2L2Nu_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False)
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_Eff_full_mass_1D_TTTo2L2Nu", 'png,pdf', 0.16, 0.72, 0.56, 0.82, 1)
     hdata_ = getHistoFromEff(plot['Efficiency_HLT_Full_mass_DATA'])
@@ -503,7 +448,7 @@ if __name__ == "__main__":
     canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
     canvas.addHisto(hTTTo2L2Nu_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
     canvas.addLatex(0.9, 0.88, era, size = 0.035, align = 31)
-    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hTTTo2L2Nu_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False)
+    canvas.saveRatio(1, 1, 0, '', hdata = hdata_, hMC = hTTTo2L2Nu_, r_ymin = 0.7, r_ymax = 1.0, label = 'Scale factor',outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False)
 
     ### Sys variations
 
@@ -528,7 +473,7 @@ if __name__ == "__main__":
     canvas.addHisto(hSF_MET60,'P,SAME', 'MET > 60 GeV', 'pl', r.kBlue, True, 3, marker = 25)
     canvas.addHisto(hSF_MET40,'P,SAME', 'MET > 40 GeV', 'pl', r.kBlue, True, 4, marker = 32)
     canvas.addLatex(0.9, 0.93, era, size = 0.035, align = 31)
-    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False)
+    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False)
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_SFvar_full_pt_1D_DYJetsToLL_M-50", 'png,pdf', 0.46, 0.72, 0.86, 0.89, 1)
     hSF_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
@@ -551,7 +496,7 @@ if __name__ == "__main__":
     canvas.addHisto(hSF_MET60,'P,SAME', 'MET > 60 GeV', 'pl', r.kBlue, True, 3, marker = 25)
     canvas.addHisto(hSF_MET40,'P,SAME', 'MET > 40 GeV', 'pl', r.kBlue, True, 4, marker = 32)
     canvas.addLatex(0.9, 0.93, era, size = 0.035, align = 31)
-    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False)
+    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False)
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_SFvar_full_pt_1D_TTTo2L2Nu", 'png,pdf', 0.46, 0.72, 0.86, 0.89, 1)
     hSF_ = getHistoFromEff(plot['Efficiency_HLT_Full_pt_DATA'])
@@ -574,7 +519,7 @@ if __name__ == "__main__":
     canvas.addHisto(hSF_MET60,'P,SAME', 'MET > 60 GeV', 'pl', r.kBlue, True, 3, marker = 25)
     canvas.addHisto(hSF_MET40,'P,SAME', 'MET > 40 GeV', 'pl', r.kBlue, True, 4, marker = 32)
     canvas.addLatex(0.9, 0.93, era, size = 0.035, align = 31)
-    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False)
+    canvas.save(1, 1, 0, '', '', ymin=0.65, ymax=1.2, outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False)
 
 
     ### Efficiency (2d)
@@ -586,23 +531,23 @@ if __name__ == "__main__":
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_Data_full_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_HLT_Full_pt_2d_DATA'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_MC_full_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_HLT_Full_pt_2d_MC'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     SF, SFErr = getSFPlot(plot['Efficiency_HLT_Full_pt_2d_DATA'], plot['Efficiency_HLT_Full_pt_2d_MC'])
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_SF_full_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SF,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False, is2d = True, labelz = 'Scale factor')
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_SFErr_full_pt_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SFErr,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
 
     SF.Write()
     SFErr.Write()
@@ -613,23 +558,23 @@ if __name__ == "__main__":
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_Data_full_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_HLT_Full_eta_2d_DATA'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_MC_full_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_HLT_Full_eta_2d_MC'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     SF, SFErr = getSFPlot(plot['Efficiency_HLT_Full_eta_2d_DATA'], plot['Efficiency_HLT_Full_eta_2d_MC'])
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_SF_full_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SF,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False, is2d = True, labelz = 'Scale factor')
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_SFErr_full_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SFErr,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
 
     SF.Write()
     SFErr.Write()
@@ -640,23 +585,23 @@ if __name__ == "__main__":
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_Data_full_pt_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_HLT_Full_pt_eta_2d_DATA'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_MC_full_pt_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_HLT_Full_pt_eta_2d_MC'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False, is2d = True, labelz = 'Efficiency')
 
     SF, SFErr = getSFPlot(plot['Efficiency_HLT_Full_pt_eta_2d_DATA'], plot['Efficiency_HLT_Full_pt_eta_2d_MC'])
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_SF_full_pt_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SF,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False, is2d = True, labelz = 'Scale factor')
 
     canvas = Canvas.Canvas("MuonTrigger_"+era+"_SFErr_full_pt_eta_2D", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.addHisto(SFErr,'COLZ,TEXT', '', '', '', True, 0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
+    canvas.save(0, 1, 0, '', '', outputDir = EOSPATH + 'MuonTrigger-SFs_AllPaths_VertexCuts/', inProgress = False, is2d = True, labelz = 'Scale factor uncertainty (stat)')
 
     SF.Write()
     SFErr.Write()
