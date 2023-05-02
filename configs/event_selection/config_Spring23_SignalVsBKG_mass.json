@@ -15,47 +15,40 @@
         }
     },
     "selection" : {
-        "electrons" : {
+         "electrons" : {
             "2016" : [ "abs(ev.ElectronCandidate_eta[ev.EE_idxA[iee]]) < 2.0",
                        "abs(ev.ElectronCandidate_eta[ev.EE_idxB[iee]]) < 2.0",
                        "sum(map(lambda x : x > 45., ev.ElectronCandidate_et)) > 0",
                        "sum(map(lambda x : x > 30., ev.ElectronCandidate_et)) > 1",
-                       "ev.EE_mass[iee] > 15",
                        "abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxA[iee]]]) < 1.4442 or abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxA[iee]]]) > 1.566",
                        "abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxB[iee]]]) < 1.4442 or abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxB[iee]]]) > 1.566",
-                       "ev.EE_Lxy_PV[iee] > 2.5" ],
+                       "ev.EE_normalizedChi2[iee] < 20" ],
             "2017" : [ "abs(ev.ElectronCandidate_eta[ev.EE_idxA[iee]]) < 2.0",
                        "abs(ev.ElectronCandidate_eta[ev.EE_idxB[iee]]) < 2.0",
                        "sum(map(lambda x : x > 40., ev.ElectronCandidate_et)) > 0",
                        "sum(map(lambda x : x > 25., ev.ElectronCandidate_et)) > 1",
-                       "ev.EE_mass[iee] > 100",
                        "abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxA[iee]]]) < 1.4442 or abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxA[iee]]]) > 1.566",
                        "abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxB[iee]]]) < 1.4442 or abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxB[iee]]]) > 1.566",
-                       "ev.EE_Lxy_PV[iee] > 2.5" ],
+                       "ev.EE_normalizedChi2[iee] < 20" ],
             "2018" : [ "abs(ev.ElectronCandidate_eta[ev.EE_idxA[iee]]) < 2.0",
                        "abs(ev.ElectronCandidate_eta[ev.EE_idxB[iee]]) < 2.0",
                        "sum(map(lambda x : x > 40., ev.ElectronCandidate_et)) > 0",
                        "sum(map(lambda x : x > 25., ev.ElectronCandidate_et)) > 1",
-                       "ev.EE_mass[iee] > 15",
                        "abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxA[iee]]]) < 1.4442 or abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxA[iee]]]) > 1.566",
                        "abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxB[iee]]]) < 1.4442 or abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxB[iee]]]) > 1.566",
-                       "ev.EE_Lxy_PV[iee] > 2.5" ]
+                       "ev.EE_normalizedChi2[iee] < 20"]
          },
         "muons" : {
-            "2016" : [ "ev.DGM_pt[ev.DMDM_idxA[imm]] > 30",
-                       "ev.DGM_pt[ev.DMDM_idxB[imm]] > 30",
+            "2016" : [ "sum(map(lambda x : x > 30., ev.DGM_pt)) > 1",
                        "abs(ev.DGM_eta[ev.DMDM_idxA[imm]]) < 2.0",
                        "abs(ev.DGM_eta[ev.DMDM_idxB[imm]]) < 2.0",
-                       "ev.DMDM_mass[imm] > 15",
-                       "ev.DMDM_cosAlpha[imm] > -0.8",
-                       "ev.DMDM_Lxy_PV[imm] > 2.5"],
-            "2018" : [ "ev.DGM_pt[ev.DMDM_idxA[imm]] > 25",
-                       "ev.DGM_pt[ev.DMDM_idxB[imm]] > 25",
+                       "ev.DMDM_cosAlpha[imm] > -0.80",
+                       "ev.DMDM_normalizedChi2[imm] < 20"],
+            "2018" : [ "sum(map(lambda x : x > 25., ev.DGM_pt)) > 1",
                        "abs(ev.DGM_eta[ev.DMDM_idxA[imm]]) < 2.0",
                        "abs(ev.DGM_eta[ev.DMDM_idxB[imm]]) < 2.0",
-                       "ev.DMDM_mass[imm] > 15",
-                       "ev.DMDM_cosAlpha[imm] > -0.90",
-                       "ev.DMDM_Lxy_PV[imm] > 2.5"]
+                       "ev.DMDM_cosAlpha[imm] > -0.9",
+                       "ev.DMDM_normalizedChi2[imm] < 20"]
          }
     },
     "regions" : {
