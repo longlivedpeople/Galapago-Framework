@@ -24,6 +24,9 @@ import helper as helper
 import Canvas as Canvas
 import CutManager as CutManager
 
+from CombineHarvester.CombineTools.plotting import *
+#r.PyConfig.IgnoreCommandLineOptions = True
+
 #### Cross sections of the models
 XSECS = {}
 
@@ -135,6 +138,507 @@ XSECS['RPV(350,148,1000)'] = 10e3
 XSECS['RPV(350,148,100)'] = 10e3
 XSECS['RPV(350,148,10)'] = 10e3
 XSECS['RPV(350,148,1)'] = 10e3
+
+#
+##  Function to plot summary in Signal Region bins
+#   - Accepts Data, background and signal
+#   - Only mandatory think is to provide data (background)
+#
+
+### Dic with region labels
+regdic = {}
+regdic['IaA'] = 'low mass DV, region A'
+regdic['IaB'] = 'low mass DV, region B'
+regdic['IaC'] = 'low mass DV, region C'
+regdic['IaD'] = 'low mass DV, region D'
+regdic['IbA'] = 'high mass DV, region A'
+regdic['IbB'] = 'high mass DV, region B'
+regdic['IbC'] = 'high mass DV, region C'
+regdic['IbD'] = 'high mass DV, region D'
+regdic['II'] = 'High multiplicity'
+
+def buildSummaryPlot(title, treeDATA, treeSI = False, inputdir = '', regions = [], luminosity = 1.0, LLlabel = 'MM', sys = 0.1, unblinded = [], outpath = 'Plots_SignalYields'):
+    '''
+    Function to make the plots
+    Output (neccesary arrays to print the tables with 'printTable' and 'printSignals')
+    '''
+    # Arrays to store yields for table
+    BKG_yields = []
+    signal_yields = []
+    titles = []
+
+    ## Init the background and data histograms:
+    nbins = len(regions)
+    hbkg = r.TH1F("hbkg","hbkg;;Number of events", nbins, 0, nbins)
+    hbkg.Sumw2()
+    hunc = r.TH1F("hunc","hunc;;Number of events", nbins, 0, nbins)
+    hunc.Sumw2()
+    hdata = r.TH1F("hdata","hdata;;Number of events", nbins, 0, nbins)
+    hdata.Sumw2()
+
+    ## Fill BKG hist
+    for n,reg in enumerate(regions):
+        hname = 'h'+LLlabel+'_BCR'+reg
+        h_ = treeDATA.getLoopTH1F(inputdir, hname)
+        hbkg.GetXaxis().SetBinLabel(n+1,regdic[reg])
+        hbkg.SetBinContent(n+1,h_.GetBinContent(1))
+        hbkg.SetBinError(n+1,h_.GetBinError(1))
+        hunc.SetBinContent(n+1,h_.GetBinContent(1))
+        hunc.SetBinError(n+1, math.sqrt(sys*h_.GetBinContent(1)*sys*h_.GetBinContent(1) + h_.GetBinError(1)*h_.GetBinError(1))) 
+        print(reg, h_.GetBinContent(1), h_.GetBinError(1), sys*h_.GetBinContent(1))
+        BKG_yields.append(h_.GetBinContent(1))
+
+    ## Fill DATA hist
+    for n,reg in enumerate(regions):
+        hdata.GetXaxis().SetBinLabel(n+1,regdic[reg])
+        if reg not in unblinded:
+            hdata.GetXaxis().SetBinLabel(n+1, regdic[reg] + ' (X)')
+            continue
+        hname = 'h'+LLlabel+'_SR'+reg
+        h_ = treeDATA.getLoopTH1F(inputdir, hname)
+        hdata.SetBinContent(n+1,h_.GetBinContent(1))
+        hdata.SetBinError(n+1,h_.GetBinError(1))
+        print(reg, h_.GetBinContent(1), h_.GetBinError(1))
+        #BKG_yields.append(h_.GetBinContent(1))
+
+
+    ### Set background histos style
+    hbkg.SetFillColorAlpha(r.kCyan-6, 0.8)
+    hbkg.SetLineColor(r.kCyan-2)
+    hbkg.GetXaxis().SetTitleSize(0.045)
+    hbkg.GetYaxis().SetTitleSize(0.045)
+    hunc.SetFillStyle(3244)
+    hunc.SetFillColor(r.kCyan+3)
+    hunc.SetMarkerSize(0)
+    hdata.SetMarkerStyle(20)
+    hdata.SetMarkerSize(0.8)
+    hdata.SetMarkerColor(r.kBlack)
+    hdata.SetLineColor(r.kBlack)
+    hdata.SetLineWidth(2)
+
+    # Get signal titles
+    s_histos = []
+    if treeSI:
+        hname = 'h'+LLlabel+'_SR'+regions[0]
+        print(hname)
+        h_stack = treeSI.getLoopStack(inputdir, hname)
+        for i,h_ in enumerate(h_stack):
+            s_histos.append(r.TH1F(h_.GetTitle(),h_.GetTitle(),nbins,0,nbins)) # declare histograms
+            signal_yields.append([]) # declare array for yields
+
+        ## Fill S_histos
+        for n,reg in enumerate(regions):
+            hname = 'h'+LLlabel+'_SR'+reg
+            h_stack = treeSI.getLoopStack(inputdir, hname)
+            for i,h_ in enumerate(h_stack):
+                s_histos[i].GetXaxis().SetBinLabel(n+1,reg)
+                print(h_.GetTitle(), XSECS[h_.GetTitle()])
+                h_.Scale(XSECS[h_.GetTitle()])
+                content = h_.GetBinContent(1)
+                s_histos[i].SetBinContent(n+1,content)
+                s_histos[i].SetBinError(n+1,h_.GetBinError(1))
+                signal_yields[i].append(content)
+                titles.append(h_.GetTitle())
+
+    ### Get maximum
+    maxValbkg = hbkg.GetMaximum()
+    if treeSI:
+        maxValSI = max([s_histos[i].GetMaximum() for i in range(0, len(s_histos))])
+    else:
+        maxValSI = 0.0001
+    maxVal = max([maxValSI, maxValbkg])
+
+    hbkg.SetMaximum(1e4*maxVal)
+    hbkg.SetMinimum(0.1)
+
+    ### -> Canvas object
+    plot = Canvas.Canvas(title, 'png,pdf', 0.15, 0.55, 0.45, 0.84, 1)
+
+    plot.addHisto(hbkg, 'HIST', 'Background (predicted)', 'f', '', 1, 0)
+    plot.addHisto(hunc, 'E2, SAME', 'Background uncertainty', 'f', '', 1, 0)
+    if len(unblinded) > 0:
+        plot.addHisto(hdata, 'P0,SAME', 'Data', 'p', '', 1, 0)
+
+    colors = [r.kRed, r.kOrange, r.kGreen+2, r.kBlue, r.kMagenta]
+    for i,_h in enumerate(s_histos):
+        _h.SetLineWidth(2)
+        masses = eval(_h.GetTitle()[3:])
+        if 'HSS' in _h.GetTitle():
+            legend = 'H#rightarrowSS (%d GeV, %d GeV, %d mm)'%(masses[0], masses[1], masses[2])
+        else:
+            legend = 'RPV (%d GeV, %d GeV, %d mm)'%(masses[0], masses[1], masses[2])
+        plot.addHisto(_h, 'HIST, SAME', legend, 'l', colors[i], 1, i+1) # Signal
+
+    ### Channel banner:
+    if LLlabel == 'EE':
+        plot.addLatex(0.7, 0.7, 'e^{+}e^{-} channel', font = 42, size = 0.045)
+    if LLlabel == 'MM':
+        plot.addLatex(0.7, 0.7, '#mu^{+}#mu^{-} channel', font = 42, size = 0.045)
+
+    ## Systematic bar
+    hsys = False
+    if sys:
+        """
+        hsys = hbkg.Clone("sys_up")
+        hsys.Reset()
+        for n in range(1, hbkg.GetNbinsX() +1):
+            hsys.SetBinContent(n, 1.0 )
+            hsys.SetBinError(n, sys)
+        """
+        """
+        hsys = r.TGraphAsymmErrors(hbkg)
+        for n in range(1, hbkg.GetNbinsX() + 1):
+            if hbkg.GetBinContent(n) == 0: continue
+            hsys.SetPoint(n - 1 , hbkg.GetBinCenter(n), 1.0)
+            ratio     = hdata.GetBinContent(n)/hbkg.GetBinContent(n)
+            ratio_up  = hdata.GetBinContent(n)/(hbkg.GetBinContent(n)-sys*hbkg.GetBinContent(n))
+            ratio_low = hdata.GetBinContent(n)/(hbkg.GetBinContent(n)+sys*hbkg.GetBinContent(n))
+            hsys.SetPointEYlow(n - 1, ratio - ratio_low)
+            hsys.SetPointEYhigh(n - 1, ratio_up - ratio)
+        """
+        hsys = hbkg.Clone("sys_up")
+        hsys.Reset()
+        for n in range(1, hbkg.GetNbinsX() + 1):
+            if hbkg.GetBinContent(n) == 0: continue
+            hsys.SetBinContent(n, 1.0 )
+            hsys.SetBinError(n, hunc.GetBinError(n) / hunc.GetBinContent(n))
+ 
+
+    ### Save it
+    outdir = outpath
+    #plot.save(1, 1, True, luminosity, '', outputDir = outdir, xlog = False, maxYnumbers = 4, is2d = True, inProgress = True)
+    plot.saveRatio2(1, 1, True, luminosity, hdata, hbkg, r_ymin = 0.0, r_ymax = 3.0, label="Obs./Pred.", sys = sys, outputDir = outdir, xlog = False, inProgress = True)
+
+    # Return info for table
+    return np.asarray(BKG_yields), np.transpose(np.asarray(signal_yields)), titles
+
+
+#####################
+#####
+###
+###   Function to plot single limit 
+###
+#####
+#####################
+
+CMSstyle = {
+               'obs' : { 'LineWidth' : 2, 'LineColor' : R.kRed},
+               'exp0' : { 'LineWidth' : 2, 'LineColor' : R.kBlack, 'LineStyle' : 4},
+               'exp1' : { 'FillColor' : R.kGreen+1},
+               'exp2' : { 'FillColor' : R.kOrange}
+               }
+
+
+legend_dict = {
+         'obs' : { 'Label' : 'Observed {0}', 'LegendStyle' : 'L', 'DrawStyle' : 'LSAME'},
+         'exp0' : { 'Label' : 'Median expected{0}', 'LegendStyle' : 'L', 'DrawStyle' : 'LSAME'},
+         'exp1' : { 'Label' : '68% expected', 'LegendStyle' : 'F', 'DrawStyle' : '3SAME'},
+         'exp2' : { 'Label' : '95% expected', 'LegendStyle' : 'F', 'DrawStyle' : '3SAME'}
+         }
+
+def setLegendLabel(legend, label):
+    legend['obs']['Label'] = legend['obs']['Label'].format(label)
+    legend['exp0']['Label'] = legend['exp0']['Label'].format(label)
+
+def makeSingleLimitPlot(plotname, jsonfile_limit, theory, flavor, lumilabel, masstext, modeltext, references = False, ymin = 1e-5, ymax = 1e6, xmin = 1e-3, xmax = 1e6, scale = False, ylabel = '', unblind = False):
+
+    # Style and pads
+    ModTDRStyle()
+    r.gStyle.SetFrameLineWidth(2)
+    r.gStyle.SetLegendFont(42)
+    r.gStyle.SetLegendTextSize(0.033)
+    r.gStyle.SetNdivisions(510, 'Y')
+    canv = r.TCanvas('limit', 'limit', 600, 500)
+    canv.SetFillStyle(4000);
+    canv.SetFrameFillColor(4000);
+    canv.SetFrameFillStyle(4000);
+    pads = OnePad()
+
+    # Get Limit
+    if not scale:
+        jsonfile = jsonfile_limit
+    else:
+        with open(jsonfile_limit) as f:
+            limit_values = json.load(f)
+        for key1 in limit_values.keys():
+            for key2 in limit_values[key1]:
+                limit_values[key1][key2] = scale * limit_values[key1][key2]
+
+        with open('.temp_scaledlimits.json', 'w') as outfile:
+            json.dump(limit_values, outfile)
+        jsonfile = '.temp_scaledlimits.json'
+
+    limit = StandardLimitsFromJSONFile(jsonfile)
+
+    # Get references
+    graphs = []
+    if references:
+        for other in references:
+            _file = r.TFile(other[0])
+            _graph = _file.Get(other[1])
+            _graph.SetLineColor(other[3])
+            _graph.SetLineStyle(other[4])
+            _graph.SetLineWidth(2)
+            graphs.append([copy.deepcopy(_graph), other[2]])
+
+    # Create an empty TH1 from the first TGraph to serve as the pad axis and frame
+    axis = r.TH1F('axis', '', 1, xmin, xmax)
+    axis.GetXaxis().SetTitle('c#tau [cm]')
+    if ylabel:
+        axis.GetYaxis().SetTitle(ylabel)
+    elif theory == 'HSS':
+        axis.GetYaxis().SetTitle('#sigma(H)xB(H#rightarrowSS) [pb]')
+    elif theory == 'RPV':
+        axis.GetYaxis().SetTitle('#sigma(#tilde{q}#bar{#tilde{q}}+#tilde{q}#tilde{q})xB(#tilde{q}#rightarrowq#tilde{#chi}^{0}_{1}) [pb]')
+    axis.GetYaxis().SetRangeUser(ymin, ymax)
+    axis.GetXaxis().SetRangeUser(xmin, xmax)
+    axis.SetFillColor(4000);
+    pads[0].cd()
+    pads[0].SetFillStyle(4000)
+    pads[0].SetFrameFillStyle(4000)
+    axis.Draw('axis')
+
+    ### Create legend
+    legend = PositionedLegend(0.37, 0.2, 3, 0.05, horizontaloffset=0.15)
+
+    ### Draw
+    StyleLimitBand(limit, overwrite_style_dict=CMSstyle)
+    setLegendLabel(legend_dict, ' ')
+    if unblind:
+        DrawLimitBand(pads[0], limit, draw=['exp2', 'exp1', 'exp0', 'obs'], legend=legend, legend_overwrite=legend_dict)
+    else:
+        DrawLimitBand(pads[0], limit, draw=['exp2', 'exp1', 'exp0'], legend=legend, legend_overwrite=legend_dict)
+    for graph in graphs:
+        graph[0].Draw('L, SAME')
+        legend.AddEntry(graph[0], graph[1], 'l')
+    legend.Draw()
+
+    # Re-draw the frame and tick marks
+    pads[0].RedrawAxis()
+    pads[0].GetFrame().Draw()
+    pads[0].SetLogx(1)
+    pads[0].SetLogy(1)
+    pads[0].SetTickx(1)
+    pads[0].SetTicky(1)
+
+    # Standard CMS logo
+    # DrawCMSLogo(pads[0], 'CMS', 'Internal', 0, 0.045, 0.035, 1000.0, '', 0.8)
+    CMSlabel = r.TLatex()
+    CMSlabel.SetNDC();
+    CMSlabel.SetTextAngle(0);
+    CMSlabel.SetTextColor(r.kBlack);
+    CMSlabel.SetTextFont(42);
+    CMSlabel.SetTextAlign(12);
+    CMSlabel.SetTextSize(0.055);
+    CMSlabel.DrawLatex(0.2, 0.89, "#bf{CMS}")
+    CMSextralabel = r.TLatex()
+    CMSextralabel.SetNDC();
+    CMSextralabel.SetTextAngle(0);
+    CMSextralabel.SetTextColor(r.kBlack);
+    CMSextralabel.SetTextFont(42);
+    CMSextralabel.SetTextAlign(12);
+    CMSextralabel.SetTextSize(0.036);
+    CMSextralabel.DrawLatex(0.2, 0.84, "#it{Work in progress}")
+
+    # Channel label
+    Channellabel = r.TLatex()
+    Channellabel.SetNDC();
+    Channellabel.SetTextAngle(0);
+    Channellabel.SetTextColor(r.kBlack);
+    Channellabel.SetTextFont(42);
+    Channellabel.SetTextAlign(13);
+    Channellabel.SetTextSize(0.04);
+    if flavor == 'Electron':
+        Channellabel.DrawLatex(0.2, 0.79, "ee channel")
+    elif flavor == 'Muon':
+        Channellabel.DrawLatex(0.2, 0.79, "#mu#mu channel")
+    elif flavor == 'Joint':
+        Channellabel.DrawLatex(0.2, 0.79, "Combined channel")
+
+    # Year label
+    Yearlabel = r.TLatex()
+    Yearlabel.SetNDC();
+    Yearlabel.SetTextAngle(0);
+    Yearlabel.SetTextColor(r.kBlack);
+    Yearlabel.SetTextFont(42);
+    Yearlabel.SetTextAlign(33);
+    Yearlabel.SetTextSize(0.04);
+    Yearlabel.DrawLatex(0.96, 0.99, lumilabel)
+
+    CLlabel = r.TLatex()
+    CLlabel.SetNDC();
+    CLlabel.SetTextAngle(0);
+    CLlabel.SetTextColor(r.kBlack);
+    CLlabel.SetTextFont(42);
+    CLlabel.SetTextAlign(13);
+    CLlabel.SetTextSize(0.04);
+    CLlabel.DrawLatex(0.16, 0.98, "95% CL upper limits")
+
+    # Model label
+    Modellabel = r.TLatex()
+    Modellabel.SetNDC();
+    Modellabel.SetTextAngle(0);
+    Modellabel.SetTextColor(r.kBlack);
+    Modellabel.SetTextFont(42);
+    Modellabel.SetTextAlign(13);
+    Modellabel.SetTextSize(0.037);
+    Modellabel.DrawLatex(0.20, 0.55, modeltext)
+    """
+    if theory=='HSS':
+        Modellabel.DrawLatex(0.20, 0.55, "H #rightarrow SS, S #rightarrow l^{+}l^{-}") # Hardcoded
+    elif theory=='RPV':
+        Modellabel.DrawLatex(0.20, 0.55, "2#tilde{q}, #tilde{q}#rightarrowq#tilde{#chi}^{0}, #tilde{#chi}^{0}_{1} #rightarrow l^{+}l^{-}#nu") # Hardcoded
+    """
+
+    Masslabel = r.TLatex()
+    Masslabel.SetNDC();
+    Masslabel.SetTextAngle(0);
+    Masslabel.SetTextColor(r.kBlack);
+    Masslabel.SetTextFont(42);
+    Masslabel.SetTextAlign(13);
+    Masslabel.SetTextSize(0.037);
+    Masslabel.DrawLatex(0.20, 0.65, masstext)
+
+    # Re-draw axis
+    axis.Draw('axis, same')
+
+    canv.Update()
+    canv.Modified()
+    canv.Print(plotname + '.pdf')
+    canv.Print(plotname + '.png')
+
+
+
+#####################
+#####
+###
+###   Function to plot limit comparison with our analysis and other analyses
+###
+#####
+#####################
+
+def makeLimitComparison(name, lumi, limitSet, masslabel = [], ymin = 1e-5, ymax = 1e6, xmin = 1e-3, xmax = 1e6):
+
+    ModTDRStyle()
+    r.gStyle.SetLegendFont(42)
+    r.gStyle.SetLegendTextSize(0.033)
+    r.gStyle.SetNdivisions(510, 'Y')
+    canv = r.TCanvas('limit', 'limit')
+    canv.SetFillStyle(4000);
+    canv.SetFrameFillColor(4000);
+    canv.SetFrameFillStyle(4000);
+    pads = OnePad()
+
+    ### Get the reference graph
+    referenceLimit = StandardLimitsFromJSONFile(limitSet['Reference'][0])
+
+    ### Get the graphs (pending)
+    graphs = []
+    for other in limitSet['Others']:
+        _file = r.TFile(other[0])
+        _graph = _file.Get(other[1])
+        _graph.SetLineColor(other[3])
+        _graph.SetLineStyle(other[4])
+        _graph.SetLineWidth(2)
+        graphs.append([copy.deepcopy(_graph), other[2]])
+
+
+    ### Create axis to draw the limits
+    #axis = CreateAxisHist(referenceLimit['exp0'])
+    axis = r.TH1F('axis', '', 1, xmin, xmax)
+    axis.GetXaxis().SetTitle('c#tau [cm]')
+    axis.GetYaxis().SetTitle('#sigma(H#rightarrowSS) [pb]')
+    axis.GetYaxis().SetRangeUser(ymin, ymax)
+    axis.GetXaxis().SetRangeUser(xmin, xmax)
+    axis.SetFillColor(4000);
+    pads[0].cd()
+    pads[0].SetFillStyle(4000)
+    pads[0].SetFrameFillStyle(4000)
+    axis.Draw('axis')
+
+    ### Create the legend
+    legend = r.TLegend(0.17, 0.65, 0.5, 0.8)
+
+    ### Draw the reference graph    
+    #StyleLimitBand(referenceLimit, overwrite_style_dict=CMSstyle)
+    #DrawLimitBand(pads[0], referenceLimit, draw=['exp0'], legend=None, legend_overwrite=None)
+    referenceLimit['exp0'].SetLineColor(r.kBlack)
+    referenceLimit['exp0'].SetLineWidth(2)
+    referenceLimit['exp0'].Draw('L, SAME')
+    legend.AddEntry(referenceLimit['exp0'], limitSet['Reference'][1], 'l')
+
+    ### Draw the other graphs
+    for graph in graphs:
+        graph[0].Draw('L, SAME')
+        legend.AddEntry(graph[0], graph[1], 'l')
+
+    legend.Draw()
+
+    # Re-draw the frame and tick marks
+    pads[0].RedrawAxis()
+    pads[0].GetFrame().Draw()
+    pads[0].SetLogx(1)
+    pads[0].SetLogy(1)
+    pads[0].SetTickx(1)
+    pads[0].SetTicky(1)
+
+    # Standard CMS logo
+    CMSlabel = r.TLatex()
+    CMSlabel.SetNDC();
+    CMSlabel.SetTextAngle(0);
+    CMSlabel.SetTextColor(r.kBlack);
+    CMSlabel.SetTextFont(42);
+    CMSlabel.SetTextAlign(22);
+    CMSlabel.SetTextSize(0.06);
+    CMSlabel.DrawLatex(0.28, 0.89, "#bf{CMS}")
+    CMSextralabel = r.TLatex()
+    CMSextralabel.SetNDC();
+    CMSextralabel.SetTextAngle(0);
+    CMSextralabel.SetTextColor(r.kBlack);
+    CMSextralabel.SetTextFont(42);
+    CMSextralabel.SetTextAlign(22);
+    CMSextralabel.SetTextSize(0.04);
+    CMSextralabel.DrawLatex(0.28, 0.84, "#it{Internal}")
+
+    # Year label
+    Yearlabel = r.TLatex()
+    Yearlabel.SetNDC();
+    Yearlabel.SetTextAngle(0);
+    Yearlabel.SetTextColor(r.kBlack);
+    Yearlabel.SetTextFont(42);
+    Yearlabel.SetTextAlign(33);
+    Yearlabel.SetTextSize(0.04);
+    Yearlabel.DrawLatex(0.96, 0.99, lumi)
+
+    CLlabel = r.TLatex()
+    CLlabel.SetNDC();
+    CLlabel.SetTextAngle(0);
+    CLlabel.SetTextColor(r.kBlack);
+    CLlabel.SetTextFont(42);
+    CLlabel.SetTextAlign(13);
+    CLlabel.SetTextSize(0.04);
+    CLlabel.DrawLatex(0.16, 0.98, "95% CL upper limits")
+
+    # Model label
+    Modellabel = r.TLatex()
+    Modellabel.SetNDC();
+    Modellabel.SetTextAngle(0);
+    Modellabel.SetTextColor(r.kBlack);
+    Modellabel.SetTextFont(42);
+    Modellabel.SetTextAlign(13);
+    Modellabel.SetTextSize(0.037);
+    Modellabel.DrawLatex(0.4, 0.9, masslabel[0])
+    Modellabel.DrawLatex(0.4, 0.85, masslabel[1])
+
+    # Re-draw axis
+    axis.Draw('axis, same')
+
+    canv.Update()
+    canv.Modified()
+    canv.Print(name + '.pdf')
+    canv.Print(name + '.png')
+
+
 
 
 

@@ -62,6 +62,7 @@ styles = []
 styles.append(style_blue_dict)
 styles.append(style_red_dict)
 styles.append(style_green_dict)
+styles.append(style_magenta_dict)
 
 ##### Combined legend definition
 
@@ -140,9 +141,9 @@ if __name__ == "__main__":
  
     # Create a legend in the top left
     if len(graphs) == 1:
-        legend = PositionedLegend(0.45, 0.15, 3, 0.045)
+        legend = PositionedLegend(0.4, 0.15, 3, 0.03)
     else:
-        legend = PositionedLegend(0.45, 0.07*len(graphs), 3, 0.1, 0.045)
+        legend = PositionedLegend(0.4, 0.07*len(graphs), 3, 0.1, 0.03)
  
     # Set the standard green and yellow colors and draw
     if len(graphs) == 1:
@@ -189,17 +190,17 @@ if __name__ == "__main__":
     CMSlabel.SetTextAngle(0);
     CMSlabel.SetTextColor(ROOT.kBlack);
     CMSlabel.SetTextFont(42);
-    CMSlabel.SetTextAlign(22);
+    CMSlabel.SetTextAlign(12);
     CMSlabel.SetTextSize(0.06);
-    CMSlabel.DrawLatex(0.28, 0.89, "#bf{CMS}")
+    CMSlabel.DrawLatex(0.2, 0.89, "#bf{CMS}")
     CMSextralabel = ROOT.TLatex()
     CMSextralabel.SetNDC();
     CMSextralabel.SetTextAngle(0);
     CMSextralabel.SetTextColor(ROOT.kBlack);
     CMSextralabel.SetTextFont(42);
-    CMSextralabel.SetTextAlign(22);
+    CMSextralabel.SetTextAlign(12);
     CMSextralabel.SetTextSize(0.04);
-    CMSextralabel.DrawLatex(0.31, 0.84, "#it{Preliminary}")
+    CMSextralabel.DrawLatex(0.2, 0.84, "#it{Work in progress}")
     
     # Channel label
     Channellabel = ROOT.TLatex()
@@ -232,7 +233,10 @@ if __name__ == "__main__":
         Yearlabel.DrawLatex(0.96, 0.99, "59.7 fb^{-1} (13 TeV)")
     elif opts.year == 'Full':
         #Yearlabel.DrawLatex(0.96, 0.99, "96 fb^{-1} (13 TeV)")
-        Yearlabel.DrawLatex(0.96, 0.99, "117 fb^{-1} (13 TeV)")
+        if opts.flavor == 'Electron':
+            Yearlabel.DrawLatex(0.96, 0.99, "112 fb^{-1} (13 TeV)")
+        else:
+            Yearlabel.DrawLatex(0.96, 0.99, "96 fb^{-1} (13 TeV)")
 
     CLlabel = ROOT.TLatex()
     CLlabel.SetNDC();

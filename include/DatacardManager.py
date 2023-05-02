@@ -115,8 +115,9 @@ class SystematicsHandler:
         nuisanceList = []
         nbck = len(channels[0].backgrounds)
         for i, thename in enumerate(self.name):
-            print self.year[i], year
+            print thename, self.year[i], year
             if self.correlated[i] == '0' and self.year[i] != year:
+                print('continue')
                 continue
             nuisance = ''
             nuisance += self.toCell(self.name[i], int(self.hwidth/2))
@@ -253,6 +254,7 @@ class Datacard:
 
         # nuisances
         self.nuisance = self.Systematics.listOfSystematics(self.year, self.channels)
+        print(self.nuisance)
 
         ### Write file:
         if not os.path.exists(outputDir):
@@ -322,8 +324,8 @@ class Channel:
 
     def addData(self, h):
 
-        nbinmin = h.FindBin(self.xmin)
-        nbinmax = h.FindBin(self.xmax)
+        nbinmin = h.FindBin(float(self.xmin))
+        nbinmax = h.FindBin(float(self.xmax))
         value = h.Integral(nbinmin, nbinmax)
 
         self.data += value

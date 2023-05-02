@@ -49,9 +49,10 @@ if __name__ == "__main__":
         output_dict_xsec[mass]["exp+1"] = xsec * _limits.limit
         _limits.GetEntry(4)
         output_dict_mu[mass]["exp+2"] = _limits.limit
-        output_dict_mu[mass]["obs"] = output_dict_mu[mass]["exp0"]
         output_dict_xsec[mass]["exp+2"] = xsec * _limits.limit
-        output_dict_xsec[mass]["obs"] = output_dict_xsec[mass]["exp0"]
+        _limits.GetEntry(5)
+        output_dict_mu[mass]["obs"] = _limits.limit
+        output_dict_xsec[mass]["obs"] = xsec * _limits.limit
 
     outdir = opts.outdir
     if outdir[-1] != '/': outdir = outdir + '/'
