@@ -1,0 +1,227 @@
+import ROOT as r
+from   ROOT import gROOT, TCanvas, TFile, TGraphErrors, SetOwnership
+import math, sys, optparse, array, copy, os
+import gc, inspect, __main__
+import numpy as np
+import time
+import shutil
+
+import include.Sample as Sample
+import include.Launcher as Launcher
+import include.helper as helper
+import include.Canvas as Canvas
+import include.CutManager as CutManager
+from include.Utils import makeBackgroundValidationPlot
+
+
+################################# GLOBAL VARIABLES DEFINITION ####################################
+
+runningfile = os.path.abspath(__file__)
+WORKPATH = ''
+for level in runningfile.split('/')[:-1]: 
+    WORKPATH += level
+    WORKPATH += '/'
+
+if __name__ == "__main__":
+
+    parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
+    parser.add_option('-i', '--input', action='store', type=str, dest='input', default='', help='Target directory')
+    (opts, args) = parser.parse_args()
+
+    ############# Set the TDR plot style
+    r.gROOT.LoadMacro(WORKPATH + 'include/tdrstyle.C+')
+    r.gROOT.SetBatch(1)
+    r.setTDRStyle()
+    r.gStyle.SetOptFit(0)
+
+
+    ############# EG data definition
+    DoubleEGB = 'DoubleEG_Run2016B_HIPM'
+    DoubleEGC = 'DoubleEG_Run2016C_HIPM'
+    DoubleEGD = 'DoubleEG_Run2016D_HIPM'
+    DoubleEGE = 'DoubleEG_Run2016E_HIPM'
+    DoubleEGF1 = 'DoubleEG_Run2016F_HIPM'
+    DoubleEGF2 = 'DoubleEG_Run2016F_noHIPM'
+    DoubleEGG = 'DoubleEG_Run2016G_noHIPM'
+    DoubleEGH = 'DoubleEG_Run2016H_noHIPM'
+
+    DoubleEG_HIPM = []
+    DoubleEG_noHIPM = []
+    DoubleEG_HIPM.append(DoubleEGB)
+    DoubleEG_HIPM.append(DoubleEGC)
+    DoubleEG_HIPM.append(DoubleEGD)
+    DoubleEG_HIPM.append(DoubleEGE)
+    DoubleEG_HIPM.append(DoubleEGF1)
+    DoubleEG_noHIPM.append(DoubleEGF2)
+    DoubleEG_noHIPM.append(DoubleEGG)
+    DoubleEG_noHIPM.append(DoubleEGH)
+
+    DoubleEG2017 = []
+    DoubleEG2017.append('DoubleEG_Run2017B')
+    DoubleEG2017.append('DoubleEG_Run2017C')
+    DoubleEG2017.append('DoubleEG_Run2017D')
+    DoubleEG2017.append('DoubleEG_Run2017E')
+    DoubleEG2017.append('DoubleEG_Run2017F')
+
+    EGamma2018 = []
+    EGamma2018.append('EGamma_Run2018A')
+    EGamma2018.append('EGamma_Run2018B')
+    EGamma2018.append('EGamma_Run2018C')
+    EGamma2018.append('EGamma_Run2018D')
+
+    ############# Muon data definition
+    DoubleMuonB = 'DoubleMuon_Run2016B_HIPM'
+    DoubleMuonC = 'DoubleMuon_Run2016C_HIPM'
+    DoubleMuonD = 'DoubleMuon_Run2016D_HIPM'
+    DoubleMuonE = 'DoubleMuon_Run2016E_HIPM'
+    DoubleMuonF1 = 'DoubleMuon_Run2016F_HIPM'
+    DoubleMuonF2 = 'DoubleMuon_Run2016F_noHIPM'
+    DoubleMuonG = 'DoubleMuon_Run2016G_noHIPM'
+    DoubleMuonH = 'DoubleMuon_Run2016H_noHIPM'
+
+    DoubleMuon_HIPM = []
+    DoubleMuon_noHIPM = []
+    DoubleMuon_HIPM.append(DoubleMuonB)
+    DoubleMuon_HIPM.append(DoubleMuonC)
+    DoubleMuon_HIPM.append(DoubleMuonD)
+    DoubleMuon_HIPM.append(DoubleMuonE)
+    DoubleMuon_HIPM.append(DoubleMuonF1)
+    DoubleMuon_noHIPM.append(DoubleMuonF2)
+    DoubleMuon_noHIPM.append(DoubleMuonG)
+    DoubleMuon_noHIPM.append(DoubleMuonH)
+
+    DoubleMuon2018 = []
+    DoubleMuon2018.append('DoubleMuon_Run2018A')
+    DoubleMuon2018.append('DoubleMuon_Run2018B')
+    DoubleMuon2018.append('DoubleMuon_Run2018C')
+    DoubleMuon2018.append('DoubleMuon_Run2018D')
+
+
+    filename = 'dat/Samples_cern_UltraLegacy_Spring23.dat'
+    www = '/eos/user/f/fernance/www/DisplacedLeptons-analysis/Background-validation/Spring23/'
+
+    ######################################
+    ######## Some bin definitions ########
+    ######################################
+    mass_rebin =  np.concatenate((np.arange(0, 90, 5, float), np.arange(90, 130, 10), np.arange(130, 190, 15), np.arange(190, 260, 40), np.array([300])))
+    mass_rebin =  np.concatenate((np.arange(0, 15, 5, float), 
+                                  np.arange(15, 65, 10, float), 
+                                  np.arange(65, 100, 5, float), 
+                                  np.arange(100, 220, 15, float), 
+                                  np.arange(220, 400, 20, float)))
+#                                  np.arange(15, 65, 10, float), 
+#                                  np.arange(100, 400, 15, float)))
+
+
+    Ixy_reb = [0.0, 1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 10.0, 14.0, 20.0, 30.0, 40.0]
+    Ixy_rebin = np.array(Ixy_reb)
+
+    ################################
+    ######## DoubleEG Plots ########
+    ################################
+    treeDATA_HIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_HIPM, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_noHIPM, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_HIPM + DoubleEG_noHIPM, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2017, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, EGamma2018, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_full = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_HIPM + DoubleEG_noHIPM + DoubleEG2017 + EGamma2018, 'DATA'), name = 'DATA', isdata = 1, close = True)
+
+    #### Prompt validation
+
+    makeBackgroundValidationPlot(name = 'EEprompt_mass_HIPM', lumi = 19.7, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEprompt_mass_noHIPM', lumi = 16.15, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEprompt_mass_2016', lumi = 35.9, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEprompt_mass_2017', lumi = 41.5, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_2017, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEprompt_mass_2018', lumi = 59.8, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
+
+    #### On-Z validation
+
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackIxy_log_HIPM', lumi = 19.7, hname_SR = 'hEEOnZSR_trackIxy_log', hname_CR = 'hEEOnZBCR_trackIxy_log', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = True, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackIxy_HIPM', lumi = 19.7, hname_SR = 'hEEOnZSR_trackIxy', hname_CR = 'hEEOnZBCR_trackIxy', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackIxy_log_noHIPM', lumi = 16.2, hname_SR = 'hEEOnZSR_trackIxy_log', hname_CR = 'hEEOnZBCR_trackIxy_log', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = True, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackIxy_noHIPM', lumi = 16.2, hname_SR = 'hEEOnZSR_trackIxy', hname_CR = 'hEEOnZBCR_trackIxy', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_Ixy_noHIPM', lumi = 16.2, hname_SR = 'hEEOnZSR_Ixy', hname_CR = 'hEEOnZBCR_Ixy', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_Lxy_noHIPM', lumi = 16.2, hname_SR = 'hEEOnZSR_Lxy', hname_CR = 'hEEOnZBCR_Lxy', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, rebin = 5, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+
+
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackIxy_log_2016', lumi = 35.9, hname_SR = 'hEEOnZSR_trackIxy_log', hname_CR = 'hEEOnZBCR_trackIxy_log', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = True, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackIxy_2016', lumi = 35.9, hname_SR = 'hEEOnZSR_trackIxy', hname_CR = 'hEEOnZBCR_trackIxy', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackDxy_2016', lumi = 35.9, hname_SR = 'hEEOnZSR_trackDxy', hname_CR = 'hEEOnZBCR_trackDxy', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_sigmaD_2016', lumi = 35.9, hname_SR = 'hEEOnZSR_sigmaD', hname_CR = 'hEEOnZBCR_sigmaD', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_Ixy_2016', lumi = 35.9, hname_SR = 'hEEOnZSR_Ixy', hname_CR = 'hEEOnZBCR_Ixy', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_Lxy_2016', lumi = 35.9, hname_SR = 'hEEOnZSR_Lxy', hname_CR = 'hEEOnZBCR_Lxy', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, rebin = 5, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackIxy_log_2017', lumi = 41.5, hname_SR = 'hEEOnZSR_trackIxy_log', hname_CR = 'hEEOnZBCR_trackIxy_log', ylog = True, treeDATA = treeDATA_2017, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = True, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackIxy_2017', lumi = 41.5, hname_SR = 'hEEOnZSR_trackIxy', hname_CR = 'hEEOnZBCR_trackIxy', ylog = True, treeDATA = treeDATA_2017, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackDxy_2017', lumi = 41.5, hname_SR = 'hEEOnZSR_trackDxy', hname_CR = 'hEEOnZBCR_trackDxy', ylog = True, treeDATA = treeDATA_2017, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_sigmaD_2017', lumi = 41.5, hname_SR = 'hEEOnZSR_sigmaD', hname_CR = 'hEEOnZBCR_sigmaD', ylog = True, treeDATA = treeDATA_2017, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_Ixy_2017', lumi = 41.5, hname_SR = 'hEEOnZSR_Ixy', hname_CR = 'hEEOnZBCR_Ixy', ylog = True, treeDATA = treeDATA_2017, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_Lxy_2017', lumi = 41.5, hname_SR = 'hEEOnZSR_Lxy', hname_CR = 'hEEOnZBCR_Lxy', ylog = True, treeDATA = treeDATA_2017, inputdir = opts.input, rebin = 5, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+
+
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackIxy_log_2018', lumi = 59.8, hname_SR = 'hEEOnZSR_trackIxy_log', hname_CR = 'hEEOnZBCR_trackIxy_log', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = True, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackIxy_2018', lumi = 59.8, hname_SR = 'hEEOnZSR_trackIxy', hname_CR = 'hEEOnZBCR_trackIxy', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackDxy_2018', lumi = 59.8, hname_SR = 'hEEOnZSR_trackDxy', hname_CR = 'hEEOnZBCR_trackDxy', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_Ixy_2018', lumi = 59.8, hname_SR = 'hEEOnZSR_Ixy', hname_CR = 'hEEOnZBCR_Ixy', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, xlabel = '', rebin = 2, outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_Lxy_2018', lumi = 59.8, hname_SR = 'hEEOnZSR_Lxy', hname_CR = 'hEEOnZBCR_Lxy', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, xlabel = '', rebin = 5, outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+
+
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackIxy_log_full', lumi = 137.1, hname_SR = 'hEEOnZSR_trackIxy_log', hname_CR = 'hEEOnZBCR_trackIxy_log', ylog = True, treeDATA = treeDATA_full, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = True, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_trackIxy_full', lumi = 137.1, hname_SR = 'hEEOnZSR_trackIxy', hname_CR = 'hEEOnZBCR_trackIxy', ylog = True, treeDATA = treeDATA_full, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_Lxy_full', lumi = 137.1, hname_SR = 'hEEOnZSR_Lxy', hname_CR = 'hEEOnZBCR_Lxy', ylog = True, treeDATA = treeDATA_full, inputdir = opts.input, xlabel = '', rebin = 5, outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEOnZ_Ixy_full', lumi = 137.1, hname_SR = 'hEEOnZSR_Ixy', hname_CR = 'hEEOnZBCR_Ixy', ylog = True, treeDATA = treeDATA_full, inputdir = opts.input, xlabel = '', rebin = 2, outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+
+
+    ##################################
+    ######## DoubleMuon Plots ########
+    ##################################
+    
+    treeDATA_HIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_HIPM, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_noHIPM, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_HIPM + DoubleMuon_noHIPM, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_full = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_HIPM + DoubleMuon_noHIPM + DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1, close = True)
+
+    #### Prompt validation
+    ## 2016
+    makeBackgroundValidationPlot(name = 'MMPrompt_mass_HIPM', lumi = 19.7, hname_SR = 'hMMPromptSR_mass', hname_CR = 'hMMPromptBCR_mass', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMPrompt_mass_noHIPM', lumi = 16.2, hname_SR = 'hMMPromptSR_mass', hname_CR = 'hMMPromptBCR_mass', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMPrompt_mass_2016', lumi = 35.9, hname_SR = 'hMMPromptSR_mass', hname_CR = 'hMMPromptBCR_mass', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
+    ## 2018
+    makeBackgroundValidationPlot(name = 'MMPrompt_mass_2018', lumi = 59.8, hname_SR = 'hMMPromptSR_mass', hname_CR = 'hMMPromptBCR_mass', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
+    ## 2016 + 2018
+
+    
+    #### On-Z validation
+    ## 2016
+    makeBackgroundValidationPlot(name = 'MMOnZ_trackIxy_log_HIPM', lumi = 19.7, hname_SR = 'hMMOnZSR_trackIxy_log', hname_CR = 'hMMOnZBCR_trackIxy_log', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input,  xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = True, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_trackIxy_HIPM', lumi = 19.7, hname_SR = 'hMMOnZSR_trackIxy', hname_CR = 'hMMOnZBCR_trackIxy', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_Lxy_HIPM', lumi = 19.7, hname_SR = 'hMMOnZSR_Lxy', hname_CR = 'hMMOnZBCR_Lxy', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, rebin = 5, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_Ixy_HIPM', lumi = 19.7, hname_SR = 'hMMOnZSR_Ixy', hname_CR = 'hMMOnZBCR_Ixy', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+
+    makeBackgroundValidationPlot(name = 'MMOnZ_trackIxy_log_noHIPM', lumi = 16.2, hname_SR = 'hMMOnZSR_trackIxy_log', hname_CR = 'hMMOnZBCR_trackIxy_log', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input,  xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = True, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_trackIxy_noHIPM', lumi = 16.2, hname_SR = 'hMMOnZSR_trackIxy', hname_CR = 'hMMOnZBCR_trackIxy', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_Lxy_noHIPM', lumi = 16.2, hname_SR = 'hMMOnZSR_Lxy', hname_CR = 'hMMOnZBCR_Lxy', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, rebin = 5, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_Ixy_noHIPM', lumi = 16.2, hname_SR = 'hMMOnZSR_Ixy', hname_CR = 'hMMOnZBCR_Ixy', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+
+
+    makeBackgroundValidationPlot(name = 'MMOnZ_trackIxy_log_2016', lumi = 35.9, hname_SR = 'hMMOnZSR_trackIxy_log', hname_CR = 'hMMOnZBCR_trackIxy_log', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input,  xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = True, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_trackIxy_2016', lumi = 35.9, hname_SR = 'hMMOnZSR_trackIxy', hname_CR = 'hMMOnZBCR_trackIxy', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_trackDxy_2016', lumi = 35.9, hname_SR = 'hMMOnZSR_trackDxy', hname_CR = 'hMMOnZBCR_trackDxy', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_Lxy_2016', lumi = 35.9, hname_SR = 'hMMOnZSR_Lxy', hname_CR = 'hMMOnZBCR_Lxy', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, rebin = 5, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_Ixy_2016', lumi = 35.9, hname_SR = 'hMMOnZSR_Ixy', hname_CR = 'hMMOnZBCR_Ixy', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+
+    ## 2018
+    makeBackgroundValidationPlot(name = 'MMOnZ_trackIxy_log_2018', lumi = 59.8, hname_SR = 'hMMOnZSR_trackIxy_log', hname_CR = 'hMMOnZBCR_trackIxy_log', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input,  xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = True, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_trackIxy_2018', lumi = 59.8, hname_SR = 'hMMOnZSR_trackIxy', hname_CR = 'hMMOnZBCR_trackIxy', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_trackDxy_2018', lumi = 59.8, hname_SR = 'hMMOnZSR_trackDxy', hname_CR = 'hMMOnZBCR_trackDxy', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_Lxy_2018', lumi = 59.8, hname_SR = 'hMMOnZSR_Lxy', hname_CR = 'hMMOnZBCR_Lxy', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, rebin = 5, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_Ixy_2018', lumi = 59.8, hname_SR = 'hMMOnZSR_Ixy', hname_CR = 'hMMOnZBCR_Ixy', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+
+    ## 2016 + 2018
+    makeBackgroundValidationPlot(name = 'MMOnZ_trackIxy_log_full', lumi = 96.7, hname_SR = 'hMMOnZSR_trackIxy_log', hname_CR = 'hMMOnZBCR_trackIxy_log', ylog = True, treeDATA = treeDATA_full, inputdir = opts.input,  xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = True, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_trackIxy_full', lumi = 96.7, hname_SR = 'hMMOnZSR_trackIxy', hname_CR = 'hMMOnZBCR_trackIxy', ylog = True, treeDATA = treeDATA_full, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_Lxy_full', lumi = 96.7, hname_SR = 'hMMOnZSR_Lxy', hname_CR = 'hMMOnZBCR_Lxy', ylog = True, treeDATA = treeDATA_full, inputdir = opts.input, rebin = 5, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMOnZ_Ixy_full', lumi = 96.7, hname_SR = 'hMMOnZSR_Ixy', hname_CR = 'hMMOnZBCR_Ixy', ylog = True, treeDATA = treeDATA_full, inputdir = opts.input, rebin = 2, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'On-Z control region', xlog = False, sys = 0.1) 
+
+
