@@ -53,10 +53,12 @@ class Canvas:
       latex.SetTextAlign(31);                 
       latex.SetTextSize(0.06);                
       if isPrivate:
+          latex.SetTextSize(0.04);                
+          latex.SetTextAlign(11);                 
           if not scy:
-              latex.DrawLatex(0.25, 0.93, "#bf{Private work}") 
+              latex.DrawLatex(0.13, 0.93, "#bf{Private work}") 
           else:               
-              latex.DrawLatex(0.34, 0.93, "#bf{Private work}") 
+              latex.DrawLatex(0.22, 0.93, "#bf{Private work}") 
       else:
           if not scy:
               latex.DrawLatex(0.25, 0.93, "#bf{CMS}") 
@@ -73,10 +75,11 @@ class Canvas:
       latexb.SetTextSize(0.04);            
 
       if isPrivate:
+         latexb.SetTextSize(0.03);            
          if not scy:
-             latexb.DrawLatex(0.26, 0.93, "#it{CMS data/simulation}")
-         else:
              latexb.DrawLatex(0.35, 0.93, "#it{CMS data/simulation}")
+         else:
+             latexb.DrawLatex(0.44, 0.93, "#it{CMS data/simulation}")
       elif inProgress:
          if not scy:
              latexb.DrawLatex(0.26, 0.93, "#it{Work in progress}")
@@ -124,7 +127,7 @@ class Canvas:
       latexc.SetTextSize(0.04);
       latexc.DrawLatex(0.90, 0.93, text_lumi)                
 
-   def bannerInFrame(self, isData, lumi, inProgress = False):
+   def bannerInFrame(self, isData, lumi, inProgress = False, isPrivate = False):
      
       latex = TLatex()
       latex.SetNDC();                         
@@ -133,7 +136,10 @@ class Canvas:
       latex.SetTextFont(42);                  
       latex.SetTextAlign(11);                 
       latex.SetTextSize(0.05);                
-      latex.DrawLatex(0.17, 0.84, "#bf{CMS}") 
+      if isPrivate:
+          latex.DrawLatex(0.17, 0.84, "#bf{Private work}") 
+      else:
+          latex.DrawLatex(0.17, 0.84, "#bf{CMS}") 
 
          
       latexb = TLatex()                      
@@ -146,6 +152,8 @@ class Canvas:
 
       if inProgress:
           latexb.DrawLatex(0.17, 0.8, "#it{Work in progress}")
+      elif isPrivate:
+          latexb.DrawLatex(0.17, 0.8, "#it{CMS data/simulation}")
       elif(isData):
           latexb.DrawLatex(0.17, 0.8, "#it{Preliminary}")
       else:
@@ -218,9 +226,9 @@ class Canvas:
                  latexb.DrawLatex(0.53, 0.88, "#it{Work in progress}")
          elif isPrivate:
              if not scy:
-                 latexb.DrawLatex(0.6, 0.88, "#it{CMS data/simulation}")
+                 latexb.DrawLatex(0.61, 0.88, "#it{CMS data/simulation}")
              else:
-                 latexb.DrawLatex(0.66, 0.88, "#it{CMS data/simulation}")
+                 latexb.DrawLatex(0.67, 0.88, "#it{CMS data/simulation}")
 
 
 
@@ -841,7 +849,7 @@ class Canvas:
           for n in range(1, tmp_hMC.GetNbinsX() + 1):
               if tmp_hMC.GetBinContent(n) == 0: continue
               hsys.SetBinContent(n, 1.0 )
-              hsys.SetBinError(n, (math.sqrt(tmp_hMC.GetBinError(n)*tmp_hMC.GetBinError(n) + sys*tmp_hMC.GetBinError(n)*sys*tmp_hMC.GetBinError(n) ))/ tmp_hMC.GetBinContent(n))
+              hsys.SetBinError(n, (math.sqrt(tmp_hMC.GetBinError(n)*tmp_hMC.GetBinError(n) + sys*tmp_hMC.GetBinContent(n)*sys*tmp_hMC.GetBinContent(n) ))/ tmp_hMC.GetBinContent(n))
           hsys.GetYaxis().SetTitle(label);
           hsys.GetYaxis().CenterTitle();
           hsys.GetYaxis().SetLabelSize(0.10);
@@ -852,7 +860,7 @@ class Canvas:
           hsys.GetXaxis().SetTitleSize(0.12);
           hsys.GetXaxis().SetLabelOffset(0.02);
           hsys.SetFillStyle(3244)
-          hsys.SetFillColor(r.kCyan+3)
+          hsys.SetFillColor(r.kCyan+2)
           hsys.SetMarkerSize(0)
           #hsys.SetFillStyle(3013)
           hsys.GetYaxis().SetRangeUser(r_ymin, r_ymax);
@@ -913,7 +921,7 @@ class Canvas:
       self.myLegend.IsA().Destructor(self.myLegend)
       self.myCanvas.IsA().Destructor(self.myCanvas)                                                                                                                                            
 
-   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False, zlog = False, maxYnumbers = False, inProgress = False, is2d = False, labelz = False):
+   def save(self, legend, isData, log, lumi, labelx, ymin=0, ymax=0, outputDir = 'plots/', xlog = False, zlog = False, maxYnumbers = False, inProgress = False, is2d = False, labelz = False, isPrivate = False):
 
       self.myCanvas.cd()
 
@@ -926,11 +934,11 @@ class Canvas:
      
       for i in range(0, len(self.histos)):
           if(self.ToDraw[i] != 0):        
-              if 'TEfficiency' in str(type(self.histos[i])) and not is2d:
+              if 'TEfficiency' in str(type(self.histos[i])):
                   if ymax:
-                      self.makeRate(self.histos[i], self.options[i], is2d, ymin, ymax)                   
+                      self.makeRate(self.histos[i], self.options[i], False, ymin, ymax)                   
                   else:
-                      self.makeRate(self.histos[i], self.options[i], is2d)                   
+                      self.makeRate(self.histos[i], self.options[i], False)                   
               else:
                   if ymax:
                       self.histos[i].GetYaxis().SetRangeUser(ymin, ymax)
@@ -985,11 +993,15 @@ class Canvas:
       if not is2d:
           if maxYnumbers:
               r.TGaxis().SetMaxDigits(maxYnumbers) 
-              self.bannerInFrame(isData, lumi, inProgress = inProgress)
+              self.bannerInFrame(isData, lumi, inProgress = inProgress, isPrivate = isPrivate)
           else:
-              self.bannerInFrame(isData, lumi, inProgress = inProgress)
+              self.bannerInFrame(isData, lumi, inProgress = inProgress, isPrivate = isPrivate)
       else:
-          self.banner(isData, lumi, scy = False, inProgress = inProgress)
+          if maxYnumbers:
+              r.TGaxis().SetMaxDigits(maxYnumbers) 
+              self.banner(isData, lumi, scy = True, inProgress = inProgress, isPrivate = isPrivate)
+          else:
+              self.banner(isData, lumi, scy = False, inProgress = inProgress, isPrivate = isPrivate)
 
       if not outputDir[-1] == '/': dirName = outputDir + '/'
       else: dirName = outputDir
