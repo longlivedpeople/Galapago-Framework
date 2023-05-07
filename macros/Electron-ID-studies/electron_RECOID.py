@@ -23,7 +23,7 @@ import include.Sample as Sample
 import include.helper as helper
 import include.CutManager as CutManager
 
-from include.galapagoStyle import sigpalette, gcolors, dcolors
+from include.galapagoStyle import sigpalette, gcolors, dcolors, acolors
 
 def combinePlots(plotList):
 
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     #########################
 
     Lxy_binning = np.array([0., 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 17., 19., 22., 25., 30., 35., 40., 45., 50., 55., 60., 65., 70.])
-    eta_binning = np.array([-2.4, -2.0, -1.6, -1.2, -0.9, -0.3, -0.2, 0.2, 0.3, 0.9, 1.2, 1.6, 2.0, 2.4])
+    eta_binning = np.array([-2.0, -1.6, -1.2, -0.9, -0.3, -0.2, 0.2, 0.3, 0.9, 1.2, 1.6, 2.0])
     print(len(Lxy_binning))
     plot = {}
     for signal in HSS_Signals:
@@ -339,6 +339,7 @@ if __name__ == "__main__":
                             ## Displaced Electron matching and ID
                             eMatched  = False
                             passHits  = False
+                            passPt    = False
                             passHP    = False
                             passHoE   = False
                             passSigma = False
@@ -369,7 +370,7 @@ if __name__ == "__main__":
                                         passHoE = True
                                     if (ev.PhotonSel_full5x5_sigmaIetaIeta[ev.ElectronCandidate_photonIdx[j]] < 0.0112 and abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[j]]) < 1.4442) or (ev.PhotonSel_full5x5_sigmaIetaIeta[ev.ElectronCandidate_photonIdx[j]] < 0.0425 and abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[j]]) > 1.566):
                                         passSigma = True
-                                    if passHits and passHP and passHoE and passSigma:
+                                    if passHits and passHoE and passSigma: # passHP removed
                                         passID = True
 
                                     break
@@ -388,7 +389,7 @@ if __name__ == "__main__":
                                 plot[signal + '_electronEff_oversc'].Fill(eMatched, 0)
                                 plot[signal + '_electronEff_oversc_pt'].Fill(eMatched, pt)
 
-                            if pt > 20:
+                            if pt > 15:
                                 plot[signal + '_trackEff_Lxy'].Fill(trackMatched, Lxy)
                                 plot[signal + '_scEff_Lxy'].Fill(scMatched, Lxy)
                                 plot[signal + '_electronEff_Lxy'].Fill(eMatched, Lxy)
@@ -397,7 +398,7 @@ if __name__ == "__main__":
                                     plot[signal + '_matchEff_Lxy'].Fill(eMatched, Lxy)
                                 if trackMatched:
                                     plot[signal + '_electronEff_oversc_Lxy'].Fill(eMatched, Lxy)
-                                if eMatched:
+                                if eMatched and recopt > 15:
                                     plot[signal + '_electron_ptres'].Fill(ptres)
                                     plot[signal + '_electron_etres'].Fill(etres)
                                     plot[signal + '_electron_dxyres'].Fill(dxyres)
@@ -444,7 +445,7 @@ if __name__ == "__main__":
     canvas.addLatex(0.9, 0.93, '2018 UL', size = 0.035, align = 31)
     canvas.addLatex(0.45, 0.87, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.45, 0.83, 'M_{H} = 1000 GeV, M_{S} = 150 GeV', size = 0.03)
-    canvas.save(1, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True)
 
     ### Efficiency vs Lxy
     trackEff = plot['HSS_1000_150_1_2018_trackEff_Lxy']
@@ -476,7 +477,7 @@ if __name__ == "__main__":
     canvas.addLatex(0.45, 0.87, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.45, 0.83, 'M_{H} = 1000 GeV, M_{S} = 150 GeV', size = 0.03)
     canvas.addLatex(0.45, 0.79, '(all lifetimes combined)', size = 0.03)
-    canvas.save(1, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True, is2d = True)
 
     ## Electron over track efficiency
     electronEff = plot['HSS_1000_150_1_2018_electronEff_oversc_Lxy']
@@ -490,7 +491,7 @@ if __name__ == "__main__":
     canvas.addLatex(0.2, 0.4, 'H#rightarrowSS#rightarrow 2e + X', size = 0.033)
     canvas.addLatex(0.2, 0.35, 'M_{H} = 1000 GeV, M_{S} = 150 GeV', size = 0.033)
     canvas.addLatex(0.2, 0.3, '(all lifetimes combined)', size = 0.033)
-    canvas.save(0, 0, 0, '', '', ymin = 0.6, ymax = 1.1, outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(0, 0, 0, '', '', ymin = 0.6, ymax = 1.1, outputDir = WORKPATH + 'plots/', isPrivate = True, is2d = True)
 
     electronEff = plot['HSS_1000_150_1_2018_electronEff_oversc_pt']
     electronEff.Add(plot['HSS_1000_150_10_2018_electronEff_oversc_pt'])
@@ -499,7 +500,7 @@ if __name__ == "__main__":
     electronEff.Add(plot['HSS_1000_150_10000_2018_electronEff_oversc_pt'])
     canvas = Canvas.Canvas("HSS_1000_150_2018_electronEff_oversc_pt", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1)
     canvas.addHisto(electronEff,'AP', 'Displaced electron efficiency', 'p', r.kBlack, True, 0, marker = 20)
-    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True)
 
 
     ## Matching efficiency
@@ -510,7 +511,7 @@ if __name__ == "__main__":
     matchEff.Add(plot['HSS_1000_150_10000_2018_matchEff_Lxy'])
     canvas = Canvas.Canvas("HSS_1000_150_2018_matchEff_Lxy", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1)
     canvas.addHisto(matchEff,'AP', 'Displaced electron efficiency', 'p', r.kBlack, True, 0, marker = 20)
-    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True)
 
     matchEff = plot['HSS_1000_150_1_2018_matchEff_pt']
     matchEff.Add(plot['HSS_1000_150_10_2018_matchEff_pt'])
@@ -519,7 +520,7 @@ if __name__ == "__main__":
     matchEff.Add(plot['HSS_1000_150_10000_2018_matchEff_pt'])
     canvas = Canvas.Canvas("HSS_1000_150_2018_matchEff_pt", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1)
     canvas.addHisto(matchEff,'AP', 'Displaced electron efficiency', 'p', r.kBlack, True, 0, marker = 20)
-    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True)
 
     ## ID efficiency
     # The single cut efficiency (Lxy):
@@ -555,15 +556,15 @@ if __name__ == "__main__":
 
     canvas = Canvas.Canvas("HSS_1000_150_2018_IdEff_Lxy", 'png,pdf', 0.2, 0.2, 0.4, 0.35, 1)
     canvas.addHisto(hitsEff,'AP', 'Track hit selection', 'p', gcolors['blue'], True, 0, marker = 24)
-    canvas.addHisto(hpEff,'AP,SAME', 'Track high purity requirement', 'p', gcolors['red'], True, 1, marker = 24)
-    canvas.addHisto(hoeEff,'AP,SAME', 'SC H/E selection', 'p', gcolors['yellow'], True, 2, marker = 24)
-    canvas.addHisto(sigmaEff,'AP,SAME', 'SC #sigma_{i#etai#eta} selection', 'p', gcolors['green'], True, 3, marker = 24)
-    canvas.addHisto(IdEff,'AP,SAME', 'All requirements', 'p', r.kBlack, True, 4, marker = 24)
+    #canvas.addHisto(hpEff,'P,SAME', 'Track high purity requirement', 'p', gcolors['red'], True, 1, marker = 24)
+    canvas.addHisto(hoeEff,'P,SAME', 'SC H/E selection', 'p', gcolors['red'], True, 1, marker = 24)
+    canvas.addHisto(sigmaEff,'P,SAME', 'SC #sigma_{i#etai#eta} selection', 'p', gcolors['green'], True, 2, marker = 24)
+    canvas.addHisto(IdEff,'P,SAME', 'All requirements', 'p', r.kBlack, True, 3, marker = 24)
     canvas.addLatex(0.9, 0.93, '2018 UL', size = 0.035, align = 31)
     canvas.addLatex(0.45, 0.87, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.45, 0.83, 'M_{H} = 1000 GeV, M_{S} = 150 GeV', size = 0.03)
     canvas.addLatex(0.45, 0.79, '(all lifetimes combined)', size = 0.03)
-    canvas.save(1, 0, 0, '', '', ymin = 0.6, ymax = 1.1, outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 0, '', '', ymin = 0.6, ymax = 1.1, outputDir = WORKPATH + 'plots/', isPrivate = True)
 
 
     # The single cut efficiency (pt):
@@ -599,15 +600,15 @@ if __name__ == "__main__":
 
     canvas = Canvas.Canvas("HSS_1000_150_2018_IdEff_pt", 'png,pdf', 0.2, 0.2, 0.4, 0.35, 1)
     canvas.addHisto(hitsEff,'AP', 'Track hit selection', 'p', gcolors['blue'], True, 0, marker = 24)
-    canvas.addHisto(hpEff,'AP,SAME', 'Track high purity requirement', 'p', gcolors['red'], True, 1, marker = 24)
-    canvas.addHisto(hoeEff,'AP,SAME', 'SC H/E selection', 'p', gcolors['yellow'], True, 2, marker = 24)
-    canvas.addHisto(sigmaEff,'AP,SAME', 'SC #sigma_{i#etai#eta} selection', 'p', gcolors['green'], True, 3, marker = 24)
-    canvas.addHisto(IdEff,'AP,SAME', 'All requirements', 'p', r.kBlack, True, 4, marker = 24)
+    #canvas.addHisto(hpEff,'AP,SAME', 'Track high purity requirement', 'p', gcolors['red'], True, 1, marker = 24)
+    canvas.addHisto(hoeEff,'P,SAME', 'SC H/E selection', 'p', gcolors['red'], True, 1, marker = 24)
+    canvas.addHisto(sigmaEff,'P,SAME', 'SC #sigma_{i#etai#eta} selection', 'p', gcolors['green'], True, 2, marker = 24)
+    canvas.addHisto(IdEff,'P,SAME', 'All requirements', 'p', r.kBlack, True, 3, marker = 24)
     canvas.addLatex(0.9, 0.93, '2018 UL', size = 0.035, align = 31)
     canvas.addLatex(0.45, 0.87, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.45, 0.83, 'M_{H} = 1000 GeV, M_{S} = 150 GeV', size = 0.03)
     canvas.addLatex(0.45, 0.79, '(all lifetimes combined)', size = 0.03)
-    canvas.save(1, 0, 0, '', '', ymin = 0.4, ymax = 1.2, outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 0, '', '', ymin = 0.4, ymax = 1.2, outputDir = WORKPATH + 'plots/', isPrivate = True, is2d = True)
 
     # The single cut efficiency (eta):
     hitsEff = plot['HSS_1000_150_1_2018_hitsEff_eta']
@@ -642,15 +643,15 @@ if __name__ == "__main__":
 
     canvas = Canvas.Canvas("HSS_1000_150_2018_IdEff_eta", 'png,pdf', 0.2, 0.2, 0.4, 0.35, 1)
     canvas.addHisto(hitsEff,'AP', 'Track hit selection', 'p', gcolors['blue'], True, 0, marker = 24)
-    canvas.addHisto(hpEff,'AP,SAME', 'Track high purity requirement', 'p', gcolors['red'], True, 1, marker = 24)
-    canvas.addHisto(hoeEff,'AP,SAME', 'SC H/E selection', 'p', gcolors['yellow'], True, 2, marker = 24)
-    canvas.addHisto(sigmaEff,'AP,SAME', 'SC #sigma_{i#etai#eta} selection', 'p', gcolors['green'], True, 3, marker = 24)
-    canvas.addHisto(IdEff,'AP,SAME', 'All requirements', 'p', r.kBlack, True, 4, marker = 24)
+    #canvas.addHisto(hpEff,'AP,SAME', 'Track high purity requirement', 'p', gcolors['red'], True, 1, marker = 24)
+    canvas.addHisto(hoeEff,'P,SAME', 'SC H/E selection', 'p', gcolors['red'], True, 1, marker = 24)
+    canvas.addHisto(sigmaEff,'P,SAME', 'SC #sigma_{i#etai#eta} selection', 'p', gcolors['green'], True, 2, marker = 24)
+    canvas.addHisto(IdEff,'P,SAME', 'All requirements', 'p', r.kBlack, True, 3, marker = 24)
     canvas.addLatex(0.9, 0.93, '2018 UL', size = 0.035, align = 31)
     canvas.addLatex(0.45, 0.87, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.45, 0.83, 'M_{H} = 1000 GeV, M_{S} = 150 GeV', size = 0.03)
     canvas.addLatex(0.45, 0.79, '(all lifetimes combined)', size = 0.03)
-    canvas.save(1, 0, 0, '', '', ymin = 0.4, ymax = 1.2, outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 0, '', '', ymin = 0.4, ymax = 1.2, outputDir = WORKPATH + 'plots/', isPrivate = True, is2d = True)
 
 
     # The Id - cut efficiency (Lxy):
@@ -694,7 +695,7 @@ if __name__ == "__main__":
     canvas.addLatex(0.45, 0.87, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.45, 0.83, 'M_{H} = 1000 GeV, M_{S} = 150 GeV', size = 0.03)
     canvas.addLatex(0.45, 0.79, '(all lifetimes combined)', size = 0.03)
-    canvas.save(1, 0, 0, '', '', ymin = 0.6, ymax = 1.1, outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 0, '', '', ymin = 0.6, ymax = 1.1, outputDir = WORKPATH + 'plots/', isPrivate = True, is2d = True)
 
 
     # The Id - cut efficiency (pt):
@@ -738,7 +739,7 @@ if __name__ == "__main__":
     canvas.addLatex(0.45, 0.87, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.45, 0.83, 'M_{H} = 1000 GeV, M_{S} = 150 GeV', size = 0.03)
     canvas.addLatex(0.45, 0.79, '(all lifetimes combined)', size = 0.03)
-    canvas.save(1, 0, 0, '', '', ymin = 0.6, ymax = 1.1, outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 0, '', '', ymin = 0.6, ymax = 1.1, outputDir = WORKPATH + 'plots/', isPrivate = True)
 
 
     # The Id - cut efficiency (eta):
@@ -782,23 +783,28 @@ if __name__ == "__main__":
     canvas.addLatex(0.45, 0.87, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.45, 0.83, 'M_{H} = 1000 GeV, M_{S} = 150 GeV', size = 0.03)
     canvas.addLatex(0.45, 0.79, '(all lifetimes combined)', size = 0.03)
-    canvas.save(1, 0, 0, '', '', ymin = 0.4, ymax = 1.1, outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 0, '', '', ymin = 0.4, ymax = 1.1, outputDir = WORKPATH + 'plots/', isPrivate = True)
 
     ## Resolution and electron plots
     plot['HSS_1000_150_1_2018_electron_dR'].Scale(1./plot['HSS_1000_150_1_2018_electron_dR'].Integral()) 
     plot['HSS_1000_150_10_2018_electron_dR'].Scale(1./plot['HSS_1000_150_10_2018_electron_dR'].Integral()) 
     plot['HSS_1000_150_100_2018_electron_dR'].Scale(1./plot['HSS_1000_150_100_2018_electron_dR'].Integral()) 
     plot['HSS_1000_150_1000_2018_electron_dR'].Scale(1./plot['HSS_1000_150_1000_2018_electron_dR'].Integral()) 
+    plot['HSS_1000_150_1_2018_electron_dR'].SetLineWidth(2)
+    plot['HSS_1000_150_10_2018_electron_dR'].SetLineWidth(2)
+    plot['HSS_1000_150_100_2018_electron_dR'].SetLineWidth(2)
+    plot['HSS_1000_150_1000_2018_electron_dR'].SetLineWidth(2)
+    plot['HSS_1000_150_1_2018_electron_dR'].SetMaximum(0.5)
     canvas = Canvas.Canvas("HSS_1000_150_2018_electron_dR", 'png,pdf', 0.6, 0.6, 0.89, 0.75, 1)
-    canvas.addHisto(plot['HSS_1000_150_1_2018_electron_dR'],'HIST', 'c#tau = 1 mm', 'l', dcolors['1mm'], True, 0)
-    canvas.addHisto(plot['HSS_1000_150_10_2018_electron_dR'],'HIST,SAME', 'c#tau = 10 mm', 'l', dcolors['10mm'], True, 1)
-    canvas.addHisto(plot['HSS_1000_150_100_2018_electron_dR'],'HIST,SAME', 'c#tau = 100 mm', 'l', dcolors['100mm'], True, 2)
-    canvas.addHisto(plot['HSS_1000_150_1000_2018_electron_dR'],'HIST,SAME', 'c#tau = 1000 mm', 'l', dcolors['1000mm'], True, 3)
+    canvas.addHisto(plot['HSS_1000_150_1_2018_electron_dR'],'HIST', 'c#tau = 1 mm', 'l', acolors['1'], True, 0)
+    canvas.addHisto(plot['HSS_1000_150_10_2018_electron_dR'],'HIST,SAME', 'c#tau = 10 mm', 'l', acolors['2'], True, 1)
+    canvas.addHisto(plot['HSS_1000_150_100_2018_electron_dR'],'HIST,SAME', 'c#tau = 100 mm', 'l', acolors['3'], True, 2)
+    canvas.addHisto(plot['HSS_1000_150_1000_2018_electron_dR'],'HIST,SAME', 'c#tau = 1000 mm', 'l', acolors['4'], True, 3)
     canvas.addLatex(0.9, 0.93, '2018 UL', size = 0.035, align = 31)
     canvas.addLatex(0.6, 0.85, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.6, 0.81, 'M_{H} = 1000 GeV', size = 0.03)
     canvas.addLatex(0.6, 0.77, 'M_{S} = 150 GeV', size = 0.03)
-    canvas.save(1, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True)
 
     plot['HSS_1000_150_1_2018_electron_ptres'].Scale(1./plot['HSS_1000_150_1_2018_electron_ptres'].Integral()) 
     plot['HSS_1000_150_10_2018_electron_ptres'].Scale(1./plot['HSS_1000_150_10_2018_electron_ptres'].Integral()) 
@@ -813,7 +819,7 @@ if __name__ == "__main__":
     canvas.addLatex(0.6, 0.85, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.6, 0.81, 'M_{H} = 1000 GeV', size = 0.03)
     canvas.addLatex(0.6, 0.77, 'M_{S} = 150 GeV', size = 0.03)
-    canvas.save(1, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True)
 
     plot['HSS_1000_150_1_2018_electron_dxyres'].Scale(1./plot['HSS_1000_150_1_2018_electron_dxyres'].Integral()) 
     plot['HSS_1000_150_10_2018_electron_dxyres'].Scale(1./plot['HSS_1000_150_10_2018_electron_dxyres'].Integral()) 
@@ -829,7 +835,7 @@ if __name__ == "__main__":
     canvas.addLatex(0.6, 0.85, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.6, 0.81, 'M_{H} = 1000 GeV', size = 0.03)
     canvas.addLatex(0.6, 0.77, 'M_{S} = 150 GeV', size = 0.03)
-    canvas.save(1, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True)
 
 
     plot['HSS_1000_150_1_2018_electron_etres'].Scale(1./plot['HSS_1000_150_1_2018_electron_etres'].Integral()) 
@@ -845,14 +851,14 @@ if __name__ == "__main__":
     canvas.addLatex(0.6, 0.85, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.6, 0.81, 'M_{H} = 1000 GeV', size = 0.03)
     canvas.addLatex(0.6, 0.77, 'M_{S} = 150 GeV', size = 0.03)
-    canvas.save(1, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(1, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True)
 
     r.gStyle.SetPadRightMargin(0.14)
     genpt_scet = combinePlots([plot['HSS_1000_150_1_2018_electron_pt_et'], plot['HSS_1000_150_10_2018_electron_pt_et'], plot['HSS_1000_150_100_2018_electron_pt_et'], plot['HSS_1000_150_1000_2018_electron_pt_et'], plot['HSS_1000_150_10000_2018_electron_pt_et']])
     canvas = Canvas.Canvas("HSS_1000_150_2018_electron_pt_et", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 610, hh = 600)
     canvas.addHisto(genpt_scet,'COLZ', '', '', '', True, 0)
     canvas.addLatex(0.9, 0.93, '2018 UL', size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False, zlog = True, is2d = True)
+    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True, zlog = True, is2d = True)
     r.gStyle.SetPadRightMargin(0.1)
 
     ## Others
@@ -863,7 +869,7 @@ if __name__ == "__main__":
     histo.Add(plot['HSS_1000_150_10000_2018_clustersAssocToTrack'])
     canvas = Canvas.Canvas("HSS_1000_150_2018_clustersAssocToTrack", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1)
     canvas.addHisto(histo,'P', 'Track counting', 'p', r.kBlack, True, 0, marker = 20)
-    canvas.save(0, 0, 1, '', '', outputDir = WORKPATH + 'plots/', inProgress = False)
+    canvas.save(0, 0, 1, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True)
 
 
     ## 2D plots
@@ -872,50 +878,50 @@ if __name__ == "__main__":
     canvas = Canvas.Canvas("HSS_1000_150_2018_genpt_scet", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 610, hh = 600)
     canvas.addHisto(genpt_scet,'COLZ', '', '', '', True, 0)
     canvas.addLatex(0.9, 0.93, '2018 UL', size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False, zlog = True)
+    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True, zlog = True)
 
     genpt_scet_passSigma = combinePlots([plot['HSS_1000_150_1_2018_genpt_scet_passSigma'], plot['HSS_1000_150_10_2018_genpt_scet_passSigma'], plot['HSS_1000_150_100_2018_genpt_scet_passSigma'], plot['HSS_1000_150_1000_2018_genpt_scet_passSigma'], plot['HSS_1000_150_10000_2018_genpt_scet_passSigma']])
     canvas = Canvas.Canvas("HSS_1000_150_2018_genpt_scet_passSigma", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 610, hh = 600)
     canvas.addHisto(genpt_scet_passSigma,'COLZ', '', '', '', True, 0)
     canvas.addLatex(0.9, 0.93, '2018 UL', size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False, zlog = True)
+    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True, zlog = True)
 
     genpt_scet_passHoE = combinePlots([plot['HSS_1000_150_1_2018_genpt_scet_passHoE'], plot['HSS_1000_150_10_2018_genpt_scet_passHoE'], plot['HSS_1000_150_100_2018_genpt_scet_passHoE'], plot['HSS_1000_150_1000_2018_genpt_scet_passHoE'], plot['HSS_1000_150_10000_2018_genpt_scet_passHoE']])
     canvas = Canvas.Canvas("HSS_1000_150_2018_genpt_scet_passHoE", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 610, hh = 600)
     canvas.addHisto(genpt_scet_passHoE,'COLZ', '', '', '', True, 0)
     canvas.addLatex(0.9, 0.93, '2018 UL', size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False, zlog = True)
+    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True, zlog = True)
 
     """
     sc_dEta_vs_Lxy = combinePlots([plot['HSS_1000_150_1_2018_sc_dEta_vs_Lxy'], plot['HSS_1000_150_10_2018_sc_dEta_vs_Lxy'], plot['HSS_1000_150_100_2018_sc_dEta_vs_Lxy'], plot['HSS_1000_150_1000_2018_sc_dEta_vs_Lxy'], plot['HSS_1000_150_10000_2018_sc_dEta_vs_Lxy']])
     canvas = Canvas.Canvas("HSS_1000_150_2018_sc_dEta_vs_Lxy", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1)
     canvas.addHisto(sc_dEta_vs_Lxy,'COLZ', '', '', '', True, 0)
-    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False, zlog = True)
+    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True, zlog = True)
 
     track_dEta_vs_Lxy = combinePlots([plot['HSS_1000_150_1_2018_track_dEta_vs_Lxy'], plot['HSS_1000_150_10_2018_track_dEta_vs_Lxy'], plot['HSS_1000_150_100_2018_track_dEta_vs_Lxy'], plot['HSS_1000_150_1000_2018_track_dEta_vs_Lxy'], plot['HSS_1000_150_10000_2018_track_dEta_vs_Lxy']])
     canvas = Canvas.Canvas("HSS_1000_150_2018_track_dEta_vs_Lxy", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1)
     canvas.addHisto(track_dEta_vs_Lxy,'COLZ', '', '', '', True, 0)
-    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False, zlog = True)
+    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True, zlog = True)
 
     sc_dPhi_vs_Lxy = combinePlots([plot['HSS_1000_150_1_2018_sc_dPhi_vs_Lxy'], plot['HSS_1000_150_10_2018_sc_dPhi_vs_Lxy'], plot['HSS_1000_150_100_2018_sc_dPhi_vs_Lxy'], plot['HSS_1000_150_1000_2018_sc_dPhi_vs_Lxy'], plot['HSS_1000_150_10000_2018_sc_dPhi_vs_Lxy']])
     canvas = Canvas.Canvas("HSS_1000_150_2018_sc_dPhi_vs_Lxy", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1)
     canvas.addHisto(sc_dPhi_vs_Lxy,'COLZ', '', '', '', True, 0)
-    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False, zlog = True)
+    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True, zlog = True)
 
     track_dPhi_vs_Lxy = combinePlots([plot['HSS_1000_150_1_2018_track_dPhi_vs_Lxy'], plot['HSS_1000_150_10_2018_track_dPhi_vs_Lxy'], plot['HSS_1000_150_100_2018_track_dPhi_vs_Lxy'], plot['HSS_1000_150_1000_2018_track_dPhi_vs_Lxy'], plot['HSS_1000_150_10000_2018_track_dPhi_vs_Lxy']])
     canvas = Canvas.Canvas("HSS_1000_150_2018_track_dPhi_vs_Lxy", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1)
     canvas.addHisto(track_dPhi_vs_Lxy,'COLZ', '', '', '', True, 0)
-    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False, zlog = True)
+    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True, zlog = True)
 
     sc_dR_vs_Lxy = combinePlots([plot['HSS_1000_150_1_2018_sc_dR_vs_Lxy'], plot['HSS_1000_150_10_2018_sc_dR_vs_Lxy'], plot['HSS_1000_150_100_2018_sc_dR_vs_Lxy'], plot['HSS_1000_150_1000_2018_sc_dR_vs_Lxy'], plot['HSS_1000_150_10000_2018_sc_dR_vs_Lxy']])
     canvas = Canvas.Canvas("HSS_1000_150_2018_sc_dR_vs_Lxy", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1)
     canvas.addHisto(sc_dR_vs_Lxy,'COLZ', '', '', '', True, 0)
-    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False, zlog = True)
+    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True, zlog = True)
 
     track_dR_vs_Lxy = combinePlots([plot['HSS_1000_150_1_2018_track_dR_vs_Lxy'], plot['HSS_1000_150_10_2018_track_dR_vs_Lxy'], plot['HSS_1000_150_100_2018_track_dR_vs_Lxy'], plot['HSS_1000_150_1000_2018_track_dR_vs_Lxy'], plot['HSS_1000_150_10000_2018_track_dR_vs_Lxy']])
     canvas = Canvas.Canvas("HSS_1000_150_2018_track_dR_vs_Lxy", 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1)
     canvas.addHisto(track_dR_vs_Lxy,'COLZ', '', '', '', True, 0)
-    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', inProgress = False, zlog = True)
+    canvas.save(0, 0, 0, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True, zlog = True)
     """
 
 
