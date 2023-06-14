@@ -68,7 +68,7 @@ class yieldHandler(processHandler):
         #### --------------------
         #### ---- Records
         #### --------------------
-        self.record = False
+        self.record = True
         self.recordpath = '/afs/cern.ch/work/f/fernance/private/Long_Lived_Analysis/UL-analysis/CMSSW_10_6_20/src/MyAnalysis/FastPR-Galapago/Galapago-Framework' + '/records/'
         if self.record:
             for re,region in enumerate(self.dimuonRegions):
@@ -142,7 +142,7 @@ class yieldHandler(processHandler):
                     self.hMM_wSF[region[0]].Fill(sf)
                     if self.record:
                         with open(self.recordpath + "DMDM_" + self.samplename + "_" + region[0] + "_" + self.samplenumber + ".txt", "a") as f: 
-                            f.write(str(ev.DMDM_Lxy_PV[imm]) + '\t' + str(ev.DMDM_trackIxy_PV[imm]) + '\t' + str(ev.DMDM_leadingPt[imm]) + '\t' + str(ev.DMDM_subleadingPt[imm]) + '\t' + str(ev.DMDM_dR[imm]) + '\t' + str(ev.DMDM_mass[imm]) + '\n')
+                            f.write("New: " + str(ev.DMDM_Lxy_PV[imm]) + '\t' + str(ev.DMDM_trackIxy_PV[imm]) + '\t' + str(ev.DMDM_leadingPt[imm]) + '\t' + str(ev.DMDM_subleadingPt[imm]) + '\t' + str(ev.DMDM_dR[imm]) + '\t' + str(ev.DMDM_mass[imm]) + '\n')
                             f.close()
 
 
@@ -151,7 +151,8 @@ class yieldHandler(processHandler):
         ### Note:
         # Orthogonal: if not ee_maxIxy < 0 and passElectronTrigger and not (not mm_maxIxy < 0 and passMuonTrigger):
         # With overlap: if not ee_maxIxy < 0 and passElectronTrigger:
-        if not ee_maxIxy < 0 and passElectronTrigger and not (not mm_maxIxy < 0 and passMuonTrigger):
+        #if not ee_maxIxy < 0 and passElectronTrigger and not (not mm_maxIxy < 0 and passMuonTrigger):
+        if not ee_maxIxy < 0 and passElectronTrigger:
 
             iee = ee_maxIxy
 
@@ -168,7 +169,9 @@ class yieldHandler(processHandler):
                     self.hEE_wSF[region[0]].Fill(sf)
                     if self.record:
                         with open(self.recordpath + "EE_" + self.samplename + "_" + region[0] + "_" + self.samplenumber + ".txt", "a") as f: 
-                            f.write(str(ev.EE_Lxy_PV[iee]) + '\t' + str(ev.EE_trackIxy_PV[iee]) + '\t' + str(ev.EE_leadingEt[iee]) + '\t' + str(ev.EE_subleadingEt[iee]) + '\t' + str(ev.EE_dR[iee]) + '\t' + str(ev.EE_mass[iee]) + '\n')
+                            f.write(str(ev.Event_event) + '\t' + str(ev.EE_Lxy_PV[iee]) + '\t' + str(ev.EE_trackIxy_PV[iee]) + '\t' + str(ev.EE_leadingEt[iee]) + '\t' + str(ev.EE_subleadingEt[iee]) + '\t' + str(ev.EE_dR[iee]) + '\t' + str(ev.EE_mass[iee]) +'\n')
+                            for i in range(ev.nEE):
+                                f.write(str(ev.EE_vx[i]) + '\t' + str(ev.EE_vy[i]) + '\t' + str(ev.ElectronCandidate_phi[ev.EE_idxA[i]]) + '\t' + str(ev.ElectronCandidate_phi[ev.EE_idxB[i]])+'\n')
                             f.close()
 
         ### Fill summary plot

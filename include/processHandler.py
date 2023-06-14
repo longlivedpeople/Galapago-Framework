@@ -162,7 +162,6 @@ class processHandler:
                 weight = self.lumiweight*ev.wPU*ev.genWeight/abs(ev.genWeight)
         else: 
             weight = 1.
-
         return weight
 
 
