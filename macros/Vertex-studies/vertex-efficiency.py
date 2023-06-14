@@ -405,7 +405,7 @@ if __name__ == "__main__":
     canvas.addLatex(0.2, 0.28, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.2, 0.24, 'M_{H} = 1000 GeV, M_{S} = 150 GeV', size = 0.03)
     canvas.addLatex(0.2, 0.2, '(all lifetimes combined)', size = 0.03)
-    canvas.save(1, 0, 0, '', '', ymin = 0.6, ymax = 1.2, outputDir = WORKPATH + 'plots/', inProgress = True)
+    canvas.save(1, 0, 0, '', '', ymin = 0.6, ymax = 1.2, outputDir = WORKPATH + 'plots/', isPrivate = True, is2d = True)
 
 
     plot['HSS_1000_150_1_2018_EE_normChi2'].Scale(1./plot['HSS_1000_150_1_2018_EE_normChi2'].Integral())
@@ -478,7 +478,7 @@ if __name__ == "__main__":
     canvas.addLatex(0.4, 0.85, 'H#rightarrowSS#rightarrow 2e + X', size = 0.03)
     canvas.addLatex(0.4, 0.81, 'M_{H} = 1000 GeV', size = 0.03)
     canvas.addLatex(0.4, 0.77, 'M_{S} = 150 GeV', size = 0.03)
-    canvas.save(1, 0, 1, '', '', outputDir = WORKPATH + 'plots/', inProgress = True)
+    canvas.save(1, 0, 1, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True, is2d = True)
 
 
     type1 = plot['HSS_1000_150_1_2018_MM_mass_type1']
@@ -515,7 +515,7 @@ if __name__ == "__main__":
     canvas.addLatex(0.4, 0.85, 'H#rightarrowSS#rightarrow 2#mu + X', size = 0.03)
     canvas.addLatex(0.4, 0.81, 'M_{H} = 1000 GeV', size = 0.03)
     canvas.addLatex(0.4, 0.77, 'M_{S} = 150 GeV', size = 0.03)
-    canvas.save(1, 0, 1, '', '', outputDir = WORKPATH + 'plots/', inProgress = True)
+    canvas.save(1, 0, 1, '', '', outputDir = WORKPATH + 'plots/', isPrivate = True, is2d = True)
 
     ## 2D plots
     r.gStyle.SetPadRightMargin(0.14)

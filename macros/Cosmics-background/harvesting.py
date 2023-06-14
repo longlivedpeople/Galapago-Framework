@@ -116,7 +116,7 @@ if __name__ == "__main__":
     hist_dPhi = getObject('Results/th1f_all.root', 'hist_dPhi')
     hist_dPhi.Rebin(4)
     hist_dPhi.SetTitle(';Dimuon collinearity |#Delta#Phi|; Dimuon vertex yield')
-    hist_dPhi.SetMaximum(1.2*hist_dPhi.GetMaximum())
+    hist_dPhi.SetMaximum(1.4*hist_dPhi.GetMaximum())
     hist_dPhi.SetMinimum(0.0)
     hist_dPhi.Sumw2()
     plot = Canvas.Canvas('hist_cosmics_dPhi', 'png,pdf', 0.3, 0.75, 0.89, 0.8, 1)
@@ -124,7 +124,7 @@ if __name__ == "__main__":
     plot.addLatex(0.9, 0.93, 'Cosmic data 2018', size = 0.026, align = 31)
     plot.addLatex(0.85, 0.85, '/NoBPTX/Run2018B-12Nov2019_UL2018-v1/AOD', size = 0.026, align = 31)
     plot.addLatex(0.85, 0.8, 'HLT_L2Mu10_NoVertex_NoBPTX3BX', size = 0.026, align = 31)
-    plot.save(0, 1, 0, '', '', outputDir = WORKPATH + 'harvested/', inProgress = False, maxYnumbers = 3)
+    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', is2d = True, isPrivate = True, maxYnumbers = 3)
 
 
     hist_alpha = getObject('Results/th1f_all.root', 'hist_Alpha')
@@ -137,7 +137,7 @@ if __name__ == "__main__":
     plot.addLatex(0.9, 0.93, 'Cosmic data 2018', size = 0.026, align = 31)
     plot.addLatex(0.85, 0.85, '/NoBPTX/Run2018B-12Nov2019_UL2018-v1/AOD', size = 0.026, align = 31)
     plot.addLatex(0.85, 0.8, 'HLT_L2Mu10_NoVertex_NoBPTX3BX', size = 0.026, align = 31)
-    plot.save(0, 1, 1, '', '', outputDir = WORKPATH + 'harvested/', inProgress = False)
+    plot.save(0, 0, 1, '', '', outputDir = WORKPATH + 'harvested/', is2d = True, isPrivate = True)
 
 
     hist_cosalpha = getObject('Results/th1f_all.root', 'hist_cosAlpha')
@@ -149,10 +149,10 @@ if __name__ == "__main__":
     plot = Canvas.Canvas('hist_cosmics_cosalpha', 'png,pdf', 0.3, 0.75, 0.89, 0.8, 1)
     plot.addHisto(hist_cosalpha, 'P', '', 'p', r.kBlue, 1, 0)
     plot.addLine(-0.8, 0.1, -0.8, 1e5,r.kRed)
-    plot.addLine(-0.99, 0.1, -0.99, 1e5,r.kRed)
+    plot.addLine(-0.9, 0.1, -0.9, 1e5,r.kRed)
     plot.addLatex(0.9, 0.93, 'Cosmic data 2018', size = 0.026, align = 31)
     plot.addLatex(0.85, 0.85, '/NoBPTX/Run2018B-12Nov2019_UL2018-v1/AOD', size = 0.026, align = 31)
     plot.addLatex(0.85, 0.8, 'HLT_L2Mu10_NoVertex_NoBPTX3BX', size = 0.026, align = 31)
-    plot.save(0, 1, 1, '', '', outputDir = WORKPATH + 'harvested/', inProgress = False)
+    plot.save(0, 0, 1, '', '', outputDir = WORKPATH + 'harvested/', is2d = True, isPrivate = True)
 
 

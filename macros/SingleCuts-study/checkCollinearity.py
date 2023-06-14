@@ -1,7 +1,7 @@
 
 import ROOT as r
 from   ROOT import gROOT, TCanvas, TFile, TGraphErrors, SetOwnership, TVector3
-import math, sys, optparse, array, copy, os
+import math, sys, optparse, array, copy, os, json
 import gc, inspect, __main__
 import numpy as np
 
@@ -114,8 +114,8 @@ def makeJointSignalPlot(values, key, ylabel, plotname, modellabel = ''):
     latex.SetTextColor(r.kBlack);
     latex.SetTextFont(42);
     latex.SetTextAlign(11);
-    latex.SetTextSize(0.06);
-    latex.DrawLatex(lm, 0.93, "#bf{CMS}")
+    latex.SetTextSize(0.045);
+    latex.DrawLatex(lm, 0.93, "#bf{Private work}")
 
     latexb = r.TLatex()
     latexb.SetNDC();
@@ -124,7 +124,7 @@ def makeJointSignalPlot(values, key, ylabel, plotname, modellabel = ''):
     latexb.SetTextFont(42);
     latexb.SetTextAlign(31);
     latexb.SetTextSize(0.034);
-    latexb.DrawLatex(0.35, 0.93, "#it{Simulation}")
+    latexb.DrawLatex(0.58, 0.93, "#it{CMS data/simulation}")
 
     ## Model banner
     latext = r.TLatex()
@@ -188,36 +188,53 @@ if __name__ == "__main__":
     ####   Load sample   ####
     #########################
 
-    year = '2017'
+    year = '2018'
     _cosAlphaMin = -0.8
 
     Signals2016 = []
     Signals2016.append('HSS_125_50_1_'+year)
     Signals2016.append('HSS_125_50_10_'+year)
     Signals2016.append('HSS_125_50_100_'+year)
-    Signals2016.append('HSS_400_50_1_'+year)
-    Signals2016.append('HSS_400_50_10_'+year)
-    Signals2016.append('HSS_400_50_100_'+year)
+    Signals2016.append('HSS_300_50_1_'+year)
+    Signals2016.append('HSS_300_50_10_'+year)
+    Signals2016.append('HSS_300_50_100_'+year)
     Signals2016.append('HSS_400_150_1_'+year)
     Signals2016.append('HSS_400_150_10_'+year)
     Signals2016.append('HSS_400_150_100_'+year)
-    Signals2016.append('HSS_600_150_1_'+year)
-    Signals2016.append('HSS_600_150_10_'+year)
-    Signals2016.append('HSS_600_150_100_'+year)
-    Signals2016.append('HSS_1000_150_1_'+year)
-    Signals2016.append('HSS_1000_150_10_'+year)
-    Signals2016.append('HSS_1000_150_100_'+year)
-    Signals2016.append('HSS_1000_350_1_'+year)
-    Signals2016.append('HSS_1000_350_10_'+year)
-    Signals2016.append('HSS_1000_350_100_'+year)
+    Signals2016.append('HSS_500_50_1_'+year)
+    Signals2016.append('HSS_500_50_10_'+year)
+    Signals2016.append('HSS_500_50_100_'+year)
+    Signals2016.append('HSS_1000_250_1_'+year)
+    Signals2016.append('HSS_1000_250_10_'+year)
+    Signals2016.append('HSS_1000_250_100_'+year)
 
-    treeSI = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'signals_'+year+'.dat', Signals2016, 'MC'), name = year, isdata = 0 )
+    treeSI = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'dat/CombSignal_'+year+'UL_Spring23.dat', Signals2016, 'SI'), name = year, isdata = 0 )
 
     ###################################
     ####   Loop over tree events   ####
     ###################################
 
     cm = CutManager.CutManager()
+    configfile = '/afs/cern.ch/work/f/fernance/private/Long_Lived_Analysis/UL-analysis/CMSSW_10_6_20/src/MyAnalysis/FastPR-Galapago/Galapago-Framework/configs/event_selection/config_Spring23_SignalVsBKG_Pt.json'
+    config = {}
+    with open(configfile) as f:
+        config = json.load(f)
+
+    if year=='2016' or year=='2016APV':
+        mumu_path      = cm.ORList(config['triggerPaths']['muons']['2016'], 'ev.')
+        ee_path        = cm.ORList(config['triggerPaths']['electrons']['2016'], 'ev.')
+        mumu_selection = cm.AddList(config['selection']['muons']['2016'])
+        ee_selection   = cm.AddList(config['selection']['electrons']['2016'])
+    elif year=='2017':
+        ee_path        = cm.ORList(config['triggerPaths']['electrons']['2017'], 'ev.')
+        ee_selection   = cm.AddList(config['selection']['electrons']['2017'])
+    elif year=='2018':
+        mumu_path      = cm.ORList(config['triggerPaths']['muons']['2018'], 'ev.')
+        ee_path        = cm.ORList(config['triggerPaths']['electrons']['2018'], 'ev.')
+        mumu_selection = cm.AddList(config['selection']['muons']['2018'])
+        ee_selection   = cm.AddList(config['selection']['electrons']['2018'])
+
+
     rates = {}
     for b in treeSI.blocks:
         for s in b.samples:
@@ -253,13 +270,11 @@ if __name__ == "__main__":
                         for j in range(0, ev.nDMDM):
 
                             imm = j # index to handle DMDM pair
-                            if year == '2016':
-                                if not eval(cm.MM_BS2016): continue
-                            if year == '2018':
-                                if not eval(cm.MM_BS2018): continue
+                            if not eval(mumu_selection): continue
 
-                            if not eval(cm.MM_iso2l): continue
-                            if not eval(cm.MM_OS): continue
+                            if not ev.DGM_relPFiso[ev.DMDM_idxA[imm]] < 0.2: continue
+                            if not ev.DGM_relPFiso[ev.DMDM_idxB[imm]] < 0.2: continue
+                            if not ev.DGM_charge[ev.DMDM_idxA[imm]]*ev.DGM_charge[ev.DMDM_idxB[imm]] < 0: continue
 
                             total_counted = True
                             # Evaluate the cut:
@@ -297,15 +312,11 @@ if __name__ == "__main__":
                         for j in range(0, ev.nEE):
 
                             iee = j # index to handle DMDM pair
-                            if year == '2016':
-                                if not eval(cm.EE_BS2016): continue
-                            if year == '2017':
-                                if not eval(cm.EE_BS2017): continue
-                            if year == '2018':
-                                if not eval(cm.EE_BS2018): continue
+                            if not eval(ee_selection): continue
 
-                            if not eval(cm.EE_iso2l): continue
-                            if not eval(cm.EE_OS): continue
+                            if not ev.EE_relisoA[iee] < 0.1: continue
+                            if not ev.EE_relisoB[iee] < 0.1: continue
+                            if not ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EE_idxA[iee]]]*ev.IsoTrackSel_charge[ev.ElectronCandidate_isotrackIdx[ev.EE_idxB[iee]]] < 0: continue
 
                             total_counted = True
                             # Evaluate the cut:

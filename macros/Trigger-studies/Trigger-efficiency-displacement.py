@@ -117,7 +117,7 @@ def passedPhotonTrigger(ev, year):
     passed = False
 
     if year == '2016':
-        passed = ev.HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15 or ev.HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55
+         passed = ev.HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15 or ev.HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55
     elif year == '2017':
         passed = ev.HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 or ev.HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_PixelVeto_Mass55 or ev.HLT_DoublePhoton70
     elif year == '2018':
@@ -172,11 +172,11 @@ if __name__ == "__main__":
     Signals.append('HSS_500_150_100')
     Signals.append('HSS_500_150_1000')
     Signals.append('HSS_500_150_10000')
-    Signals.append('HSS_600_250_1')
-    Signals.append('HSS_600_250_10')
-    Signals.append('HSS_600_250_100')
-    Signals.append('HSS_600_250_1000')
-    Signals.append('HSS_600_250_10000')
+    Signals.append('HSS_600_150_1')
+    Signals.append('HSS_600_150_10')
+    Signals.append('HSS_600_150_100')
+    Signals.append('HSS_600_150_1000')
+    Signals.append('HSS_600_150_10000')
     Signals.append('HSS_800_350_1')
     Signals.append('HSS_800_350_10')
     Signals.append('HSS_800_350_100')
@@ -196,14 +196,14 @@ if __name__ == "__main__":
     sys_800_350['photon2016'] = 0.01 
     sys_800_350['photon2017'] = 0.01
     sys_800_350['photon2018'] = 0.01
-    sys_600_250 = {}
-    sys_600_250['muon2016APV'] = 0.03
-    sys_600_250['muon2016'] = 0.03
-    sys_600_250['muon2018'] = 0.02 
-    sys_600_250['photon2016APV'] = 0.01 
-    sys_600_250['photon2016'] = 0.01 
-    sys_600_250['photon2017'] = 0.01
-    sys_600_250['photon2018'] = 0.01
+    sys_600_150 = {}
+    sys_600_150['muon2016APV'] = 0.03
+    sys_600_150['muon2016'] = 0.03
+    sys_600_150['muon2018'] = 0.02 
+    sys_600_150['photon2016APV'] = 0.01 
+    sys_600_150['photon2016'] = 0.01 
+    sys_600_150['photon2017'] = 0.01
+    sys_600_150['photon2018'] = 0.01
     sys_500_150 = {}
     sys_500_150['muon2016APV'] = 0.06
     sys_500_150['muon2016'] = 0.06
@@ -223,7 +223,7 @@ if __name__ == "__main__":
 
     plot = {}
     if era == '2016':
-        treeMC = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'dat/CentralHSS_2016UL_Fall22.dat', HSS_Signals_2016postVFP, 'DATA'), name = year, isdata = 1 )
+        treeMC = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'dat/CombSignal_2016UL_Spring23.dat', HSS_Signals_2016postVFP, 'DATA'), name = year, isdata = 1 )
         for signal in HSS_Signals_2016postVFP:
             key = signal.split('_')[1] + '_' + signal.split('_')[2]
             if key not in plot.keys():
@@ -232,7 +232,7 @@ if __name__ == "__main__":
                 plot['Efficiency_muon_maxdxy_' + key] = copy.deepcopy(r.TEfficiency('Efficiency_muon_maxdxy_' + key, "; Max. muon |d_{xy}| cm; Effiency", len(dxy_bin )-1, dxy_bin))
                 plot['Efficiency_photon_maxdxy_' + key] = copy.deepcopy(r.TEfficiency('Efficiency_photon_maxdxy_' + key, ";Max. electron |d_{dxy}| cm;Efficiency", len(dxy_bin )-1, dxy_bin))
     elif era == '2016APV':
-        treeMC = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'dat/CentralHSS_2016APVUL_Fall22.dat', HSS_Signals_2016preVFP, 'DATA'), name = year, isdata = 1 )
+        treeMC = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'dat/CombSignal_2016UL_Spring23.dat', HSS_Signals_2016preVFP, 'DATA'), name = year, isdata = 1 )
         for signal in HSS_Signals_2016preVFP:
             key = signal.split('_')[1] + '_' + signal.split('_')[2]
             if key not in plot.keys():
@@ -241,7 +241,7 @@ if __name__ == "__main__":
                 plot['Efficiency_muon_maxdxy_' + key] = copy.deepcopy(r.TEfficiency('Efficiency_muon_maxdxy_' + key, "; Max. muon |d_{xy}| cm; Effiency", len(dxy_bin )-1, dxy_bin))
                 plot['Efficiency_photon_maxdxy_' + key] = copy.deepcopy(r.TEfficiency('Efficiency_photon_maxdxy_' + key, ";Max. electron |d_{dxy}| cm;Efficiency", len(dxy_bin )-1, dxy_bin))
     elif era == '2017':
-        treeMC = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'dat/CentralHSS_2017UL_Fall22.dat', HSS_Signals_2017, 'DATA'), name = year, isdata = 1 )
+        treeMC = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'dat/CombSignal_2017UL_Spring23.dat', HSS_Signals_2017, 'DATA'), name = year, isdata = 1 )
         for signal in HSS_Signals_2017:
             key = signal.split('_')[1] + '_' + signal.split('_')[2]
             if key not in plot.keys():
@@ -250,7 +250,7 @@ if __name__ == "__main__":
                 plot['Efficiency_muon_maxdxy_' + key] = copy.deepcopy(r.TEfficiency('Efficiency_muon_maxdxy_' + key, "; Max. muon |d_{xy}| cm; Effiency", len(dxy_bin )-1, dxy_bin))
                 plot['Efficiency_photon_maxdxy_' + key] = copy.deepcopy(r.TEfficiency('Efficiency_photon_maxdxy_' + key, ";Max. electron |d_{dxy}| cm;Efficiency", len(dxy_bin )-1, dxy_bin))
     elif era == '2018':
-        treeMC = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'dat/CentralHSS_2018UL_Fall22.dat', HSS_Signals_2018, 'DATA'), name = year, isdata = 1 )
+        treeMC = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + 'dat/CombSignal_2018UL_Spring23.dat', HSS_Signals_2018, 'DATA'), name = year, isdata = 1 )
         for signal in HSS_Signals_2018:
             key = signal.split('_')[1] + '_' + signal.split('_')[2]
             if key not in plot.keys():
@@ -388,32 +388,32 @@ if __name__ == "__main__":
     canvas = Canvas.Canvas("Efficiency_muon_2d_dxy_500_150_" + era, 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_muon_2d_dxy_500_150'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'SignalTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'SignalTrigger-SFs/', isPrivate = True, is2d = True, labelz = 'Efficiency')
 
     canvas = Canvas.Canvas("Efficiency_photon_2d_dxy_500_150_" + era, 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_photon_2d_dxy_500_150'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'SignalTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'SignalTrigger-SFs/', isPrivate = True, is2d = True, labelz = 'Efficiency')
 
-    canvas = Canvas.Canvas("Efficiency_muon_2d_dxy_600_250_" + era, 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
-    canvas.add2DRate(plot['Efficiency_muon_2d_dxy_600_250'],'COLZ,TEXT', 0.0, 1.0)
+    canvas = Canvas.Canvas("Efficiency_muon_2d_dxy_600_150_" + era, 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
+    canvas.add2DRate(plot['Efficiency_muon_2d_dxy_600_150'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'SignalTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'SignalTrigger-SFs/', isPrivate = True, is2d = True, labelz = 'Efficiency')
 
-    canvas = Canvas.Canvas("Efficiency_photon_2d_dxy_600_250_" + era, 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
-    canvas.add2DRate(plot['Efficiency_photon_2d_dxy_600_250'],'COLZ,TEXT', 0.0, 1.0)
+    canvas = Canvas.Canvas("Efficiency_photon_2d_dxy_600_150_" + era, 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
+    canvas.add2DRate(plot['Efficiency_photon_2d_dxy_600_150'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'SignalTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'SignalTrigger-SFs/', isPrivate = True, is2d = True, labelz = 'Efficiency')
 
     canvas = Canvas.Canvas("Efficiency_muon_2d_dxy_800_350_" + era, 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_muon_2d_dxy_800_350'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'SignalTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'SignalTrigger-SFs/', isPrivate = True, is2d = True, labelz = 'Efficiency')
 
     canvas = Canvas.Canvas("Efficiency_photon_2d_dxy_800_350_" + era, 'png,pdf', 0.4, 0.8, 0.8, 0.9, 1, ww = 650, hh = 600)
     canvas.add2DRate(plot['Efficiency_photon_2d_dxy_800_350'],'COLZ,TEXT', 0.0, 1.0)
     canvas.addLatex(0.8, 0.93, era, size = 0.035, align = 31)
-    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'SignalTrigger-SFs/', inProgress = False, is2d = True, labelz = 'Efficiency')
+    canvas.save(0, 0, 0, '', '', outputDir = EOSPATH + 'SignalTrigger-SFs/', isPrivate = True, is2d = True, labelz = 'Efficiency')
 
 
     r.gStyle.SetPadRightMargin(0.1)
@@ -424,41 +424,41 @@ if __name__ == "__main__":
         canvas = Canvas.Canvas("MuonTrigger_maxdxy_" + era, 'png,pdf', 0.36, 0.72, 0.76, 0.89, 1)
         h_800_350_muon = getHistoFromEff(plot['Efficiency_muon_maxdxy_800_350'])
         e_800_350_muon = h_800_350_muon.GetBinContent(1)
-        h_600_250_muon = getHistoFromEff(plot['Efficiency_muon_maxdxy_600_250'])
-        e_600_250_muon = h_600_250_muon.GetBinContent(1)
+        h_600_150_muon = getHistoFromEff(plot['Efficiency_muon_maxdxy_600_150'])
+        e_600_150_muon = h_600_150_muon.GetBinContent(1)
         h_500_150_muon = getHistoFromEff(plot['Efficiency_muon_maxdxy_500_150'])
         e_500_150_muon = h_500_150_muon.GetBinContent(1)
         canvas.addHisto(h_800_350_muon,'P', 'm_{H} = 800 GeV, m_{S} = 350 GeV', 'pl', r.kBlack, True, 0, marker = 20)
-        canvas.addHisto(h_600_250_muon,'P,SAME', 'm_{H} = 600 GeV, m_{S} = 250 GeV', 'pl', r.kBlue, True, 0, marker = 20)
+        canvas.addHisto(h_600_150_muon,'P,SAME', 'm_{H} = 600 GeV, m_{S} = 150 GeV', 'pl', r.kBlue, True, 0, marker = 20)
         canvas.addHisto(h_500_150_muon,'P,SAME', 'm_{H} = 500 GeV, m_{S} = 150 GeV', 'pl', r.kRed, True, 0, marker = 20)
         canvas.addBand(0, e_800_350_muon*(1-sys_800_350['muon'+era]), 14, e_800_350_muon*(1+sys_800_350['muon'+era]), r.kBlack, 0.2)
         canvas.addLine(0, e_800_350_muon, 14, e_800_350_muon, r.kBlack)
-        canvas.addBand(0, e_600_250_muon*(1-sys_600_250['muon'+era]), 14, e_600_250_muon*(1+sys_600_250['muon'+era]), r.kBlue, 0.2)
-        canvas.addLine(0, e_600_250_muon, 14, e_600_250_muon, r.kBlue)
+        canvas.addBand(0, e_600_150_muon*(1-sys_600_150['muon'+era]), 14, e_600_150_muon*(1+sys_600_150['muon'+era]), r.kBlue, 0.2)
+        canvas.addLine(0, e_600_150_muon, 14, e_600_150_muon, r.kBlue)
         canvas.addBand(0, e_500_150_muon*(1-sys_500_150['muon'+era]), 14, e_500_150_muon*(1+sys_500_150['muon'+era]), r.kRed, 0.2)
         canvas.addLine(0, e_500_150_muon, 14, e_500_150_muon, r.kRed)
         canvas.addLatex(0.9, 0.93, era, size = 0.035, align = 31)
-        canvas.save(1, 0, 0, '', '', ymin=0.8, ymax=1.05, outputDir = EOSPATH + 'SignalTrigger-SFs/', inProgress = False)
+        canvas.save(1, 0, 0, '', '', ymin=0.8, ymax=1.05, outputDir = EOSPATH + 'SignalTrigger-SFs/', isPrivate = True, is2d = True)
 
     ## 1d histograms
     canvas = Canvas.Canvas("PhotonTrigger_maxdxy_" + era, 'png,pdf', 0.36, 0.72, 0.76, 0.89, 1)
     h_800_350_photon = getHistoFromEff(plot['Efficiency_photon_maxdxy_800_350'])
     e_800_350_photon = h_800_350_photon.GetBinContent(1)
-    h_600_250_photon = getHistoFromEff(plot['Efficiency_photon_maxdxy_600_250'])
-    e_600_250_photon = h_600_250_photon.GetBinContent(1)
+    h_600_150_photon = getHistoFromEff(plot['Efficiency_photon_maxdxy_600_150'])
+    e_600_150_photon = h_600_150_photon.GetBinContent(1)
     h_500_150_photon = getHistoFromEff(plot['Efficiency_photon_maxdxy_500_150'])
     e_500_150_photon = h_500_150_photon.GetBinContent(1)
     canvas.addHisto(h_800_350_photon,'P', 'm_{H} = 800 GeV, m_{S} = 350 GeV', 'pl', r.kBlack, True, 0, marker = 20)
-    canvas.addHisto(h_600_250_photon,'P,SAME', 'm_{H} = 600 GeV, m_{S} = 250 GeV', 'pl', r.kBlue, True, 0, marker = 20)
+    canvas.addHisto(h_600_150_photon,'P,SAME', 'm_{H} = 600 GeV, m_{S} = 150 GeV', 'pl', r.kBlue, True, 0, marker = 20)
     canvas.addHisto(h_500_150_photon,'P,SAME', 'm_{H} = 500 GeV, m_{S} = 150 GeV', 'pl', r.kRed, True, 0, marker = 20)
     canvas.addBand(0, e_800_350_photon*(1-sys_800_350['photon'+era]), 14, e_800_350_photon*(1+sys_800_350['photon'+era]), r.kBlack, 0.2)
     canvas.addLine(0, e_800_350_photon, 14, e_800_350_photon, r.kBlack)
-    canvas.addBand(0, e_600_250_photon*(1-sys_600_250['photon'+era]), 14, e_600_250_photon*(1+sys_600_250['photon'+era]), r.kBlue, 0.2)
-    canvas.addLine(0, e_600_250_photon, 14, e_600_250_photon, r.kBlue)
+    canvas.addBand(0, e_600_150_photon*(1-sys_600_150['photon'+era]), 14, e_600_150_photon*(1+sys_600_150['photon'+era]), r.kBlue, 0.2)
+    canvas.addLine(0, e_600_150_photon, 14, e_600_150_photon, r.kBlue)
     canvas.addBand(0, e_500_150_photon*(1-sys_500_150['photon'+era]), 14, e_500_150_photon*(1+sys_500_150['photon'+era]), r.kRed, 0.2)
     canvas.addLine(0, e_500_150_photon, 14, e_500_150_photon, r.kRed)
     canvas.addLatex(0.9, 0.93, era, size = 0.035, align = 31)
-    canvas.save(1, 0, 0, '', '', ymin=0.95, ymax=1.05, outputDir = EOSPATH + 'SignalTrigger-SFs/', inProgress = False)
+    canvas.save(1, 0, 0, '', '', ymin=0.95, ymax=1.05, outputDir = EOSPATH + 'SignalTrigger-SFs/', isPrivate = True, is2d = True)
 
     outputFile.Close()
 

@@ -96,6 +96,7 @@ if __name__ == "__main__":
     gROOT.SetBatch(1)
     print('WORKPATH: ' + WORKPATH)
     r.setTDRStyle()
+    r.gStyle.SetPalette(r.kBird)
 
     ###########################
     ####   Parser object   ####
@@ -111,8 +112,8 @@ if __name__ == "__main__":
     histo.GetYaxis().SetTitle('Dielectron vertex y_{PV} (cm)')
     plot = Canvas.Canvas('hist_EE_vxIvyI', 'png,pdf', 0.3, 0.75, 0.89, 0.8, 1)
     plot.addHisto(histo, 'COLZ', '', 'f', '', 1, 0)
-    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.) 2018 UL', size = 0.03, align = 31)
-    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', inProgress = False, maxYnumbers = 2)
+    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.)', size = 0.03, align = 31)
+    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', isPrivate = True, maxYnumbers = 2, is2d = True)
 
     histo = getObject('Vertex-results/th1f_TT2018.root', 'EE_vx1vy1')
     histo.GetZaxis().SetLabelSize(0.03)
@@ -120,8 +121,8 @@ if __name__ == "__main__":
     histo.GetYaxis().SetTitle('Dielectron vertex y_{1} (cm)')
     plot = Canvas.Canvas('hist_EE_vx1vy1', 'png,pdf', 0.3, 0.75, 0.89, 0.8, 1)
     plot.addHisto(histo, 'COLZ', '', 'f', '', 1, 0)
-    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.) 2018 UL', size = 0.03, align = 31)
-    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', inProgress = False, maxYnumbers = 3)
+    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.)', size = 0.03, align = 31)
+    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', isPrivate = True, maxYnumbers = 3, is2d = True)
 
     histo = getObject('Vertex-results/th1f_TT2018.root', 'EE_vx2vy2')
     histo.GetZaxis().SetLabelSize(0.03)
@@ -129,8 +130,8 @@ if __name__ == "__main__":
     histo.GetYaxis().SetTitle('Dielectron vertex y_{2} (cm)')
     plot = Canvas.Canvas('hist_EE_vx2vy2', 'png,pdf', 0.3, 0.75, 0.89, 0.8, 1)
     plot.addHisto(histo, 'COLZ', '', 'f', '', 1, 0)
-    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.) 2018 UL', size = 0.03, align = 31)
-    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', inProgress = False, maxYnumbers = 3)
+    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.)', size = 0.03, align = 31)
+    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', isPrivate = True, maxYnumbers = 3, is2d = True)
 
     histo = getObject('Vertex-results/th1f_TT2018.root', 'EE_vxIIvyII')
     histo.GetZaxis().SetLabelSize(0.03)
@@ -138,8 +139,8 @@ if __name__ == "__main__":
     histo.GetYaxis().SetTitle('Dielectron vertex y_{ee} (cm)')
     plot = Canvas.Canvas('hist_EE_vxIIvyII', 'png,pdf', 0.3, 0.75, 0.89, 0.8, 1)
     plot.addHisto(histo, 'COLZ', '', 'f', '', 1, 0)
-    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.) 2018 UL', size = 0.03, align = 31)
-    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', inProgress = False, maxYnumbers = 3)
+    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.)', size = 0.03, align = 31)
+    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', isPrivate = True, maxYnumbers = 3, is2d = True)
 
 
 
@@ -149,8 +150,8 @@ if __name__ == "__main__":
     histo.GetYaxis().SetTitle('Dimuon vertex y_{PV} (cm)')
     plot = Canvas.Canvas('hist_MM_vxIvyI', 'png,pdf', 0.3, 0.75, 0.89, 0.8, 1)
     plot.addHisto(histo, 'COLZ', '', 'f', '', 1, 0)
-    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.) 2018 UL', size = 0.03, align = 31)
-    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', inProgress = False, maxYnumbers = 2)
+    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.)', size = 0.03, align = 31)
+    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', isPrivate = True, maxYnumbers = 2, is2d = True)
 
     histo = getObject('Vertex-results/th1f_TT2018.root', 'MM_vx1vy1')
     histo.GetZaxis().SetLabelSize(0.03)
@@ -158,8 +159,8 @@ if __name__ == "__main__":
     histo.GetYaxis().SetTitle('Dimuon vertex y_{1} (cm)')
     plot = Canvas.Canvas('hist_MM_vx1vy1', 'png,pdf', 0.3, 0.75, 0.89, 0.8, 1)
     plot.addHisto(histo, 'COLZ', '', 'f', '', 1, 0)
-    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.) 2018 UL', size = 0.03, align = 31)
-    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', inProgress = False, maxYnumbers = 3)
+    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.)', size = 0.03, align = 31)
+    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', isPrivate = True, maxYnumbers = 3, is2d = True)
 
     histo = getObject('Vertex-results/th1f_TT2018.root', 'MM_vx2vy2')
     histo.GetZaxis().SetLabelSize(0.03)
@@ -167,8 +168,8 @@ if __name__ == "__main__":
     histo.GetYaxis().SetTitle('Dimuon vertex y_{2} (cm)')
     plot = Canvas.Canvas('hist_MM_vx2vy2', 'png,pdf', 0.3, 0.75, 0.89, 0.8, 1)
     plot.addHisto(histo, 'COLZ', '', 'f', '', 1, 0)
-    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.) 2018 UL', size = 0.03, align = 31)
-    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', inProgress = False, maxYnumbers = 3)
+    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.)', size = 0.03, align = 31)
+    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', isPrivate = True, maxYnumbers = 3, is2d = True)
 
     histo = getObject('Vertex-results/th1f_TT2018.root', 'MM_vxIIvyII')
     histo.GetZaxis().SetLabelSize(0.03)
@@ -176,8 +177,8 @@ if __name__ == "__main__":
     histo.GetYaxis().SetTitle('Dimuon vertex y_{#mu#mu} (cm)')
     plot = Canvas.Canvas('hist_MM_vxIIvyII', 'png,pdf', 0.3, 0.75, 0.89, 0.8, 1)
     plot.addHisto(histo, 'COLZ', '', 'f', '', 1, 0)
-    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.) 2018 UL', size = 0.03, align = 31)
-    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', inProgress = False, maxYnumbers = 3)
+    plot.addLatex(0.9, 0.93, 't#bar{t} (dilep.)', size = 0.03, align = 31)
+    plot.save(0, 0, 0, '', '', outputDir = WORKPATH + 'harvested/', isPrivate = True, maxYnumbers = 3, is2d = True)
 
 
 

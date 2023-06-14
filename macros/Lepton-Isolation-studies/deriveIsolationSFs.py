@@ -330,7 +330,7 @@ if __name__ == "__main__":
 
 
                          num += 1
-                         if num > 30:
+                         if num > 300000:
                              num = 0
                              break
 
@@ -477,7 +477,7 @@ if __name__ == "__main__":
     hMC_ = getHistoFromEff(plot['Efficiency_DMDM_DGM_pt_MC'])
     canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
     canvas.addHisto(hMC_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
-    canvas.saveRatio(1, 1, 0, lumi[era], hdata = hdata_, hMC = hMC_, r_ymin = 0.96, r_ymax = 1.04, label = 'Scale factor',outputDir = EOSPATH + 'Isolation-SFs_'+era, inProgress = True)
+    canvas.saveRatio(1, 1, 0, lumi[era], hdata = hdata_, hMC = hMC_, r_ymin = 0.96, r_ymax = 1.04, label = 'Scale factor',outputDir = EOSPATH + 'Isolation-SFs_'+era, isPrivate = True)
 
     SF_ = hdata_.Clone(hdata_.GetName() + '_SF')
     SF_.Divide(hMC_)
@@ -488,7 +488,7 @@ if __name__ == "__main__":
     hMC_ = getHistoFromEff(plot['Efficiency_EE_Electron_et_MC'])
     canvas.addHisto(hdata_,'P', 'Data', 'pl', r.kBlack, True, 0, marker = 20)
     canvas.addHisto(hMC_,'P,SAME', 'Simulation', 'pl', r.kBlue, True, 0, marker = 25)
-    canvas.saveRatio(1, 1, 0, lumi[era], hdata = hdata_, hMC = hMC_, r_ymin = 0.92, r_ymax = 1.08, label = 'Scale factor',outputDir = EOSPATH + 'Isolation-SFs_'+era, inProgress = True)
+    canvas.saveRatio(1, 1, 0, lumi[era], hdata = hdata_, hMC = hMC_, r_ymin = 0.92, r_ymax = 1.08, label = 'Scale factor',outputDir = EOSPATH + 'Isolation-SFs_'+era, isPrivate = True)
 
     SF_ = hdata_.Clone(hdata_.GetName() + '_SF')
     SF_.Divide(hMC_)

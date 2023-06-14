@@ -137,10 +137,10 @@ if __name__ == "__main__":
     ratio_fullPath = h_fullPath[0].Clone()
     ratio_fullPath.Divide(h_fullPath[1])
 
-    h_m90[0].SetMarkerColor(r.kRed+2)
-    h_m90[1].SetMarkerColor(r.kRed+2)
-    h_m90[0].SetLineColor(r.kRed+2)
-    h_m90[1].SetLineColor(r.kRed+2)
+    h_m90[0].SetMarkerColor(r.TColor.GetColor('#048ba8'))
+    h_m90[1].SetMarkerColor(r.TColor.GetColor('#048ba8'))
+    h_m90[0].SetLineColor(r.TColor.GetColor('#048ba8'))
+    h_m90[1].SetLineColor(r.TColor.GetColor('#048ba8'))
     h_m90[0].SetMarkerStyle(21)
     h_m90[1].SetMarkerStyle(25)
     h_m90[0].SetMarkerSize(1)
@@ -165,10 +165,10 @@ if __name__ == "__main__":
     ratio_m55.Divide(h_m55[1])
     ratio_m55.SetMarkerStyle(20)
 
-    h_p70[0].SetMarkerColor(r.kGreen+2)
-    h_p70[1].SetMarkerColor(r.kGreen+2)
-    h_p70[0].SetLineColor(r.kGreen+2)
-    h_p70[1].SetLineColor(r.kGreen+2)
+    h_p70[0].SetMarkerColor(r.TColor.GetColor('#f18f01'))
+    h_p70[1].SetMarkerColor(r.TColor.GetColor('#f18f01'))
+    h_p70[0].SetLineColor(r.TColor.GetColor('#f18f01'))
+    h_p70[1].SetLineColor(r.TColor.GetColor('#f18f01'))
     h_p70[0].SetMarkerStyle(23)
     h_p70[1].SetMarkerStyle(32)
     h_p70[0].SetMarkerSize(1)
@@ -184,27 +184,25 @@ if __name__ == "__main__":
     h_fullPath[0].SetMaximum(1e10)
     h_fullPath[0].SetMinimum(1)
     h_fullPath[0].GetXaxis().SetLabelSize(0)
-    h_fullPath[0].Draw('P E0 E1')
-    h_fullPath[1].Draw('P E0 E1, SAME')
-    h_m90[0].Draw('P E0 E1,SAME')
-    h_m90[1].Draw('P E0 E1,SAME')
-    h_m55[0].Draw('P E0 E1,SAME')
-    h_m55[1].Draw('P E0 E1,SAME')
-    h_p70[0].Draw('P E0 E1,SAME')
-    h_p70[1].Draw('P E0 E1,SAME')
+    h_fullPath[0].Draw('P E0')
+    h_fullPath[1].Draw('P E0, SAME')
+    h_m90[0].Draw('P E0,SAME')
+    h_m90[1].Draw('P E0,SAME')
+    #h_m55[0].Draw('P E0 E1,SAME')
+    #h_m55[1].Draw('P E0 E1,SAME')
+    h_p70[0].Draw('P E0,SAME')
+    h_p70[1].Draw('P E0,SAME')
 
-    legend = r.TLegend(0.15, 0.55, 0.3, 0.85)
+    legend = r.TLegend(0.18, 0.50, 0.3, 0.82)
     legend.SetTextFont(42)
-    legend.SetTextSize(0.025)
+    legend.SetTextSize(0.04)
     legend.SetBorderSize(0)
     legend.SetFillColor(0)
     legend.SetFillStyle(0) # added (Celia)
     legend.AddEntry(h_fullPath[0], 'Full path (Forward)', 'p')
     legend.AddEntry(h_fullPath[1], 'Full path (Backward)', 'p')
-    legend.AddEntry(h_m90[0], 'HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 (Forward)', 'p')
-    legend.AddEntry(h_m90[1], 'HLT_Diphoton30_22_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass90 (Backward)', 'p')
-    legend.AddEntry(h_m55[0], 'HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_PixelVeto_Mass55 (Forward)', 'p')
-    legend.AddEntry(h_m55[1], 'HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_PixelVeto_Mass55 (Backward)', 'p')
+    legend.AddEntry(h_m90[0], 'HLT_Diphoton30_22_*_Mass90 (Forward)', 'p')
+    legend.AddEntry(h_m90[1], 'HLT_Diphoton30_22_*_Mass90 (Backward)', 'p')
     legend.AddEntry(h_p70[0], 'HLT_DoublePhoton70 (Forward)', 'p')
     legend.AddEntry(h_p70[1], 'HLT_DoublePhoton70 (Backward)', 'p')
     legend.Draw()
@@ -214,9 +212,9 @@ if __name__ == "__main__":
     latex.SetTextAngle(0);
     latex.SetTextColor(r.kBlack);
     latex.SetTextFont(42);
-    latex.SetTextAlign(31);
-    latex.SetTextSize(0.068);
-    latex.DrawLatex(0.23, 0.88, "#bf{CMS}")
+    latex.SetTextAlign(11);
+    latex.SetTextSize(0.055);
+    latex.DrawLatex(0.13, 0.88, "#bf{Private work}")
     latexb = r.TLatex()
     latexb.SetNDC();
     latexb.SetTextAngle(0);
@@ -224,7 +222,7 @@ if __name__ == "__main__":
     latexb.SetTextFont(42);
     latexb.SetTextAlign(31);
     latexb.SetTextSize(0.045);
-    latexb.DrawLatex(0.39, 0.88, "#it{Preliminary}")
+    latexb.DrawLatex(0.6, 0.88, "#it{CMS data/simulation}")
 
     latexc = r.TLatex()
     latexc.SetNDC();
@@ -247,10 +245,12 @@ if __name__ == "__main__":
     ratio_fullPath.GetYaxis().SetTitleSize(0.12)
     ratio_fullPath.GetYaxis().SetTitle('Obs./Pred.')
     ratio_fullPath.GetYaxis().SetNdivisions(4)
-    ratio_fullPath.Draw('P E0 E1')
-    ratio_m90.Draw('P E0 E1,SAME')
-    ratio_m55.Draw('P E0 E1,SAME')
-    ratio_p70.Draw('P E0 E1,SAME')
+    ratio_fullPath.SetLineWidth(2)
+    ratio_m90.SetLineWidth(2)
+    ratio_p70.SetLineWidth(2)
+    ratio_fullPath.Draw('P E0')
+    ratio_m90.Draw('P E0,SAME')
+    ratio_p70.Draw('P E0,SAME')
 
     canvas.Print('EE_mass_2017_triggersplit.png')
     canvas.Print('EE_mass_2017_triggersplit.pdf')
