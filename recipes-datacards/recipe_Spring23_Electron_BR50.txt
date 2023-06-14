@@ -1,0 +1,19 @@
+#######################################################################################################################################
+#
+# NAME ;      CHANNEL NAME ;      TYPE ;      HISTOGRAM ;                LIMITS (min,max);         DIRECTORY ; 
+#
+#######################################################################################################################################
+Electron      nEE_IaA              bkg         hEE_BCRIaA                        0.0,1.0                 yields_Spring23_electrons_BR50
+Electron      nEE_IaA              sig         hEE_SRIaA                         0.0,1.0                 yields_Spring23_electrons_BR50
+Electron      nEE_IaB              bkg         hEE_BCRIaB                        0.0,1.0                 yields_Spring23_electrons_BR50
+Electron      nEE_IaB              sig         hEE_SRIaB                         0.0,1.0                 yields_Spring23_electrons_BR50
+Electron      nEE_IaC              bkg         hEE_BCRIaC                        0.0,1.0                 yields_Spring23_electrons_BR50
+Electron      nEE_IaC              sig         hEE_SRIaC                         0.0,1.0                 yields_Spring23_electrons_BR50
+Electron      nEE_IbA              bkg         hEE_BCRIbA                        0.0,1.0                 yields_Spring23_electrons_BR50
+Electron      nEE_IbA              sig         hEE_SRIbA                         0.0,1.0                 yields_Spring23_electrons_BR50
+Electron      nEE_IbB              bkg         hEE_BCRIbB                        0.0,1.0                 yields_Spring23_electrons_BR50
+Electron      nEE_IbB              sig         hEE_SRIbB                         0.0,1.0                 yields_Spring23_electrons_BR50
+Electron      nEE_IbC              bkg         hEE_BCRIbC                        0.0,1.0                 yields_Spring23_electrons_BR50
+Electron      nEE_IbC              sig         hEE_SRIbC                         0.0,1.0                 yields_Spring23_electrons_BR50
+Electron      nEE_II               bkg         hEE_BCRII                         0.0,1.0                 yields_Spring23_electrons_BR50
+Electron      nEE_II               sig         hEE_SRII                          0.0,1.0                 yields_Spring23_electrons_BR50

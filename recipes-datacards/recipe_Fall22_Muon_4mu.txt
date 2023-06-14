@@ -1,0 +1,23 @@
+#######################################################################################################################################
+#
+# NAME ;      CHANNEL NAME ;      TYPE ;      HISTOGRAM ;                LIMITS (min,max);         DIRECTORY ; 
+#
+#######################################################################################################################################
+Muon      nMM_IaA              bkg         hMM_BCRIaA                        0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IaA              sig         hMM_SRIaA                         0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IaB              bkg         hMM_BCRIaB                        0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IaB              sig         hMM_SRIaB                         0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IaC              bkg         hMM_BCRIaC                        0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IaC              sig         hMM_SRIaC                         0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IaD              bkg         hMM_BCRIaD                        0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IaD              sig         hMM_SRIaD                         0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IbA              bkg         hMM_BCRIbA                        0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IbA              sig         hMM_SRIbA                         0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IbB              bkg         hMM_BCRIbB                        0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IbB              sig         hMM_SRIbB                         0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IbC              bkg         hMM_BCRIbC                        0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IbC              sig         hMM_SRIbC                         0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IbD              bkg         hMM_BCRIbD                        0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_IbD              sig         hMM_SRIbD                         0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_II               bkg         hMM_BCRII                         0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
+Muon      nMM_II               sig         hMM_SRII                          0.0,1.0                 finalyields_4mu_Spring23_recoSpring23_trgSpring23
