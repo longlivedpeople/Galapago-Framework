@@ -110,7 +110,8 @@ if __name__ == "__main__":
     regions_mu = ["IaA", "IaB", "IaC", "IaD", "IbA", "IbB", "IbC", "IbD", "II"]
     regions_ee = ["IaA", "IaB", "IaC", "IbA", "IbB", "IbC", "II"]
 
-    www = '/eos/user/f/fernance/www/DisplacedLeptons-analysis/SignalYieldsAndTables/QCD-tests_upperCut_1p5/' 
+    www = '/eos/user/f/fernance/www/DisplacedLeptons-analysis/SignalYieldsAndTables/QCD-tests/' 
+    #www = '/eos/user/f/fernance/www/DisplacedLeptons-analysis/SignalYieldsAndTables/QCD-tests_upperCut_1p5/' 
 
     ############ Dielectron plots
     if opts.inputElectrons:

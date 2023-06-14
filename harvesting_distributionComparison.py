@@ -38,6 +38,7 @@ def makeAgreementTest(lumi, hname1, hname2, ylog, tree, inputdir, label1, label2
     histo1.SetMinimum(0.0)
     histo1.SetMarkerStyle(20)
     histo2.SetMarkerStyle(20)
+    histo1.GetYaxis().SetTitle('Events / bin width')
 
     ## Systematic bar
     hsys = False
@@ -53,7 +54,7 @@ def makeAgreementTest(lumi, hname1, hname2, ylog, tree, inputdir, label1, label2
     plot.addHisto(histo2, 'P,SAME', label2, 'p', r.kRed, 1, 1)
     plot.addLatex(0.18, 0.78, labela, font = 42, size = 0.045, align = 11)
     plot.addLatex(0.9, 0.88, labelb, font = 42, size = 0.045, align = 31)
-    plot.saveRatio(1, isData, 0, str(lumi), histo1, histo2, r_ymin = rmin, r_ymax = rmax, r_xmin = r_xmin, r_xmax = r_xmax, label = 'Ratio', hsys = hsys, xlog = False, outputDir = WORKPATH + 'SymmetryResults/', maxYnumbers = maxY)
+    plot.saveRatio(1, isData, 0, str(lumi), histo1, histo2, r_ymin = rmin, r_ymax = rmax, r_xmin = r_xmin, r_xmax = r_xmax, label = 'Ratio', hsys = hsys, xlog = False, outputDir = WORKPATH + 'SymmetryResults/', maxYnumbers = maxY, isPrivate = True)
 
     return 
 
@@ -90,8 +91,8 @@ def makeComparison(lumi, hnameList, ylog, treeList, inputdir, labelList, labela,
         else:
             plot.addHisto(histo, 'P,SAME', labelList[h], 'p', galapago_palette[h], 1, h, marker = point_types[h])
     #plot.addLatex(0.18, 0.78, labela, font = 42, size = 0.04, align = 11)
-    plot.addLatex(0.9, 0.93, labelb, font = 42, size = 0.035, align = 31)
-    plot.save(1, isData, 0, str(lumi), '', outputDir = WORKPATH + 'Distribution/', maxYnumbers = maxY)
+    plot.addLatex(0.91, 0.93, labelb, font = 42, size = 0.035, align = 31)
+    plot.save(1, isData, 0, str(lumi), '', outputDir = WORKPATH + 'Distribution/', maxYnumbers = maxY, is2d = True, isPrivate = True)
 
     return 
 
@@ -189,16 +190,16 @@ if __name__ == "__main__":
 
 
     ################ Define the .dat file
-    filename = 'dat/Samples_cern_UltraLegacy.dat'
+    filename = 'dat/Samples_cern_UltraLegacy_Spring23.dat'
 
     lumi_total = ""
 
     rebin1 = np.linspace(0, 3.14/2., 16)
 
-
     #
     # -- Symmetry tests in Drell-Yan simulation
     #
+    """
     treeDY_preVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-10to50_preVFP', 'DYJetsToLL_M-50_preVFP'], 'MC'), name = 'MC', isdata = 0 )
     makeAgreementTest(lumi_total, 'hEESel_dPhi', 'hEESel_dPhi_inv', 0, treeDY_preVFP, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'Drell-Yan (Baseline selection)', '2016 UL: preVFP', 'DYpreVFP_hEE_dPhi_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 0, maxY = 4)
     makeAgreementTest(lumi_total, 'hMMSel_dPhi', 'hMMSel_dPhi_inv', 0, treeDY_preVFP, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'Drell-Yan (Baseline selection)', '2016 UL: preVFP', 'DYpreVFP_hMM_dPhi_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 0, maxY = 4)
@@ -221,7 +222,15 @@ if __name__ == "__main__":
     makeAgreementTest(lumi_total, 'hEESelDisp_dPhi', 'hEESelDisp_dPhi_inv', 0, treeDY_2018, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'Drell-Yan (Baseline selection, |d_{0}|/#sigma_{d} > 2.5)', '2018 UL', 'DY2018_hEE_dPhi_Disp_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.6, rmax= 1.4)
     makeAgreementTest(lumi_total, 'hMMSelDisp_dPhi', 'hMMSelDisp_dPhi_inv', 0, treeDY_2018, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'Drell-Yan (Baseline selection, |d_{0}|/#sigma_{d} > 2.5)', '2018 UL', 'DY2018_hMM_dPhi_Disp_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.6, rmax= 1.4)
 
-   
+    tree_DYMMFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-10to50_preVFP', 'DYJetsToLL_M-50_preVFP', 'DYJetsToLL_M-10to50_postVFP', 'DYJetsToLL_M-50_postVFP', 'DYJetsToLL_M-10to50_2018', 'DYJetsToLL_M-50_2018'], 'MC'), name = 'MC', isdata = 1 )
+    tree_DYEEFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-10to50_preVFP', 'DYJetsToLL_M-50_preVFP', 'DYJetsToLL_M-10to50_postVFP', 'DYJetsToLL_M-50_postVFP', 'DYJetsToLL_M-10to50_2017', 'DYJetsToLL_M-50_2017', 'DYJetsToLL_M-10to50_2018', 'DYJetsToLL_M-50_2018'], 'MC'), name = 'MC', isdata = 1 )
+
+    makeAgreementTest(lumi_total, 'hEESel_dPhi', 'hEESel_dPhi_inv', 0, tree_DYEEFull, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'Drell-Yan (Baseline selection)', 'All years', 'DYFull_hEE_dPhi_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 0, maxY = 2)
+    makeAgreementTest(lumi_total, 'hMMSel_dPhi', 'hMMSel_dPhi_inv', 0, tree_DYMMFull, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'Drell-Yan (Baseline selection)', '2016 + 2018', 'DYFull_hMM_dPhi_corr', 0, sys = 0.1,  ranges = [0, 1.56], rebin = 0, maxY = 4)
+    makeAgreementTest(lumi_total, 'hEESelDisp_dPhi', 'hEESelDisp_dPhi_inv', 0, tree_DYEEFull, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'Drell-Yan (Baseline selection, |d_{0}|/#sigma_{d} > 2.5)', 'All years', 'DYFull_hEE_dPhi_Disp_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.6, rmax= 1.4, maxY = 3)
+    makeAgreementTest(lumi_total, 'hMMSelDisp_dPhi', 'hMMSelDisp_dPhi_inv', 0, tree_DYMMFull, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'Drell-Yan (Baseline selection, |d_{0}|/#sigma_{d} > 2.5)', '2016 + 2018', 'DYFull_hMM_dPhi_Disp_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.6, rmax= 1.4)
+
+
     #
     # -- Symmetry tests in TTbar simulation
     #
@@ -248,11 +257,18 @@ if __name__ == "__main__":
     makeAgreementTest(lumi_total, 'hEESelDisp_dPhi', 'hEESelDisp_dPhi_inv', 0, treeTT_2018, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 't#bar{t} dilep. (Baseline selection, |d_{0}|/#sigma_{d} > 2.5)', '2018 UL', 'TT2018_hEE_dPhi_Disp_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.5, rmax= 1.5, maxY = 4)
     makeAgreementTest(lumi_total, 'hMMSelDisp_dPhi', 'hMMSelDisp_dPhi_inv', 0, treeTT_2018, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 't#bar{t} dilep. (Baseline selection, |d_{0}|/#sigma_{d} > 2.5)', '2018 UL', 'TT2018_hMM_dPhi_Disp_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.5, rmax= 1.5, maxY = 0)
     
+    tree_TTMMFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TTTo2L2Nu_preVFP', 'TTTo2L2Nu_postVFP', 'TTTo2L2Nu_2018'], 'MC'), name = 'MC', isdata = 1 )
+    tree_TTEEFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TTTo2L2Nu_preVFP', 'TTTo2L2Nu_postVFP', 'TTTo2L2Nu_2017', 'TTTo2L2Nu_2018'], 'MC'), name = 'MC', isdata = 1 )
+
+    makeAgreementTest(lumi_total, 'hEESel_dPhi', 'hEESel_dPhi_inv', 0, tree_TTEEFull, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 't#bar{t} dilep. (Baseline selection)', 'All years', 'TTFull_hEE_dPhi_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 0, maxY = 4)
+    makeAgreementTest(lumi_total, 'hMMSel_dPhi', 'hMMSel_dPhi_inv', 0, tree_TTMMFull, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 't#bar{t} dilep. (Baseline selection)', '2016 + 2018', 'TTFull_hMM_dPhi_corr', 0, sys = 0.1,  ranges = [0, 1.56], rebin = 0, maxY = 4)
+    makeAgreementTest(lumi_total, 'hEESelDisp_dPhi', 'hEESelDisp_dPhi_inv', 0, tree_TTEEFull, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 't#bar{t} dilep. (Baseline selection, |d_{0}|/#sigma_{d} > 2.5)', 'All years', 'TTFull_hEE_dPhi_Disp_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.6, rmax= 1.4)
+    makeAgreementTest(lumi_total, 'hMMSelDisp_dPhi', 'hMMSelDisp_dPhi_inv', 0, tree_TTMMFull, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 't#bar{t} dilep. (Baseline selection, |d_{0}|/#sigma_{d} > 2.5)', '2016 + 2018', 'TTFull_hMM_dPhi_Disp_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.6, rmax= 1.4)
+
 
     #
     # -- Symmetry tests in diboson simulation
     #
-
     treeVV_preVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['ZZ_preVFP', 'WW_preVFP', 'WZ_preVFP'], 'MC'), name = 'MC', isdata = 0 )
     makeAgreementTest(lumi_total, 'hEESel_dPhi', 'hEESel_dPhi_inv', 0, treeVV_preVFP, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'WZ, WW (Baseline selection)', '2016 UL: preVFP', 'VVpreVFP_hEE_dPhi_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.8, rmax= 1.2, maxY = 0)
     makeAgreementTest(lumi_total, 'hMMSel_dPhi', 'hMMSel_dPhi_inv', 0, treeVV_preVFP, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'WZ, WW (Baseline selection)', '2016 UL: preVFP', 'VVpreVFP_hMM_dPhi_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.8, rmax= 1.2, maxY = 0)
@@ -276,6 +292,16 @@ if __name__ == "__main__":
     makeAgreementTest(lumi_total, 'hEESelDisp_dPhi', 'hEESelDisp_dPhi_inv', 0, treeVV_2018, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'ZZ, WZ, WW (Baseline selection, |d_{0}|/#sigma_{d} > 2.5)', '2018 UL', 'VV2018_hEE_dPhi_Disp_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.0, rmax= 2.0, maxY = 0)
     makeAgreementTest(lumi_total, 'hMMSelDisp_dPhi', 'hMMSelDisp_dPhi_inv', 0, treeVV_2018, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'ZZ, WZ, WW (Baseline selection, |d_{0}|/#sigma_{d} > 2.5)', '2018 UL', 'VV2018_hMM_dPhi_Disp_corr', 0, sys = 0.1, ranges = [0, 1.56],  rebin = 3, rmin = 0.0, rmax= 2.0, maxY = 0)
 
+    tree_VVMMFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['WW_preVFP', 'WZ_preVFP', 'ZZ_preVFP', 'WW_postVFP', 'WZ_postVFP', 'ZZ_postVFP', 'WW_2018', 'WZ_2018', 'ZZ_2018'], 'MC'), name = 'MC', isdata = 1 )
+    tree_VVEEFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['WW_preVFP', 'WZ_preVFP', 'ZZ_preVFP', 'WW_postVFP', 'WZ_postVFP', 'ZZ_postVFP', 'WW_2017', 'WZ_2017', 'ZZ_2017', 'WW_2018', 'WZ_2018', 'ZZ_2018'], 'MC'), name = 'MC', isdata = 1 )
+
+    makeAgreementTest(lumi_total, 'hEESel_dPhi', 'hEESel_dPhi_inv', 0, tree_VVEEFull, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'Diboson (Baseline selection)', 'All years', 'VVFull_hEE_dPhi_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 0, maxY = 4)
+    makeAgreementTest(lumi_total, 'hMMSel_dPhi', 'hMMSel_dPhi_inv', 0, tree_VVMMFull, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'Diboson (Baseline selection)', '2016 + 2018', 'VVFull_hMM_dPhi_corr', 0, sys = 0.1,  ranges = [0, 1.56], rebin = 0, maxY = 4)
+    makeAgreementTest(lumi_total, 'hEESelDisp_dPhi', 'hEESelDisp_dPhi_inv', 0, tree_VVEEFull, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'Diboson (Baseline selection, |d_{0}|/#sigma_{d} > 2.5)', 'All years', 'VVFull_hEE_dPhi_Disp_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.6, rmax= 1.4)
+    makeAgreementTest(lumi_total, 'hMMSelDisp_dPhi', 'hMMSelDisp_dPhi_inv', 0, tree_VVMMFull, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'Diboson (Baseline selection, |d_{0}|/#sigma_{d} > 2.5)', '2016 + 2018', 'VVFull_hMM_dPhi_Disp_corr', 0, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.6, rmax= 1.4)
+
+    """
+    """
     #
     # -- Symmetry tests in Data QCD control region
     #
@@ -306,12 +332,6 @@ if __name__ == "__main__":
     makeAgreementTest(59.8, 'hEEQCDDisp_dPhi', 'hEEQCDDisp_dPhi_inv', 0, tree_EE2018, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'QCD Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'QCD2018_hEE_dPhi_Disp_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.5, rmax= 1.5, maxY = 0)
     makeAgreementTest(59.8, 'hMMQCDDisp_dPhi', 'hMMQCDDisp_dPhi_inv', 0, tree_MM2018, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'QCD Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'QCD2018_hMM_dPhi_Disp_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.5, rmax= 1.5, maxY = 0)
 
-    makeAgreementTest(59.8, 'hMMQCDSRDisp_cosAlpha', 'hMMQCDBCRDisp_cosAlpha', 0, tree_MM2018, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})| < #pi/2', '|#Delta#Phi(#mu^{+}, #mu^{-})| > #pi/2', 'QCD Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'QCD2018_hMM_cosAlpha_comp', 1, sys = 0.0, rebin = False, rmin = 0.5, rmax= 1.5, maxY = 0)
-    makeAgreementTest(59.8, 'hMMQCDSRDisp_mass', 'hMMQCDBCRDisp_mass', 0, tree_MM2018, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})| < #pi/2', '|#Delta#Phi(#mu^{+}, #mu^{-})| > #pi/2', 'QCD Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'QCD2018_hMM_mass_comp', 1, sys = 0.0, rebin = False, rmin = 0.5, rmax= 1.5, maxY = 0)
-    makeAgreementTest(59.8, 'hMMQCDSRDisp_normalizedChi2', 'hMMQCDBCRDisp_normalizedChi2', 0, tree_MM2018, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})| < #pi/2', '|#Delta#Phi(#mu^{+}, #mu^{-})| > #pi/2', 'QCD Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'QCD2018_hMM_normalizedChi2_comp', 1, sys = 0.0, rebin = False, rmin = 0.5, rmax= 1.5, maxY = 0)
-    makeAgreementTest(59.8, 'hMMQCDSRDisp_nPU', 'hMMQCDBCRDisp_nPU', 0, tree_MM2018, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})| < #pi/2', '|#Delta#Phi(#mu^{+}, #mu^{-})| > #pi/2', 'QCD Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'QCD2018_hMM_nPU_comp', 1, sys = 0.0, rebin = False, rmin = 0.5, rmax= 1.5, maxY = 0)
-    makeAgreementTest(59.8, 'hMMQCDSRDisp_Lxy', 'hMMQCDBCRDisp_Lxy', 0, tree_MM2018, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})| < #pi/2', '|#Delta#Phi(#mu^{+}, #mu^{-})| > #pi/2', 'QCD Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'QCD2018_hMM_Lxy_comp', 1, sys = 0.0, rebin = False, rmin = 0.5, rmax= 1.5, maxY = 0)
-
 
 
     #
@@ -338,6 +358,9 @@ if __name__ == "__main__":
     makeAgreementTest(59.8, 'hMMWjetsDisp_dPhi', 'hMMWjetsDisp_dPhi_inv', 0, tree_MM2018, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'W+jets Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'Wjets2018_hMM_dPhi_Disp_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.6, rmax= 1.4, maxY = 0)
 
 
+
+
+
     #
     # -- Symmetry tests in Data SS control region
     #
@@ -357,24 +380,64 @@ if __name__ == "__main__":
 
 
     makeAgreementTest(59.8, 'hEESS_dPhi', 'hEESS_dPhi_inv', 0, tree_EE2018, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'Same-sign Control Region', '', 'SS2018_hEE_dPhi_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.8, rmax= 1.2, maxY = 4)
-    makeAgreementTest(59.8, 'hMMSS_dPhi', 'hMMSS_dPhi_inv', 0, tree_MM2018, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'Same-sign Control Region', '', 'SS2018_hMM_dPhi_corr', 1, sys = 0.1,  ranges = [0, 1.56], rebin = 3, rmin = 0.8, rmax= 1.2, maxY = 4)
+    makeAgreementTest(59.8, 'hMMSS_dPhi', 'hMMSS_dPhi_inv', 0, tree_MM2018, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'Same-sign Control Region', '', 'SS2018_hMM_dPhi_corr', 1, sys = 0.1,  ranges = [0, 1.56], rebin = 3, rmin = 0.8, rmax= 1.2, maxY = 3)
     makeAgreementTest(59.8, 'hEESSDisp_dPhi', 'hEESSDisp_dPhi_inv', 0, tree_EE2018, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'Same-sign Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'SS2018_hEE_dPhi_Disp_corr', 1, sys = 0.1,  ranges = [0, 1.56], rebin = 3, rmin = 0.6, rmax= 1.4, maxY = 0)
     makeAgreementTest(59.8, 'hMMSSDisp_dPhi', 'hMMSSDisp_dPhi_inv', 0, tree_MM2018, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'Same-sign Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'SS2018_hMM_dPhi_Disp_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.6, rmax= 1.4, maxY = 0)
+    """
+
+    tree_MMFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016_HIPM + DoubleMuon2016_noHIPM + DoubleMuon2018, 'MC'), name = 'DATA', isdata = 1 )
+    tree_EEFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016_HIPM + DoubleEG2016_noHIPM + DoubleEG2017 + DoubleEG2018, 'MC'), name = 'DATA', isdata = 1 )
+
+    makeAgreementTest(137, 'hEEQCD_dPhi', 'hEEQCD_dPhi_inv', 0, tree_EEFull, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'QCD Control Region', '', 'QCDFull_hEE_dPhi_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.8, rmax= 1.2, maxY = 4)
+    makeAgreementTest(96, 'hMMQCD_dPhi', 'hMMQCD_dPhi_inv', 0, tree_MMFull, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'QCD Control Region', '', 'QCDFull_hMM_dPhi_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.8, rmax= 1.2, maxY = 4)
+    makeAgreementTest(137, 'hEEQCDDisp_dPhi', 'hEEQCDDisp_dPhi_inv', 0, tree_EEFull, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'QCD Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'QCDFull_hEE_dPhi_Disp_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.5, rmax= 1.5, maxY = 0)
+    makeAgreementTest(96, 'hMMQCDDisp_dPhi', 'hMMQCDDisp_dPhi_inv', 0, tree_MMFull, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'QCD Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'QCDFull_hMM_dPhi_Disp_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.5, rmax= 1.5, maxY = 3)
+
+    makeAgreementTest(137, 'hEEWjets_dPhi', 'hEEWjets_dPhi_inv', 0, tree_EEFull, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'W+jets Control Region', '', 'WjetsFull_hEE_dPhi_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.8, rmax= 1.2, maxY = 4)
+    makeAgreementTest(96, 'hMMWjets_dPhi', 'hMMWjets_dPhi_inv', 0, tree_MMFull, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'W+jets Control Region', '', 'WjetsFull_hMM_dPhi_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.8, rmax= 1.2, maxY = 4)
+    makeAgreementTest(137, 'hEEWjetsDisp_dPhi', 'hEEWjetsDisp_dPhi_inv', 0, tree_EEFull, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'W+jets Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'WjetsFull_hEE_dPhi_Disp_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.5, rmax= 1.5, maxY = 3)
+    makeAgreementTest(96, 'hMMWjetsDisp_dPhi', 'hMMWjetsDisp_dPhi_inv', 0, tree_MMFull, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'W+jets Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'WjetsFull_hMM_dPhi_Disp_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.5, rmax= 1.5, maxY = 3)
+
+
+    makeAgreementTest(137, 'hEESS_dPhi', 'hEESS_dPhi_inv', 0, tree_EEFull, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'Same-sign Control Region', '', 'SSFull_hEE_dPhi_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.8, rmax= 1.2, maxY = 4)
+    makeAgreementTest(96, 'hMMSS_dPhi', 'hMMSS_dPhi_inv', 0, tree_MMFull, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'Same-sign Control Region', '', 'SSFull_hMM_dPhi_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.8, rmax= 1.2, maxY = 4)
+    makeAgreementTest(137, 'hEESSDisp_dPhi', 'hEESSDisp_dPhi_inv', 0, tree_EEFull, WORKPATH + opts.input, '|#Delta#Phi(e^{+}, e^{-})|', '#pi - |#Delta#Phi(e^{+}, e^{-})|', 'Same-sign Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'SSFull_hEE_dPhi_Disp_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.5, rmax= 1.5, maxY = 0)
+    makeAgreementTest(96, 'hMMSSDisp_dPhi', 'hMMSSDisp_dPhi_inv', 0, tree_MMFull, WORKPATH + opts.input, '|#Delta#Phi(#mu^{+}, #mu^{-})|', '#pi - |#Delta#Phi(#mu^{+}, #mu^{-})|', 'Same-sign Control Region, |d_{0}|/#sigma_{d}  > 2.5', '', 'SSFull_hMM_dPhi_Disp_corr', 1, sys = 0.1, ranges = [0, 1.56], rebin = 3, rmin = 0.5, rmax= 1.5, maxY = 0)
+
 
     #
     # -- Collinearity simple distributions
     #
     """
-    makeComparison('', ['hEESel_dPhi', 'hEESel_dPhi', 'hEESel_dPhi', 'hEEQCD_dPhi', 'hEEWjets_dPhi'], 0, [treeDY_postVFP, treeTT_postVFP, treeVV_postVFP, tree_EE2016_noHIPM, tree_EE2016_noHIPM], WORKPATH + opts.input, ['Drell-Yan simulation', 't#bar{t} (dilep.) simulation', 'WW, WZ, simulation', 'QCD control region', 'W+jets control region'], '', '2016 UL: no HIPM / postVFP', 'hdPhi_EE_noHIPMpostVFP', 1)
-    makeComparison('', ['hEESel_dPhi', 'hEESel_dPhi', 'hEESel_dPhi', 'hEEQCD_dPhi', 'hEEWjets_dPhi'], 0, [treeDY_preVFP, treeTT_preVFP, treeVV_preVFP, tree_EE2016_HIPM, tree_EE2016_HIPM], WORKPATH + opts.input, ['Drell-Yan simulation', 't#bar{t} (dilep.) simulation', 'WW, WZ simulation', 'QCD control region', 'W+jets control region'], '', '2016 UL: HIPM / preVFP', 'hdPhi_EE_HIPMpreVFP', 1)
+    treeDY_preVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-10to50_preVFP', 'DYJetsToLL_M-50_preVFP'], 'MC'), name = 'MC', isdata = 0 )
+    treeDY_postVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-10to50_postVFP', 'DYJetsToLL_M-50_postVFP'], 'MC'), name = 'MC', isdata = 0 )
+    treeDY_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-10to50_2017', 'DYJetsToLL_M-50_2017'], 'MC'), name = 'MC', isdata = 0 )
+    treeDY_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['DYJetsToLL_M-10to50_2018', 'DYJetsToLL_M-50_2018'], 'MC'), name = 'MC', isdata = 0 )
+    treeTT_preVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TTTo2L2Nu_preVFP'], 'MC'), name = 'MC', isdata = 0 )
+    treeTT_postVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TTTo2L2Nu_postVFP'], 'MC'), name = 'MC', isdata = 0 )
+    treeTT_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TTTo2L2Nu_2017'], 'MC'), name = 'MC', isdata = 0 )
+    treeTT_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['TTTo2L2Nu_2018'], 'MC'), name = 'MC', isdata = 0 )
+    treeVV_preVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['ZZ_preVFP', 'WW_preVFP', 'WZ_preVFP'], 'MC'), name = 'MC', isdata = 0 )
+    treeVV_postVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['ZZ_postVFP', 'WW_postVFP', 'WZ_postVFP'], 'MC'), name = 'MC', isdata = 0 )
+    treeVV_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['ZZ_2017', 'WW_2017', 'WZ_2017'], 'MC'), name = 'MC', isdata = 0 )
+    treeVV_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, ['ZZ_2018', 'WW_2018', 'WZ_2018'], 'MC'), name = 'MC', isdata = 0 )
+    tree_EE2016_HIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016_HIPM, 'MC'), name = 'DATA', isdata = 1 )
+    tree_MM2016_HIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016_HIPM, 'MC'), name = 'DATA', isdata = 1 )
+    tree_EE2016_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016_noHIPM, 'MC'), name = 'DATA', isdata = 1 )
+    tree_MM2016_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016_noHIPM, 'MC'), name = 'DATA', isdata = 1 )
+    tree_EE2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2017, 'MC'), name = 'DATA', isdata = 1 )
+    tree_EE2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2018, 'MC'), name = 'DATA', isdata = 1 )
+    tree_MM2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2018, 'MC'), name = 'DATA', isdata = 1 )
+
+    makeComparison('', ['hEESel_dPhi', 'hEESel_dPhi', 'hEESel_dPhi', 'hEEQCD_dPhi', 'hEEWjets_dPhi'], 0, [treeDY_postVFP, treeTT_postVFP, treeVV_postVFP, tree_EE2016_noHIPM, tree_EE2016_noHIPM], WORKPATH + opts.input, ['Drell-Yan simulation', 't#bar{t} (dilep.) simulation', 'WW, WZ, simulation', 'QCD control region', 'W+jets control region'], '', '2016 UL: no HIPM', 'hdPhi_EE_noHIPMpostVFP', 1)
+    makeComparison('', ['hEESel_dPhi', 'hEESel_dPhi', 'hEESel_dPhi', 'hEEQCD_dPhi', 'hEEWjets_dPhi'], 0, [treeDY_preVFP, treeTT_preVFP, treeVV_preVFP, tree_EE2016_HIPM, tree_EE2016_HIPM], WORKPATH + opts.input, ['Drell-Yan simulation', 't#bar{t} (dilep.) simulation', 'WW, WZ simulation', 'QCD control region', 'W+jets control region'], '', '2016 UL: HIPM', 'hdPhi_EE_HIPMpreVFP', 1)
     makeComparison('', ['hEESel_dPhi', 'hEESel_dPhi', 'hEESel_dPhi', 'hEEQCD_dPhi', 'hEEWjets_dPhi'], 0, [treeDY_2017, treeTT_2017, treeVV_2017, tree_EE2017, tree_EE2017], WORKPATH + opts.input, ['Drell-Yan simulation', 't#bar{t} (dilep.) simulation', 'WW, WZ, ZZ simulation', 'QCD control region', 'Wjets control region'], '', '2017 UL', 'hdPhi_EE_2017', 1)
     makeComparison('', ['hEESel_dPhi', 'hEESel_dPhi', 'hEESel_dPhi', 'hEEQCD_dPhi', 'hEEWjets_dPhi'], 0, [treeDY_2018, treeTT_2018, treeVV_2018, tree_EE2018, tree_EE2018], WORKPATH + opts.input, ['Drell-Yan simulation', 't#bar{t} (dilep.) simulation', 'WW, WZ, ZZ simulation', 'QCD control region', 'W+jets control region'], '', '2018 UL', 'hdPhi_EE_2018', 1)
 
-    makeComparison('', ['hMMSel_dPhi', 'hMMSel_dPhi', 'hMMSel_dPhi', 'hMMQCD_dPhi', 'hMMWjets_dPhi'], 0, [treeDY_postVFP, treeTT_postVFP, treeVV_postVFP, tree_MM2016_noHIPM, tree_MM2016_noHIPM], WORKPATH + opts.input, ['Drell-Yan simulation', 't#bar{t} (dilep.) simulation', 'WW, WZ, simulation', 'QCD control region', 'W+jets control region'], '', '2016 UL: no HIPM / postVFP', 'hdPhi_MM_noHIPMpostVFP', 1)
-    makeComparison('', ['hMMSel_dPhi', 'hMMSel_dPhi', 'hMMSel_dPhi', 'hMMQCD_dPhi', 'hMMWjets_dPhi'], 0, [treeDY_preVFP, treeTT_preVFP, treeVV_preVFP, tree_MM2016_HIPM, tree_MM2016_HIPM], WORKPATH + opts.input, ['Drell-Yan simulation', 't#bar{t} (dilep.) simulation', 'WW, WZ simulation', 'QCD control region', 'W+jets control region'], '', '2016 UL: HIPM / preVFP', 'hdPhi_MM_HIPMpreVFP', 1)
+    makeComparison('', ['hMMSel_dPhi', 'hMMSel_dPhi', 'hMMSel_dPhi', 'hMMQCD_dPhi', 'hMMWjets_dPhi'], 0, [treeDY_postVFP, treeTT_postVFP, treeVV_postVFP, tree_MM2016_noHIPM, tree_MM2016_noHIPM], WORKPATH + opts.input, ['Drell-Yan simulation', 't#bar{t} (dilep.) simulation', 'WW, WZ, simulation', 'QCD control region', 'W+jets control region'], '', '2016 UL: no HIPM', 'hdPhi_MM_noHIPMpostVFP', 1)
+    makeComparison('', ['hMMSel_dPhi', 'hMMSel_dPhi', 'hMMSel_dPhi', 'hMMQCD_dPhi', 'hMMWjets_dPhi'], 0, [treeDY_preVFP, treeTT_preVFP, treeVV_preVFP, tree_MM2016_HIPM, tree_MM2016_HIPM], WORKPATH + opts.input, ['Drell-Yan simulation', 't#bar{t} (dilep.) simulation', 'WW, WZ simulation', 'QCD control region', 'W+jets control region'], '', '2016 UL: HIPM', 'hdPhi_MM_HIPMpreVFP', 1)
     makeComparison('', ['hMMSel_dPhi', 'hMMSel_dPhi', 'hMMSel_dPhi', 'hMMQCD_dPhi', 'hMMWjets_dPhi'], 0, [treeDY_2018, treeTT_2018, treeVV_2018, tree_MM2018, tree_MM2018], WORKPATH + opts.input, ['Drell-Yan simulation', 't#bar{t} (dilep.) simulation', 'WW, WZ, ZZ simulation', 'QCD control region', 'W+jets control region'], '', '2018 UL', 'hdPhi_MM_2018', 1)
     """
-
 
 
 

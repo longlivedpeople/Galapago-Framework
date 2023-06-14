@@ -32,28 +32,48 @@ def printSignals(signalNames):
         print("["+str(i)+"] {:<12}".format(signalNames[i]))
 
 
-def printTable(title, regions, BKG, signal):
+def printTable(title, regions, BKG, signal, data = []):
     '''
     Function to print the tables with the yields in LaTeX format
     '''
-    nsignals = len(signal[0])
-    print("    \\begin{center}")
-    print("        {\\footnotesize")
-    print("        \\begin{tabular}{ |c|c|"+"c|"*nsignals+" }")
-    print("        \\hline")
-    title_line = "        \\multicolumn{%d}{|c|}{"%(nsignals+2)+title+"} \\\\"
-    print(title_line)
-    print("        \\hline")
-    header = "        {:<6} & {:<7} "+"& {:<7} "*nsignals+" \\\\"
-    print(header.format('Region', 'BKG', *["["+str(i)+"]" for i in range(len(signal[0]))]))
-    print("        \\hline")
-    format_line = "        {:<6} & {:<7.1f} "+"& {:<7.1f} "*len(signal[0])+" \\\\"
-    for n in range(len(regions)):
-        print(format_line.format(regions[n], BKG[n], *signal[n]))
-    print("        \\hline")
-    print("        \\end{tabular}")
-    print("        }")
-    print("    \\end{center}")
+    if len(data) < 1:
+        nsignals = len(signal[0])
+        print("    \\begin{center}")
+        print("        {\\footnotesize")
+        print("        \\begin{tabular}{ |c|c|"+"c|"*nsignals+" }")
+        print("        \\hline")
+        title_line = "        \\multicolumn{%d}{|c|}{"%(nsignals+2)+title+"} \\\\"
+        print(title_line)
+        print("        \\hline")
+        header = "        {:<6} & {:<7} "+"& {:<7} "*nsignals+" \\\\"
+        print(header.format('Region', 'BKG', *["["+str(i)+"]" for i in range(len(signal[0]))]))
+        print("        \\hline")
+        format_line = "        {:<6} & {:<7.1f} "+"& {:<7.1f} "*len(signal[0])+" \\\\"
+        for n in range(len(regions)):
+            print(format_line.format(regions[n], BKG[n], *signal[n]))
+        print("        \\hline")
+        print("        \\end{tabular}")
+        print("        }")
+        print("    \\end{center}")
+    else:
+        nsignals = len(signal[0])
+        print("    \\begin{center}")
+        print("        {\\footnotesize")
+        print("        \\begin{tabular}{ |c|c|c|"+"c|"*nsignals+" }")
+        print("        \\hline")
+        title_line = "        \\multicolumn{%d}{|c|}{"%(nsignals+3)+title+"} \\\\"
+        print(title_line)
+        print("        \\hline")
+        header = "        {:<6} & {:<7} & {:<7}"+ "& {:<7} "*nsignals+" \\\\"
+        print(header.format('Region', 'BKG', 'OBS', *["["+str(i)+"]" for i in range(len(signal[0]))]))
+        print("        \\hline")
+        format_line = "        {:<6} & {:<7.0f} & {:<7.0f}"+"& {:<7.1f} "*len(signal[0])+" \\\\"
+        for n in range(len(regions)):
+            print(format_line.format(regions[n], BKG[n], data[n],  *signal[n]))
+        print("        \\hline")
+        print("        \\end{tabular}")
+        print("        }")
+        print("    \\end{center}")
 
 
 
@@ -109,12 +129,14 @@ if __name__ == "__main__":
     ############# Signal definition
     Signals = []
     Signals.append('HSS_300_50_100')
+    Signals.append('HSS_400_150_100')
     Signals.append('HSS_500_50_100')
+    Signals.append('HSS_800_50_100')
     Signals.append('HSS_1000_250_100')
     #Signals.append('HSS_600_50_100')
     #Signals.append('HSS_1000_350_100')
-    Signals.append('RPV_350_148_100')
-    Signals.append('RPV_1500_494_100')
+    #Signals.append('RPV_350_148_100')
+    #Signals.append('RPV_1500_494_100')
     
     Signals_2016preVFP = [i + '_2016APV' for i in Signals]
     Signals_2016postVFP = [i + '_2016' for i in Signals]
@@ -147,7 +169,7 @@ if __name__ == "__main__":
     regions_ee = ["IaA", "IaB", "IaC", "IbA", "IbB", "IbC", "II"]
 
     ############ Define output
-    www = '/eos/user/f/fernance/www/DisplacedLeptons-analysis/SignalYieldsAndTables/No-Parrot/'
+    www = '/eos/user/f/fernance/www/DisplacedLeptons-analysis/SignalYieldsAndTables/ParrotLike/'
 
     ############ Dielectron plots
     if opts.inputElectrons:
@@ -161,12 +183,21 @@ if __name__ == "__main__":
         treeDATA_EG2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, EGamma2018, 'DATA'), name = 'DATA', isdata = 1 )
         treeDATA_EGFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016 + DoubleEG2017 + EGamma2018, 'DATA'), name = 'DATA', isdata = 1 )
 
-        #unblinded = ["IaA", "IaB", "IaC", "IbA", "IbB", "IbC", "II"]
-        unblinded = []
-        BKG_EG_2016, Signal_EG_2016, titles = buildSummaryPlot("EG_2016", treeDATA_EG2016, treeSI_2016_GH, opts.inputElectrons, regions_ee, lumi_2016_GH, LLlabel='EE', sys = 0.1, unblinded = unblinded, outpath = www)
-        BKG_EG_2017, Signal_EG_2017, _ = buildSummaryPlot("EG_2017", treeDATA_EG2017, treeSI_2017, opts.inputElectrons, regions_ee, lumi_2017, LLlabel='EE', sys = 0.1, unblinded = unblinded, outpath = www) 
-        BKG_EG_2018, Signal_EG_2018, _ = buildSummaryPlot("EG_2018", treeDATA_EG2018, treeSI_2018, opts.inputElectrons, regions_ee, lumi_2018_EE, LLlabel='EE', sys = 0.1, unblinded = unblinded, outpath = www)
-        BKG_EG_Full, Signal_EG_Full, _ = buildSummaryPlot("EG_Full", treeDATA_EGFull, treeSI_Full, opts.inputElectrons, regions_ee, 112, LLlabel='EE', sys = 0.1, unblinded = unblinded, outpath = www)
+        unblinded = ["IaA", "IaB", "IaC", "IbA", "IbB", "IbC", "II"]
+        #unblinded = []
+        BKG_EG_2016, DATA_EG_2016, Signal_EG_2016, titles = buildSummaryPlot("EG_2016", treeDATA_EG2016, treeSI_2016_GH, opts.inputElectrons, regions_ee, lumi_2016_GH, LLlabel='EE', sys = 0.1, unblinded = unblinded, outpath = www)
+        BKG_EG_2017, DATA_EG_2017, Signal_EG_2017, _ = buildSummaryPlot("EG_2017", treeDATA_EG2017, treeSI_2017, opts.inputElectrons, regions_ee, lumi_2017, LLlabel='EE', sys = 0.1, unblinded = unblinded, outpath = www) 
+        BKG_EG_2018, DATA_EG_2018, Signal_EG_2018, _ = buildSummaryPlot("EG_2018", treeDATA_EG2018, treeSI_2018, opts.inputElectrons, regions_ee, lumi_2018_EE, LLlabel='EE', sys = 0.1, unblinded = unblinded, outpath = www)
+        BKG_EG_Full, DATA_EG_Full, Signal_EG_Full, _ = buildSummaryPlot("EG_Full", treeDATA_EGFull, treeSI_Full, opts.inputElectrons, regions_ee, 112, LLlabel='EE', sys = 0.1, unblinded = unblinded, outpath = www)
+
+        original_stdout = sys.stdout # Save a reference to the original standard output
+        with open(www + '/tables_EE.txt', 'w') as f:
+            sys.stdout = f
+            printSignals(titles)
+            printTable("Electron channel 2016", regions_ee, BKG_EG_2016, Signal_EG_2016, DATA_EG_2016)
+            printTable("Electron channel 2017", regions_ee, BKG_EG_2017, Signal_EG_2017, DATA_EG_2017)
+            printTable("Electron channel 2018", regions_ee, BKG_EG_2018, Signal_EG_2018, DATA_EG_2018)
+            sys.stdout = original_stdout
 
 
     if opts.inputMuons:
@@ -180,9 +211,19 @@ if __name__ == "__main__":
         treeDATA_MuFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016 + DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1 )
 
         unblinded = ["IaA", "IaB", "IaC", "IaD", "IbA", "IbB", "IbC", "IbD", "II"]
-        unblinded = []
+        #unblinded = []
         sys_value = 0.0
-        BKG_Mu_2016, Signal_Mu_2016, titles = buildSummaryPlot("Mu_2016", treeDATA_Mu2016, treeSI_2016, opts.inputMuons, regions_mu, lumi_2016, LLlabel='MM', sys = 0.1, unblinded = unblinded, outpath = www)
-        BKG_Mu_2018, Signal_Mu_2018, _ = buildSummaryPlot("Mu_2018", treeDATA_Mu2018, treeSI_2018, opts.inputMuons, regions_mu, lumi_2018_MM, LLlabel='MM', sys = 0.1, unblinded = unblinded, outpath = www)
-        BKG_Mu_Full, Signal_Mu_Full, _ = buildSummaryPlot("Mu_Full", treeDATA_MuFull, treeSI_Full, opts.inputMuons, regions_mu, 96, LLlabel='MM', sys = 0.1, unblinded = unblinded, outpath = www)
+        BKG_Mu_2016, DATA_Mu_2016, Signal_Mu_2016, titles = buildSummaryPlot("Mu_2016", treeDATA_Mu2016, treeSI_2016, opts.inputMuons, regions_mu, lumi_2016, LLlabel='MM', sys = 0.1, unblinded = unblinded, outpath = www)
+        BKG_Mu_2018, DATA_Mu_2018, Signal_Mu_2018, _ = buildSummaryPlot("Mu_2018", treeDATA_Mu2018, treeSI_2018, opts.inputMuons, regions_mu, lumi_2018_MM, LLlabel='MM', sys = 0.1, unblinded = unblinded, outpath = www)
+        BKG_Mu_Full, DATA_Mu_Full, Signal_Mu_Full, _ = buildSummaryPlot("Mu_Full", treeDATA_MuFull, treeSI_Full, opts.inputMuons, regions_mu, 96, LLlabel='MM', sys = 0.1, unblinded = unblinded, outpath = www)
+
+        original_stdout = sys.stdout # Save a reference to the original standard output
+        with open(www + '/tables_MuMu.txt', 'w') as f:
+            sys.stdout = f
+            printSignals(titles)
+            printTable("Muon channel 2016", regions_mu, BKG_Mu_2016, Signal_Mu_2016, DATA_Mu_2016)
+            printTable("Muon channel 2018", regions_mu, BKG_Mu_2018, Signal_Mu_2018, DATA_Mu_2018)
+            sys.stdout = original_stdout
+
+
 

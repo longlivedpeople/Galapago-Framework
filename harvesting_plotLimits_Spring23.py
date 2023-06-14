@@ -217,69 +217,81 @@ if __name__ == "__main__":
     ### Structure for 'Others'
     ### [filename, GraphName, Label, Color, Style]
 
-    www = '/eos/user/f/fernance/www/DisplacedLeptons-analysis/Limits/Spring23/Final_Spring23_CompleteVersion/'
+    #www = '/eos/user/f/fernance/www/DisplacedLeptons-analysis/Limits/Spring23/Final_Spring23_CompleteVersion/'
+    www = '/eos/user/f/fernance/www/200814_checkpoint/Plots_DoubleEG_examples/Plots_DoubleEG_Run2016E/noParrotsUpdated/'
 
     ###########
     ########### Pure flavor muon channel
     ###########
 
-    inputdir = 'LimitsResults_Spring23_muons_BR100_unblinded/'   
+    inputdir = 'LimitsResults_Spring23_muons_BR100_unblinded_updatedStat/'   
 
     ####### mH = 1000 GeV, mS = 350 GeV (muons)
     others = []
-    others.append([EXO_18_003_mH1000_mm, 'H(1000) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 1])
-    others.append([EXO_21_006_mH1000_mS350, 'Figure 17 bottom right/Graph1D_y2', 'CMS-EXO-21-006 comb. expected', r.kMagenta-3, 1])
+    others.append([EXO_18_003_mH1000_mm, 'H(1000) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y3', 'CMS-EXO-18-003 observed', r.kBlue, 1])
+    others.append([EXO_18_003_mH1000_mm, 'H(1000) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 7])
+    others.append([EXO_21_006_mH1000_mS350, 'Figure 17 bottom right/Graph1D_y1', 'CMS-EXO-21-006 comb. observed', r.kMagenta-3, 1])
+    others.append([EXO_21_006_mH1000_mS350, 'Figure 17 bottom right/Graph1D_y2', 'CMS-EXO-21-006 comb. expected', r.kMagenta-3, 9])
     others.append([EXO_21_006_mH1000_mS350, 'Figure 17 bottom right/Graph1D_y3', 'CMS-EXO-21-006 TMS-TMS expected', r.kMagenta-3, 7])
-    makeSingleLimitPlot(www + 'mH1000_mS350_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH1000__mS350__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 350 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH1000_mS350_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH1000__mS350__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 350 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
+
+    ####### mH = 1000 GeV, mS = 120 GeV (muons)
+    others = []
+    makeSingleLimitPlot(www + 'mH1000_mS250_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH1000__mS250__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 250 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 1000 GeV, mS = 150 GeV (muons)
     others = []
-    others.append([EXO_18_003_mH1000_mm, 'H(1000) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y2', 'CMS-EXO-18-003 expected', r.kBlue, 1])
-    others.append([EXO_21_006_mH1000_mS150, 'Figure 17 bottom left/Graph1D_y2', 'CMS-EXO-21-006 comb. expected', r.kMagenta-3, 1])
+    others.append([EXO_18_003_mH1000_mm, 'H(1000) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y1', 'CMS-EXO-18-003 observed', r.kBlue, 1])
+    others.append([EXO_18_003_mH1000_mm, 'H(1000) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y2', 'CMS-EXO-18-003 expected', r.kBlue, 7])
+    others.append([EXO_21_006_mH1000_mS150, 'Figure 17 bottom left/Graph1D_y1', 'CMS-EXO-21-006 comb. observed', r.kMagenta-3, 1])
+    others.append([EXO_21_006_mH1000_mS150, 'Figure 17 bottom left/Graph1D_y2', 'CMS-EXO-21-006 comb. expected', r.kMagenta-3, 9])
     others.append([EXO_21_006_mH1000_mS150, 'Figure 17 bottom left/Graph1D_y3', 'CMS-EXO-21-006 TMS-TMS expected', r.kMagenta-3, 7])
-    makeSingleLimitPlot(www + 'mH1000_mS150_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH1000__mS150__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH1000_mS150_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH1000__mS150__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 800 GeV, mS = 350, 250, 50 GeV (muons)
     others = []
-    makeSingleLimitPlot(www + 'mH800_mS350_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH800__mS350__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 800 GeV, m_{S} = 350 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
-    makeSingleLimitPlot(www + 'mH800_mS250_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH800__mS250__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 800 GeV, m_{S} = 250 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
-    makeSingleLimitPlot(www + 'mH800_mS50_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH800__mS50__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 800 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH800_mS350_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH800__mS350__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 800 GeV, m_{S} = 350 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
+    makeSingleLimitPlot(www + 'mH800_mS250_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH800__mS250__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 800 GeV, m_{S} = 250 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
+    makeSingleLimitPlot(www + 'mH800_mS50_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH800__mS50__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 800 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 600 GeV, mS = 150, 50 GeV (muons)
     others = []
     others.append([EXO_18_003_mH600_mm, 'H(600) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y3', 'CMS-EXO-18-003 observed', r.kBlue, 1])
     others.append([EXO_18_003_mH600_mm, 'H(600) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 7])
-    makeSingleLimitPlot(www + 'mH600_mS150_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH600__mS150__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 600 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH600_mS150_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH600__mS150__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 600 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
     others = []
     others.append([EXO_18_003_mH600_mm, 'H(600) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y1', 'CMS-EXO-18-003 observed', r.kBlue, 1])
     others.append([EXO_18_003_mH600_mm, 'H(600) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y2', 'CMS-EXO-18-003 expected', r.kBlue, 7])
-    makeSingleLimitPlot(www + 'mH600_mS50_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH600__mS50__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 600 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH600_mS50_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH600__mS50__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 600 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 500 GeV, mS = 150, 50 GeV (muons)
     others = []
-    makeSingleLimitPlot(www + 'mH500_mS150_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH500__mS150__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 500 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
-    makeSingleLimitPlot(www + 'mH500_mS50_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH500__mS50__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 500 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH500_mS150_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH500__mS150__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 500 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
+    makeSingleLimitPlot(www + 'mH500_mS50_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH500__mS50__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 500 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 400 GeV, mS = 150 GeV (muons)
     others = []
-    others.append([EXO_21_006_mH400_mS150, 'Figure 16 bottom/Graph1D_y2', 'CMS-EXO-21-006 comb. expected', r.kMagenta-3, 1])
+    others.append([EXO_21_006_mH400_mS150, 'Figure 16 bottom/Graph1D_y1', 'CMS-EXO-21-006 comb. observed', r.kMagenta-3, 1])
+    others.append([EXO_21_006_mH400_mS150, 'Figure 16 bottom/Graph1D_y2', 'CMS-EXO-21-006 comb. expected', r.kMagenta-3, 9])
     others.append([EXO_21_006_mH400_mS150, 'Figure 16 bottom/Graph1D_y3', 'CMS-EXO-21-006 TMS-TMS expected', r.kMagenta-3, 7])
-    makeSingleLimitPlot(www + 'mH400_mS150_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH400__mS150__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 400 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH400_mS150_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH400__mS150__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 400 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 300 GeV, mS = 50 GeV (muons)
     others = []
-    makeSingleLimitPlot(www + 'mH300_mS50_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH300__mS50__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 300 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH300_mS50_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH300__mS50__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 300 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 125 GeV, mS = 50 GeV (muons)
     ### Limit on xsec X BR
     others = []
-    others.append([EXO_21_006_mH125_mS50, 'Figure 14 right/Graph1D_y2', 'CMS-EXO-21-006 comb. expected', r.kMagenta-3, 1])
+    others.append([EXO_21_006_mH125_mS50, 'Figure 14 right/Graph1D_y1', 'CMS-EXO-21-006 comb. observed', r.kMagenta-3, 1])
+    others.append([EXO_21_006_mH125_mS50, 'Figure 14 right/Graph1D_y2', 'CMS-EXO-21-006 comb. expected', r.kMagenta-3, 9])
     others.append([EXO_21_006_mH125_mS50, 'Figure 14 right/Graph1D_y3', 'CMS-EXO-21-006 TMS-TMS expected', r.kMagenta-3, 7])
-    makeSingleLimitPlot(www + 'mH125_mS50_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH125__mS50__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 125 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH125_mS50_muon_BR100', inputdir + '/JSONhiggsCombine__Muon__mH125__mS50__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 125 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
     ### Limit on BR
     others = []
-    others.append([EXO_18_003_mH125_mm, 'H(125) to 4ell, bf limits, mumu channel/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 1])
-    makeSingleLimitPlot(www + 'mH125_mS50_muon_BR100_BranchingRatioLimit', inputdir + '/JSONhiggsCombine__Muon__mH125__mS50__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 125 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, scale = 1.0/21.459897, ylabel = 'B(H#rightarrowSS)')
+    others.append([EXO_18_003_mH125_mm, 'H(125) to 4ell, bf limits, mumu channel/Graph1D_y3', 'CMS-EXO-18-003 observed', r.kBlue, 1])
+    others.append([EXO_18_003_mH125_mm, 'H(125) to 4ell, bf limits, mumu channel/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 7])
+    makeSingleLimitPlot(www + 'mH125_mS50_muon_BR100_BranchingRatioLimit', inputdir + '/JSONhiggsCombine__Muon__mH125__mS50__eraFull_xsec.json', 'HSS', 'Muon', '96 fb^{-1} (13 TeV)', 'm_{H} = 125 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrow#mu#mu) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, scale = 1.0/21.459897, ylabel = 'B(H#rightarrowSS)', unblind = True)
 
 
     ###########
@@ -288,20 +300,28 @@ if __name__ == "__main__":
 
     inputdir = 'LimitsResults_Spring23_electrons_BR100/'   
     inputdir = 'LimitsResults_Spring23_electrons_BR100_unblinded'   
+    inputdir = 'LimitsResults_Spring23_electrons_BR100_unblinded_updatedStat/'   
 
     ####### mH = 1000 GeV, mS = 350 GeV (electrons)
     others = []
-    others.append([EXO_18_003_mH1000_ee, 'H(1000) to 4ell, sigmatimes bf limits, ee channel/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 1])
+    others.append([EXO_18_003_mH1000_ee, 'H(1000) to 4ell, sigmatimes bf limits, ee channel/Graph1D_y3', 'CMS-EXO-18-003 observed', r.kBlue, 1])
+    others.append([EXO_18_003_mH1000_ee, 'H(1000) to 4ell, sigmatimes bf limits, ee channel/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 7])
     makeSingleLimitPlot(www + 'mH1000_mS350_electron_BR100', inputdir + '/JSONhiggsCombine__Electron__mH1000__mS350__eraFull_xsec.json', 'HSS', 'Electron', '112 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 350 GeV', 'H#rightarrowSS, B(S#rightarrowee) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 1000 GeV, mS = 250 GeV (electrons)
     others = []
-    makeSingleLimitPlot(www + 'mH1000_mS250_electron_BR100', inputdir + '/JSONhiggsCombine__Electron__mH1000__mS250__eraFull_xsec.json', 'HSS', 'Electron', '112 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrowee) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
+    makeSingleLimitPlot(www + 'mH1000_mS250_electron_BR100', inputdir + '/JSONhiggsCombine__Electron__mH1000__mS250__eraFull_xsec.json', 'HSS', 'Electron', '112 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 250 GeV', 'H#rightarrowSS, B(S#rightarrowee) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 1000 GeV, mS = 150 GeV (electrons)
     others = []
-    others.append([EXO_18_003_mH1000_ee, 'H(1000) to 4ell, sigmatimes bf limits, ee channel/Graph1D_y2', 'CMS-EXO-18-003 expected', r.kBlue, 1])
+    others.append([EXO_18_003_mH1000_ee, 'H(1000) to 4ell, sigmatimes bf limits, ee channel/Graph1D_y1', 'CMS-EXO-18-003 observed', r.kBlue, 1])
+    others.append([EXO_18_003_mH1000_ee, 'H(1000) to 4ell, sigmatimes bf limits, ee channel/Graph1D_y2', 'CMS-EXO-18-003 expected', r.kBlue, 7])
     makeSingleLimitPlot(www + 'mH1000_mS150_electron_BR100', inputdir + '/JSONhiggsCombine__Electron__mH1000__mS150__eraFull_xsec.json', 'HSS', 'Electron', '112 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrowee) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
+
+    others = []
+    makeSingleLimitPlot(www + 'mH1000_mS150_electron_BR100_old', 'LimitsResults_Spring23_electrons_BR100_unblinded/JSONhiggsCombine__Electron__mH1000__mS150__eraFull_xsec.json', 'HSS', 'Electron', '112 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrowee) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = False)
+    makeSingleLimitPlot(www + 'mH1000_mS150_electron_BR100_new', 'LimitsResults_Spring23_electrons_BR100_unblinded_updatedStat/JSONhiggsCombine__Electron__mH1000__mS150__eraFull_xsec.json', 'HSS', 'Electron', '112 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrowee) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = False)
+
 
     ####### mH = 800 GeV, mS = 350, 250, 50 GeV (electrons)
     others = []
@@ -321,7 +341,7 @@ if __name__ == "__main__":
 
     ####### mH = 500 GeV, mS = 150, 50 GeV (electrons)
     others = []
-    makeSingleLimitPlot(www + 'mH500_mS150_electron_BR100', inputdir + '/JSONhiggsCombine__Electron__mH500__mS150__eraFull_xsec.json', 'HSS', 'Electron', '112 fb^{-1} (13 TeV)', 'm_{H} = 500 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrowee) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH500_mS150_electron_BR100', inputdir + '/JSONhiggsCombine__Electron__mH500__mS150__eraFull_xsec.json', 'HSS', 'Electron', '112 fb^{-1} (13 TeV)', 'm_{H} = 500 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrowee) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
     makeSingleLimitPlot(www + 'mH500_mS50_electron_BR100', inputdir + '/JSONhiggsCombine__Electron__mH500__mS50__eraFull_xsec.json', 'HSS', 'Electron', '112 fb^{-1} (13 TeV)', 'm_{H} = 500 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 400 GeV, mS = 150 GeV (electrons)
@@ -336,11 +356,12 @@ if __name__ == "__main__":
     ####### mH = 125 GeV, mS = 50 GeV (electrons)
     ### Limit on xsec X BR
     others = []
-    makeSingleLimitPlot(www + 'mH125_mS50_electron_BR100', inputdir + '/JSONhiggsCombine__Electron__mH125__mS50__eraFull_xsec.json', 'HSS', 'Electron', '112 fb^{-1} (13 TeV)', 'm_{H} = 125 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
+    makeSingleLimitPlot(www + 'mH125_mS50_electron_BR100', inputdir + '/JSONhiggsCombine__Electron__mH125__mS50__eraFull_xsec.json', 'HSS', 'Electron', '112 fb^{-1} (13 TeV)', 'm_{H} = 125 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-3, ymax = 1e2, unblind = True)
     ### Limit on BR
     others = []
-    others.append([EXO_18_003_mH125_ee, 'H(125) to 4ell, bf limits, ee channel/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 1])
-    makeSingleLimitPlot(www + 'mH125_mS50_electron_BR100_BranchingRatioLimit', inputdir + '/JSONhiggsCombine__Electron__mH125__mS50__eraFull_xsec.json', 'HSS', 'Electron', '112 fb^{-1} (13 TeV)', 'm_{H} = 125 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, scale = 1.0/21.459897, ylabel = 'B(H#rightarrowSS)')
+    others.append([EXO_18_003_mH125_ee, 'H(125) to 4ell, bf limits, ee channel/Graph1D_y3', 'CMS-EXO-18-003 observed', r.kBlue, 1])
+    others.append([EXO_18_003_mH125_ee, 'H(125) to 4ell, bf limits, ee channel/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 7])
+    makeSingleLimitPlot(www + 'mH125_mS50_electron_BR100_BranchingRatioLimit', inputdir + '/JSONhiggsCombine__Electron__mH125__mS50__eraFull_xsec.json', 'HSS', 'Electron', '112 fb^{-1} (13 TeV)', 'm_{H} = 125 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = 100%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-4, ymax = 1e2, scale = 1.0/21.459897, ylabel = 'B(H#rightarrowSS)', unblind = True)
 
 
     ###########
@@ -348,65 +369,74 @@ if __name__ == "__main__":
     ###########
 
     inputdir = 'LimitsResults_Spring23_BR50/'   
+    inputdir = 'LimitsResults_Spring23_BR50_unblinded/' 
+    inputdir = 'LimitsResults_Spring23_BR50_unblinded_updatedStat/' 
 
     ####### mH = 1000 GeV, mS = 350 GeV (combined)
     others = []
-    others.append([EXO_18_003_mH1000_ll, 'H(1000) to SS, Stoell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 1])
-    makeSingleLimitPlot(www + 'mH1000_mS350_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH1000__mS350__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 350 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    others.append([EXO_18_003_mH1000_ll, 'H(1000) to SS, Stoell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y3', 'CMS-EXO-18-003 observed', r.kBlue, 1])
+    others.append([EXO_18_003_mH1000_ll, 'H(1000) to SS, Stoell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 7])
+    makeSingleLimitPlot(www + 'mH1000_mS350_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH1000__mS350__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 350 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 1000 GeV, mS = 150 GeV (combined)
     others = []
-    others.append([EXO_18_003_mH1000_ll, 'H(1000) to SS, Stoell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y2', 'CMS-EXO-18-003 expected', r.kBlue, 1])
-    makeSingleLimitPlot(www + 'mH1000_mS150_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH1000__mS150__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH1000_mS250_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH1000__mS250__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 250 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
+
+    ####### mH = 1000 GeV, mS = 150 GeV (combined)
+    others = []
+    others.append([EXO_18_003_mH1000_ll, 'H(1000) to SS, Stoell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y1', 'CMS-EXO-18-003 observed', r.kBlue, 1])
+    others.append([EXO_18_003_mH1000_ll, 'H(1000) to SS, Stoell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y2', 'CMS-EXO-18-003 expected', r.kBlue, 7])
+    makeSingleLimitPlot(www + 'mH1000_mS150_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH1000__mS150__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 1000 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 800 GeV, mS = 350, 250, 50 GeV (combined)
     others = []
-    makeSingleLimitPlot(www + 'mH800_mS350_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH800__mS350__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 800 GeV, m_{S} = 350 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH800_mS350_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH800__mS350__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 800 GeV, m_{S} = 350 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
     others = []
     others.append([EXO_18_003_mH800_ll, 'H(800) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y5', 'CMS-EXO-18-003 observed', r.kBlue, 1])
     others.append([EXO_18_003_mH800_ll, 'H(800) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y6', 'CMS-EXO-18-003 expected', r.kBlue, 7])
-    makeSingleLimitPlot(www + 'mH800_mS250_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH800__mS250__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 800 GeV, m_{S} = 250 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH800_mS250_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH800__mS250__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 800 GeV, m_{S} = 250 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
     others = []
     others.append([EXO_18_003_mH800_ll, 'H(800) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y1', 'CMS-EXO-18-003 observed', r.kBlue, 1])
     others.append([EXO_18_003_mH800_ll, 'H(800) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y2', 'CMS-EXO-18-003 expected', r.kBlue, 7])
-    makeSingleLimitPlot(www + 'mH800_mS50_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH800__mS50__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 800 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH800_mS50_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH800__mS50__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 800 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 600 GeV, mS = 150, 50 GeV (combined)
     others = []
     others.append([EXO_18_003_mH600_ll, 'H(600) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y3', 'CMS-EXO-18-003 observed', r.kBlue, 1])
     others.append([EXO_18_003_mH600_ll, 'H(600) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 7])
-    makeSingleLimitPlot(www + 'mH600_mS150_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH600__mS150__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 600 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH600_mS150_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH600__mS150__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 600 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
     others = []
     others.append([EXO_18_003_mH600_ll, 'H(600) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y1', 'CMS-EXO-18-003 observed', r.kBlue, 1])
     others.append([EXO_18_003_mH600_ll, 'H(600) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y2', 'CMS-EXO-18-003 expected', r.kBlue, 7])
-    makeSingleLimitPlot(www + 'mH600_mS50_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH600__mS50__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 600 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH600_mS50_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH600__mS50__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 600 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 500 GeV, mS = 150, 50 GeV (combined)
     others = []
-    makeSingleLimitPlot(www + 'mH500_mS150_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH500__mS150__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 500 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH500_mS150_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH500__mS150__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 500 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
     others = []
-    makeSingleLimitPlot(www + 'mH500_mS50_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH500__mS50__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 500 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH500_mS50_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH500__mS50__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 500 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 400 GeV, mS = 150 GeV (combined)
     others = []
     others.append([EXO_18_003_mH400_ll, 'H(400) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y3', 'CMS-EXO-18-003 observed', r.kBlue, 1])
     others.append([EXO_18_003_mH400_ll, 'H(400) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 7])
-    makeSingleLimitPlot(www + 'mH400_mS150_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH400__mS150__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 400 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH400_mS150_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH400__mS150__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 400 GeV, m_{S} = 150 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 300 GeV, mS = 50 GeV (combined)
     others = []
     others.append([EXO_18_003_mH300_ll, 'H(300) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y3', 'CMS-EXO-18-003 observed', r.kBlue, 1])
     others.append([EXO_18_003_mH300_ll, 'H(300) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 7])
-    makeSingleLimitPlot(www + 'mH300_mS50_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH300__mS50__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 300 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH300_mS50_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH300__mS50__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 300 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, unblind = True)
 
     ####### mH = 125 GeV, mS = 50 GeV (combined)
     ### Limit on xsec X BR
     others = []
-    makeSingleLimitPlot(www + 'mH125_mS50_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH125__mS50__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 125 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2)
+    makeSingleLimitPlot(www + 'mH125_mS50_combined_BR50', inputdir + '/JSONhiggsCombine__Joint__mH125__mS50__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 125 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-4, ymax = 1e2, unblind = True)
     ### Limit on BR
     others = []
-    others.append([EXO_18_003_mH125_ll, 'H(125) to SS, S to ell^{+}ell^{-}, bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 1])
-    makeSingleLimitPlot(www + 'mH125_mS50_combined_BR50_BranchingRatioLimit', inputdir + '/JSONhiggsCombine__Joint__mH125__mS50__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 125 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, scale = 1.0/21.459897, ylabel = 'B(H#rightarrowSS)')
+    others.append([EXO_18_003_mH125_ll, 'H(125) to SS, S to ell^{+}ell^{-}, bf limits/Graph1D_y3', 'CMS-EXO-18-003 observed', r.kBlue, 1])
+    others.append([EXO_18_003_mH125_ll, 'H(125) to SS, S to ell^{+}ell^{-}, bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected', r.kBlue, 7])
+    makeSingleLimitPlot(www + 'mH125_mS50_combined_BR50_BranchingRatioLimit', inputdir + '/JSONhiggsCombine__Joint__mH125__mS50__eraFull_xsec.json', 'HSS', 'Joint', '96-112 fb^{-1} (13 TeV)', 'm_{H} = 125 GeV, m_{S} = 50 GeV', 'H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', others, xmin = 1e-1, xmax = 1e3, ymin = 1e-5, ymax = 1e2, scale = 1.0/21.459897, ylabel = 'B(H#rightarrowSS)', unblind = True)
 
 
 

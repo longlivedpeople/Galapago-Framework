@@ -75,12 +75,13 @@ def makeBackgroundPlot2D(lumi, hname_bkg, zlog, treeDATA, inputdir, rebin = Fals
 
     ### Extralabel
     plot.addLatex(0.13, 0.93, 'Background (predicted)', font = 42)
-    plot.addLatex(0.4, 0.85, extralabel, font = 42, size = 0.03)
+    #plot.addLatex(0.4, 0.85, extralabel, font = 42, size = 0.03)
+    plot.addLatex(0.17, 0.75, extralabel, font = 42, size = 0.03)
 
     ### Save it
     if not outdir:
         outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/2DPlots_' + outtag + '/'
-    plot.save(1, 1, ylog, luminosity, '', outputDir = outdir, zlog = zlog, is2d = False, xlog = xlog, inProgress = True)
+    plot.save(1, 1, ylog, luminosity, '', outputDir = outdir, zlog = zlog, is2d = False, xlog = xlog, isPrivate = True)
 
     
 #####################
@@ -115,7 +116,7 @@ def makeSignalPlot2D(name, lumi, hname_sig, zlog, treeSI, inputdir, rebin = Fals
     
     ### Extralabel
     plot.addLatex(0.13, 0.93, legend, font = 42, size = 0.032)
-    plot.addLatex(0.4, 0.85, extralabel, font = 42, size = 0.03)
+    plot.addLatex(0.17, 0.75, extralabel, font = 42, size = 0.03)
 
     for line in lines:
         plot.addLine(line[0], line[1], line[2], line[3], r.kRed, 2)
@@ -123,7 +124,7 @@ def makeSignalPlot2D(name, lumi, hname_sig, zlog, treeSI, inputdir, rebin = Fals
     ### Save it
     if not outdir:
         outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/2DPlots_' + outtag + '/'
-    plot.save(1, 1, ylog, luminosity, '', outputDir = outdir, zlog = zlog, xlog = xlog, is2d = False, inProgress = True)
+    plot.save(1, 1, ylog, luminosity, '', outputDir = outdir, zlog = zlog, xlog = xlog, is2d = False, isPrivate = True)
 
 
 def countJointYields2D(hname_bkg, hname_sig, treeDATA, treeSI, inputdir, xmins, ymins):

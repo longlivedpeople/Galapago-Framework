@@ -163,6 +163,7 @@ def buildSummaryPlot(title, treeDATA, treeSI = False, inputdir = '', regions = [
     Output (neccesary arrays to print the tables with 'printTable' and 'printSignals')
     '''
     # Arrays to store yields for table
+    DATA_yields = []
     BKG_yields = []
     signal_yields = []
     titles = []
@@ -199,7 +200,7 @@ def buildSummaryPlot(title, treeDATA, treeSI = False, inputdir = '', regions = [
         hdata.SetBinContent(n+1,h_.GetBinContent(1))
         hdata.SetBinError(n+1,h_.GetBinError(1))
         print(reg, h_.GetBinContent(1), h_.GetBinError(1))
-        #BKG_yields.append(h_.GetBinContent(1))
+        DATA_yields.append(h_.GetBinContent(1))
 
 
     ### Set background histos style
@@ -307,10 +308,10 @@ def buildSummaryPlot(title, treeDATA, treeSI = False, inputdir = '', regions = [
     ### Save it
     outdir = outpath
     #plot.save(1, 1, True, luminosity, '', outputDir = outdir, xlog = False, maxYnumbers = 4, is2d = True, inProgress = True)
-    plot.saveRatio2(1, 1, True, luminosity, hdata, hbkg, r_ymin = 0.0, r_ymax = 3.0, label="Obs./Pred.", sys = sys, outputDir = outdir, xlog = False, inProgress = True)
+    plot.saveRatio2(1, 1, True, luminosity, hdata, hbkg, r_ymin = 0.0, r_ymax = 3.0, label="Obs./Pred.", sys = sys, outputDir = outdir, xlog = False, inProgress = True, isPrivate = False)
 
     # Return info for table
-    return np.asarray(BKG_yields), np.transpose(np.asarray(signal_yields)), titles
+    return np.asarray(BKG_yields), np.asarray(DATA_yields), np.transpose(np.asarray(signal_yields)), titles
 
 
 #####################
@@ -322,7 +323,7 @@ def buildSummaryPlot(title, treeDATA, treeSI = False, inputdir = '', regions = [
 #####################
 
 CMSstyle = {
-               'obs' : { 'LineWidth' : 2, 'LineColor' : R.kRed},
+               'obs' : { 'LineWidth' : 2, 'LineColor' : R.kBlack},
                'exp0' : { 'LineWidth' : 2, 'LineColor' : R.kBlack, 'LineStyle' : 4},
                'exp1' : { 'FillColor' : R.kGreen+1},
                'exp2' : { 'FillColor' : R.kOrange}
@@ -399,8 +400,9 @@ def makeSingleLimitPlot(plotname, jsonfile_limit, theory, flavor, lumilabel, mas
     axis.Draw('axis')
 
     ### Create legend
-    legend = PositionedLegend(0.37, 0.2, 3, 0.05, horizontaloffset=0.15)
-
+    #legend = PositionedLegend(0.37, 0.2, 3, 0.05, horizontaloffset=0.15)
+    legend = PositionedLegend(0.28, 0.25, 3, 0.05, horizontaloffset=0.25)
+    
     ### Draw
     StyleLimitBand(limit, overwrite_style_dict=CMSstyle)
     setLegendLabel(legend_dict, ' ')
@@ -453,6 +455,7 @@ def makeSingleLimitPlot(plotname, jsonfile_limit, theory, flavor, lumilabel, mas
     elif flavor == 'Muon':
         Channellabel.DrawLatex(0.2, 0.79, "#mu#mu channel")
     elif flavor == 'Joint':
+        Channellabel.SetTextSize(0.035);
         Channellabel.DrawLatex(0.2, 0.79, "Combined channel")
 
     # Year label
@@ -497,7 +500,7 @@ def makeSingleLimitPlot(plotname, jsonfile_limit, theory, flavor, lumilabel, mas
     Masslabel.SetTextFont(42);
     Masslabel.SetTextAlign(13);
     Masslabel.SetTextSize(0.037);
-    Masslabel.DrawLatex(0.20, 0.65, masstext)
+    Masslabel.DrawLatex(0.20, 0.6, masstext)
 
     # Re-draw axis
     axis.Draw('axis, same')
@@ -750,7 +753,7 @@ def makeClosureTest(lumi, name, hBKG_A, hBKG_B, ylog, tree, inputdir, labelA = '
     ### Save it
     #outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/ClosureTests_' + outtag + '/'
     outdir = outpath + '/'
-    plot.saveRatio(1, tree.isData, ylog, luminosity, cumA, cumB, r_ymin = rmin, r_ymax = rmax, label="SR/BCR", hsys = hsys, outputDir = outdir, inProgress = True)
+    plot.saveRatio(1, tree.isData, ylog, luminosity, cumA, cumB, r_ymin = rmin, r_ymax = rmax, label="SR/BCR", hsys = hsys, outputDir = outdir, isPrivate = True)
 
     ### Main comparison
     cplot = Canvas.Canvas('plaincomparison_'+name, 'png,pdf', 0.45, 0.66, 0.65, 0.78, 1)
@@ -762,7 +765,7 @@ def makeClosureTest(lumi, name, hBKG_A, hBKG_B, ylog, tree, inputdir, labelA = '
         cplot.addLatex(0.17, 0.75, 'Dimuon vertices', font = 42)
     cplot.addLatex(0.17, 0.81, extralabel, font = 42, align = 11, size = 0.045)
     cplot.addLatex(0.9, 0.88, DATAlabel, font = 42, align = 31, size = 0.045)
-    cplot.saveRatio(1, tree.isData, ylog, luminosity, hBKG_A, hBKG_B, label="SR/BCR", hsys = hsys, outputDir = outdir, inProgress = True)
+    cplot.saveRatio(1, tree.isData, ylog, luminosity, hBKG_A, hBKG_B, label="SR/BCR", hsys = hsys, outputDir = outdir, isPrivate = True)
 
 
 
@@ -780,7 +783,7 @@ def makeClosureTest(lumi, name, hBKG_A, hBKG_B, ylog, tree, inputdir, labelA = '
 #####################
 
 
-def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI, treeBKG = False, treeBKGlabel = '', rebin = False, lines = [], line_ymax = False, xlabel = '', outtag = '', ymax = 0.0, LLlabel = '', DATAlabel = '', extralabel = '', xsec = False, xlog = False, text = False, outpath = ''):
+def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI, treeBKG = False, treeBKGlabel = '', rebin = False, lines = [], line_ymax = False, xlabel = '', outtag = '', ymax = 0.0, LLlabel = '', DATAlabel = '', extralabel = '', xsec = False, xlog = False, text = False, outpath = '', drawZero = True, cutBins = []):
 
 
     ### Get histograms
@@ -809,11 +812,30 @@ def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI,
         if treeBKG:
             hbkgsim = hbkgsim_.Clone()
 
+    ### Uncertainty bkg
+    hunc = hbkg.Clone("uncertainty")
+    hunc.Reset()
+    hunc.Sumw2()
+    sys = 0.1 # Overwritten
+    for n in range(1, hbkg.GetNbinsX() + 1):
+        if n in cutBins: continue
+        hunc.SetBinContent(n, hbkg.GetBinContent(n))
+        hunc.SetBinError(n, math.sqrt(sys*hbkg.GetBinContent(n)*sys*hbkg.GetBinContent(n) + hbkg.GetBinError(n)*hbkg.GetBinError(n)))
+        if drawZero and  hunc.GetBinContent(n) < 1.:
+            hunc.SetBinError(n, 1.8)
+            if ylog: hunc.SetBinContent(n, 0.1)
+        #print(hunc.GetBinContent(n), hunc.GetBinError(n))
+
+
     ### Set background histos style
     hbkg.SetFillColorAlpha(r.kCyan-6, 0.8)
     hbkg.SetLineColor(r.kCyan-2)
     hbkg.GetXaxis().SetTitleSize(0.045)
     hbkg.GetYaxis().SetTitleSize(0.045)
+    hunc.SetFillStyle(3244)
+    hunc.SetFillColor(r.kCyan+3)
+    hunc.SetLineColor(r.kCyan+3)
+    hunc.SetMarkerSize(0)
 
     if treeBKG:
         hbkgsim.SetLineColor(r.kBlack)
@@ -823,7 +845,6 @@ def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI,
     s_histos = []
 
     hSIS = treeSI.getLoopStack(inputdir, hname_SI)
-    xsecs = [0.107e3, 4.938e3, 2.588e3, 0.67, 10e3] # HARDCODED THIS NEEDS TO CHANGE
 
     for _i, _h in enumerate(hSIS.GetHists()):
 
@@ -837,7 +858,6 @@ def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI,
             _h2 = _h.Clone()
 
         s_histos.append(copy.deepcopy(_h2))
-        print(_h2.GetName(), xsecs[_i])
         s_histos[-1].Scale(XSECS[_h2.GetTitle()])
 
 
@@ -862,6 +882,7 @@ def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI,
         plot.addHisto(hbkg, 'HIST, TEXT', 'Background (predicted)', 'f', '', 1, 0)
     else:
         plot.addHisto(hbkg, 'HIST', 'Background (predicted)', 'f', '', 1, 0)
+        plot.addHisto(hunc, 'E2, SAME', 'Background uncertainty', 'f', '', 1, 0)
 
     ### Add signals:
     colors = [r.kRed, r.kOrange, r.kGreen+2, r.kBlue, r.kMagenta]
@@ -898,7 +919,7 @@ def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI,
     ### Save it
     #outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/SRPlots_' + outtag + '/'
     outdir = outpath + '/SRPlots_' + outtag + '/'
-    plot.save(1, 1, ylog, luminosity, '', outputDir = outdir, xlog = xlog, maxYnumbers = 4, is2d = True, inProgress = True)
+    plot.save(1, 1, ylog, luminosity, '', outputDir = outdir, xlog = xlog, is2d = True, inProgress = True, isPrivate = True)
 
 
 
@@ -910,7 +931,7 @@ def makeBlindedPlot(lumi, hname_SI, hname_bkg, ylog, treeDATA, inputdir, treeSI,
 #
 
 
-def makeBackgroundValidationPlot(name, lumi, hname_SR, hname_CR, ylog, treeDATA, inputdir, rebin = False, limit = 0.0, xlabel = '', outpath = False, yshift = 0.0, LLlabel = '', extralabel = '', xlog = False, sys = 0.0):
+def makeBackgroundValidationPlot(name, lumi, hname_SR, hname_CR, ylog, treeDATA, inputdir, rebin = False, limit = 0.0, xlabel = '', outpath = False, yshift = 0.0, LLlabel = '', extralabel = '', xlog = False, sys = 0.0, drawZero = True):
 
 
     ### Get histograms
@@ -937,6 +958,18 @@ def makeBackgroundValidationPlot(name, lumi, hname_SR, hname_CR, ylog, treeDATA,
             if hSR.GetBinLowEdge(n) > limit: hSR.SetBinContent(n, 0.0)
             #if hCR_.GetBinLowEdge(n) > limit: hCR_.SetBinContent(n, 0.0)
 
+    ### Uncertainty bkg
+    hunc = hCR.Clone("uncertainty")
+    hunc.Reset()
+    hunc.Sumw2()
+    for n in range(1, hCR.GetNbinsX() + 1):
+        hunc.SetBinContent(n, hCR.GetBinContent(n))
+        hunc.SetBinError(n, math.sqrt(sys*hCR.GetBinContent(n)*sys*hCR.GetBinContent(n) + hCR.GetBinError(n)*hCR.GetBinError(n)))
+        if drawZero and  hunc.GetBinContent(n) < 1.:
+            hunc.SetBinError(n, 1.8)
+            if ylog: hunc.SetBinContent(n, 0.1)
+
+
     hCR.SetFillColorAlpha(r.kCyan-6, 0.8)
     #hCR.SetLineColor(r.kCyan-6) 
     hCR.SetLineWidth(0)
@@ -949,6 +982,10 @@ def makeBackgroundValidationPlot(name, lumi, hname_SR, hname_CR, ylog, treeDATA,
     hSR.GetXaxis().SetTitleSize(0.045)
     hCR.GetYaxis().SetTitleSize(0.045)
     hSR.GetYaxis().SetTitleSize(0.045)
+    hunc.SetFillStyle(3244)
+    hunc.SetFillColor(r.kCyan+2)
+    hunc.SetLineColor(r.kCyan+2)
+    hunc.SetMarkerSize(0)
 
     ### Get maximum
     maxValSR = hSR.GetMaximum()
@@ -963,6 +1000,7 @@ def makeBackgroundValidationPlot(name, lumi, hname_SR, hname_CR, ylog, treeDATA,
         hCR.SetMinimum(0.1)
 
     ## Systematic bar
+    """
     hsys = False
     if sys:
         hsys = hSR.Clone("sys_up")
@@ -970,10 +1008,12 @@ def makeBackgroundValidationPlot(name, lumi, hname_SR, hname_CR, ylog, treeDATA,
         for n in range(1, hSR.GetNbinsX() +1):
             hsys.SetBinContent(n, 1.0 )
             hsys.SetBinError(n, sys)
+    """
 
     ### Canvas object
     plot = Canvas.Canvas('BKGVal_'+name, 'png,pdf', 0.51, 0.65, 0.7, 0.77, 1)
     plot.addHisto(hCR, 'HIST', 'Background (Data-driven)', 'f', '', 1, 0)
+    plot.addHisto(hunc, 'E2, SAME', 'Background uncertainty', 'f', '', 1, 0)
     plot.addHisto(hSR, 'P, SAME', 'Data', 'p', '', 1, 1)
     plot.addLatex(0.17, 0.8, extralabel, font = 42)
 
@@ -989,7 +1029,7 @@ def makeBackgroundValidationPlot(name, lumi, hname_SR, hname_CR, ylog, treeDATA,
         outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/BKGValidation/'
     else:
         outdir = outpath
-    plot.saveRatio(1, 1, ylog, luminosity, hSR, hCR, r_ymin = 0.0, r_ymax = 2.0, label="Obs./Pred.", hsys = hsys, outputDir = outdir, xlog = xlog, inProgress = True)
+    plot.saveRatio2(1, 1, ylog, luminosity, hSR, hCR, r_ymin = 0.0, r_ymax = 2.0, label="Obs./Pred.", sys = sys, outputDir = outdir, xlog = xlog, isPrivate = True)
 
 
 

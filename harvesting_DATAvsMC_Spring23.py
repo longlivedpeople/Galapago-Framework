@@ -16,7 +16,7 @@ from include.galapagoStyle import sigpalette, gcolors, dcolors
 from include.Utils import makeSystematicsHist
 
 
-def makeDataMCPlot(lumi, hname_DATA, hname_MC, ylog, treeDATA, treeMC, inputdir, hname_extra = '', label_extra = '', treeEXTRA = False, xlabel = '', outtag = '', yshift = 100.0, LLlabel = '', leftlabel = '', xlog = False, outdir = '', sys_errors = None):
+def makeDataMCPlot(lumi, hname_DATA, hname_MC, ylog, treeDATA, treeMC, inputdir, hname_extra = '', label_extra = '', treeEXTRA = False, xlabel = '', outtag = '', yshift = 100.0, LLlabel = '', leftlabel = '', xlog = False, outdir = '', sys_errors = None, drawZero = False):
 
     
     luminosity = lumi
@@ -51,11 +51,36 @@ def makeDataMCPlot(lumi, hname_DATA, hname_MC, ylog, treeDATA, treeMC, inputdir,
         #_h.Scale(7.10/59.83)
         hBKG.Add(copy.deepcopy(_h))
 
+    ### Systematics
+    """
+    hsys = None
+    if sys_errors is not None: hsys = makeSystematicsHist(sys_errors, hMCtotal)
+    """
+    if sys_errors is not None: 
+        error_values = 1 * np.array(sys_errors)
+        sys = np.linalg.norm(error_values)
+
+    ### Uncertainty bkg
+    hunc = hMCtotal.Clone("uncertainty")
+    hunc.Reset()
+    hunc.Sumw2()
+    for n in range(1, hMCtotal.GetNbinsX() + 1):
+        hunc.SetBinContent(n, hMCtotal.GetBinContent(n))
+        hunc.SetBinError(n, math.sqrt(sys*hMCtotal.GetBinContent(n)*sys*hMCtotal.GetBinContent(n) + hMCtotal.GetBinError(n)*hMCtotal.GetBinError(n)))
+        if drawZero and  hunc.GetBinContent(n) < 1.:
+            hunc.SetBinError(n, 1.8)
+            if ylog: hunc.SetBinContent(n, 0.1)
+
+
     ### Tune the histograms
     hMCtotal.SetMarkerStyle(20) # Auxiliar to save the ratio correctly 
     hDATA.SetMarkerStyle(20)
     hDATA.SetMarkerSize(0.8)
     hDATA.SetLineWidth(2)
+    hunc.SetFillStyle(3244)
+    hunc.SetFillColor(r.kCyan+3)
+    hunc.SetLineColor(r.kCyan+3)
+    hunc.SetMarkerSize(0)
     
     ### Get maximum
     maxValMC = hMCtotal.GetMaximum()
@@ -99,11 +124,12 @@ def makeDataMCPlot(lumi, hname_DATA, hname_MC, ylog, treeDATA, treeMC, inputdir,
     r.SetOwnership(hMCtotal, 0)
     
     ### -> Canvas object
-    plot = Canvas.Canvas(hname_DATA, 'png,pdf', 0.6, 0.55, 0.85, 0.85, 1)
+    plot = Canvas.Canvas(hname_DATA, 'png,pdf', 0.52, 0.55, 0.77, 0.85, 1)
     
     ### Add background:
     plot.addStack(hBKG, 'HIST', 1, 0) # Background
-    plot.addHisto(hDATA, 'P, SAME', 'Data', 'p', r.kBlack, 1, nBKG)
+    plot.addHisto(hunc, 'E2, SAME', 'Background uncertainty', 'f', '', 1, nBKG)
+    plot.addHisto(hDATA, 'P, SAME', 'Data', 'p', r.kBlack, 1, nBKG+1)
     
     ### Channel banner:
     if LLlabel == 'EE':
@@ -115,16 +141,13 @@ def makeDataMCPlot(lumi, hname_DATA, hname_MC, ylog, treeDATA, treeMC, inputdir,
     if leftlabel:
         plot.addLatex(0.17, 0.74, leftlabel, font = 42)
 
-    ### Systematics
-    hsys = None
-    if sys_errors is not None: hsys = makeSystematicsHist(sys_errors, hMCtotal)
 
     ### Save it
     if not outdir:
         outfolder = os.path.dirname(os.path.abspath(__main__.__file__)) + '/PlotsDATAMC_' + outtag + '/'
     else:
         outfolder = outdir + '/PlotsDATAMC_' + outtag + '/'
-    plot.saveRatio(1, 1, ylog, luminosity, hDATA, hMCtotal, r_ymin = 0.0, r_ymax = 2.0, label="Data/BKG", outputDir = outfolder, xlog = xlog, inProgress = False, isPrivate = True, hsys = hsys)
+    plot.saveRatio2(1, 1, ylog, luminosity, hDATA, hMCtotal, r_ymin = 0.0, r_ymax = 2.0, label="Data/BKG", outputDir = outfolder, xlog = xlog, isPrivate = True, sys = sys)
     
 
 
@@ -354,6 +377,7 @@ if __name__ == "__main__":
     lumi2016_noHIPM = 16.2 # fb-1
     lumi2017 = 41.5 # fb-1
     lumi2018 = 54.5 # fb-1
+    lumi2018 = 59.8 # fb-1
 
     #treeMC_2016     = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds_postVFP, 'MC'), name = 'MC', isdata = 0, close = True)
 
@@ -405,7 +429,7 @@ if __name__ == "__main__":
         makeDataMCPlot(lumi = lumi2016_noHIPM, hname_DATA = 'hEEBCR_nEE', hname_MC = 'hEEBCR_nEE', ylog = True, treeDATA = treeDATA_EG2016_noHIPM, treeMC = treeMC_postVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_noHIPM', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
         makeDataMCPlot(lumi = lumi2016_noHIPM, hname_DATA = 'hEEBCR_mass', hname_MC = 'hEEBCR_mass', ylog = True, treeDATA = treeDATA_EG2016_noHIPM, treeMC = treeMC_postVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_noHIPM', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
         makeDataMCPlot(lumi = lumi2016_noHIPM, hname_DATA = 'hEEBCR_MET', hname_MC = 'hEEBCR_MET', ylog = True, treeDATA = treeDATA_EG2016_noHIPM, treeMC = treeMC_postVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_noHIPM', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
-        makeDataMCPlot(lumi = lumi2016_noHIPM, hname_DATA = 'hEEBCR_mass_Z', hname_MC = 'hEEBCR_mass_Z', ylog = True, treeDATA = treeDATA_EG2016_noHIPM, treeMC = treeMC_postVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_noHIPM', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
+        makeDataMCPlot(lumi = lumi2016_noHIPM, hname_DATA = 'hEEBCR_mass_Z', hname_MC = 'hEEBCR_mass_Z', ylog = True, treeDATA = treeDATA_EG2016_noHIPM, treeMC = treeMC_postVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_noHIPM', yshift = 10000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
         makeDataMCPlot(lumi = lumi2016_noHIPM, hname_DATA = 'hEEBCR_leadingEt', hname_MC = 'hEEBCR_leadingEt', ylog = True, treeDATA = treeDATA_EG2016_noHIPM, treeMC = treeMC_postVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_noHIPM', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
         makeDataMCPlot(lumi = lumi2016_noHIPM, hname_DATA = 'hEEBCR_subleadingEt', hname_MC = 'hEEBCR_subleadingEt', ylog = True, treeDATA = treeDATA_EG2016_noHIPM, treeMC = treeMC_postVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_noHIPM', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
         makeDataMCPlot(lumi = lumi2016_noHIPM, hname_DATA = 'hEEBCR_eta', hname_MC = 'hEEBCR_eta', ylog = True, treeDATA = treeDATA_EG2016_noHIPM, treeMC = treeMC_postVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_noHIPM', yshift = 10000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
@@ -415,10 +439,10 @@ if __name__ == "__main__":
         makeDataMCPlot(lumi = lumi2016_HIPM, hname_DATA = 'hEEBCR_nEE', hname_MC = 'hEEBCR_nEE', ylog = True, treeDATA = treeDATA_EG2016_HIPM, treeMC = treeMC_preVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_HIPM', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
         makeDataMCPlot(lumi = lumi2016_HIPM, hname_DATA = 'hEEBCR_mass', hname_MC = 'hEEBCR_mass', ylog = True, treeDATA = treeDATA_EG2016_HIPM, treeMC = treeMC_preVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_HIPM', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
         makeDataMCPlot(lumi = lumi2016_HIPM, hname_DATA = 'hEEBCR_MET', hname_MC = 'hEEBCR_MET', ylog = True, treeDATA = treeDATA_EG2016_HIPM, treeMC = treeMC_preVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_HIPM', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
-        makeDataMCPlot(lumi = lumi2016_HIPM, hname_DATA = 'hEEBCR_mass_Z', hname_MC = 'hEEBCR_mass_Z', ylog = True, treeDATA = treeDATA_EG2016_HIPM, treeMC = treeMC_preVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_HIPM', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
+        makeDataMCPlot(lumi = lumi2016_HIPM, hname_DATA = 'hEEBCR_mass_Z', hname_MC = 'hEEBCR_mass_Z', ylog = True, treeDATA = treeDATA_EG2016_HIPM, treeMC = treeMC_preVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_HIPM', yshift = 10000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
         makeDataMCPlot(lumi = lumi2016_HIPM, hname_DATA = 'hEEBCR_leadingEt', hname_MC = 'hEEBCR_leadingEt', ylog = True, treeDATA = treeDATA_EG2016_HIPM, treeMC = treeMC_preVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_HIPM', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
         makeDataMCPlot(lumi = lumi2016_HIPM, hname_DATA = 'hEEBCR_subleadingEt', hname_MC = 'hEEBCR_subleadingEt', ylog = True, treeDATA = treeDATA_EG2016_HIPM, treeMC = treeMC_preVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_HIPM', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
-        makeDataMCPlot(lumi = lumi2016_HIPM, hname_DATA = 'hEEBCR_eta', hname_MC = 'hEEBCR_eta', ylog = True, treeDATA = treeDATA_EG2016_HIPM, treeMC = treeMC_preVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_HIPM', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
+        makeDataMCPlot(lumi = lumi2016_HIPM, hname_DATA = 'hEEBCR_eta', hname_MC = 'hEEBCR_eta', ylog = True, treeDATA = treeDATA_EG2016_HIPM, treeMC = treeMC_preVFP, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2016, xlabel = '', outtag = '2016_HIPM', yshift = 100000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2016'])
         """
 
         # muons
@@ -426,7 +450,7 @@ if __name__ == "__main__":
         makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hMMBCR_nMM', hname_MC = 'hMMBCR_nMM', ylog = True, treeDATA = treeDATA_Mu2016, treeMC = treeMC_2016, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_Mu2016, xlabel = '', outtag = '2016', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'MM', xlog = False, outdir = www, sys_errors = sys['MM_2016'])
         makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hMMBCR_mass', hname_MC = 'hMMBCR_mass', ylog = True, treeDATA = treeDATA_Mu2016, treeMC = treeMC_2016, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_Mu2016, xlabel = '', outtag = '2016', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'MM', xlog = False, outdir = www, sys_errors = sys['MM_2016'])
         makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hMMBCR_MET', hname_MC = 'hMMBCR_MET', ylog = True, treeDATA = treeDATA_Mu2016, treeMC = treeMC_2016, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_Mu2016, xlabel = '', outtag = '2016', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'MM', xlog = False, outdir = www, sys_errors = sys['MM_2016'])
-        makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hMMBCR_mass_Z', hname_MC = 'hMMBCR_mass_Z', ylog = True, treeDATA = treeDATA_Mu2016, treeMC = treeMC_2016, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_Mu2016, xlabel = '', outtag = '2016', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'MM', xlog = False, outdir = www, sys_errors = sys['MM_2016'])
+        makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hMMBCR_mass_Z', hname_MC = 'hMMBCR_mass_Z', ylog = True, treeDATA = treeDATA_Mu2016, treeMC = treeMC_2016, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_Mu2016, xlabel = '', outtag = '2016', yshift = 10000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'MM', xlog = False, outdir = www, sys_errors = sys['MM_2016'])
         makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hMMBCR_leadingPt', hname_MC = 'hMMBCR_leadingPt', ylog = True, treeDATA = treeDATA_Mu2016, treeMC = treeMC_2016, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_Mu2016, xlabel = '', outtag = '2016', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'MM', xlog = False, outdir = www, sys_errors = sys['MM_2016'])
         makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hMMBCR_subleadingPt', hname_MC = 'hMMBCR_subleadingPt', ylog = True, treeDATA = treeDATA_Mu2016, treeMC = treeMC_2016, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_Mu2016, xlabel = '', outtag = '2016', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'MM', xlog = False, outdir = www, sys_errors = sys['MM_2016'])
         makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hMMBCR_eta', hname_MC = 'hMMBCR_eta', ylog = True, treeDATA = treeDATA_Mu2016, treeMC = treeMC_2016, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_Mu2016, xlabel = '', outtag = '2016', yshift = 100000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'MM', xlog = False, outdir = www, sys_errors = sys['MM_2016'])
@@ -448,21 +472,21 @@ if __name__ == "__main__":
     if True:
 
         treeMC_2018     = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds_2018, 'MC'), name = 'MC', isdata = 0, close = True)
-        #treeDATA_EG2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, EGamma2018, 'DATA'), name = 'DATA', isdata = 1, close = True)
-        treeDATA_Mu2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1, close = True)
-
         """
+        treeDATA_EG2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, EGamma2018, 'DATA'), name = 'DATA', isdata = 1, close = True)
+
         ## 2018
         makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEEBCR_nEE', hname_MC = 'hEEBCR_nEE', ylog = True, treeDATA = treeDATA_EG2018, treeMC = treeMC_2018, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2018, xlabel = '', outtag = '2018', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2018'])
         makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEEBCR_mass', hname_MC = 'hEEBCR_mass', ylog = True, treeDATA = treeDATA_EG2018, treeMC = treeMC_2018, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2018, xlabel = '', outtag = '2018', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2018'])
-        makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEEBCR_mass_Z', hname_MC = 'hEEBCR_mass_Z', ylog = True, treeDATA = treeDATA_EG2018, treeMC = treeMC_2018, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2018, xlabel = '', outtag = '2018', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2018'])
+        makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEEBCR_mass_Z', hname_MC = 'hEEBCR_mass_Z', ylog = True, treeDATA = treeDATA_EG2018, treeMC = treeMC_2018, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2018, xlabel = '', outtag = '2018', yshift = 100000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2018'])
         makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEEBCR_leadingEt', hname_MC = 'hEEBCR_leadingEt', ylog = True, treeDATA = treeDATA_EG2018, treeMC = treeMC_2018, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2018, xlabel = '', outtag = '2018', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2018'])
         makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEEBCR_subleadingEt', hname_MC = 'hEEBCR_subleadingEt', ylog = True, treeDATA = treeDATA_EG2018, treeMC = treeMC_2018, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2018, xlabel = '', outtag = '2018', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2018'])
-        makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEEBCR_eta', hname_MC = 'hEEBCR_eta', ylog = True, treeDATA = treeDATA_EG2018, treeMC = treeMC_2018, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2018, xlabel = '', outtag = '2018', yshift = 10000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2018'])
+        makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEEBCR_eta', hname_MC = 'hEEBCR_eta', ylog = True, treeDATA = treeDATA_EG2018, treeMC = treeMC_2018, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_EG2018, xlabel = '', outtag = '2018', yshift = 100000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'EE', xlog = False, outdir = www, sys_errors = sys['EE_2018'])
         """
 
+        treeDATA_Mu2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1, close = True)
         makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hMMBCR_mass', hname_MC = 'hMMBCR_mass', ylog = True, treeDATA = treeDATA_Mu2018, treeMC = treeMC_2018, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_Mu2018, xlabel = '', outtag = '2018', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'MM', xlog = False, outdir = www, sys_errors = sys['MM_2018'])
-        makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hMMBCR_mass_Z', hname_MC = 'hMMBCR_mass_Z', ylog = True, treeDATA = treeDATA_Mu2018, treeMC = treeMC_2018, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_Mu2018, xlabel = '', outtag = '2018', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'MM', xlog = False, outdir = www, sys_errors = sys['MM_2018'])
+        makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hMMBCR_mass_Z', hname_MC = 'hMMBCR_mass_Z', ylog = True, treeDATA = treeDATA_Mu2018, treeMC = treeMC_2018, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_Mu2018, xlabel = '', outtag = '2018', yshift = 10000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'MM', xlog = False, outdir = www, sys_errors = sys['MM_2018'])
         makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hMMBCR_leadingPt', hname_MC = 'hMMBCR_leadingPt', ylog = True, treeDATA = treeDATA_Mu2018, treeMC = treeMC_2018, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_Mu2018, xlabel = '', outtag = '2018', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'MM', xlog = False, outdir = www, sys_errors = sys['MM_2018'])
         makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hMMBCR_subleadingPt', hname_MC = 'hMMBCR_subleadingPt', ylog = True, treeDATA = treeDATA_Mu2018, treeMC = treeMC_2018, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_Mu2018, xlabel = '', outtag = '2018', yshift = 1000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'MM', xlog = False, outdir = www, sys_errors = sys['MM_2018'])
         makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hMMBCR_eta', hname_MC = 'hMMBCR_eta', ylog = True, treeDATA = treeDATA_Mu2018, treeMC = treeMC_2018, inputdir = opts.input, hname_extra = '', label_extra = 'SS background', treeEXTRA = treeDATA_Mu2018, xlabel = '', outtag = '2018', yshift = 100000.0, leftlabel = 'Control Region: |#Delta#Phi| > #pi/2', LLlabel = 'MM', xlog = False, outdir = www, sys_errors = sys['MM_2018'])

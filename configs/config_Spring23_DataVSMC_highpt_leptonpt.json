@@ -18,8 +18,8 @@
         "electrons" : {
             "2016" : [ "abs(ev.ElectronCandidate_eta[ev.EE_idxA[iee]]) < 2.0",
                        "abs(ev.ElectronCandidate_eta[ev.EE_idxB[iee]]) < 2.0",
-                       "ev.EE_leadingEt[iee] > 55",
-                       "ev.EE_subleadingEt[iee] > 40",
+                       "ev.EE_leadingEt[iee] > 50",
+                       "ev.EE_subleadingEt[iee] > 30",
                        "ev.EE_mass[iee] > 15",
                        "abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxA[iee]]]) < 1.4442 or abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxA[iee]]]) > 1.566",
                        "abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxB[iee]]]) < 1.4442 or abs(ev.PhotonSel_eta[ev.ElectronCandidate_photonIdx[ev.EE_idxB[iee]]]) > 1.566",

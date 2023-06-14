@@ -110,7 +110,7 @@ def makeClosureTestMC(lumi, name, hBKG_A, hBKG_B, ylog, tree, inputdir, labelA =
 
     ### Save it
     outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/ClosureTests_' + outtag + '/'
-    plot.saveRatio(1, tree.isData, ylog, luminosity, cumA, cumB, r_ymin = rmin, r_ymax = rmax, label="SR/BCR", outputDir = outdir)
+    plot.saveRatio(1, tree.isData, ylog, luminosity, cumA, cumB, r_ymin = rmin, r_ymax = rmax, label="SR/BCR", outputDir = outdir, inProgress = True)
 
     ### Main comparison
     cplot = Canvas.Canvas('plaincomparison_'+name, 'png,pdf', 0.45, 0.66, 0.65, 0.78, 1)
@@ -122,7 +122,7 @@ def makeClosureTestMC(lumi, name, hBKG_A, hBKG_B, ylog, tree, inputdir, labelA =
         cplot.addLatex(0.17, 0.75, 'Dimuon vertices', font = 42)
     cplot.addLatex(0.17, 0.81, extralabel, font = 42, align = 11, size = 0.045)
     cplot.addLatex(0.9, 0.88, DATAlabel, font = 42, align = 31, size = 0.045)
-    cplot.saveRatio(1, tree.isData, ylog, luminosity, hBKG_A, hBKG_B, label="SR/BCR", outputDir = outdir)
+    cplot.saveRatio(1, tree.isData, ylog, luminosity, hBKG_A, hBKG_B, label="SR/BCR", outputDir = outdir, inProgress = True)
 
     
 
@@ -217,7 +217,7 @@ if __name__ == "__main__":
     Backgrounds_2018.append('ZZ_2018')
 
     ################ Define the .dat file
-    filename = 'dat/Samples_cern_UltraLegacy.dat'
+    filename = 'dat/Samples_cern_UltraLegacy_Spring23.dat'
 
     stabin = np.array([0., 1., 2., 3., 4., 6., 8., 10., 15., 20., 30., 40.])
 
@@ -709,14 +709,14 @@ if __name__ == "__main__":
     makeClosureTestMC(lumi = '', name = 'VV_MM_Full_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = treeVV_MMFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'Run 2', extralabel = 'WW, WZ, ZZ (Baseline selection)', rmax = 3)
 
 
-
     """
+
 
     #
     # -- QCD and Wjets Correlation
     #
-    tree_EE2016_HIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016_HIPM, 'MC'), name = 'DATA', isdata = 1 )
-    tree_MM2016_HIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016_HIPM, 'MC'), name = 'DATA', isdata = 1 )
+    tree_EE2016_HIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016_HIPM, 'MC'), name = 'DATA', isdata = 1, close = True)
+    tree_MM2016_HIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016_HIPM, 'MC'), name = 'DATA', isdata = 1, close = True)
 
     hBKG_A = tree_EE2016_HIPM.getLoopTH1F(opts.input, 'hEEQCDSR_trackIxy')
     hBKG_B = tree_EE2016_HIPM.getLoopTH1F(opts.input, 'hEEQCDBCR_trackIxy')
@@ -782,8 +782,8 @@ if __name__ == "__main__":
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
     makeClosureTestMC(lumi = '', name = 'Wjets_MM_2016HIPM_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2016_HIPM, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = 'HIP affected runs', extralabel = 'W+jets Control Region', rmax = 3.0)
 
-    tree_EE2016_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016_noHIPM, 'MC'), name = 'DATA', isdata = 1 )
-    tree_MM2016_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016_noHIPM, 'MC'), name = 'DATA', isdata = 1 )
+    tree_EE2016_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016_noHIPM, 'MC'), name = 'DATA', isdata = 1, close = True)
+    tree_MM2016_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016_noHIPM, 'MC'), name = 'DATA', isdata = 1, close = True)
 
     hBKG_A = tree_EE2016_noHIPM.getLoopTH1F(opts.input, 'hEEQCDSR_trackIxy')
     hBKG_B = tree_EE2016_noHIPM.getLoopTH1F(opts.input, 'hEEQCDBCR_trackIxy')
@@ -851,7 +851,7 @@ if __name__ == "__main__":
 
 
 
-    tree_EE2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2017, 'MC'), name = 'DATA', isdata = 1 )
+    tree_EE2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2017, 'MC'), name = 'DATA', isdata = 1, close = True)
 
     hBKG_A = tree_EE2017.getLoopTH1F(opts.input, 'hEEQCDSR_trackIxy')
     hBKG_B = tree_EE2017.getLoopTH1F(opts.input, 'hEEQCDBCR_trackIxy')
@@ -887,8 +887,8 @@ if __name__ == "__main__":
 
 
 
-    tree_EE2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2018, 'MC'), name = 'DATA', isdata = 1 )
-    tree_MM2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2018, 'MC'), name = 'DATA', isdata = 1 )
+    tree_EE2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2018, 'MC'), name = 'DATA', isdata = 1, close = True)
+    tree_MM2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2018, 'MC'), name = 'DATA', isdata = 1, close = True)
 
     hBKG_A = tree_EE2018.getLoopTH1F(opts.input, 'hEEQCDSR_trackIxy')
     hBKG_B = tree_EE2018.getLoopTH1F(opts.input, 'hEEQCDBCR_trackIxy')
@@ -954,10 +954,7 @@ if __name__ == "__main__":
     hBKG_B_rebin = hBKG_B.Rebin(len(newbin)-1, 'hBKG_B_rebin', newbin)
     makeClosureTestMC(lumi = 59.8, name = 'Wjets_MM_2018_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_MM2018, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/2', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'MMChannel', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'W+jets Control Region', rmax = 3.0)
 
-    """
-
-    """
-    tree_EEFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016_noHIPM + DoubleEG2017 + DoubleEG2018, 'DATA'), name = 'DATA', isdata = 1 )
+    tree_EEFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016_noHIPM + DoubleEG2017 + DoubleEG2018, 'DATA'), name = 'DATA', isdata = 1, close = True)
 
     hBKG_A = tree_EEFull.getLoopTH1F(opts.input, 'hEEWjetsSR_trackIxy')
     hBKG_B = tree_EEFull.getLoopTH1F(opts.input, 'hEEWjetsBCR_trackIxy')
@@ -993,7 +990,7 @@ if __name__ == "__main__":
     makeClosureTestMC(lumi = 117, name = 'QCD_EE_Full_Tight', hBKG_A = hBKG_A_rebin, hBKG_B = hBKG_B_rebin, ylog = True, tree = tree_EEFull, inputdir = opts.input, labelB = 'Control Region: |#Delta#Phi| > 3#pi/4', labelA = 'Signal Region: |#Delta#Phi| < #pi/4', xlabel = '|d_{xy}|/#sigma_{d}', outtag = 'EEChannel', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'QCD Control Region', rmax = 3.0)
 
 
-    tree_MMFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016_noHIPM + DoubleMuon2016_HIPM + DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1 )
+    tree_MMFull = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016_noHIPM + DoubleMuon2016_HIPM + DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1, close = True)
 
     hBKG_A = tree_MMFull.getLoopTH1F(opts.input, 'hMMWjetsSR_trackIxy')
     hBKG_B = tree_MMFull.getLoopTH1F(opts.input, 'hMMWjetsBCR_trackIxy')

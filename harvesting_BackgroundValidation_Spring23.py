@@ -128,11 +128,11 @@ if __name__ == "__main__":
 
     #### Prompt validation
 
-    makeBackgroundValidationPlot(name = 'EEprompt_mass_HIPM', lumi = 19.7, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
-    makeBackgroundValidationPlot(name = 'EEprompt_mass_noHIPM', lumi = 16.15, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
-    makeBackgroundValidationPlot(name = 'EEprompt_mass_2016', lumi = 35.9, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
-    makeBackgroundValidationPlot(name = 'EEprompt_mass_2017', lumi = 41.5, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_2017, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
-    makeBackgroundValidationPlot(name = 'EEprompt_mass_2018', lumi = 59.8, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'EEprompt_mass_HIPM', lumi = 19.7, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1, drawZero = False) 
+    makeBackgroundValidationPlot(name = 'EEprompt_mass_noHIPM', lumi = 16.15, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1, drawZero = False) 
+    makeBackgroundValidationPlot(name = 'EEprompt_mass_2016', lumi = 35.9, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1, drawZero = False) 
+    makeBackgroundValidationPlot(name = 'EEprompt_mass_2017', lumi = 41.5, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_2017, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1, drawZero = False) 
+    makeBackgroundValidationPlot(name = 'EEprompt_mass_2018', lumi = 59.8, hname_SR = 'hEEPromptSR_mass', hname_CR = 'hEEPromptBCR_mass', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'EE', extralabel = 'Prompt control region', xlog = False, sys = 0.1, drawZero = False) 
 
     #### On-Z validation
 
@@ -184,11 +184,11 @@ if __name__ == "__main__":
 
     #### Prompt validation
     ## 2016
-    makeBackgroundValidationPlot(name = 'MMPrompt_mass_HIPM', lumi = 19.7, hname_SR = 'hMMPromptSR_mass', hname_CR = 'hMMPromptBCR_mass', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
-    makeBackgroundValidationPlot(name = 'MMPrompt_mass_noHIPM', lumi = 16.2, hname_SR = 'hMMPromptSR_mass', hname_CR = 'hMMPromptBCR_mass', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
-    makeBackgroundValidationPlot(name = 'MMPrompt_mass_2016', lumi = 35.9, hname_SR = 'hMMPromptSR_mass', hname_CR = 'hMMPromptBCR_mass', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMPrompt_mass_HIPM', lumi = 19.7, hname_SR = 'hMMPromptSR_mass', hname_CR = 'hMMPromptBCR_mass', ylog = True, treeDATA = treeDATA_HIPM, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'Prompt control region', xlog = False, sys = 0.1, drawZero = False) 
+    makeBackgroundValidationPlot(name = 'MMPrompt_mass_noHIPM', lumi = 16.2, hname_SR = 'hMMPromptSR_mass', hname_CR = 'hMMPromptBCR_mass', ylog = True, treeDATA = treeDATA_noHIPM, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'Prompt control region', xlog = False, sys = 0.1, drawZero = False) 
+    makeBackgroundValidationPlot(name = 'MMPrompt_mass_2016', lumi = 35.9, hname_SR = 'hMMPromptSR_mass', hname_CR = 'hMMPromptBCR_mass', ylog = True, treeDATA = treeDATA_2016, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'Prompt control region', xlog = False, sys = 0.1, drawZero = False) 
     ## 2018
-    makeBackgroundValidationPlot(name = 'MMPrompt_mass_2018', lumi = 59.8, hname_SR = 'hMMPromptSR_mass', hname_CR = 'hMMPromptBCR_mass', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'Prompt control region', xlog = False, sys = 0.1) 
+    makeBackgroundValidationPlot(name = 'MMPrompt_mass_2018', lumi = 59.8, hname_SR = 'hMMPromptSR_mass', hname_CR = 'hMMPromptBCR_mass', ylog = True, treeDATA = treeDATA_2018, inputdir = opts.input, xlabel = '', outpath = www, yshift = 0.0, LLlabel = 'MM', extralabel = 'Prompt control region', xlog = False, sys = 0.1, drawZero = False) 
     ## 2016 + 2018
 
     

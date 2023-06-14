@@ -197,9 +197,17 @@ if __name__ == "__main__":
     ############# HEPData files
     EXO_18_003_mH1000_mm = '/eos/user/f/fernance/LLP_Analysis/comparisons/EXO-18-003/HEPData-ins1940976-v1-H1000_mumu_channel.root'
     EXO_18_003_mH1000_ee = '/eos/user/f/fernance/LLP_Analysis/comparisons/EXO-18-003/HEPData-ins1940976-v1-H1000_ee_channel.root'
+    EXO_18_003_mH1000_ll = '/eos/user/f/fernance/LLP_Analysis/comparisons/EXO-18-003/HEPData-ins1940976-v1-H1000_ll_channel.root'
+    EXO_18_003_mH800_ll = '/eos/user/f/fernance/LLP_Analysis/comparisons/EXO-18-003/HEPData-ins1940976-v1-H800_ll_channel.root'
     EXO_18_003_mH600_mm = '/eos/user/f/fernance/LLP_Analysis/comparisons/EXO-18-003/HEPData-ins1940976-v1-H600_mumu_channel.root'
     EXO_18_003_mH600_ee = '/eos/user/f/fernance/LLP_Analysis/comparisons/EXO-18-003/HEPData-ins1940976-v1-H600_ee_channel.root'
+    EXO_18_003_mH600_ll = '/eos/user/f/fernance/LLP_Analysis/comparisons/EXO-18-003/HEPData-ins1940976-v1-H600_ll_channel.root'
+    EXO_18_003_mH400_ll = '/eos/user/f/fernance/LLP_Analysis/comparisons/EXO-18-003/HEPData-ins1940976-v1-H400_ll_channel.root'
+    EXO_18_003_mH300_ll = '/eos/user/f/fernance/LLP_Analysis/comparisons/EXO-18-003/HEPData-ins1940976-v1-H300_ll_channel.root'
+    EXO_18_003_mH125_ll = '/eos/user/f/fernance/LLP_Analysis/comparisons/EXO-18-003/HEPData-ins1940976-v1-H125_ll_channel.root'
     EXO_21_006_mH1000_mS350 = '/eos/user/f/fernance/LLP_Analysis/comparisons/EXO-21-006/HEPData-ins2083735-v2-Figure_17_bottom_right.root'
+    EXO_21_006_mH1000_mS150 = '/eos/user/f/fernance/LLP_Analysis/comparisons/EXO-21-006/HEPData-ins2083735-v2-Figure_17_bottom_left.root'
+    EXO_21_006_mH400_mS150 = '/eos/user/f/fernance/LLP_Analysis/comparisons/EXO-21-006/HEPData-ins2083735-v2-Figure_16_bottom.root'
 
 
     ############# Set the drawing set
@@ -207,57 +215,262 @@ if __name__ == "__main__":
     ### [filename, GraphName, Label, Color, Style]
 
 
+    ###########
+    ########### Pure flavor channel
+    ###########
+
+
     ####### mH = 1000 GeV, mS = 350 GeV (muons)
     drawSet = {}
-    drawSet['Reference'] = ['LimitsResults_Fall2022_muonBR4/JSONhiggsCombine__Muon__mH1000__mS350__eraFull_xsec.json', 'Muon channel expected']
+    drawSet['Reference'] = ['LimitsResults_Spring23_muons_BR100/JSONhiggsCombine__Muon__mH1000__mS350__eraFull_xsec.json', 'Muon channel expected']
     drawSet['Others'] = []
-    drawSet['Others'].append([EXO_18_003_mH1000_mm, 'H(1000) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y3', 'CMS-EXO-18-003 observed (113 fb^{-1})', r.kBlue, 1])
-    drawSet['Others'].append([EXO_21_006_mH1000_mS350, 'Figure 17 bottom right/Graph1D_y1', 'CMS-EXO-21-006 observed (97 fb^{-1})', r.kOrange-3, 1])
+    #drawSet['Others'].append([EXO_18_003_mH1000_mm, 'H(1000) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y3', 'CMS-EXO-18-003 observed (113 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH1000_mm, 'H(1000) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y4', 'CMS-EXO-18-003 expected (113 fb^{-1})', r.kBlue, 1])
+    #drawSet['Others'].append([EXO_21_006_mH1000_mS350, 'Figure 17 bottom right/Graph1D_y1', 'CMS-EXO-21-006 observed (97 fb^{-1})', r.kOrange-3, 1])
+    drawSet['Others'].append([EXO_21_006_mH1000_mS350, 'Figure 17 bottom right/Graph1D_y2', 'CMS-EXO-21-006 comb. expected (97 fb^{-1})', r.kOrange-3, 1])
     drawSet['Others'].append([EXO_21_006_mH1000_mS350, 'Figure 17 bottom right/Graph1D_y3', 'CMS-EXO-21-006 TMS-TMS expected (97 fb^{-1})', r.kOrange-3, 7])
 
     HSSlabel = ['H#rightarrowSS, S#rightarrow#mu#mu, B(S#rightarrow#mu#mu) = 100%', 'm_{H} = 1000 GeV, m_{S} = 350 GeV']
     makeLimitComparison('AnalysesComp_mH1000_mS350_mm', '96 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e6) 
 
+    ####### mH = 1000 GeV, mS = 150 GeV (muons)
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_muons_BR100/JSONhiggsCombine__Muon__mH1000__mS150__eraFull_xsec.json', 'Muon channel expected']
+    drawSet['Others'] = []
+    #drawSet['Others'].append([EXO_18_003_mH1000_mm, 'H(1000) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y1', 'CMS-EXO-18-003 observed (113 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH1000_mm, 'H(1000) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y2', 'CMS-EXO-18-003 expected (113 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_21_006_mH1000_mS150, 'Figure 17 bottom left/Graph1D_y2', 'CMS-EXO-21-006 comb. expected (97 fb^{-1})', r.kOrange-3, 1])
+    drawSet['Others'].append([EXO_21_006_mH1000_mS150, 'Figure 17 bottom left/Graph1D_y3', 'CMS-EXO-21-006 TMS-TMS expected (97 fb^{-1})', r.kOrange-3, 7])
+
+    HSSlabel = ['H#rightarrowSS, S#rightarrow#mu#mu, B(S#rightarrow#mu#mu) = 100%', 'm_{H} = 1000 GeV, m_{S} = 150 GeV']
+    makeLimitComparison('AnalysesComp_mH1000_mS150_mm', '96 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e6) 
+
+    ####### mH = 400 GeV, mS = 150 GeV (muons)
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_muons_BR100/JSONhiggsCombine__Muon__mH400__mS150__eraFull_xsec.json', 'Muon channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_21_006_mH400_mS150, 'Figure 16 bottom/Graph1D_y2', 'CMS-EXO-21-006 comb. expected (97 fb^{-1})', r.kOrange-3, 1])
+    drawSet['Others'].append([EXO_21_006_mH400_mS150, 'Figure 16 bottom/Graph1D_y3', 'CMS-EXO-21-006 TMS-TMS expected (97 fb^{-1})', r.kOrange-3, 7])
+
+    HSSlabel = ['H#rightarrowSS, S#rightarrow#mu#mu, B(S#rightarrow#mu#mu) = 100%', 'm_{H} = 400 GeV, m_{S} = 150 GeV']
+    makeLimitComparison('AnalysesComp_mH400_mS150_mm', '96 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e6) 
+
     ####### mH = 1000 GeV, mS = 350 GeV (electrons)
     drawSet = {}
-    drawSet['Reference'] = ['LimitsResults_Fall2022_electronBR4/JSONhiggsCombine__Electron__mH1000__mS350__eraFull_xsec.json', 'Electron channel expected']
+    drawSet['Reference'] = ['LimitsResults_Spring23_electrons_BR100/JSONhiggsCombine__Electron__mH1000__mS350__eraFull_xsec.json', 'Electron channel expected']
     drawSet['Others'] = []
     drawSet['Others'].append([EXO_18_003_mH1000_ee, 'H(1000) to 4ell, sigmatimes bf limits, ee channel/Graph1D_y3', 'CMS-EXO-18-003 observed (118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH1000_ee, 'H(1000) to 4ell, sigmatimes bf limits, ee channel/Graph1D_y4', 'CMS-EXO-18-003 expected (118 fb^{-1})', r.kBlue, 7])
 
-    HSSlabel = ['H#rightarrowSS, S#rightarrow#mu#mu, B(S#rightarrowee) = 100%', 'm_{H} = 1000 GeV, m_{S} = 350 GeV']
-    makeLimitComparison('AnalysesComp_mH1000_mS350_ee', '117 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e6) 
+    HSSlabel = ['H#rightarrowSS, S#rightarrowee, B(S#rightarrowee) = 100%', 'm_{H} = 1000 GeV, m_{S} = 350 GeV']
+    makeLimitComparison('AnalysesComp_mH1000_mS350_ee', '112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+    ####### mH = 1000 GeV, mS = 150 GeV (electrons)
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_electrons_BR100/JSONhiggsCombine__Electron__mH1000__mS150__eraFull_xsec.json', 'Electron channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH1000_ee, 'H(1000) to 4ell, sigmatimes bf limits, ee channel/Graph1D_y1', 'CMS-EXO-18-003 observed (118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH1000_ee, 'H(1000) to 4ell, sigmatimes bf limits, ee channel/Graph1D_y2', 'CMS-EXO-18-003 expected (118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, S#rightarrowee, B(S#rightarrowee) = 100%', 'm_{H} = 1000 GeV, m_{S} = 150 GeV']
+    makeLimitComparison('AnalysesComp_mH1000_mS150_ee', '112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
 
     ####### mH = 600 GeV, mS = 50 GeV (muons)
     drawSet = {}
-    drawSet['Reference'] = ['LimitsResults_Fall2022_muonBR4/JSONhiggsCombine__Muon__mH600__mS50__eraFull_xsec.json', 'Muon channel expected']
+    drawSet['Reference'] = ['LimitsResults_Spring23_muons_BR100/JSONhiggsCombine__Muon__mH600__mS50__eraFull_xsec.json', 'Muon channel expected']
     drawSet['Others'] = []
     drawSet['Others'].append([EXO_18_003_mH600_mm, 'H(600) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y1', 'CMS-EXO-18-003 observed (113 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH600_mm, 'H(600) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y2', 'CMS-EXO-18-003 expected (113 fb^{-1})', r.kBlue, 7])
     HSSlabel = ['H#rightarrowSS, S#rightarrow#mu#mu, B(S#rightarrow#mu#mu) = 100%', 'm_{H} = 600 GeV, m_{S} = 50 GeV']
     makeLimitComparison('AnalysesComp_mH600_mS50_mm', '96 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
 
     ####### mH = 600 GeV, mS = 150 GeV (muons)
     drawSet = {}
-    drawSet['Reference'] = ['LimitsResults_Fall2022_muonBR4/JSONhiggsCombine__Muon__mH600__mS150__eraFull_xsec.json', 'Muon channel expected']
+    drawSet['Reference'] = ['LimitsResults_Spring23_muons_BR100/JSONhiggsCombine__Muon__mH600__mS150__eraFull_xsec.json', 'Muon channel expected']
     drawSet['Others'] = []
     drawSet['Others'].append([EXO_18_003_mH600_mm, 'H(600) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y3', 'CMS-EXO-18-003 observed (113 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH600_mm, 'H(600) to 4ell, sigmatimes bf limits, mumu channel/Graph1D_y4', 'CMS-EXO-18-003 expected (113 fb^{-1})', r.kBlue, 7])
     HSSlabel = ['H#rightarrowSS, S#rightarrow#mu#mu, B(S#rightarrow#mu#mu) = 100%', 'm_{H} = 600 GeV, m_{S} = 150 GeV']
     makeLimitComparison('AnalysesComp_mH600_mS150_mm', '96 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
 
     ####### mH = 600 GeV, mS = 50 GeV (electron)
     drawSet = {}
-    drawSet['Reference'] = ['LimitsResults_Fall2022_electronBR4/JSONhiggsCombine__Electron__mH600__mS50__eraFull_xsec.json', 'Electron channel expected']
+    drawSet['Reference'] = ['LimitsResults_Spring23_electrons_BR100/JSONhiggsCombine__Electron__mH600__mS50__eraFull_xsec.json', 'Electron channel expected']
     drawSet['Others'] = []
     drawSet['Others'].append([EXO_18_003_mH600_ee, 'H(600) to 4ell, sigmatimes bf limits, ee channel/Graph1D_y1', 'CMS-EXO-18-003 observed (118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH600_ee, 'H(600) to 4ell, sigmatimes bf limits, ee channel/Graph1D_y2', 'CMS-EXO-18-003 expected (118 fb^{-1})', r.kBlue, 7])
     HSSlabel = ['H#rightarrowSS, S#rightarrowee, B(S#rightarrowee) = 100%', 'm_{H} = 600 GeV, m_{S} = 50 GeV']
-    makeLimitComparison('AnalysesComp_mH600_mS50_ee', '117 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+    makeLimitComparison('AnalysesComp_mH600_mS50_ee', '112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
 
 
     ####### mH = 600 GeV, mS = 150 GeV (electron)
     drawSet = {}
-    drawSet['Reference'] = ['LimitsResults_Fall2022_electronBR4/JSONhiggsCombine__Electron__mH600__mS150__eraFull_xsec.json', 'Electron channel expected']
+    drawSet['Reference'] = ['LimitsResults_Spring23_electrons_BR100/JSONhiggsCombine__Electron__mH600__mS150__eraFull_xsec.json', 'Electron channel expected']
+    drawSet['Reference'] = ['LimitsResults_Spring23_electrons_BR100/JSONhiggsCombine__Electron__mH600__mS150__eraFull_xsec.json', 'Electron channel expected']
     drawSet['Others'] = []
     drawSet['Others'].append([EXO_18_003_mH600_ee, 'H(600) to 4ell, sigmatimes bf limits, ee channel/Graph1D_y3', 'CMS-EXO-18-003 observed (118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH600_ee, 'H(600) to 4ell, sigmatimes bf limits, ee channel/Graph1D_y4', 'CMS-EXO-18-003 expected (118 fb^{-1})', r.kBlue, 7])
     HSSlabel = ['H#rightarrowSS, S#rightarrowee, B(S#rightarrowee) = 100%', 'm_{H} = 600 GeV, m_{S} = 150 GeV']
-    makeLimitComparison('AnalysesComp_mH600_mS150_ee', '117 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+    makeLimitComparison('AnalysesComp_mH600_mS150_ee', '112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+    ###########
+    ########### Combined channel
+    ###########
+
+    ####### mH = 1000 GeV, mS = 350 GeV (combined)
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50/JSONhiggsCombine__Joint__mH1000__mS350__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH1000_ll, 'H(1000) to SS, Stoell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y3', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH1000_ll, 'H(1000) to SS, Stoell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 1000 GeV, m_{S} = 350 GeV']
+    makeLimitComparison('AnalysesComp_mH1000_mS350_ll', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50_MuonTight2018/JSONhiggsCombine__Joint__mH1000__mS350__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH1000_ll, 'H(1000) to SS, Stoell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y3', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH1000_ll, 'H(1000) to SS, Stoell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 1000 GeV, m_{S} = 350 GeV']
+    makeLimitComparison('AnalysesComp_mH1000_mS350_ll_tight', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+    ####### mH = 1000 GeV, mS = 150 GeV (combined)
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50/JSONhiggsCombine__Joint__mH1000__mS150__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH1000_ll, 'H(1000) to SS, Stoell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y1', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH1000_ll, 'H(1000) to SS, Stoell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y2', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 1000 GeV, m_{S} = 150 GeV']
+    makeLimitComparison('AnalysesComp_mH1000_mS150_ll', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50_MuonTight2018/JSONhiggsCombine__Joint__mH1000__mS150__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH1000_ll, 'H(1000) to SS, Stoell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y1', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH1000_ll, 'H(1000) to SS, Stoell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y2', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 1000 GeV, m_{S} = 150 GeV']
+    makeLimitComparison('AnalysesComp_mH1000_mS150_ll_tight', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+    ####### mH = 800 GeV, mS = 50 GeV (combined)
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50/JSONhiggsCombine__Joint__mH800__mS50__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH800_ll, 'H(800) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y1', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH800_ll, 'H(800) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y2', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 800 GeV, m_{S} = 50 GeV']
+    makeLimitComparison('AnalysesComp_mH800_mS50_ll', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50_MuonTight2018/JSONhiggsCombine__Joint__mH800__mS50__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH800_ll, 'H(800) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y1', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH800_ll, 'H(800) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y2', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 800 GeV, m_{S} = 50 GeV']
+    makeLimitComparison('AnalysesComp_mH800_mS50_ll_tight', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+    ####### mH = 800 GeV, mS = 250 GeV (combined)
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50/JSONhiggsCombine__Joint__mH800__mS250__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH800_ll, 'H(800) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y5', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH800_ll, 'H(800) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y6', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 800 GeV, m_{S} = 250 GeV']
+    makeLimitComparison('AnalysesComp_mH800_mS250_ll', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50_MuonTight2018/JSONhiggsCombine__Joint__mH800__mS250__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH800_ll, 'H(800) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y5', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH800_ll, 'H(800) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y6', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 800 GeV, m_{S} = 250 GeV']
+    makeLimitComparison('AnalysesComp_mH800_mS250_ll_tight', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+
+    ####### mH = 600 GeV, mS = 50 GeV (combined)
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50/JSONhiggsCombine__Joint__mH600__mS50__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH600_ll, 'H(600) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y1', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH600_ll, 'H(600) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y2', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 600 GeV, m_{S} = 50 GeV']
+    makeLimitComparison('AnalysesComp_mH600_mS50_ll', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50_MuonTight2018/JSONhiggsCombine__Joint__mH600__mS50__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH600_ll, 'H(600) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y1', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH600_ll, 'H(600) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y2', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 600 GeV, m_{S} = 50 GeV']
+    makeLimitComparison('AnalysesComp_mH600_mS50_ll_tight', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+
+    ####### mH = 600 GeV, mS = 150 GeV (combined)
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50/JSONhiggsCombine__Joint__mH600__mS150__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH600_ll, 'H(600) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y3', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH600_ll, 'H(600) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 600 GeV, m_{S} = 150 GeV']
+    makeLimitComparison('AnalysesComp_mH600_mS150_ll', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50_MuonTight2018/JSONhiggsCombine__Joint__mH600__mS150__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH600_ll, 'H(600) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y3', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH600_ll, 'H(600) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 600 GeV, m_{S} = 150 GeV']
+    makeLimitComparison('AnalysesComp_mH600_mS150_ll_tight', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+    ####### mH = 400 GeV, mS = 150 GeV (combined)
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50/JSONhiggsCombine__Joint__mH400__mS150__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH400_ll, 'H(400) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y3', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH400_ll, 'H(400) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 400 GeV, m_{S} = 150 GeV']
+    makeLimitComparison('AnalysesComp_mH400_mS150_ll', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50_MuonTight2018/JSONhiggsCombine__Joint__mH400__mS150__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH400_ll, 'H(400) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y3', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH400_ll, 'H(400) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 400 GeV, m_{S} = 150 GeV']
+    makeLimitComparison('AnalysesComp_mH400_mS150_ll_tight', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+
+    ####### mH = 300 GeV, mS = 50 GeV (combined)
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50/JSONhiggsCombine__Joint__mH300__mS50__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH300_ll, 'H(300) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y3', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH300_ll, 'H(300) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 300 GeV, m_{S} = 50 GeV']
+    makeLimitComparison('AnalysesComp_mH300_mS50_ll', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
+    drawSet = {}
+    drawSet['Reference'] = ['LimitsResults_Spring23_BR50_MuonTight2018/JSONhiggsCombine__Joint__mH300__mS50__eraFull_xsec.json', 'Combined channel expected']
+    drawSet['Others'] = []
+    drawSet['Others'].append([EXO_18_003_mH300_ll, 'H(300) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y3', 'CMS-EXO-18-003 observed (113-118 fb^{-1})', r.kBlue, 1])
+    drawSet['Others'].append([EXO_18_003_mH300_ll, 'H(300) to SS, S toell^{+}ell^{-}, sigmatimes bf limits/Graph1D_y4', 'CMS-EXO-18-003 expected (113-118 fb^{-1})', r.kBlue, 7])
+
+    HSSlabel = ['H#rightarrowSS, B(S#rightarrowee) = B(S#rightarrow#mu#mu) = 50%', 'm_{H} = 300 GeV, m_{S} = 50 GeV']
+    makeLimitComparison('AnalysesComp_mH300_mS50_ll_tight', '96-112 fb^{-1} (13 TeV)', drawSet, masslabel = HSSlabel, ymin = 1e-5, ymax = 1e2, xmin = 1e-1, xmax = 1e3) 
+
 
 

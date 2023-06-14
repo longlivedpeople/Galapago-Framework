@@ -74,10 +74,12 @@ if __name__ == "__main__":
     ############# Signal definition
     Signals = []
     Signals.append('HSS_300_50_100')
+    Signals.append('HSS_400_150_100')
     Signals.append('HSS_500_50_100')
+    Signals.append('HSS_800_50_100')
     Signals.append('HSS_1000_250_100')
-    Signals.append('RPV_350_148_100')
-    Signals.append('RPV_1500_494_100')
+    #Signals.append('RPV_350_148_100')
+    #Signals.append('RPV_1500_494_100')
 
 
     Signals_2016preVFP = [i + '_2016APV' for i in Signals]
@@ -120,30 +122,30 @@ if __name__ == "__main__":
     ################################
     #### -> 2016 plots
     if True:
-        makeBlindedPlot(lumi = lumi2016_EE, hname_SI = 'hEESR_nEE', hname_bkg = 'hEEBCR_nEE', ylog = True, treeDATA = treeDATA_EG2016, inputdir = input_ee, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www)
-        makeBlindedPlot(lumi = lumi2016_EE, hname_SI = 'hEESR_mass', hname_bkg = 'hEEBCR_mass', ylog = True, treeDATA = treeDATA_EG2016, inputdir = input_ee, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www)
-        makeBlindedPlot(lumi = lumi2016_EE, hname_SI = 'hEESRI_dPhi_scan', hname_bkg = 'hEEBCRI_dPhi_scan', ylog = True, treeDATA = treeDATA_EG2016, inputdir = input_ee, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'N_{ee} = 1, Off-Z region', outpath = www)
+        makeBlindedPlot(lumi = lumi2016_EE, hname_SI = 'hEESR_nEE', hname_bkg = 'hEEBCR_nEE', ylog = True, treeDATA = treeDATA_EG2016, inputdir = input_ee, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www, cutBins = [1])
+        makeBlindedPlot(lumi = lumi2016_EE, hname_SI = 'hEESR_mass', hname_bkg = 'hEEBCR_mass', ylog = True, treeDATA = treeDATA_EG2016, inputdir = input_ee, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www, cutBins = [1,2])
+        makeBlindedPlot(lumi = lumi2016_EE, hname_SI = 'hEESRI_dPhi_scan', hname_bkg = 'hEEBCRI_dPhi_scan', ylog = True, treeDATA = treeDATA_EG2016, inputdir = input_ee, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'N_{ee} = 1, Off-Z region', outpath = www, cutBins = [1,2])
 
-        makeBlindedPlot(lumi = lumi2016_MM, hname_SI = 'hMMSR_nMM', hname_bkg = 'hMMBCR_nMM', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = input_mm, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www)
-        makeBlindedPlot(lumi = lumi2016_MM, hname_SI = 'hMMSR_mass', hname_bkg = 'hMMBCR_mass', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = input_mm, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www)
-        makeBlindedPlot(lumi = lumi2016_MM, hname_SI = 'hMMSRI_dPhi_scan', hname_bkg = 'hMMBCRI_dPhi_scan', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = input_mm, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = 'N_{#mu#mu} = 1, Off-Z region', outpath = www)
+        makeBlindedPlot(lumi = lumi2016_MM, hname_SI = 'hMMSR_nMM', hname_bkg = 'hMMBCR_nMM', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = input_mm, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www, cutBins = [1])
+        makeBlindedPlot(lumi = lumi2016_MM, hname_SI = 'hMMSR_mass', hname_bkg = 'hMMBCR_mass', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = input_mm, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www, cutBins = [1,2])
+        makeBlindedPlot(lumi = lumi2016_MM, hname_SI = 'hMMSRI_dPhi_scan', hname_bkg = 'hMMBCRI_dPhi_scan', ylog = True, treeDATA = treeDATA_Mu2016, inputdir = input_mm, treeSI = treeSI_2016, xlabel = '', outtag = '2016', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = 'N_{#mu#mu} = 1, Off-Z region', outpath = www, cutBins = [1,2])
 
 
     #### -> 2017 plots
     if True:
-        makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESR_nEE', hname_bkg = 'hEEBCR_nEE', ylog = True, treeDATA = treeDATA_EG2017, inputdir = input_ee, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www)
-        makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESR_mass', hname_bkg = 'hEEBCR_mass', ylog = True, treeDATA = treeDATA_EG2017, inputdir = input_ee, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www)
-        makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESRI_dPhi_scan', hname_bkg = 'hEEBCRI_dPhi_scan', ylog = True, treeDATA = treeDATA_EG2017, inputdir = input_ee, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'N_{ee} = 1, Off-Z region', outpath = www)
+        makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESR_nEE', hname_bkg = 'hEEBCR_nEE', ylog = True, treeDATA = treeDATA_EG2017, inputdir = input_ee, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www, cutBins = [1])
+        makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESR_mass', hname_bkg = 'hEEBCR_mass', ylog = True, treeDATA = treeDATA_EG2017, inputdir = input_ee, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www, cutBins = [1,2])
+        makeBlindedPlot(lumi = lumi2017, hname_SI = 'hEESRI_dPhi_scan', hname_bkg = 'hEEBCRI_dPhi_scan', ylog = True, treeDATA = treeDATA_EG2017, inputdir = input_ee, treeSI = treeSI_2017, xlabel = '', outtag = '2017', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'N_{ee} = 1, Off-Z region', outpath = www, cutBins = [1,2])
 
 
     #### -> 2018 plots
     if True:
-        makeBlindedPlot(lumi = lumi2018_EE, hname_SI = 'hEESR_nEE', hname_bkg = 'hEEBCR_nEE', ylog = True, treeDATA = treeDATA_EG2018, inputdir = input_ee, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www)
-        makeBlindedPlot(lumi = lumi2018_EE, hname_SI = 'hEESR_mass', hname_bkg = 'hEEBCR_mass', ylog = True, treeDATA = treeDATA_EG2018, inputdir = input_ee, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www)
-        makeBlindedPlot(lumi = lumi2018_EE, hname_SI = 'hEESRI_dPhi_scan', hname_bkg = 'hEEBCRI_dPhi_scan', ylog = True, treeDATA = treeDATA_EG2018, inputdir = input_ee, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'N_{ee} = 1, Off-Z region', outpath = www)
-        makeBlindedPlot(lumi = lumi2018_MM, hname_SI = 'hMMSR_nMM', hname_bkg = 'hMMBCR_nMM', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = input_mm, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www)
-        makeBlindedPlot(lumi = lumi2018_MM, hname_SI = 'hMMSR_mass', hname_bkg = 'hMMBCR_mass', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = input_mm, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www)
-        makeBlindedPlot(lumi = lumi2018_MM, hname_SI = 'hMMSRI_dPhi_scan', hname_bkg = 'hMMBCRI_dPhi_scan', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = input_mm, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = 'N_{#mu#mu} = 1, Off-Z region', outpath = www)
+        makeBlindedPlot(lumi = lumi2018_EE, hname_SI = 'hEESR_nEE', hname_bkg = 'hEEBCR_nEE', ylog = True, treeDATA = treeDATA_EG2018, inputdir = input_ee, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www, cutBins = [1])
+        makeBlindedPlot(lumi = lumi2018_EE, hname_SI = 'hEESR_mass', hname_bkg = 'hEEBCR_mass', ylog = True, treeDATA = treeDATA_EG2018, inputdir = input_ee, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www, cutBins = [1,2])
+        makeBlindedPlot(lumi = lumi2018_EE, hname_SI = 'hEESRI_dPhi_scan', hname_bkg = 'hEEBCRI_dPhi_scan', ylog = True, treeDATA = treeDATA_EG2018, inputdir = input_ee, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'EE', DATAlabel = '', extralabel = 'N_{ee} = 1, Off-Z region', outpath = www, cutBins = [1,2])
+        makeBlindedPlot(lumi = lumi2018_MM, hname_SI = 'hMMSR_nMM', hname_bkg = 'hMMBCR_nMM', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = input_mm, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www, cutBins = [1])
+        makeBlindedPlot(lumi = lumi2018_MM, hname_SI = 'hMMSR_mass', hname_bkg = 'hMMBCR_mass', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = input_mm, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = 'Baseline selection, Sig(d_{0}) > 1', outpath = www, cutBins = [1,2])
+        makeBlindedPlot(lumi = lumi2018_MM, hname_SI = 'hMMSRI_dPhi_scan', hname_bkg = 'hMMBCRI_dPhi_scan', ylog = True, treeDATA = treeDATA_Mu2018, inputdir = input_mm, treeSI = treeSI_2018, xlabel = '', outtag = '2018', ymax = 1e12, LLlabel = 'MM', DATAlabel = '', extralabel = 'N_{#mu#mu} = 1, Off-Z region', outpath = www, cutBins = [1,2])
 
 
 

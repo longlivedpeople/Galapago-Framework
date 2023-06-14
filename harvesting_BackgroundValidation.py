@@ -192,12 +192,12 @@ if __name__ == "__main__":
     ################################
     ######## DoubleEG Plots ########
     ################################
-    treeDATA_HIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_HIPM, 'DATA'), name = 'DATA', isdata = 1 )
-    treeDATA_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_noHIPM, 'DATA'), name = 'DATA', isdata = 1 )
-    treeDATA_2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_HIPM + DoubleEG_noHIPM, 'DATA'), name = 'DATA', isdata = 1 )
-    treeDATA_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2017, 'DATA'), name = 'DATA', isdata = 1 )
-    treeDATA_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, EGamma2018, 'DATA'), name = 'DATA', isdata = 1 )
-    treeDATA_full = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_HIPM + DoubleEG_noHIPM + DoubleEG2017 + EGamma2018, 'DATA'), name = 'DATA', isdata = 1 )
+    treeDATA_HIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_HIPM, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_noHIPM, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_HIPM + DoubleEG_noHIPM, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2017, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, EGamma2018, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_full = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG_HIPM + DoubleEG_noHIPM + DoubleEG2017 + EGamma2018, 'DATA'), name = 'DATA', isdata = 1, close = True)
 
     #### Prompt validation
 
@@ -244,17 +244,16 @@ if __name__ == "__main__":
     makePromptBKGPlot(name = 'EEOnZ_Lxy_full', lumi = 137.1, hname_SR = 'hEEOnZSR_Lxy', hname_CR = 'hEEOnZBCR_Lxy', ylog = True, treeDATA = treeDATA_full, inputdir = opts.input, xlabel = '', rebin = 5, outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'On-Z control region', xlog = False) 
     makePromptBKGPlot(name = 'EEOnZ_Ixy_full', lumi = 137.1, hname_SR = 'hEEOnZSR_Ixy', hname_CR = 'hEEOnZBCR_Ixy', ylog = True, treeDATA = treeDATA_full, inputdir = opts.input, xlabel = '', rebin = 2, outtag = '', yshift = 0.0, LLlabel = 'EE', DATAlabel = '', extralabel = 'On-Z control region', xlog = False) 
 
-    """
 
     ##################################
     ######## DoubleMuon Plots ########
     ##################################
     
-    treeDATA_HIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_HIPM, 'DATA'), name = 'DATA', isdata = 1 )
-    treeDATA_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_noHIPM, 'DATA'), name = 'DATA', isdata = 1 )
-    treeDATA_2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_HIPM + DoubleMuon_noHIPM, 'DATA'), name = 'DATA', isdata = 1 )
-    treeDATA_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1 )
-    treeDATA_full = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_HIPM + DoubleMuon_noHIPM + DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1 )
+    treeDATA_HIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_HIPM, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_noHIPM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_noHIPM, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_HIPM + DoubleMuon_noHIPM, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1, close = True)
+    treeDATA_full = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon_HIPM + DoubleMuon_noHIPM + DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1, close = True)
 
     #### Prompt validation
     ## 2016
@@ -299,4 +298,3 @@ if __name__ == "__main__":
     makePromptBKGPlot(name = 'MMOnZ_Ixy_full', lumi = 96.7, hname_SR = 'hMMOnZSR_Ixy', hname_CR = 'hMMOnZBCR_Ixy', ylog = True, treeDATA = treeDATA_full, inputdir = opts.input, rebin = 2, xlabel = '', outtag = '', yshift = 0.0, LLlabel = 'MM', DATAlabel = '', extralabel = 'On-Z control region', xlog = False) 
 
 
-    """

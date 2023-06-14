@@ -138,12 +138,12 @@ def makeDataMCPlot(lumi, hname_DATA, ylog, treeDATA, inputdir, xlabel = '', outt
 
     ### Extralabel:
     if leftlabel:
-        plot.addLatex(0.17, 0.76, leftlabel, font = 42)
+        plot.addLatex(0.57, 0.82, leftlabel+' region', font = 42)
 
     ### Save it
     if not outdir:
         outdir = os.path.dirname(os.path.abspath(__main__.__file__)) + '/2DPlots_' + outtag + '/'
-    plot.save(1, 1, ylog, luminosity, '', outputDir = outdir)
+    plot.save(1, 0, ylog, luminosity, '', outputDir = outdir, isPrivate = True)
 
 
 ################################# GLOBAL VARIABLES DEFINITION ####################################
@@ -281,58 +281,28 @@ if __name__ == "__main__":
     ########################################################
 
     #www = '/eos/user/f/fernance/www/LLP/SignalRegion-optimization/2DPlots_nLL1'
-    www = '/eos/user/r/rlopezru/Galapago_Plots/2Dvxvy_datanocuts'
-    region = 'BCR'
+    www = None
     #### -> Electron plots
-    #makeBackgroundPlot2D(lumi=lumi2016, hname_bkg='hEE'+region+'_vx_vy', zlog=True, treeDATA=treeDATA_EG2016, inputdir=opts.input, xlabel='', outtag='2016', LLlabel='EE', extralabel=region+' region', outdir=www)
-    #makeBackgroundPlot2D(lumi=lumi2017, hname_bkg='hEE'+region+'_vx_vy', zlog=True, treeDATA=treeDATA_EG2017, inputdir=opts.input, xlabel='', outtag='2017', LLlabel='EE', extralabel=region+' region', outdir=www)
-    #makeBackgroundPlot2D(lumi=lumi2018, hname_bkg='hEE'+region+'_vx_vy', zlog=True, treeDATA=treeDATA_EG2018, inputdir=opts.input, xlabel='', outtag='2018', LLlabel='EE', extralabel=region+' region', outdir=www)
-    #makeBackgroundPlot2D(lumi=lumi2016, hname_bkg='hEE'+region+'_phi_eta', zlog=True, treeDATA=treeDATA_EG2016, inputdir=opts.input, xlabel='', outtag='2016', LLlabel='EE', extralabel=region+' region', outdir=www) 
-    #makeBackgroundPlot2D(lumi=lumi2017, hname_bkg='hEE'+region+'_phi_eta', zlog=True, treeDATA=treeDATA_EG2017, inputdir=opts.input, xlabel='', outtag='2017', LLlabel='EE', extralabel=region+' region', outdir=www) 
-    #makeBackgroundPlot2D(lumi=lumi2018, hname_bkg='hEE'+region+'_phi_eta', zlog=False, treeDATA=treeDATA_EG2018, inputdir=opts.input, xlabel='', outtag='2018', LLlabel='EE', extralabel=region+' region', outdir=www) 
-    makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hEE'+region+'_vr', ylog=True, treeDATA = treeDATA_EG2016, inputdir = opts.input, xlabel = '', outtag = '2016', outdir = www, yshift = 100.0, LLlabel = 'EE')
-    makeDataMCPlot(lumi = lumi2017, hname_DATA = 'hEE'+region+'_vr', ylog=True, treeDATA = treeDATA_EG2017, inputdir = opts.input, xlabel = '', outtag = '2017', outdir = www, yshift = 100.0, LLlabel = 'EE')
-    makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEE'+region+'_vr', ylog=True, treeDATA = treeDATA_EG2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'EE')
-    makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hEE'+region+'_vr_low', ylog=True, treeDATA = treeDATA_EG2016, inputdir = opts.input, xlabel = '', outtag = '2016', outdir = www, yshift = 100.0, LLlabel = 'EE')
-    makeDataMCPlot(lumi = lumi2017, hname_DATA = 'hEE'+region+'_vr_low', ylog=True, treeDATA = treeDATA_EG2017, inputdir = opts.input, xlabel = '', outtag = '2017', outdir = www, yshift = 100.0, LLlabel = 'EE')
-    makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEE'+region+'_vr_low', ylog=True, treeDATA = treeDATA_EG2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'EE')
-    makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hEE'+region+'_vr_high', ylog=True, treeDATA = treeDATA_EG2016, inputdir = opts.input, xlabel = '', outtag = '2016', outdir = www, yshift = 100.0, LLlabel = 'EE')
-    makeDataMCPlot(lumi = lumi2017, hname_DATA = 'hEE'+region+'_vr_high', ylog=True, treeDATA = treeDATA_EG2017, inputdir = opts.input, xlabel = '', outtag = '2017', outdir = www, yshift = 100.0, LLlabel = 'EE')
-    makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEE'+region+'_vr_high', ylog=True, treeDATA = treeDATA_EG2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'EE')
+    '''region = 'OnZ'
+    makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hEE'+region+'_vr_low', ylog=True, treeDATA = treeDATA_EG2016, inputdir = opts.input, xlabel = '', outtag = '2016', outdir = www, yshift = 100.0, LLlabel = 'EE', leftlabel = region)
+    makeDataMCPlot(lumi = lumi2017, hname_DATA = 'hEE'+region+'_vr_low', ylog=True, treeDATA = treeDATA_EG2017, inputdir = opts.input, xlabel = '', outtag = '2017', outdir = www, yshift = 100.0, LLlabel = 'EE', leftlabel = region)
+    makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEE'+region+'_vr_low', ylog=True, treeDATA = treeDATA_EG2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'EE', leftlabel = region)
+    region = 'OnZ'
+    makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hEE'+region+'_vr_low', ylog=True, treeDATA = treeDATA_EG2016, inputdir = opts.input, xlabel = '', outtag = '2016', outdir = www, yshift = 100.0, LLlabel = 'EE', leftlabel = region)
+    makeDataMCPlot(lumi = lumi2017, hname_DATA = 'hEE'+region+'_vr_low', ylog=True, treeDATA = treeDATA_EG2017, inputdir = opts.input, xlabel = '', outtag = '2017', outdir = www, yshift = 100.0, LLlabel = 'EE', leftlabel = region)
+    makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEE'+region+'_vr_low', ylog=True, treeDATA = treeDATA_EG2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'EE', leftlabel = region)'''
+    region = 'OnZ'
+    makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hEE'+region+'_vr_low', ylog=True, treeDATA = treeDATA_EG2016, inputdir = opts.input, xlabel = '', outtag = '2016', outdir = www, yshift = 100.0, LLlabel = 'EE', leftlabel = region)
+    makeDataMCPlot(lumi = lumi2017, hname_DATA = 'hEE'+region+'_vr_low', ylog=True, treeDATA = treeDATA_EG2017, inputdir = opts.input, xlabel = '', outtag = '2017', outdir = www, yshift = 100.0, LLlabel = 'EE', leftlabel = region)
+    makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEE'+region+'_vr_low', ylog=True, treeDATA = treeDATA_EG2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'EE', leftlabel = region)
 
     #### -> Muon plots
-    #makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hMM'+region+'_vx_vy', zlog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'MM', extralabel = region+' region', outdir = www) 
-    #makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hMM'+region+'_vx_vy', zlog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = region+' region', outdir = www)
-    #makeBackgroundPlot2D(lumi = lumi2016, hname_bkg = 'hMM'+region+'_phi_eta', zlog = True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, xlabel = '', outtag = '2016', LLlabel = 'MM', extralabel = region+' region', outdir = www)
-    #makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hMM'+region+'_phi_eta', zlog = True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = region+' region', outdir = www)
-    makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hMM'+region+'_vr', ylog=True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, xlabel = '', outtag = '2016', outdir = www, yshift = 100.0, LLlabel = 'MM')
-    makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hMM'+region+'_vr', ylog=True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'MM')
-    makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hMM'+region+'_vr_low', ylog=True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, xlabel = '', outtag = '2016', outdir = www, yshift = 100.0, LLlabel = 'MM')
-    makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hMM'+region+'_vr_low', ylog=True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'MM')
-    makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hMM'+region+'_vr_high', ylog=True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, xlabel = '', outtag = '2016', outdir = www, yshift = 100.0, LLlabel = 'MM')
-    makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hMM'+region+'_vr_high', ylog=True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'MM')
-
-    '''
-    www = '/eos/user/r/rlopezru/Galapago_Plots/2Dvxvy_1/MC'
-    region = 'BCR'
-    #### -> Electron plots
-    makeBackgroundPlot2D(lumi = lumi2017, hname_bkg = 'hEE'+region+'_vx_vy', zlog = True, treeDATA = treeMC_2017, inputdir = opts.input, xlabel = '', outtag = '2017', LLlabel = 'EE', extralabel = region+' region', outdir = www) 
-    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hEE'+region+'_vx_vy', zlog = True, treeDATA = treeMC_2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = region+' region', outdir = www) 
-    makeBackgroundPlot2D(lumi = lumi2017, hname_bkg = 'hEE'+region+'_phi_eta', zlog = False, treeDATA = treeMC_2017, inputdir = opts.input, xlabel = '', outtag = '2017', LLlabel = 'EE', extralabel = region+' region', outdir = www) 
-    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hEE'+region+'_phi_eta', zlog = False, treeDATA = treeMC_2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = region+' region', outdir = www) 
-    makeDataMCPlot(lumi = lumi2017, hname_DATA = 'hEE'+region+'_vr', ylog=True, treeDATA = treeMC_2017, inputdir = opts.input, xlabel = '', outtag = '2017', outdir = www, yshift = 100.0, LLlabel = 'EE')
-    makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEE'+region+'_vr', ylog=True, treeDATA = treeMC_2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'EE')
-    region = 'SR'
-    #### -> Electron plots
-    makeBackgroundPlot2D(lumi = lumi2017, hname_bkg = 'hEE'+region+'_vx_vy', zlog = True, treeDATA = treeMC_2017, inputdir = opts.input, xlabel = '', outtag = '2017', LLlabel = 'EE', extralabel = region+' region', outdir = www) 
-    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hEE'+region+'_vx_vy', zlog = True, treeDATA = treeMC_2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = region+' region', outdir = www) 
-    makeBackgroundPlot2D(lumi = lumi2017, hname_bkg = 'hEE'+region+'_phi_eta', zlog = False, treeDATA = treeMC_2017, inputdir = opts.input, xlabel = '', outtag = '2017', LLlabel = 'EE', extralabel = region+' region', outdir = www) 
-    makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hEE'+region+'_phi_eta', zlog = False, treeDATA = treeMC_2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'EE', extralabel = region+' region', outdir = www) 
-    makeDataMCPlot(lumi = lumi2017, hname_DATA = 'hEE'+region+'_vr', ylog=True, treeDATA = treeMC_2017, inputdir = opts.input, xlabel = '', outtag = '2017', outdir = www, yshift = 100.0, LLlabel = 'EE')
-    makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hEE'+region+'_vr', ylog=True, treeDATA = treeMC_2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'EE')
-
-    #### -> Muon plots
-    #makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hMM'+region+'_vx_vy', zlog = True, treeDATA = treeMC_2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = region+' region', outdir = www)
-    #makeBackgroundPlot2D(lumi = lumi2018, hname_bkg = 'hMM'+region+'_phi_eta', zlog = True, treeDATA = treeMC_2018, inputdir = opts.input, xlabel = '', outtag = '2018', LLlabel = 'MM', extralabel = region+' region', outdir = www)
-    #makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hMM'+region+'_vr', ylog=True, treeDATA = treeMC_2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'MM')
-    '''
+    '''region = 'OnZ'
+    makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hMM'+region+'_vr_low', ylog=True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, xlabel = '', outtag = '2016', outdir = www, yshift = 100.0, LLlabel = 'MM', leftlabel = region)
+    makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hMM'+region+'_vr_low', ylog=True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'MM', leftlabel = region)
+    region = 'OnZ'
+    makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hMM'+region+'_vr_low', ylog=True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, xlabel = '', outtag = '2016', outdir = www, yshift = 100.0, LLlabel = 'MM', leftlabel = region)
+    makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hMM'+region+'_vr_low', ylog=True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'MM', leftlabel = region)'''
+    region = 'OnZ'
+    makeDataMCPlot(lumi = lumi2016, hname_DATA = 'hMM'+region+'_vr_low', ylog=True, treeDATA = treeDATA_Mu2016, inputdir = opts.input, xlabel = '', outtag = '2016', outdir = www, yshift = 100.0, LLlabel = 'MM', leftlabel = region)
+    makeDataMCPlot(lumi = lumi2018, hname_DATA = 'hMM'+region+'_vr_low', ylog=True, treeDATA = treeDATA_Mu2018, inputdir = opts.input, xlabel = '', outtag = '2018', outdir = www, yshift = 100.0, LLlabel = 'MM', leftlabel = region)
