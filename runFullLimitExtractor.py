@@ -14,7 +14,7 @@
 import ROOT as r
 from   ROOT import gROOT, TCanvas, TFile, TGraphErrors, SetOwnership
 import math, sys, optparse, array, copy, os
-import gc, inspect
+import gc, inspect, __main__
 import numpy as np
 
 import include.Sample as Sample
@@ -41,11 +41,24 @@ class bcolors:
 
 WORKPATH = os.path.abspath('./') + '/'
 
+
+GALAPAGOPATH = ''
+for d in WORKPATH.split('/'):
+    GALAPAGOPATH += d
+    GALAPAGOPATH += '/'
+    if d == 'Galapago-Framework': break
+
+GALAPAGOPATH = ''
+for _p,path in enumerate(os.path.abspath(__main__.__file__).split('/')):
+       if _p == len(os.path.abspath(__main__.__file__).split('/')) - 1: break
+       GALAPAGOPATH += path + '/'
+
+
 ##################################### FUNCTION DEFINITION ########################################
 
 def createDatacards(datacards, Systematics, Backgrounds, Signals, flavor, year, exclude = []):
 
-    treeBKG = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds, 'DATA'), name = 'DATA', isdata = 1 )
+    treeBKG = Sample.Tree( fileName = helper.selectSamples(GALAPAGOPATH + filename, Backgrounds, 'DATA'), name = 'DATA', isdata = 1 )
     datacard_list = []
 
     for datacard_key in datacards.keys():
@@ -68,15 +81,23 @@ def createDatacards(datacards, Systematics, Backgrounds, Signals, flavor, year, 
 
             channels[channel_name] = DatacardManager.Channel(channel_name, xmin, xmax)
 
-            ## Get histogram
-            _histo = treeBKG.getLoopTH1F(directory, histogram)
-            print(directory, histogram)
-            c1 = r.TCanvas("", "", 500, 500)
-            c1.SetLogy(1)
-            _histo.Draw('HIST')
-            c1.Print('Pruebafondochannel.png')
+            ## Get histogram for background
+            _histo = treeBKG.getLoopTH1F(GALAPAGOPATH + directory, histogram)
+            #print(directory, histogram)
+            #c1 = r.TCanvas("", "", 500, 500)
+            #c1.SetLogy(1)
+            #_histo.Draw('HIST')
+            #c1.Print('Pruebafondochannel.png')
             channels[channel_name].addBackground('bkg', _histo)
-            print(channels[channel_name].backgrounds[0].rate)
+            #print(channels[channel_name].backgrounds[0].rate)
+
+            ## Get histogram for data
+            xmin_data = datacard[channel_name]['bkg']['limits'][0] # minimum value
+            xmax_data = datacard[channel_name]['bkg']['limits'][1] # minimum value
+            directory_data = datacard[channel_name]['bkg']['dir']
+            histogram_data = datacard[channel_name]['sig']['histogram']
+            _histo_data = treeBKG.getLoopTH1F(GALAPAGOPATH + directory, histogram_data)
+            channels[channel_name].addData( _histo_data)
          
         for sample in Signals:
 
@@ -86,7 +107,7 @@ def createDatacards(datacards, Systematics, Backgrounds, Signals, flavor, year, 
             else:
                 samplelist = [sample]
 
-            treeSI = Sample.Tree(fileName = helper.selectSamples(WORKPATH + 'dat/CombSignal_'+year+'UL_Fall22.dat', samplelist, 'SI'), name = 'SI', isdata = 0)
+            treeSI = Sample.Tree(fileName = helper.selectSamples(GALAPAGOPATH + 'dat/CombSignal_'+year+'UL_Spring23.dat', samplelist, 'SI'), name = 'SI', isdata = 0)
 
             sample_split = sample.split('_')
             mH = sample_split[1]
@@ -103,7 +124,7 @@ def createDatacards(datacards, Systematics, Backgrounds, Signals, flavor, year, 
                     continue
                 histogram = datacard[channel_name]['sig']['histogram']
                 directory = datacard[channel_name]['sig']['dir']
-                _histo = treeSI.getLoopTH1F(directory, histogram)
+                _histo = treeSI.getLoopTH1F(GALAPAGOPATH + directory, histogram)
                 channels[channel_name].setSignal('sig', _histo)
                 output_datacard.addChannel(channels[channel_name])
             
@@ -113,7 +134,7 @@ def createDatacards(datacards, Systematics, Backgrounds, Signals, flavor, year, 
     return datacard_list
 
 
-def executeCombine(_d, year):
+def executeCombine(_d, year, unblind = True):
 
     name = _d.replace('Datacard__', '')
     name = name.replace('.txt', '')
@@ -121,7 +142,10 @@ def executeCombine(_d, year):
     ctau = (_d.split('__ctau')[1]).split('mm')[0]
     
     ### Move to the working dir:
-    command = 'combine -M AsymptoticLimits -n {0} -m {1} --run blind {2}'.format(name, ctau, _d)
+    if not unblind:
+        command = 'combine -M AsymptoticLimits -n {0} -m {1} --run blind {2}'.format(name, ctau, _d)
+    else:
+        command = 'combine -M AsymptoticLimits -n {0} -m {1} {2}'.format(name, ctau, _d)
     os.system(command)
     
 
@@ -131,29 +155,33 @@ if __name__ == "__main__":
 
 
     parser = optparse.OptionParser(usage='usage: %prog [opts] FilenameWithSamples', version='%prog 1.0')
-    parser.add_option('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_UltraLegacy.dat', help='dat file')
+    parser.add_option('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_UltraLegacy_Spring23.dat', help='dat file')
     parser.add_option('-t', '--t', action='store', type=str, dest='tag', default='', help='tag')
     parser.add_option('-e', '--electronRecipe', action='store', type=str, dest='electronRecipe', default='', help='the input dir')
     parser.add_option('-m', '--muonRecipe',   action='store', type=str, dest='muonRecipe', default='', help='the input dir')
-    parser.add_option('-s', '--Esystematics', action='store', type=str, dest='electron_systematics', default='recipes-datacards/recipe_Systematics_UltraLegacy_Electron.txt', help='file with systematics table')
-    parser.add_option('-S', '--Msystematics', action='store', type=str, dest='muon_systematics', default='recipes-datacards/recipe_Systematics_UltraLegacy_Muon.txt', help='file with systematics table')
+    parser.add_option('-s', '--Esystematics', action='store', type=str, dest='electron_systematics', default='recipes-datacards/recipe_Systematics_UltraLegacy_Electron_Spring23.txt', help='file with systematics table')
+    parser.add_option('-S', '--Msystematics', action='store', type=str, dest='muon_systematics', default='recipes-datacards/recipe_Systematics_UltraLegacy_Muon_Spring23.txt', help='file with systematics table')
     parser.add_option('-T', '--theory', action='store', type=str, dest='theory', default='', help='theory')
 
     (opts, args) = parser.parse_args()
 
     ############# Set the TDR plot style
-    gROOT.ProcessLine('.L ' + WORKPATH + 'include/tdrstyle.C')
+    gROOT.ProcessLine('.L ' + GALAPAGOPATH + 'include/tdrstyle.C')
     gROOT.SetBatch(1)
+    print('.L ' + GALAPAGOPATH + 'include/tdrstyle.C')
     r.setTDRStyle()
 
     ###########################################
     ########## Output Directory
     #####
     global _outdir 
-    _outdir = WORKPATH + 'LimitsResults'
+    _outdir = GALAPAGOPATH + 'LimitsResults'
     if opts.tag != '': _outdir = _outdir + '_' + opts.tag
     if _outdir[-1] != '/': _outdir = _outdir + '/'
 
+    #### Correct for absolute paths
+    muon_systematics = GALAPAGOPATH + opts.muon_systematics
+    electron_systematics = GALAPAGOPATH + opts.electron_systematics
 
     ###########################################
     ########## Tree initialization
@@ -161,20 +189,18 @@ if __name__ == "__main__":
 
     ############# Signal definition
     Masses = []
-    """
     Masses.append('HSS_125_50')
     Masses.append('HSS_300_50')
+    Masses.append('HSS_400_150')
     Masses.append('HSS_500_50')
     Masses.append('HSS_500_150')
-    """
     Masses.append('HSS_600_50')
     Masses.append('HSS_600_150')
-    """
     Masses.append('HSS_600_250')
     Masses.append('HSS_800_50')
     Masses.append('HSS_800_250')
     Masses.append('HSS_800_350')
-    """
+    Masses.append('HSS_1000_150')
     Masses.append('HSS_1000_250')
     Masses.append('HSS_1000_350')
     Masses.append('HSS_1000_450')
@@ -272,12 +298,35 @@ if __name__ == "__main__":
     electron_datacard_names_2018 = []
 
     if doMuons:
-        muon_datacard_names_2016 = createDatacards(datacards = muon_datacards, Systematics = opts.muon_systematics, Backgrounds = DoubleMuon2016, Signals = Signals2016, flavor = 'Muon', year = '2016')
-        muon_datacard_names_2018 = createDatacards(datacards = muon_datacards, Systematics = opts.muon_systematics, Backgrounds = DoubleMuon2018, Signals = Signals2018, flavor = 'Muon', year = '2018')
+        muon_datacard_names_2016_pre = createDatacards(datacards = muon_datacards, Systematics = muon_systematics, Backgrounds = DoubleMuon2016, Signals = Signals2016, flavor = 'Muon', year = '2016')
+        muon_datacard_names_2018_pre = createDatacards(datacards = muon_datacards, Systematics = muon_systematics, Backgrounds = DoubleMuon2018, Signals = Signals2018, flavor = 'Muon', year = '2018')
+        ## Stat uncertainties as nuisances are added a posteriori:
+        for datacard_name in muon_datacard_names_2016_pre:
+            datacard_name_updated = datacard_name.replace('.txt', '_updated.txt')
+            os.system('python updateDatacard.py -i {0} -o {1}'.format(_outdir + datacard_name, _outdir + datacard_name_updated))
+            muon_datacard_names_2016.append(datacard_name_updated)
+        for datacard_name in muon_datacard_names_2018_pre:
+            datacard_name_updated = datacard_name.replace('.txt', '_updated.txt')
+            os.system('python updateDatacard.py -i {0} -o {1}'.format(_outdir + datacard_name, _outdir + datacard_name_updated))
+            muon_datacard_names_2018.append(datacard_name_updated)
+
     if doElectrons:
-        electron_datacard_names_2016 = createDatacards(datacards = electron_datacards, Systematics = opts.electron_systematics, Backgrounds = DoubleEG2016, Signals = Signals2016, flavor = 'Electron', year = '2016')
-        electron_datacard_names_2017 = createDatacards(datacards = electron_datacards, Systematics = opts.electron_systematics, Backgrounds = DoubleEG2017, Signals = Signals2017, flavor = 'Electron', year = '2017', exclude = ['nEE_IaA', 'nEE_IaB', 'nEE_IaC'])
-        electron_datacard_names_2018 = createDatacards(datacards = electron_datacards, Systematics = opts.electron_systematics, Backgrounds = EGamma2018, Signals = Signals2018, flavor = 'Electron', year = '2018')
+        electron_datacard_names_2016_pre = createDatacards(datacards = electron_datacards, Systematics = electron_systematics, Backgrounds = DoubleEG2016, Signals = Signals2016, flavor = 'Electron', year = '2016')
+        electron_datacard_names_2017_pre = createDatacards(datacards = electron_datacards, Systematics = electron_systematics, Backgrounds = DoubleEG2017, Signals = Signals2017, flavor = 'Electron', year = '2017', exclude = ['nEE_IaA', 'nEE_IaB', 'nEE_IaC'])
+        electron_datacard_names_2018_pre = createDatacards(datacards = electron_datacards, Systematics = electron_systematics, Backgrounds = EGamma2018, Signals = Signals2018, flavor = 'Electron', year = '2018')
+        ## Stat uncertainties as nuisances are added a posteriori:
+        for datacard_name in electron_datacard_names_2016_pre:
+            datacard_name_updated = datacard_name.replace('.txt', '_updated.txt')
+            os.system('python updateDatacard.py -i {0} -o {1}'.format(_outdir + datacard_name, _outdir + datacard_name_updated))
+            electron_datacard_names_2016.append(datacard_name_updated)
+        for datacard_name in electron_datacard_names_2017_pre:
+            datacard_name_updated = datacard_name.replace('.txt', '_updated.txt')
+            os.system('python updateDatacard.py -i {0} -o {1}'.format(_outdir + datacard_name, _outdir + datacard_name_updated))
+            electron_datacard_names_2017.append(datacard_name_updated)
+        for datacard_name in electron_datacard_names_2018_pre:
+            datacard_name_updated = datacard_name.replace('.txt', '_updated.txt')
+            os.system('python updateDatacard.py -i {0} -o {1}'.format(_outdir + datacard_name, _outdir + datacard_name_updated))
+            electron_datacard_names_2018.append(datacard_name_updated)
 
     os.chdir(_outdir) 
 
