@@ -149,7 +149,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(usage='usage: %prog [args] FilenameWithSamples', version='%prog 1.0')
     parser.add_argument('-o', '--out', action='store', type=str, dest='out', default='', help='Output tag')
-    parser.add_argument('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_UltraLegacy.dat', help='dat file')
+    parser.add_argument('-d', '--dat', action='store', type=str, dest='dat', default='dat/Samples_cern_UltraLegacy_Spring23.dat', help='dat file')
     parser.add_argument('-m', '--mode', action='store', type=str, dest='mode', default='plot', help='Select mode to process config file')
     parser.add_argument('-c', '--config', action='store', type=str, dest='config', help='Select config file')
     parser.add_argument('-q', '--condor', action='store_true', dest='condor', help='Select if you want to send the job a condor queue')
@@ -284,16 +284,18 @@ if __name__ == "__main__":
     lumi_preVFP = 5.79 + 2.57 + 4.25 + 4.01 + 3.10
     lumi_postVFP = 7.54 + 8.61
     lumi_2017 = 41.48
-    lumi_2018 = 59.83
+    lumi_2018 = 59.83 # Note: Use 54.53 for electrons unless scaled option is activated
 
     filename = args.dat
 
 
     ############# Tree creation
     if doDATA:
-        treeDATA2016 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016 + DoubleEG2016, 'DATA'), name = 'DATA', isdata = 1 )
-        treeDATA2017 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2017, 'DATA'), name = 'DATA', isdata = 1 )
-        treeDATA2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2018 + DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1 )
+        treeDATA2016_EE = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2016, 'DATA'), name = 'DATA', isdata = 1 )
+        treeDATA2016_MM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2016, 'DATA'), name = 'DATA', isdata = 1 )
+        treeDATA2017_EE = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2017, 'DATA'), name = 'DATA', isdata = 1 )
+        treeDATA2018_EE = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleEG2018, 'DATA'), name = 'DATA', isdata = 1 )
+        treeDATA2018_MM = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, DoubleMuon2018, 'DATA'), name = 'DATA', isdata = 1 )
 
     if doMC:
         treeMCpreVFP = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds_preVFP, 'MC'), name = 'MC', isdata = 0 )
@@ -302,10 +304,10 @@ if __name__ == "__main__":
         treeMC2018 = Sample.Tree( fileName = helper.selectSamples(WORKPATH + filename, Backgrounds_2018, 'MC'), name = 'MC', isdata = 0 )
 
     if doSignals:
-        treeSI_2016APV   = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/CombSignal_2016UL_Fall22.dat', Signals_2016preVFP, 'SI'), name = 'SI', isdata = 0 )
-        treeSI_2016      = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/CombSignal_2016UL_Fall22.dat', Signals_2016postVFP, 'SI'), name = 'SI', isdata = 0 )
-        treeSI_2017      = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/CombSignal_2017UL_Fall22.dat', Signals_2017, 'SI'), name = 'SI', isdata = 0 )
-        treeSI_2018      = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/CombSignal_2018UL_Fall22.dat', Signals_2018, 'SI'), name = 'SI', isdata = 0 )
+        treeSI_2016APV   = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/CombSignal_2016UL_Spring23.dat', Signals_2016preVFP, 'SI'), name = 'SI', isdata = 0 )
+        treeSI_2016      = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/CombSignal_2016UL_Spring23.dat', Signals_2016postVFP, 'SI'), name = 'SI', isdata = 0 )
+        treeSI_2017      = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/CombSignal_2017UL_Spring23.dat', Signals_2017, 'SI'), name = 'SI', isdata = 0 )
+        treeSI_2018      = Sample.Tree( fileName = helper.selectSamples(WORKPATH + 'dat/CombSignal_2018UL_Spring23.dat', Signals_2018, 'SI'), name = 'SI', isdata = 0 )
 
     start_time = time.time()
 
@@ -325,9 +327,11 @@ if __name__ == "__main__":
             treeMC2018.launchLoop(lumi_2018, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2018', raw = args.raw)
         if doDATA:
             print('Launching Data...')
-            treeDATA2016.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2016')
-            treeDATA2017.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2017')
-            treeDATA2018.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2018')
+            treeDATA2016_EE.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2016')
+            treeDATA2016_MM.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2016')
+            treeDATA2017_EE.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2017')
+            treeDATA2018_EE.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2018')
+            treeDATA2018_MM.launchLoop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, queue = 'workday', year = '2018')
         if doSignals:
             print('Launching signal simulation...')
             treeSI_2016APV.launchLoop(lumi_preVFP, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2016APV', queue = 'microcentury', raw = args.raw)
@@ -343,9 +347,11 @@ if __name__ == "__main__":
             treeMC2018.Loop(lumi_2018, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2018', raw = args.raw)
         if doDATA:
             print('Launching Data...')
-            treeDATA2016.Loop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2016')
-            treeDATA2017.Loop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2017')
-            treeDATA2018.Loop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2018')
+            treeDATA2016_EE.Loop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2016')
+            treeDATA2016_MM.Loop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2016')
+            treeDATA2017_EE.Loop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2017')
+            treeDATA2018_EE.Loop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2018')
+            treeDATA2018_MM.Loop(lumi, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2018')
         if doSignals:
             print('Launching signal simulation...')
             treeSI_2016APV.Loop(lumi_preVFP, WORKPATH + args.out + '/', mode = args.mode, config = WORKPATH + args.config, year = '2016APV', raw = args.raw)
